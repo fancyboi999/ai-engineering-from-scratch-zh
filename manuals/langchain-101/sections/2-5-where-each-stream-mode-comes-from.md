@@ -111,7 +111,7 @@ id: fig-2-5b
 kind: timeline
 title: 三种 v3 消费者循环下，文本增量的发送与接收
 claim: 先读推理的循环，在第一次发送之后 8.8 秒一次性拿到全部 60 个文本增量，其余循环则在 5 毫秒内拿到每一个。
-caption: 每一对行是一个循环，取五次里的运行 0。橄榄色刻度是模型的发送，下方的刻度是循环拿到增量的时刻。玫瑰色条带是文本等待的区间。推理发生在所展示区间之前。来源：capture/lab/internals/05-streaming/v3_38484.json 和 capture/lab/internals/05-streaming/trace.txt。
+caption: 每一对行是一个循环，取五次里的运行 0。橄榄色刻度是模型的发送，下方的刻度是循环拿到增量的时刻。玫红色条带是文本等待的区间。推理发生在所展示区间之前。来源：capture/lab/internals/05-streaming/v3_38484.json 和 capture/lab/internals/05-streaming/trace.txt。
 ```
 
 该 issue 的一个已关闭拉取请求 #38533，在 `create_agent` 里把运行配置传给了 `model_.invoke` {{code libs/langchain_v1/langchain/agents/factory.py:1509}}。这个改动没有触及这个机制。在同一个 agent 里，只读文本的循环和读原始事件的循环本来就能实时拿到每个增量，所以模型回调不需要它就能到达流。

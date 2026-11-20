@@ -84,7 +84,7 @@ const DOWN = 410;
 module.exports = figure('plate-langchain-run', {
   height: 700,
   title: '一次 invoke，两次模型调用，一次工具调用',
-  desc: `一幅等距视角的图，画的是同一个 Python 进程里的一次 create_agent 运行。上方是 LangChain 层，放着紫色终端表示的你的代码、梅紫色塔表示的聊天模型，以及绿色单元表示的工具 ${toolCall.name}。下方是 create_agent 返回的 ${graphType}，画成带 LangGraph 标志的靛蓝色外壳，里面有 model 与 tools 两个节点，以及 messages 通道，画成四张纸。你的代码用 ${human.content} 调用 invoke。第一次模型调用返回带工具调用 ${callText} 的 AIMessage。tools 节点运行 ${toolCall.name}，返回内容为 ${tool.content} 的 ToolMessage。第二次模型调用返回 ${answer.content}。图在 InMemorySaver 里放了 ${history.length} 个检查点，步从 ${steps[0]} 到 ${steps[steps.length - 1]}，最后一个没有下一个节点。右侧的 LangSmith 是一座虚线塔，只有在追踪开启时才会收到 ${posts} 个 run。在 Mac（${machine}）上用 Qwen3 4B，create_agent 每次运行在模型之外花费 ${ms(agent)}，plain openai 循环为 ${ms(plain)}。`,
+  desc: `一幅等距视角的图，画的是同一个 Python 进程里的一次 create_agent 运行。上方是 LangChain 层，放着紫色终端表示的你的代码、梅紫色塔表示的聊天模型，以及绿色单元表示的工具 ${toolCall.name}。下方是 create_agent 返回的 ${graphType}，画成带 LangGraph 标志的靛蓝色外壳，里面有 model 与 tools 两个节点，以及 messages 通道，画成四张纸。你的代码用 ${human.content} 调用 invoke。第一次模型调用返回带工具调用 ${callText} 的 AIMessage。tools 节点运行 ${toolCall.name}，返回内容为 ${tool.content} 的 ToolMessage。第二次模型调用返回 ${answer.content}。图在 InMemorySaver 里放了 ${history.length} 个检查点，步从 ${steps[0]} 到 ${steps[steps.length - 1]}，最后一个没有下一个节点。右侧的 LangSmith 是一座虚线塔，只有在追踪开启时才会收到 ${posts} 个 run。在 Mac（${machine}）上用 Qwen3 4B，create_agent 每次运行在模型之外花费 ${ms(agent)}，朴素 openai 循环为 ${ms(plain)}。`,
 }, f => {
   const U = forms.isoView(f, { ox: OX, oy: UP, angle: 'true' });
   const D = forms.isoView(f, { ox: OX, oy: DOWN, angle: 'true' });
@@ -168,7 +168,7 @@ module.exports = figure('plate-langchain-run', {
   f.leader([506, 568], D.P(236, 76, 0), { hue: 'ink-mute' });
 
   f.kicker(20, 612, `在 Mac 上实测 · ${machine}`);
-  f.text(20, 634, `模型之外：create_agent 每次运行 ${ms(agent)}，plain openai 循环 ${ms(plain)}`, { size: 12, weight: 700, hue: 'blue' });
+  f.text(20, 634, `模型之外：create_agent 每次运行 ${ms(agent)}，朴素 openai 循环 ${ms(plain)}`, { size: 12, weight: 700, hue: 'blue' });
   f.text(20, 654, `同一轮中多出 ${ms(added)}；加上 InMemorySaver 为 ${ms(saver)}`, { size: 12, weight: 700, hue: 'teal' });
   f.text(20, 674, `各 ${real.c_create_agent.n} 次运行的中位数，Qwen3 4B，双工具任务，每次运行三次模型调用`, { size: 11, serif: true, hue: 'ink-mute' });
 

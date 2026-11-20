@@ -13,7 +13,7 @@
 | `LANGGRAPH_STRICT_MSGPACK` | `false` | 取 `1`、`true` 或 `yes` 时，会拦截所有不在白名单上的 msgpack 类型 | {{code libs/checkpoint/langgraph/checkpoint/serde/_msgpack.py:12-16}} | [5.6](#s-serialization-of-state-and-what-does-not-round-trip), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
 | `LANGGRAPH_AES_KEY` | 无 | `EncryptedSerializer` 的密钥，16、24 或 32 字节。既没有它也没有 `key` 参数时，该类会抛出 `ValueError` | {{code libs/checkpoint/langgraph/checkpoint/serde/encrypted.py:54-59}} | [R.4](#s-ref-checkpointer-and-store-api) |
 
-`create_agent` 图的递归上限是 9999，由它自己的配置设定，所以这个变量改不了它。[第 6.8 节](#s-error-handlers-node-timeouts-and-the-recursion-limit)测量了这个变量：设为 25 时，普通循环在 25 步停止。它不影响 agent 的 9999，这一点来自代码，而不是来自某次运行。
+`create_agent` 图的递归上限是 9999，由它自己的配置设定，所以这个变量改不了它。[第 6.8 节](#s-error-handlers-node-timeouts-and-the-recursion-limit)测量了这个变量：设为 25 时，朴素循环在 25 步停止。它不影响 agent 的 9999，这一点来自代码，而不是来自某次运行。
 
 ## LangChain {#s-ref-environment-variables-langchain}
 

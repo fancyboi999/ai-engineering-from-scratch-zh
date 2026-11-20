@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="fig-5-2-title fig-5-2-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-5-2-title">SQLite 文件中同一线程的三个回合</title>
-  <desc id="fig-5-2-desc">SqliteSaver 的 checkpoints 表中线程 sqlite-thread 的 11 行，排在一条从 -1 到 9 的步轴上。第 1 回合“What is 2 + 3?”在第 -1 步有一个输入检查点，在第 0、1、2、3 步有循环检查点，结束后状态里有 4 条消息。第 2 回合“What did I ask you?”在第 4 步有一个输入检查点，在第 5、6 步有循环检查点，结束后状态里有 6 条消息。第 3 回合“Remind me what my first question was.”在第 7 步有一个输入检查点，在第 8、9 步有循环检查点，结束后状态里有 8 条消息。第 2 回合与第 3 回合之间，连接被关闭，一个新进程打开同一个文件。文件里有 11 行检查点和 13 行待处理写入。</desc>
+  <title id="fig-5-2-title">SQLite 文件中同一线程的三轮</title>
+  <desc id="fig-5-2-desc">SqliteSaver 的 checkpoints 表中线程 sqlite-thread 的 11 行，排在一条从 -1 到 9 的步轴上。第 1 轮“What is 2 + 3?”在第 -1 步有一个输入检查点，在第 0、1、2、3 步有循环检查点，结束后状态里有 4 条消息。第 2 轮“What did I ask you?”在第 4 步有一个输入检查点，在第 5、6 步有循环检查点，结束后状态里有 6 条消息。第 3 轮“Remind me what my first question was.”在第 7 步有一个输入检查点，在第 8、9 步有循环检查点，结束后状态里有 8 条消息。第 2 轮与第 3 轮之间，连接被关闭，一个新进程打开同一个文件。文件里有 11 行检查点和 13 行待处理写入。</desc>
   <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">线程 SQLITE-THREAD，每个检查点一行</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <line x1="61" y1="62" x2="267" y2="62" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="61" y1="58" x2="61" y2="66" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="267" y1="58" x2="267" y2="66" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
-  <text x="67" y="38" font-size="11" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">第 1 回合</text>
+  <text x="67" y="38" font-size="11" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">第 1 轮</text>
   <text x="67" y="52" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">What is 2 + 3?</text>
   <rect x="61" y="82" width="38" height="34" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.3"/>
   <text x="80" y="104" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">input</text>
@@ -30,7 +30,7 @@
   <line x1="271" y1="62" x2="393" y2="62" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="271" y1="58" x2="271" y2="66" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="393" y1="58" x2="393" y2="66" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
-  <text x="277" y="38" font-size="11" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">第 2 回合</text>
+  <text x="277" y="38" font-size="11" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">第 2 轮</text>
   <text x="277" y="52" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">What did I ask you?</text>
   <rect x="271" y="82" width="38" height="34" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.3"/>
   <text x="290" y="104" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">input</text>
@@ -48,7 +48,7 @@
   <line x1="397" y1="62" x2="519" y2="62" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="397" y1="58" x2="397" y2="66" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
   <line x1="519" y1="58" x2="519" y2="66" stroke="var(--m-violet-ink, #5b4fa3)" stroke-width="1"/>
-  <text x="403" y="38" font-size="11" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">第 3 回合</text>
+  <text x="403" y="38" font-size="11" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">第 3 轮</text>
   <text x="403" y="52" font-size="11" class="m-serif" fill="var(--m-violet-ink, #5b4fa3)">Remind me what my first question was.</text>
   <rect x="397" y="82" width="38" height="34" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.3"/>
   <text x="416" y="104" font-size="11" text-anchor="middle" fill="var(--m-amber-ink, #85590c)">input</text>

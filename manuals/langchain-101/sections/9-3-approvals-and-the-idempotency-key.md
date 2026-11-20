@@ -67,7 +67,7 @@ id: fig-9-3
 kind: timeline
 title: 退款行之后被杀掉的 worker，以及重启
 claim: 杀掉之后审批又变成待处理，而工具处的键把第二次批准变成了一次重放，只有一条退款行。
-caption: 上面的面板是一次试验，单位是第一次批准之后的秒数。下面的面板是所有试验。青绿色方块表示有一条 8900 美分的退款行，琥珀色边框表示审批又待处理了。来源：capture/lab/prodapp-mac/summary/crash-mac.json。
+caption: 上面的面板是一次试验，单位是第一次批准之后的秒数。下面的面板是所有试验。青色方块表示有一条 8900 美分的退款行，琥珀色边框表示审批又待处理了。来源：capture/lab/prodapp-mac/summary/crash-mac.json。
 ```
 
 在下面几小节的金额检查加进去之后，我们用 Qwen3 4B 把崩溃又运行了一遍，三次试验。结果没有变。3 次试验中有 3 次，重启后审批待处理，第二次批准重放了这个键，只留下一条 8900 美分的行。用 Qwen3 14B 的同样试验没有运行。另一个任务占着内存时，Ollama 九分半钟都没有加载那个模型，所以我们停掉了它们。
@@ -110,7 +110,7 @@ note: 检查之后的插入和更新被截去。
 
 在同一线程里对同一订单退同样的金额，也会重放第一笔退款，即使余额允许再退一笔。我们没有测试这种情况。客户可能要求两笔相同的退款。那就把保存下来的 `tool_call_id` 加进键里。恢复会重复这个 id，新的请求不会。
 
-键之所以成立，是因为重放发送的参数相同。重启之后，`tools` 节点运行检查点保存下来的工具调用，它来自模型在中断之前写下的 AI 消息。模型不会被再次询问。如果被再次询问，它可能选另一个金额，键就会不同。[运行时部分](#s-the-checkpoint-write-path-and-durability)对任何节点都展示了同一条规则：按检查点保存的内容给副作用定键。在 Agent Chat UI 里输入消息，是通往一个从未运行的“成功”的第二条路径，见[聊天 UI 一节](#s-agent-chat-ui-in-front-of-langgraph-dev)。
+键之所以成立，是因为重放发送的参数相同。重启之后，`tools` 节点运行检查点保存下来的工具调用，它来自模型在中断之前写下的 AI 消息。模型不会被再次询问。如果被再次询问，它可能选另一个金额，键就会不同。[运行时部分](#s-the-checkpoint-write-path-and-durability)对任何节点都展示了同一条规则：按检查点保存的内容给副作用定键。在 Agent Chat UI 里输入消息，是通往一个从未运行的“成功”的第二条路径，见[Agent Chat UI 一节](#s-agent-chat-ui-in-front-of-langgraph-dev)。
 
 ## 审批人批准的是你展示给他的东西 {#s-approvals-and-the-idempotency-key-the-approver-approves-what-you-show}
 
@@ -151,7 +151,7 @@ id: fig-9-3b
 kind: comparison
 title: 工具检查金额之前与之后的 0 美分退款
 claim: 获得批准的 0 美分提案，在检查之前 6 次运行中有 6 次写入了退款行，检查之后 6 次中有 0 次。
-caption: 每个方框是评估的一次运行，它会批准模型对 ORD-e19-3 提出的任何退款。玫红色表示写入了 0 美分的行，青绿色表示没有写入。下面的文本是修复之后的审批请求。来源：capture/lab/prodapp-mac/summary/fix-mac.json。
+caption: 每个方框是评估的一次运行，它会批准模型对 ORD-e19-3 提出的任何退款。玫红色表示写入了 0 美分的行，青色表示没有写入。下面的文本是修复之后的审批请求。来源：capture/lab/prodapp-mac/summary/fix-mac.json。
 ```
 
 通过数没有变，因为失败来自模型的选择。被拒绝之后，Qwen3 14B 在 3 次运行中有 3 次提出全额 2400 美分，并请客户确认。这个回复是对的，而评估仍然失败，因为它期望立即退款。在 8900 美分的订单上，工具以 `refund exceeds the 8900 cents that can still be refunded` 拒绝了 10000 美分。客户发来下一条消息时，Qwen3 14B 读取了订单，并请求确认全额，3 次运行中有 3 次如此。

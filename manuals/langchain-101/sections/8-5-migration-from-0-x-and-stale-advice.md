@@ -113,7 +113,7 @@ notebook 或教程运行在作者锁定的版本上。`langchain>=0.3.9` 这样�
 ```takeaways
 - 迁移 0.x 代码之前，先在锁文件里固定每个包。
 - 只在用 create_agent 替换它们的过程中，才从 langchain_classic 导入旧链。
-- 把 prompt 改名为 system_prompt，并把钩子搬进中间件。
+- 把提示词改名为 system_prompt，并把钩子搬进中间件。
 - 显示警告运行，并修掉每个 LangGraphDeprecatedSinceV10 和 V11 警告。
 - 复制 notebook 的代码之前，先查它锁定的版本。
 - 升级每个次版本前，先读它的更新日志。

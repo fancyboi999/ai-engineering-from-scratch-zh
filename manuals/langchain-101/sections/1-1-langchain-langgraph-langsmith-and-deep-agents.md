@@ -79,7 +79,7 @@ checkpointer 让一次运行可以恢复，但不会让一次工具调用只发�
 
 **我们测得**这一点，在 Mac 上用一个三节点的图，其中间节点往文件里追加一行。我们在五个时间点设置终止，覆盖三种持久性模式和两种 saver，每个单元格五次。150 次试验里有 10 次，终止点根本没有到来。150 次里有 80 次，这一行被写了两遍。节点里带幂等键时，150 次里被写两遍的是 0 次。
 
-**我们测得**同样的五个点，在 x86 服务器客户机上，对一个用 Qwen3 4B 的 `create_agent` agent，其工具往 PostgreSQL 插入一条扣款记录。没有键时，560 次被终止的试验里有 331 次对订单重复扣款。用线程和订单 id 作键时，140 次里是 0 次。[第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)展示每个单元格，[第 2.3 节](#s-the-checkpoint-write-path-and-durability)展示代码路径。
+**我们测得**同样的五个点，在 x86 服务器客户机上，对一个用 Qwen3 4B 的 `create_agent` agent，其工具往 PostgreSQL 插入一条扣款记录。没有键时，560 次被杀的试验里有 331 次对订单重复扣款。用线程和订单 id 作键时，140 次里是 0 次。[第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)展示每个单元格，[第 2.3 节](#s-the-checkpoint-write-path-and-durability)展示代码路径。
 
 ### 重试 {#s-langchain-langgraph-langsmith-and-deep-agents-retries}
 
@@ -119,7 +119,7 @@ ValueError: License verification failed. Please ensure proper configuration:
 | 重放会重新运行节点，而不是从缓存读取 {{docs oss/python/langgraph/use-time-travel}} | 在工具包里得到确认：从工具之前的检查点重放，把工具又运行了一次。 | [6.6](#s-time-travel-replay-update-state-and-forks) |
 | 结构化输出来自主循环，不需要额外的模型调用 {{docs oss/python/releases/langchain-v1}} | 在 Claude 上成立，在 agent 带工具时的 Ollama 上不成立。在 Qwen3 4B 加查询工具上，`ToolStrategy` 在 39 个任务里有 39 个没有返回对象，`ProviderStrategy` 在 10 次里有 10 次抛出异常。多加一次提取调用，在两家提供方上都管用。Mac 和 Anthropic API。 | [4.3](#s-structured-output-which-strategy-on-which-provider) |
 | 队列 worker 同时最多运行 `N_JOBS_PER_WORKER` 个运行，默认是 10 {{docs langsmith/agent-server-scale}} | 在 `langgraph dev` 下不是，它的默认是 1。20 个各 2 秒的后台运行，一次跑 1 个用了 41.0 秒，设置为 10 时用了 5.1 秒。用 CPU 上的 Qwen3 4B，10 个后台 agent 运行，1 个作业时用了 47.1 秒，10 个作业时用了 44.4 秒，因为模型一次只服务一个调用。x86 服务器客户机，各一次运行。 | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) |
-| Agent Server 的 Postgres 任务队列让每个任务恰好运行一次 {{docs langsmith/deploy-standalone-server}} | 留到下一版。完整服务器需要许可证密钥。我们只对库本身做的运行没有显示出恰好一次的副作用：150 次试验里有 80 次写了两遍，其中 10 次根本没有被终止。 | [8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) |
+| Agent Server 的 Postgres 任务队列让每个任务恰好运行一次 {{docs langsmith/deploy-standalone-server}} | 留到下一版。完整服务器需要许可证密钥。我们只对库本身做的运行没有显示出恰好一次的副作用：150 次试验里有 80 次写了两遍，其中 10 次根本没有被杀。 | [8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) |
 | 两种部署类型下，Agent Server 都能从短暂的 Redis 或 Postgres 故障中恢复 {{docs langsmith/cloud-platform-features}} | 留到下一版，原因相同。 | [8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) |
 | 在被中断的 worker 上的运行，会从它的最后一个检查点恢复 {{docs langsmith/agent-server}} | 留到下一版，原因相同。 | [8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) |
 | Redis 不保存用户数据或运行数据 {{docs langsmith/agent-server}} | 留到下一版，原因相同。 | [8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) |

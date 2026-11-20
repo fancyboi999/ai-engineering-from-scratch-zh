@@ -8,7 +8,7 @@
 
 ## 字符串或 SystemMessage {#s-the-system-prompt-a-string-or-a-systemmessage}
 
-**系统提示词（system prompt）：** 放在 agent 每次模型请求最前面的指令。
+**系统提示词（system 提示词）：** 放在 agent 每次模型请求最前面的指令。
 
 agent 页说，这个参数接受字符串或 `SystemMessage`，而在运行时构建的提示词需要中间件 {{docs oss/python/langchain/agents}}。`create_agent` 在构建图时，把字符串转成一次 `SystemMessage` {{code libs/langchain_v1/langchain/agents/factory.py}}。
 
@@ -38,7 +38,7 @@ id: fig-3-5
 kind: flow
 title: 模型节点如何构建每一次请求
 claim: 每次模型请求都是 agent 的系统提示词加上状态里的消息，只有模型的回复会回到状态里。
-caption: 每一行从左往右读，每次模型调用一行。紫色虚线是系统提示词，最先发送，从不保存。青色线是已保存的状态。梅红色箭头是模型调用，青色箭头只追加它的回复。来自 capture/out/06-agent-run.txt 和 capture/out/18-mw-selection-emulation.txt。
+caption: 每一行从左往右读，每次模型调用一行。紫色虚线是系统提示词，最先发送，从不保存。青色线是已保存的状态。梅紫色箭头是模型调用，青色箭头只追加它的回复。来自 capture/out/06-agent-run.txt 和 capture/out/18-mw-selection-emulation.txt。
 ```
 
 - 检查点里没有提示词。由新代码恢复的线程，从下一次模型调用起就使用新提示词。

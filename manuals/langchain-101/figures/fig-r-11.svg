@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="fig-r-11-title fig-r-11-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-r-11-title">三次贪心运行互相一致，三次采样运行则不一致</title>
-  <desc id="fig-r-11-desc">Mac 上 Qwen3 4B 在 30 个子集任务上的网格。plain 循环与 deep agent 各在 temperature 0、seed 42 下运行三次，每次运行在每个任务上结果都相同，token 与工具调用也相同：分别通过 30 个中的 23 个和 13 个。temperature 0.7、seed 为 1、2、3 的 plain 循环分别通过 30 个中的 24、23、23 个，有 5 个任务在不同 seed 间结果改变：chain07, chain13, chain16, sql16, files07。</desc>
+  <desc id="fig-r-11-desc">Mac 上 Qwen3 4B 在 30 个子集任务上的网格。朴素循环与 deep agent 各在 temperature 0、seed 42 下运行三次，每次运行在每个任务上结果都相同，token 与工具调用也相同：分别通过 30 个中的 23 个和 13 个。temperature 0.7、seed 为 1、2、3 的 朴素循环分别通过 30 个中的 24、23、23 个，有 5 个任务在不同 seed 间结果改变：chain07, chain13, chain16, sql16, files07。</desc>
   <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">QWEN3 4B，30 个子集任务</text>
   <text x="620" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过</text>
   <text x="198" y="44" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">chain</text>

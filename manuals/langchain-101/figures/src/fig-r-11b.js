@@ -18,8 +18,8 @@ const row = (label, c, hue) => ({ label, k: c.pass, n: c.n, hue });
 const profile = (m, name) => {
   const d = S.profiles[m];
   return [
-    { head: `${name}，99 个任务`, rows: [row('plain 循环', d.plain, 'violet'), row('deep agent', d.deep, 'blue'), row('deep，档案 B', d.profB, 'plum')] },
-    { head: `${name}，30 任务子集`, rows: [row('plain 循环', d.plain_sub, 'violet'), row('deep agent', d.deep_sub, 'blue'), row('deep，档案 A', d.profA, 'plum'), row('deep，档案 B', d.profB_sub, 'plum')] },
+    { head: `${name}，99 个任务`, rows: [row('plain 循环', d.plain, 'violet'), row('deep agent', d.deep, 'blue'), row('deep，profile B', d.profB, 'plum')] },
+    { head: `${name}，30 任务子集`, rows: [row('plain 循环', d.plain_sub, 'violet'), row('deep agent', d.deep_sub, 'blue'), row('deep，profile A', d.profA, 'plum'), row('deep，profile B', d.profB_sub, 'plum')] },
   ];
 };
 const ptc = (m, name) => {
@@ -34,7 +34,7 @@ const GROUPS = [
   ptc('qwen3:14b', 'Qwen3 14B'),
   ptc('gpt-oss:20b', 'gpt-oss 20B'),
   ptc('claude-haiku-5-5', 'Claude Haiku 5.5'),
-  { head: 'Qwen3 8B，Qwen3 14B 评分', rows: [{ label: '评分细则，此前失败的任务', k: S.rubric.recovered.length, n: S.rubric.n, hue: 'olive' }] },
+  { head: 'Qwen3 8B，Qwen3 14B 评分', rows: [{ label: '评分标准，此前失败的任务', k: S.rubric.recovered.length, n: S.rubric.n, hue: 'olive' }] },
 ];
 const AX = 250;
 const AW = 260;
@@ -51,8 +51,8 @@ const narrowest = Math.min(...widths);
 
 module.exports = figure('fig-r-11b', {
   height: Y0 + nRows * RH + GROUPS.length * (HEAD + 6) + 50,
-  title: '第二轮基准中每个单元的通过率与区间',
-  desc: `${nRows} 个单元的点与 95% Wilson 区间，来自第二轮基准，分为 ${GROUPS.length} 组：Qwen3 4B 与 Qwen3 8B 上的两项档案实验、四个模型上的 eval 工具，以及一次评分细则运行。其中 ${small} 个单元的任务数少于 30。最宽的区间是 ${Math.round(100 * widest)} 个百分点，最窄的是 ${Math.round(100 * narrowest)} 个百分点。`,
+  title: '第二个测试基准中每个单元的通过率与区间',
+  desc: `${nRows} 个单元的点与 95% Wilson 区间，来自第二个测试基准，分为 ${GROUPS.length} 组：Qwen3 4B 与 Qwen3 8B 上的两项 profile 实验、四个模型上的 eval 工具，以及一次评分标准运行。其中 ${small} 个单元的任务数少于 30。最宽的区间是 ${Math.round(100 * widest)} 个百分点，最窄的是 ${Math.round(100 * narrowest)} 个百分点。`,
 }, f => {
   f.kicker(20, 22, '单元');
   f.kicker(620, 22, '通过数/n', { anchor: 'end' });
@@ -78,5 +78,5 @@ module.exports = figure('fig-r-11b', {
   });
   f.beat(0);
   f.text(20, y + 8, '须线是 95% Wilson 区间。玫红计数表示任务数少于 30 的单元。', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, y + 24, '评分细则单元只含 plain 循环失败过的任务，所以它的基线是 25 个中的 0 个。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 24, '评分标准单元只含 朴素循环失败过的任务，所以它的基线是 25 个中的 0 个。', { size: 11, serif: true, hue: 'ink-soft' });
 });

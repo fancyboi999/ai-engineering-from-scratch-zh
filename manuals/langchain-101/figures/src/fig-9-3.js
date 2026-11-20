@@ -15,7 +15,7 @@ const count = (rows, test) => rows.filter(test).length;
 
 module.exports = figure('fig-9-3', {
   height: 400,
-  title: 'worker 在写入退款行后被杀死，然后重启',
+  title: 'worker 在写入退款行后被杀掉，然后重启',
   desc: `上图：Mac 上用 Qwen3 4B 的一次试验。approve 在 0 s 发出，退款行在 ${at('refund_row_seen').toFixed(1)} s 出现在 Postgres 中，SIGKILL 在 ${at('killed').toFixed(1)} s 到来。新进程在 ${at('state_read').toFixed(1)} s 读取线程，发现 next 为 ${JSON.stringify(one.after_restart_next)}，审批${one.approval_re_asked ? '被再次询问' : '已有答复'}。下图：${forms.map(k => `${k} 恢复值，${data[k].length} 次试验中有 ${count(data[k], t => t.refund_rows === 1 && t.refunded_cents === 8900)} 次只有一行退款，${count(data[k], t => t.approval_re_asked)} 次再次询问审批`).join('。')}。`,
 }, f => {
   const c = chart(f, { x: 150, y: 40, w: 460, h: 150, xDomain: [-1, end], yDomain: [0, 3], xTicks: Array.from({ length: Math.floor(end / 2) + 1 }, (_, i) => i * 2), yTicks: [], xLabel: '首次 approve 发出后的秒数' });

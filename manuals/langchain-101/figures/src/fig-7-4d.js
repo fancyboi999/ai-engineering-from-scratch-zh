@@ -18,7 +18,7 @@ const median = xs => {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
 const MODELS = [['claude-haiku-5-5', 'Claude Haiku 5.5'], ['claude-sonnet-5-5', 'Claude Sonnet 5.5']];
-const ROWS = [['plain', 'cost_u', 'plain，标价', 'violet'], ['plain', 'cost', 'plain，计费', 'violet'], ['deep_agent', 'cost_u', 'deep，标价', 'blue'], ['deep_agent', 'cost', 'deep，计费', 'blue']];
+const ROWS = [['plain', 'cost_u', '朴素循环，标价', 'violet'], ['plain', 'cost', '朴素循环，计费', 'violet'], ['deep_agent', 'cost_u', 'deep，标价', 'blue'], ['deep_agent', 'cost', 'deep，计费', 'blue']];
 const LO = 5e-5;
 const HI = 0.2;
 const X0 = 200;
@@ -32,8 +32,8 @@ const BLOCK = 4 * RH + 56;
 
 module.exports = figure('fig-7-4d', {
   height: Y0 + 2 * BLOCK + 40,
-  title: '每个任务的美元成本：plain 循环与 deep agent，有无提示缓存',
-  desc: `在对数刻度上用点带展示每个任务的美元成本：Claude Haiku 5.5 的 99 个任务，Claude Sonnet 5.5 的 30 个任务。标价是按基础价格计算的输入与输出 token。计费是计入 API 报告的提示缓存读取之后的成本。对所有任务，deep agent 在 Haiku 上按标价是 plain 循环的 ${ratio('claude-haiku-5-5', 'cost_u').toFixed(2)} 倍，按计费是 ${ratio('claude-haiku-5-5', 'cost').toFixed(2)} 倍，在 Sonnet 上分别是 ${ratio('claude-sonnet-5-5', 'cost_u').toFixed(2)} 倍和 ${ratio('claude-sonnet-5-5', 'cost').toFixed(2)} 倍。`,
+  title: '每个任务的美元成本：朴素循环与 deep agent，有无提示词缓存',
+  desc: `在对数刻度上用点带展示每个任务的美元成本：Claude Haiku 5.5 的 99 个任务，Claude Sonnet 5.5 的 30 个任务。标价是按基础价格计算的输入与输出 token。计费是计入 API 报告的提示词缓存读取之后的成本。对所有任务，deep agent 在 Haiku 上按标价是 朴素循环的 ${ratio('claude-haiku-5-5', 'cost_u').toFixed(2)} 倍，按计费是 ${ratio('claude-haiku-5-5', 'cost').toFixed(2)} 倍，在 Sonnet 上分别是 ${ratio('claude-sonnet-5-5', 'cost_u').toFixed(2)} 倍和 ${ratio('claude-sonnet-5-5', 'cost').toFixed(2)} 倍。`,
 }, f => {
   f.kicker(20, 22, '每个任务的美元成本，对数刻度');
   f.kicker(620, 22, '全部任务', { anchor: 'end' });
@@ -55,7 +55,7 @@ module.exports = figure('fig-7-4d', {
       f.text(620, y + 4, `$${total(m, h, k).toFixed(3)}`, { size: 11, hue: 'ink', anchor: 'end', weight: k === 'cost' ? 700 : 400 });
       y += RH;
     });
-    f.text(20, y + 6, `deep 相对 plain：标价 ${ratio(m, 'cost_u').toFixed(2)}x，计费 ${ratio(m, 'cost').toFixed(2)}x`, { size: 11, serif: true, hue: 'ink', knock: true });
+    f.text(20, y + 6, `deep 相对朴素循环：标价 ${ratio(m, 'cost_u').toFixed(2)}x，计费 ${ratio(m, 'cost').toFixed(2)}x`, { size: 11, serif: true, hue: 'ink', knock: true });
     y += 38;
   });
   f.beat(0);

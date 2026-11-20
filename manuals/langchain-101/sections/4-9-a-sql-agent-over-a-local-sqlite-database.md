@@ -16,9 +16,9 @@ agent 有三个工具。`describe_database` 一次调用返回每张表，以及
 
 - [工具、ToolRuntime 与工具错误](#s-tools-toolruntime-and-tool-errors)：每个工具从 `runtime.context` 读取数据库路径。失败的查询以文本形式返回，这样模型可以修正它的 SQL。
 - [系统提示词](#s-the-system-prompt)：agent 的工作顺序。
-- [人在回路，批量与逐个调用](#s-human-in-the-loop-batched-and-per-call)：`request_change` 在 `per_call` 模式下暂停。
-- [安全](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)：模型从不持有能写入的连接。
-- [递归上限](#s-error-handlers-node-timeouts-and-the-recursion-limit)：每个问题都以 `recursion_limit` 25 运行。
+- [人在回路：HumanInTheLoopMiddleware 的批量模式与逐调用模式](#s-human-in-the-loop-batched-and-per-call)：`request_change` 在 `per_call` 模式下暂停。
+- [安全：反序列化、store 隔离、审批与 MCP 子进程](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)：模型从不持有能写入的连接。
+- [错误处理器、节点超时与递归上限](#s-error-handlers-node-timeouts-and-the-recursion-limit)：每个问题都以 `recursion_limit` 25 运行。
 
 ## 作为上下文的数据库路径 {#s-a-sql-agent-over-a-local-sqlite-database-the-database-path-as-context}
 

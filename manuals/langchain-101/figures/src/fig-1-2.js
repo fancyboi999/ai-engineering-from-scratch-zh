@@ -63,7 +63,7 @@ const height = Y0 + rowsTotal * RH + (GROUPS.length - 1) * SEP + 92;
 module.exports = figure('fig-1-2', {
   height,
   title: '每个模型与 harness 在每项任务上的结果',
-  desc: `一张网格，每行是一个模型与 harness 的组合，每列对应 99 项任务套件中的一项任务，按任务族分组。实心方块表示通过，玫红方块表示失败，空白列表示该任务不在该行的 30 项子集之内。Claude Haiku 5.5 用 plain loop（朴素循环）在 99 项中通过 ${haiku[0].pass} 项，用 deep agent 通过 ${haiku[1].pass} 项。Qwen3 4B 的 plain 通过 ${q4[0].pass} 项，deep 通过 ${q4[1].pass} 项；Qwen3 8B 分别通过 ${q8[0].pass} 项和 ${q8[1].pass} 项。在 Qwen3 模型上，plain loop、create_agent 与手工搭建的 StateGraph 这几行在它们共有的每项任务上结果相同。`,
+  desc: `一张网格，每行是一个模型与 harness 的组合，每列对应 99 项任务集中的一项任务，按任务族分组。实心方块表示通过，玫红方块表示失败，空白列表示该任务不在该行的 30 项子集之内。Claude Haiku 5.5 用 朴素循环在 99 项中通过 ${haiku[0].pass} 项，用 deep agent 通过 ${haiku[1].pass} 项。Qwen3 4B 的朴素循环通过 ${q4[0].pass} 项，deep 通过 ${q4[1].pass} 项；Qwen3 8B 分别通过 ${q8[0].pass} 项和 ${q8[1].pass} 项。在 Qwen3 模型上，朴素循环、create_agent 与手工搭建的 StateGraph 这几行在它们共有的每项任务上结果相同。`,
 }, f => {
   f.kicker(20, 24, '模型');
   f.kicker(124, 24, 'harness');

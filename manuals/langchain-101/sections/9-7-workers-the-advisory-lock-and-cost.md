@@ -38,7 +38,7 @@ KEY = "select {fn}(hashtextextended(%s, 0))"
 - 同时向同一个线程的 A 和 B 各发一次运行：一个 200，一个 409，只有一条用户消息。
 - 向 A 发送同一线程的两次运行：一个 200，一个 409。
 - A 持有线程期间向 B 发送一次运行：409。
-- A 持有线程时被 SIGKILL 杀死，然后向 B 发送一次运行：200。进程一死，锁就空闲了。
+- A 持有线程时被 SIGKILL 杀掉，然后向 B 发送一次运行：200。进程一死，锁就空闲了。
 
 ## 上限在哪里 {#s-workers-the-advisory-lock-and-cost-where-the-ceiling-is}
 

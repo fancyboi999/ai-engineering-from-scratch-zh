@@ -15,7 +15,7 @@ const rows = [
 module.exports = figure('fig-7-3', {
   height: 470,
   title: '各种 MCP 故障对一次运行的影响',
-  desc: '七行，每行从左侧的情形指向右侧的结果。目标字符串不是 http 或 https URL 时抛出 ValueError，不启动任何东西。工具报告 isError 与工具抛出 Python 异常，都会变成 status 为 error 的 ToolMessage，运行继续。默认客户端下的慢工具在 2.0 秒后返回，因为适配器没有超时。timeout 为 1 的 FastMCP Client 在 1.0 秒后抛出 MCPError timed out。stdio 下服务器崩溃抛出 MCPError Connection closed 并中止运行，下一次调用会重新启动服务器。HTTP 下服务器崩溃在该调用上抛出 RemoteProtocolError，随后的智能体运行与后续调用都连接失败，因为没有东西重新启动服务器。',
+  desc: '七行，每行从左侧的情形指向右侧的结果。目标字符串不是 http 或 https URL 时抛出 ValueError，不启动任何东西。工具报告 isError 与工具抛出 Python 异常，都会变成 status 为 error 的 ToolMessage，运行继续。默认客户端下的慢工具在 2.0 秒后返回，因为适配器没有超时。timeout 为 1 的 FastMCP Client 在 1.0 秒后抛出 MCPError timed out。stdio 下服务器崩溃抛出 MCPError Connection closed 并中止运行，下一次调用会重新启动服务器。HTTP 下服务器崩溃在该调用上抛出 RemoteProtocolError，随后的 agent 运行与后续调用都连接失败，因为没有东西重新启动服务器。',
 }, f => {
   f.kicker(20, 20, '情形');
   f.kicker(360, 20, '运行得到的结果');

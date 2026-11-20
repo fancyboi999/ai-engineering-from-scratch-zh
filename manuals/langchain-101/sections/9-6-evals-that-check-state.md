@@ -48,7 +48,7 @@ id: fig-9-6
 kind: chart
 title: 同样的 27 个测试在三个真实模型上的结果
 claim: Qwen3 4B 和 Qwen3 14B 在同一套件里失败的案例不同，而 Claude Haiku 5.5 通过了全部 20 项评估。
-caption: 每行是一个测试，每列是套件的一次运行。梅红色格子表示通过。玫瑰色格子表示失败，其中的字母对应图例里的原因。点状格子表示没有运行。数据来自 capture/lab/prodapp-mac/summary/evals-mac.json。
+caption: 每行是一个测试，每列是套件的一次运行。梅紫色格子表示通过。玫红色格子表示失败，其中的字母对应图例里的原因。点状格子表示没有运行。数据来自 capture/lab/prodapp-mac/summary/evals-mac.json。
 ```
 
 ## 每个案例为什么失败 {#s-evals-that-check-state-why-each-case-failed}
@@ -92,7 +92,7 @@ caption: 每行是一个测试，每列是套件的一次运行。梅红色格�
 
 ## 在本地模型上重复运行 {#s-evals-that-check-state-repeats-on-a-local-model}
 
-固定 seed 的贪婪解码会重复自己。Qwen3 4B 的三次运行通过了同样的 16 个测试。第一次和第二次运行之间，20 份评估记录中有 18 份逐字相同。不同的两份是最长的对话，即失控循环和六轮线程，而它们的工具调用是一致的。所以对贪婪的本地模型重复三次，测的是服务而不是模型。想看到分布，就改变 seed 或 temperature。
+固定 seed 的贪心解码会重复自己。Qwen3 4B 的三次运行通过了同样的 16 个测试。第一次和第二次运行之间，20 份评估记录中有 18 份逐字相同。不同的两份是最长的对话，即失控循环和六轮线程，而它们的工具调用是一致的。所以对贪心的本地模型重复三次，测的是服务而不是模型。想看到分布，就改变 seed 或 temperature。
 
 ## CI 作业 {#s-evals-that-check-state-the-ci-job}
 
@@ -104,7 +104,7 @@ caption: 每行是一个测试，每列是套件的一次运行。梅红色格�
 - 在测试批准之前，先检查模型确实提出了这个操作。
 - 用能固定工具调用的请求来驱动服务测试，并要求每次运行都通过。
 - 在每个已部署的模型上运行模型评估，并按案例跟踪通过率。
-- 重复运行贪婪的本地模型时要改变 seed，否则重复毫无意义。
+- 重复运行贪心的本地模型时要改变 seed，否则重复毫无意义。
 ```
 
 来源：capture/lab/prodapp-mac/summary/evals-mac.json, capture/lab/prodapp-mac/runs/summary/suite-mac.json, capture/lab/prodapp-mac/runs/suite/qwen3-4b/rep-1/pytest.txt, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/pytest.txt, capture/lab/prodapp-mac/runs/suite/haiku/rep-1/pytest.txt, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/cases/19-new_message_while_waiting_for_approval.json, capture/lab/prodapp-mac/code/tests/test_evals.py, capture/lab/prodapp-mac/code/tests/conftest.py, capture/lab/prodapp-mac/code/tests/procs.py, capture/lab/prodapp-mac/code/tests/test_durability.py, capture/lab/prodapp-mac/code/deploy/ci.yml, capture/lab/prodapp-mac/code/scripts/causes.json, capture/lab/prodapp-mac/summary/fix-mac.json.

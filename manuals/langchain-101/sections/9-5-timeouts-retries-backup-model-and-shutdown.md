@@ -74,7 +74,7 @@ id: fig-9-5
 kind: decision
 title: 五种故障、中间件的处理，以及各模型的回复
 claim: 中间件在每个模型上对每种故障的处理方式相同，只有给客户的回复不同。
-caption: 每行从左向右读：故障、取自 span 的尝试次数，以及各模型的回复。玫瑰色的回复误导了客户或跳过了工具。数据来自 capture/lab/prodapp-mac/summary/faults-mac.json。
+caption: 每行从左向右读：故障、取自 span 的尝试次数，以及各模型的回复。玫红色的回复误导了客户或跳过了工具。数据来自 capture/lab/prodapp-mac/summary/faults-mac.json。
 ```
 
 最值得记住的是 Qwen3 4B 上订单查询卡住的那一行。工具消息写的是 `read_order timed out. Tell the customer and do not guess.`，模型却对客户说 `I couldn't find your order. Please check the order ID and try again`。这个回复是错的，还让客户去修改本来正确的订单号。任何中间件都拦不住它。请在评估里检查超时后的回复，并选一个通过该检查的模型。

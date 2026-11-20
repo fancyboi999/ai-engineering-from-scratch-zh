@@ -164,7 +164,7 @@ id: fig-8-7
 kind: comparison
 title: 演练里七种故障，每种修复前后
 claim: 七种故障里有六种什么都没抛，右栏里的每个修法，都来自记录这种故障的那一节。
-caption: 每行从左边的症状读到右边修复后的结果。玫红色格子是故障，青绿色格子是用了修法之后的结果。来源：capture/lab/summary/failure-drill-x86.json。
+caption: 每行从左边的症状读到右边修复后的结果。玫红色格子是故障，青色格子是用了修法之后的结果。来源：capture/lab/summary/failure-drill-x86.json。
 ```
 
 ## 演练对前面各节的补充 {#s-a-failure-drill-what-the-drill-adds-to-the-earlier-sections}

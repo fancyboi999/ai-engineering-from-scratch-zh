@@ -2,7 +2,7 @@
 
 > 本手册中的每个错误和警告，都对应一个类、一个抛出它的包，以及锁定版本下的一行代码；下面的文本都抄自录制文件。
 
-本页按类查找。按症状查找请看[症状、原因、修复](#s-symptom-cause-fix)，那里给出每条消息的修复方式。每条消息都抄自录制文件或实验记录。标注“不在录制文件中”的类，抄自源代码。尖括号里的文本（如 `<seconds>`）是录制工具包做的掩码。过长的消息只保留第一句，被截断的行就结束在录制文件继续的位置。
+本页按类查找。按症状查找请看[症状、原因、修法](#s-symptom-cause-fix)，那里给出每条消息的修复方式。每条消息都抄自录制文件或实验记录。标注“不在录制文件中”的类，抄自源代码。尖括号里的文本（如 `<seconds>`）是录制工具包做的掩码。过长的消息只保留第一句，被截断的行就结束在录制文件继续的位置。
 
 ## langchain {#s-ref-errors-langchain}
 
@@ -23,7 +23,7 @@
 | `ValueError` | `MCP target 'server.py' is not a valid URL.` | {{code libs/langchain_v1/langchain/mcp/adapter.py:108}} |
 | `NotImplementedError`，以错误 `ToolMessage` 的形式发给模型，前缀为 `Error calling tool 'ask_legacy': ` | `This MCP server asked for input over the legacy server-initiated elicitation path, which interrupt-based elicitation cannot answer.` | {{code libs/langchain_v1/langchain/mcp/elicitation.py:236-242}} |
 
-`ToolStrategy` 的重试文本是模板 `Error: {error}\n Please fix your mistakes.` {{code libs/langchain_v1/langchain/agents/factory.py:128}}. agent 把它作为 `ToolMessage` 发给模型，运行继续。
+`ToolStrategy` 的重试文本是模板 `Error: {error}\n Please fix your mistakes.` {{code libs/langchain_v1/langchain/agents/factory.py:128}}。 agent 把它作为 `ToolMessage` 发给模型，运行继续。
 
 ## langchain-core {#s-ref-errors-langchain-core}
 
@@ -34,7 +34,7 @@
 | `NotImplementedError` | `stream_events(version='v2') is not supported.` | {{code libs/core/langchain_core/runnables/base.py:1818}} |
 | `NotImplementedError`，文本为空 | 在原版假聊天模型上由 `bind_tools` 抛出 | {{code libs/core/langchain_core/language_models/chat_models.py:2409-2426}} |
 
-`ModelRefusalError` 是 `ModelError` 的子类 {{code libs/core/langchain_core/exceptions.py:73}}。`ModelRefusalMiddleware` 根据拒绝块抛出它 {{code libs/langchain_v1/langchain/agents/middleware/model_refusal.py:27-30}}.
+`ModelRefusalError` 是 `ModelError` 的子类 {{code libs/core/langchain_core/exceptions.py:73}}。`ModelRefusalMiddleware` 根据拒绝块抛出它 {{code libs/langchain_v1/langchain/agents/middleware/model_refusal.py:27-30}}。
 
 ## langgraph {#s-ref-errors-langgraph}
 
@@ -53,7 +53,7 @@
 | `KeyError` | `'__pregel_scratchpad'`，由图外的 `interrupt()` 引起，例如请求输入的 MCP 工具 | {{code libs/langgraph/langgraph/types.py:1030}} |
 | `TypeError` | `Tool lookup returned unexpected type: <class 'str'>`，针对名为 `lookup` 的工具 | {{code libs/prebuilt/langgraph/prebuilt/tool_node.py:1486}} |
 
-`langgraph.errors` 的其他错误类有 `GraphBubbleUp`、`GraphInterrupt`、`NodeInterrupt`、`ParentCommand`、`EmptyInputError`、`TaskNotFound`、`NodeCancelledError` 和 `GraphDrained` {{code libs/langgraph/langgraph/errors.py:52-210}}. `GraphBubbleUp` 是 `GraphInterrupt`、`ParentCommand` 和 `GraphDrained` 的基类。它们传递控制流，由循环处理。只有在图外直接调用节点时，你才会看到它们。
+`langgraph.errors` 的其他错误类有 `GraphBubbleUp`、`GraphInterrupt`、`NodeInterrupt`、`ParentCommand`、`EmptyInputError`、`TaskNotFound`、`NodeCancelledError` 和 `GraphDrained` {{code libs/langgraph/langgraph/errors.py:52-210}}。 `GraphBubbleUp` 是 `GraphInterrupt`、`ParentCommand` 和 `GraphDrained` 的基类。它们传递控制流，由循环处理。只有在图外直接调用节点时，你才会看到它们。
 
 ## checkpoint 与 store 包 {#s-ref-errors-the-checkpoint-and-store-packages}
 
@@ -70,13 +70,13 @@
 | `MCPError` | `Connection closed` | `mcp`，在 stdio 服务器于调用期间退出时 | `T12-mcp-mac` |
 | `MCPError` | `Request 'tools/call' timed out` | `mcp`，在 `fastmcp.Client` 超时时 | `T12-mcp-mac` |
 | `RemoteProtocolError` | `Server disconnected without sending a response.` | `httpx`，在 HTTP 服务器于调用期间退出时 | `T12-mcp-mac` |
-| `MCPError` | `Elicitation not supported` | `mcp`，针对协议 `2026-07-28` 上没有 elicitation 处理器的客户端 | `T20-mcp-edges-mac` |
+| `MCPError` | `Elicitation not supported` | `mcp`，针对协议 `2026-07-28` 上没有征询输入处理器的客户端 | `T20-mcp-edges-mac` |
 | `MCPError` | `Tool 'ask_name' returned an InputRequiredResult to request client input, but the multi-round-trip result type (SEP-2322) only exists at MCP 2026-07-28; this connection negotiated '2025-11-25'.` | FastMCP 服务器，在旧版连接上 | `T20-mcp-edges-mac` |
 | `LangSmithConnectionError` | `Connection error caused failure to GET /datasets in LangSmith API. Please confirm your internet connection.` | `langsmith`，来自开启了跟踪且无网络连接的 pytest 插件 | `T19-pytest-plugin-x86` |
 | `ValueError` | `log_outputs should only be called within a pytest test decorated with @pytest.mark.langsmith, and with tracing enabled (by setting the LANGSMITH_TRACING environment variable to 'true').` | `langsmith`，针对开启跟踪时未加标记的测试 | `T19-pytest-plugin-x86` |
 | `ValueError`，表现为退出码为 3 的 pytest `INTERNALERROR` | `--langsmith-output not supported when env varLANGSMITH_TEST_TRACKING='false'. Please remove the'--langsmith-output' option or enable test tracking.` 代码里本身就缺了这两个空格 | `langsmith`，位于 {{code src/langsmith/pytest_plugin.py:311-317}} | `T19-pytest-plugin-x86` |
 | `ValueError` | `log_inputs should only be called within a pytest test decorated with @pytest.mark.langsmith, and with tracing enabled (by setting the LANGSMITH_TRACING environment variable to 'true').` | `langsmith`，针对开启跟踪、`LANGSMITH_TRACING` 未设置的已标记测试，位于 {{code src/langsmith/testing/_internal.py:1166-1168}} | `T21-langsmith-account-mac` |
-| `LangSmithConflictError`，来自 HTTP 409 | `Nothing to commit: prompt has not changed since latest commit` | 托管 API，针对提示未变化的 `push_prompt` | `T21-langsmith-account-mac` |
+| `LangSmithConflictError`，来自 HTTP 409 | `Nothing to commit: prompt has not changed since latest commit` | 托管 API，针对提示词未变化的 `push_prompt` | `T21-langsmith-account-mac` |
 | `LangSmithNotFoundError`，来自 HTTP 404 | `Commit not found` | 托管 API，针对标签不存在的 `pull_prompt` | `T21-langsmith-account-mac` |
 | `LangSmithNotFoundError` | `Project healthy-coast-30 not found` | `langsmith`，读取 `evaluate(upload_results=False)` 返回的 `experiment_name` 时 | `T21-langsmith-account-mac` |
 | CLI 错误，退出码 2 | `Error: Docker not installed or not running` | `langgraph-cli` 0.4.43，针对没有 Docker 守护进程时的 `langgraph up`，发生在任何密钥检查之前 | `T21-langsmith-account-mac` |

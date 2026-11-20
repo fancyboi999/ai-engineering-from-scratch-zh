@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 736" role="img" aria-labelledby="fig-r-11b-title fig-r-11b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-r-11b-title">第二轮基准中每个单元的通过率与区间</title>
-  <desc id="fig-r-11b-desc">28 个单元的点与 95% Wilson 区间，来自第二轮基准，分为 9 组：Qwen3 4B 与 Qwen3 8B 上的两项档案实验、四个模型上的 eval 工具，以及一次评分细则运行。其中 3 个单元的任务数少于 30。最宽的区间是 34 个百分点，最窄的是 9 个百分点。</desc>
+  <title id="fig-r-11b-title">第二个测试基准中每个单元的通过率与区间</title>
+  <desc id="fig-r-11b-desc">28 个单元的点与 95% Wilson 区间，来自第二个测试基准，分为 9 组：Qwen3 4B 与 Qwen3 8B 上的两项 profile 实验、四个模型上的 eval 工具，以及一次评分标准运行。其中 3 个单元的任务数少于 30。最宽的区间是 34 个百分点，最窄的是 9 个百分点。</desc>
   <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">单元</text>
   <text x="620" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过数/N</text>
   <text x="250" y="44" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">0%</text>
@@ -19,7 +19,7 @@
   <line x1="368.93" y1="99" x2="418.88" y2="99" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="2"/>
   <rect x="390.94" y="95.5" width="7" height="7" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="620" y="103" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">55/99</text>
-  <text x="28" y="117" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，档案 B</text>
+  <text x="28" y="117" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，profile B</text>
   <line x1="368.93" y1="113" x2="418.88" y2="113" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="2"/>
   <rect x="390.94" y="109.5" width="7" height="7" fill="var(--m-plum-ink, #8a3d72)"/>
   <text x="620" y="117" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">55/99</text>
@@ -34,11 +34,11 @@
   <line x1="321.18" y1="167" x2="408.09" y2="167" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="2"/>
   <rect x="359.17" y="163.5" width="7" height="7" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="620" y="171" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">13/30</text>
-  <text x="28" y="185" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，档案 A</text>
+  <text x="28" y="185" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，profile A</text>
   <line x1="368.33" y1="181" x2="453.13" y2="181" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="2"/>
   <rect x="411.17" y="177.5" width="7" height="7" fill="var(--m-plum-ink, #8a3d72)"/>
   <text x="620" y="185" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">19/30</text>
-  <text x="28" y="199" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，档案 B</text>
+  <text x="28" y="199" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，profile B</text>
   <line x1="360.03" y1="195" x2="446.06" y2="195" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="2"/>
   <rect x="402.5" y="191.5" width="7" height="7" fill="var(--m-plum-ink, #8a3d72)"/>
   <text x="620" y="199" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">18/30</text>
@@ -53,7 +53,7 @@
   <line x1="376.72" y1="249" x2="426.26" y2="249" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="2"/>
   <rect x="398.82" y="245.5" width="7" height="7" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="620" y="253" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">58/99</text>
-  <text x="28" y="267" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，档案 B</text>
+  <text x="28" y="267" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，profile B</text>
   <line x1="389.92" y1="263" x2="438.34" y2="263" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="2"/>
   <rect x="411.95" y="259.5" width="7" height="7" fill="var(--m-plum-ink, #8a3d72)"/>
   <text x="620" y="267" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">63/99</text>
@@ -68,11 +68,11 @@
   <line x1="343.97" y1="317" x2="431.4" y2="317" stroke="var(--m-blue-ink, #2f5d9a)" stroke-width="2"/>
   <rect x="385.17" y="313.5" width="7" height="7" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="620" y="321" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">16/30</text>
-  <text x="28" y="335" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，档案 A</text>
+  <text x="28" y="335" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，profile A</text>
   <line x1="343.97" y1="331" x2="431.4" y2="331" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="2"/>
   <rect x="385.17" y="327.5" width="7" height="7" fill="var(--m-plum-ink, #8a3d72)"/>
   <text x="620" y="335" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">16/30</text>
-  <text x="28" y="349" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，档案 B</text>
+  <text x="28" y="349" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">deep，profile B</text>
   <line x1="351.91" y1="345" x2="438.82" y2="345" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="2"/>
   <rect x="393.83" y="341.5" width="7" height="7" fill="var(--m-plum-ink, #8a3d72)"/>
   <text x="620" y="349" font-size="11" text-anchor="end" font-weight="400" fill="var(--m-ink, #1a1a1a)">17/30</text>
@@ -143,11 +143,11 @@
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
   <text x="20" y="655" font-size="11" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">Qwen3 8B，Qwen3 14B 评分</text>
-  <text x="28" y="675" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">评分细则，此前失败的任务</text>
+  <text x="28" y="675" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">评分标准，此前失败的任务</text>
   <line x1="260.83" y1="671" x2="327.89" y2="671" stroke="var(--m-olive-ink, #515f26)" stroke-width="2"/>
   <rect x="277.7" y="667.5" width="7" height="7" fill="var(--m-olive-ink, #515f26)"/>
   <text x="620" y="675" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-rose-ink, #b0344d)">3/25</text>
   </g>
   <text x="20" y="694" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">须线是 95% Wilson 区间。玫红计数表示任务数少于 30 的单元。</text>
-  <text x="20" y="710" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">评分细则单元只含 plain 循环失败过的任务，所以它的基线是 25 个中的 0 个。</text>
+  <text x="20" y="710" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">评分标准单元只含 朴素循环失败过的任务，所以它的基线是 25 个中的 0 个。</text>
 </svg>

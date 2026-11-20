@@ -79,5 +79,5 @@ module.exports = figure('fig-6-2', {
     y += lines * 20 + 14;
   }
   f.text(20, 450, `同一超步内对 jokes 的三次写入合并成了一个列表。log 键最终有 ${final.log.length} 条记录。`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 468, '每个青绿色单元格是节点返回的一个值，读自 updates 流。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 468, '每个青色单元格是节点返回的一个值，读自 updates 流。', { size: 11, serif: true, hue: 'ink-soft' });
 });

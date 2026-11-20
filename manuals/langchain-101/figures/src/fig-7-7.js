@@ -20,6 +20,6 @@ module.exports = figure('fig-7-7', {
     f.text(x + 244, 262, '请求', { size: 11, serif: true, hue: 'ink-soft', anchor: 'end' });
   };
   col(20, '3 个示例：a + b', 'adder()，故意错一个答案', 'exact，然后 accuracy', ['true, false, true', 'accuracy 0.667'], ['grey', '客户端收到 0 个请求', '没有任何内容离开进程']);
-  col(330, '1 个示例：What is 2 + 3?', 'Qwen3 4B 上的 create_agent', 'same_answer', 'false: 2 + 3 = 5.', ['rose', 'POST /runs 7, PATCH 7', '智能体的 LangChain 运行']);
+  col(330, '1 个示例：What is 2 + 3?', 'Qwen3 4B 上的 create_agent', 'same_answer', 'false: 2 + 3 = 5.', ['rose', 'POST /runs 7, PATCH 7', 'agent 的 LangChain 运行']);
   f.text(20, 362, '来自录制工具包，langsmith 0.14.17，客户端会记录每个请求。', { size: 11, serif: true, hue: 'ink-soft' });
 });

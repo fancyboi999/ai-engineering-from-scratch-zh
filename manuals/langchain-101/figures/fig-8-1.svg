@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="fig-8-1-title fig-8-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-8-1-title">langgraph dev 下 Qwen3 4B 每秒运行数，按并发客户端数</title>
-  <desc id="fig-8-1-desc">点图，对数刻度，展示每秒运行数随并发客户端数（1、4、16）的变化，对象是 x86 服务器虚拟机上的 langgraph dev，带一个在 CPU 上的 Qwen3 4B 智能体，每个点一次负载运行。默认每个 worker 一个任务：每秒 0.185、0.222、0.223 次运行。每个 worker 十个任务：0.191、0.224、0.226。全部 104 次运行都回答正确，错误 0 个。</desc>
+  <desc id="fig-8-1-desc">点图，对数刻度，展示每秒运行数随并发客户端数（1、4、16）的变化，对象是 x86 服务器虚拟机上的 langgraph dev，带一个在 CPU 上的 Qwen3 4B agent，每个点一次负载运行。默认每个 worker 一个任务：每秒 0.185、0.222、0.223 次运行。每个 worker 十个任务：0.191、0.224、0.226。全部 104 次运行都回答正确，错误 0 个。</desc>
   <line x1="70" y1="280" x2="450" y2="280" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="284" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="70" y1="240" x2="450" y2="240" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -35,6 +35,6 @@
   <circle cx="423.66" cy="99.2" r="3.2" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="460" y="103.2" font-size="11" fill="var(--m-indigo-ink, #4b4f9e)">每个 worker 10 个任务</text>
   <text x="460" y="118.2" font-size="11" fill="var(--m-rose-ink, #b0344d)">默认，1 个任务</text>
-  <text x="70" y="334" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是对智能体图的一次负载运行：1 和 4 个客户端时 10 次运行，16 个时 32 次。</text>
+  <text x="70" y="334" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是对 agent 图的一次负载运行：1 和 4 个客户端时 10 次运行，16 个时 32 次。</text>
   <text x="70" y="350" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Ollama 一次只处理一个模型调用，4 个客户端以上为每秒 0.44 到 0.45 次。</text>
 </svg>

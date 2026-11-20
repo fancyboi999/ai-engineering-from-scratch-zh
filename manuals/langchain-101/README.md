@@ -9,21 +9,21 @@ LangChain Python 技术栈手册。从“到底要不要用它”这个决定讲
 - 94 幅图表与 1 幅封面插图，均由图表套件绘制。统计图表读取汇总文件。
 - 287 段代码清单（listing）。每一段都截自离线录制或固定标签处的源码，审计脚本逐行核对。
 - 第 1.1 节把项目官网的每项核心宣称与我们测得的结果并列对照。
-- 参考部分收录 `create_agent` 的参数、中间件钩子与类、流模式、checkpointer 与 store 的 API、环境变量、错误字符串、术语表、列出 32 处来源互相矛盾之处的冲突登记，以及任务集基准的方法。
+- 参考部分收录 `create_agent` 的参数、中间件钩子与类、流模式、checkpointer 与 store 的 API、环境变量、错误字符串、术语表、列出 32 处来源互相矛盾之处的冲突登记，以及测试基准的方法。
 
 ## 目录结构
 
 | 路径 | 内容 |
 |---|---|
-| `manual.json` | 清单：固定版本、各部分、配色、来源、封面插图 |
+| `manual.json` | 清单：锁定版本、各部分、配色、来源、封面插图 |
 | `front.md`、`sections/` | 正文，每节一个文件 |
 | `figures/src/` | 图表源文件，构建为 `figures/*.svg` |
 | `capture/run.py`、`capture/s_*.py` | 录制工具包：不使用密钥，不使用假聊天模型；场景需要模型时调用本地 Ollama 上的 Qwen3 4B；并写出 `capture/out/` 里的文件，代码清单即取自这些文件 |
-| `capture/lab/` | 51 个实验文件夹：`T01-overhead-mac` 到 `T20-mcp-edges-mac`、`TRC-tracing-mac` 和 `T21-langsmith-account-mac`；以 `-x86`、`-x86-real` 和 `-mac-real` 结尾的文件夹是用真实模型的重跑；`internals/` 是运行时追踪，`bench/` 是任务集基准，`bench2/` 是第二轮基准，`multiagent/`、`last-two-mac/` 是多 agent 运行，`prodapp-mac/` 是第 9 部分的生产服务，另有五个示例的录制运行。每个文件夹都带有脚本和原始输出，`capture/lab/README.md` 列出了不应使用的行 |
-| `capture/lab/summary/` | 48 份汇总文件，表格和图表读取它们，由 `capture/labsum.py` 重建。基准用 `capture/lab/bench/summarize.py` 写出自己的汇总 `capture/lab/bench/summary-mac.json`。`capture/labsum.py` 还会重建 `capture/lab/prodapp-mac/summary/` 里的十份汇总，以及 `capture/lab/prodapp-mac/runs/summary/` 里的两份运行汇总 |
+| `capture/lab/` | 51 个实验文件夹：`T01-overhead-mac` 到 `T20-mcp-edges-mac`、`TRC-tracing-mac` 和 `T21-langsmith-account-mac`；以 `-x86`、`-x86-real` 和 `-mac-real` 结尾的文件夹是用真实模型的重跑；`internals/` 是运行时追踪，`bench/` 是测试基准，`bench2/` 是第二个测试基准，`multiagent/`、`last-two-mac/` 是多 agent 运行，`prodapp-mac/` 是第 9 部分的生产服务，另有五个示例的录制运行。每个文件夹都带有脚本和原始输出，`capture/lab/README.md` 列出了不应使用的行 |
+| `capture/lab/summary/` | 48 份汇总文件，表格和图表读取它们，由 `capture/labsum.py` 重建。测试基准用 `capture/lab/bench/summarize.py` 写出自己的汇总 `capture/lab/bench/summary-mac.json`。`capture/labsum.py` 还会重建 `capture/lab/prodapp-mac/summary/` 里的十份汇总，以及 `capture/lab/prodapp-mac/runs/summary/` 里的两份运行汇总 |
 | `capture/demos/` | 五个示例，各带一份 README 和一个 `run.sh`：SQL agent、检索 agent、带记忆的助手、deep agent 和故障演练 |
 
-## 固定版本
+## 锁定版本
 
 | 项目 | 取值 |
 |---|---|
@@ -43,10 +43,10 @@ LangChain Python 技术栈手册。从“到底要不要用它”这个决定讲
 
 | 手册中的名称 | 机器 |
 |---|---|
-| Mac | 一台 Apple M1 Max 笔记本，10 核、64 GiB；运行 Ollama 提供本地模型；是基准和第 9 部分里 Anthropic API 的客户端；是 T21 里托管 LangSmith API 的客户端；并运行第 9 部分的服务，配 PostgreSQL 14 |
+| Mac | 一台 Apple M1 Max 笔记本，10 核、64 GiB；运行 Ollama 提供本地模型；是测试基准和第 9 部分里 Anthropic API 的客户端；是 T21 里托管 LangSmith API 的客户端；并运行第 9 部分的服务，配 PostgreSQL 14 |
 | x86 服务器客户机 | 一台 32 vCPU、48 GiB 的 KVM 客户机，运行 PostgreSQL 16 和 Agent Server |
 
-本地模型有 Qwen3 0.6B、1.7B、4B、8B、14B 和 30B-A3B，以及 gpt-oss 20B，嵌入用 `nomic-embed-text`，全部在 Ollama 上运行。Claude Haiku 5.5 与 Claude Sonnet 5.5 在任务集基准里通过 Anthropic API 运行，共花费 $0.93。Claude Haiku 5.5 还运行了第 9 部分的 20 项评估（64 次调用，$0.011），并对第 8.4 节的文件规则发起了 60 次攻击（134 次调用，$0.021）。有一次运行使用了免费方案的全新 LangSmith 账号，从 Mac 发起，保留文件里的 id 已被替换。`capture/lab/README.md` 把每个实验对应到它的机器。不要拿一台机器上的数字去和另一台机器上的数字比较。
+本地模型有 Qwen3 0.6B、1.7B、4B、8B、14B 和 30B-A3B，以及 gpt-oss 20B，嵌入用 `nomic-embed-text`，全部在 Ollama 上运行。Claude Haiku 5.5 与 Claude Sonnet 5.5 在测试基准里通过 Anthropic API 运行，共花费 $0.93。Claude Haiku 5.5 还运行了第 9 部分的 20 项评估（64 次调用，$0.011），并对第 8.4 节的文件规则发起了 60 次攻击（134 次调用，$0.021）。有一次运行使用了免费方案的全新 LangSmith 账户，从 Mac 发起，保留文件里的 id 已被替换。`capture/lab/README.md` 把每个实验对应到它的机器。不要拿一台机器上的数字去和另一台机器上的数字比较。
 
 ## 阅读建议
 

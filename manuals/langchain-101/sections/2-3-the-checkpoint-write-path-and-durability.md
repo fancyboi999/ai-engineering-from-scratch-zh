@@ -48,7 +48,7 @@ id: fig-2-3
 kind: timeline
 title: 一次 sync 运行里，每个已完成任务等待它的 put_writes 多久
 claim: 在一次高负载运行里，已完成的任务有 3.0 到 4.4 毫秒不持久，而 sync 只等检查点的 put。
-caption: 每个面板是一个超步的结尾，放大到最后一个任务返回之后的毫秒。上方的泳道是循环，下方的泳道是后台 saver。实心青绿色块是 put，空心块是 put_writes 调用，玫瑰色条带是任务变得持久之前的区间。面板之间的标签写出下一个任务及其耗时。来源：capture/lab/internals/03-checkpoint/a_sync.trace.jsonl。
+caption: 每个面板是一个超步的结尾，放大到最后一个任务返回之后的毫秒。上方的泳道是循环，下方的泳道是后台 saver。实心青色块是 put，空心块是 put_writes 调用，玫红色条带是任务变得持久之前的区间。面板之间的标签写出下一个任务及其耗时。来源：capture/lab/internals/03-checkpoint/a_sync.trace.jsonl。
 ```
 
 同一份追踪在开头也显示出一个间隙。输入检查点，即步骤 -1，在第 9 行才到达 saver，晚于第 5 行 `__start__` 任务的返回。所以 `sync` 在第一个任务之前并不等待输入检查点。它是在你的图的第一个节点之前才等。
@@ -74,7 +74,7 @@ id: fig-2-3b
 kind: chart
 title: 在超步中间崩溃之后，恢复运行了什么
 claim: 没有等待时，最后返回的模型节点在 100 次 sync 试验里重跑了 97 次，在 100 次 async 试验里重跑了 95 次，等待 0.2 秒时一次也没有。
-caption: 每个点是一次试验，每个单元格 50 次，共两次运行。玫瑰色的点重跑了模型节点 a 和崩溃的节点 c，青绿色的点只重跑了 c，灰色的点没有可恢复的东西。来源：capture/lab/internals/03-checkpoint/crash.json 和 capture/lab/internals/03-checkpoint/taskns.json。
+caption: 每个点是一次试验，每个单元格 50 次，共两次运行。玫红色的点重跑了模型节点 a 和崩溃的节点 c，青色的点只重跑了 c，灰色的点没有可恢复的东西。来源：capture/lab/internals/03-checkpoint/crash.json 和 capture/lab/internals/03-checkpoint/taskns.json。
 ```
 
 等待为零时，持久性模式没有造成差别。区间重叠，运行 2 在 `async` 下的重复甚至更多。两种模式都在步骤结束时等待，而崩溃发生在结束之前。风险在于每个任务之后那一次 `put_writes` 调用的窗口。在 `SqliteSaver` 上，该调用在 `sync` 下平均 4.6 毫秒，在 `async` 下平均 4.2 毫秒，是在负载较高的客户机上测得（[第 2.6 节](#s-checkpoint-growth-and-the-cost-of-a-superstep)）。在 agent 里，模型节点常常在一个更慢的兄弟节点仍在运行时就返回，这就是那个窗口。

@@ -4,7 +4,7 @@
 
 你把一个 agent 从脚本迁到 `langgraph dev`，一次发出 16 个请求。运行时间的中位数是 71 秒，其中 66 秒花在模型启动之前的等待上。文档说一个 worker 同时跑 10 个作业，`--help` 的文字也这么说。可服务器实际只跑了一个。模型跑在 CPU 上时，一次跑十个并不会更快。
 
-读完本节，你能启动 `langgraph dev`、设置每个 worker 的作业数，并预测它的递归上限和每次运行的耗时。你还能根据我们记录的效果选择 double texting 策略，并说清 `langgraph up` 和 `langgraph deploy` 需要什么。
+读完本节，你能启动 `langgraph dev`、设置每个 worker 的作业数，并预测它的递归上限和每次运行的耗时。你还能根据我们记录的效果选择双重发送策略，并说清 `langgraph up` 和 `langgraph deploy` 需要什么。
 
 ## 三条命令 {#s-agent-server-langgraph-dev-up-and-deploy-the-three-commands}
 
@@ -102,16 +102,16 @@ caption: 每个点是在 x86 服务器客户机上的一次负载运行，1 个�
 
 几乎所有额外耗时都出现在第一次模型调用之前。默认设置下这段等待约 1,003 ms，设为 10 个作业时是 641 到 651 ms。其中一部分来自内存运行时的队列：它每次轮询没找到运行，就睡 0.5 秒 {{code langgraph_runtime_inmem/ops.py}}。其余部分我们没有追查。把它当作锁定版本下 `langgraph dev` 的固定开销来看待。带 Postgres 和 Redis 的 `langgraph up` 的固定开销，留到下一版。
 
-## Double texting {#s-agent-server-langgraph-dev-up-and-deploy-double-texting}
+## 双重发送（double texting） {#s-agent-server-langgraph-dev-up-and-deploy-double-texting}
 
-**Double texting：** 一个线程上的第一次运行尚未结束时，又在同一线程上发起第二次运行。Agent Server 提供四种 multitask 策略，默认是 `enqueue` {{docs langsmith/double-texting}}。
+**双重发送（double texting）：** 一个线程上的第一次运行尚未结束时，又在同一线程上发起第二次运行。Agent Server 提供四种 multitask 策略，默认是 `enqueue` {{docs langsmith/double-texting}}。
 
-文档页说明，double texting 是服务器的功能，开源 LangGraph 没有 {{docs langsmith/double-texting}}。脚本里的线程见[第 5.2 节](#s-checkpointers-and-threads)。
+文档页说明，双重发送是服务器的功能，开源 LangGraph 没有 {{docs langsmith/double-texting}}。脚本里的线程见[第 5.2 节](#s-checkpointers-and-threads)。
 
 实验脚本先启动 `slow` 图的运行 A，耗时 4 秒。1 秒后，它在同一线程上发出运行 B，耗时 2 秒，并指定一种策略：
 
 ```listing
-title: 每种 double texting 情形里的第二次运行
+title: 每种双重发送情形里的第二次运行
 source: capture/lab/T15-agent-server-x86/t15_drive.py
 lang: python
 note: 截取到两次运行和它们之间的等待。

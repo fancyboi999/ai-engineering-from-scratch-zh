@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 409" role="img" aria-labelledby="fig-9-1b-title fig-9-1b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-9-1b-title">服务智能体的图</title>
+  <title id="fig-9-1b-title">服务 agent 的图</title>
   <desc id="fig-9-1b-desc">参考服务中 build_agent 的已编译图，由 draw_mermaid 输出绘制。它有 8 个节点，其中 4 个是钩子节点：SummarizationMiddleware.before_model, ModelCallLimitMiddleware.before_model, ModelCallLimitMiddleware.after_model, HumanInTheLoopMiddleware.after_model。其他中间件只有 wrap 钩子，不增加节点。ModelCallLimitMiddleware 可以在 model 之前或之后结束运行。tools 节点含 6 个工具：read_order, refund_order, search_faq, create_ticket, save_note, recall_notes。</desc>
   <defs><marker id="fig-9-1b-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-9-1b-head-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-amber-ink, #85590c)"/></marker></defs>
   <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">BUILD_AGENT 的 GET_GRAPH()</text>

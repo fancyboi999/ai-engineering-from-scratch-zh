@@ -52,10 +52,10 @@ if (Math.min(...allR) < 0.5 || Math.max(...allR) > 64) throw new Error('fig-1-2b
 module.exports = figure('fig-1-2b', {
   height: 428,
   title: '模型之外的耗时，以及 deep agent 的提示词 token 数',
-  desc: `两幅点图。左：每项任务中模型调用与工具之外的毫秒数，纵轴为对数刻度；Qwen3 4B 在 30 项子集上用四种 harness，Claude Haiku 5.5 在 99 项任务上用两种。中位数：${LEFT.map(c => `${c.top || ''} ${c.bottom} ${median(c.fw).toFixed(1)} ms`).join('，')}。模型在 Qwen3 4B 上每项任务的耗时中位数为 ${LEFT[0].model_s.toFixed(1)} s，在 Haiku 上为 ${LEFT[4].model_s.toFixed(1)} s。右：七个模型上逐项任务的 deep agent 提示词 token 数除以 plain loop 的提示词 token 数。在所有任务上，deep agent 发送的提示词 token 是 plain loop 的 ${rLo.toFixed(2)} 到 ${rHi.toFixed(2)} 倍。`,
+  desc: `两幅点图。左：每项任务中模型调用与工具之外的毫秒数，纵轴为对数刻度；Qwen3 4B 在 30 项子集上用四种 harness，Claude Haiku 5.5 在 99 项任务上用两种。中位数：${LEFT.map(c => `${c.top || ''} ${c.bottom} ${median(c.fw).toFixed(1)} ms`).join('，')}。模型在 Qwen3 4B 上每项任务的耗时中位数为 ${LEFT[0].model_s.toFixed(1)} s，在 Haiku 上为 ${LEFT[4].model_s.toFixed(1)} s。右：七个模型上逐项任务的 deep agent 提示词 token 数除以 朴素循环 的提示词 token 数。在所有任务上，deep agent 发送的提示词 token 是 朴素循环 的 ${rLo.toFixed(2)} 到 ${rHi.toFixed(2)} 倍。`,
 }, f => {
   f.kicker(20, 22, 'a. 每项任务中模型之外的耗时');
-  f.kicker(372, 22, 'b. deep agent 相对 plain loop');
+  f.kicker(372, 22, 'b. deep agent 相对 朴素循环');
   const L = chart(f, { x: 62, y: 56, w: 262, h: 270, yScale: 'log10', xDomain: [-0.5, LEFT.length - 0.5], yDomain: [1, 1000], yTicks: [1, 10, 100, 1000], yFormat: v => `${v} ms`, xTicks: [] });
   LEFT.forEach((c, i) => {
     f.beat(1);

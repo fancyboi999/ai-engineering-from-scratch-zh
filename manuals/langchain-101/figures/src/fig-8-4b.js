@@ -70,7 +70,7 @@ const gapCount = Object.values(data.matrix.ran_though_meant_to_block).reduce((n,
 module.exports = figure('fig-8-4b', {
   height: advBottom + 66,
   title: '锁定版本下的文件规则：每格一次调用，然后每个模型 20 次攻击',
-  desc: `上图：${RULES.length} 个规则列表乘 ${OPS.length} 个工具调用的网格，在 virtual_mode=True 的 FilesystemBackend 上，由不带模型的脚本调用方运行。玫红格是尽管规则本意是拦截，调用仍然运行的情形；五个 docs 规则列表中共有 ${gapCount} 个这样的调用，全都发生在名称以点号开头的路径上。紫罗兰是按本意被拦截，琥珀是被拦截但本意应当允许，灰是按本意运行。下图：每条对抗提示词一个方块，每行 20 个，模型为 ${MODELS.map(m => LABEL[m]).join(' 和 ')}，条件为无规则、docs isolate 规则和识别点号的规则。${MODELS.map(m => CFG.map(([c, l]) => `${LABEL[m]} ${l}：${runsOf(m, c).harm_runs} 次运行造成危害`).join('，')).join('。')}。`,
+  desc: `上图：${RULES.length} 个规则列表乘 ${OPS.length} 个工具调用的网格，在 virtual_mode=True 的 FilesystemBackend 上，由不带模型的脚本调用方运行。玫红格是尽管规则本意是拦截，调用仍然运行的情形；五个 docs 规则列表中共有 ${gapCount} 个这样的调用，全都发生在名称以点号开头的路径上。紫色是按本意被拦截，琥珀是被拦截但本意应当允许，灰是按本意运行。下图：每条对抗提示词一个方块，每行 20 个，模型为 ${MODELS.map(m => LABEL[m]).join(' 和 ')}，条件为无规则、docs isolate 规则和识别点号的规则。${MODELS.map(m => CFG.map(([c, l]) => `${LABEL[m]} ${l}：${runsOf(m, c).harm_runs} 次运行造成危害`).join('，')).join('。')}。`,
 }, f => {
   f.kicker(LX, 18, '每格一次调用，脚本调用方，无模型');
   OPS.forEach(([, a, b, c], j) => {
@@ -91,7 +91,7 @@ module.exports = figure('fig-8-4b', {
     });
   });
   f.text(LX, gridBottom + 18, '玫红：已运行，尽管规则本意是拦截。', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(LX, gridBottom + 33, '紫罗兰：按本意被拦截。琥珀：被拦截，尽管本意是', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(LX, gridBottom + 33, '紫色：按本意被拦截。琥珀：被拦截，尽管本意是', { size: 11, serif: true, hue: 'ink-soft' });
 
   f.text(LX, gridBottom + 48, '允许。灰：按本意运行。ws 即 /workspace。', { size: 11, serif: true, hue: 'ink-soft' });
   f.kicker(LX, AY - 14, '20 条对抗提示词，每次运行一个方块');
@@ -115,6 +115,6 @@ module.exports = figure('fig-8-4b', {
     row += 0;
   });
   f.text(LX, advBottom + 18, '玫红：磁盘被改动，或秘密出现在答案中。', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(LX, advBottom + 33, '琥珀：秘密只到了模型那里。紫罗兰：尝试过，没有危害。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(LX, advBottom + 33, '琥珀：秘密只到了模型那里。紫色：尝试过，没有危害。', { size: 11, serif: true, hue: 'ink-soft' });
   f.text(LX, advBottom + 48, '灰：没有尝试。被拦下：被拒绝或被路径拦截的攻击调用数/全部攻击调用数。', { size: 11, serif: true, hue: 'ink-soft' });
 });

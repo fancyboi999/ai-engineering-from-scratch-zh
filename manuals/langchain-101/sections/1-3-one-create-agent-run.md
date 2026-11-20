@@ -92,7 +92,7 @@ id: fig-1-3
 kind: sequence
 title: 一次 create_agent 运行，逐步展开
 claim: model 节点运行两次，tools 节点运行一次，checkpointer 在输入之后和四个步骤之后各保存一次状态。
-caption: 从上到下阅读各行。每个青绿色箭头是一个检查点，带着它的步骤编号。每个检查点下方的琥珀色注释是接下来运行的节点。右侧的小标签是每个检查点里的消息，粗体标签是这一步新增的。来源：capture/out/06-agent-run.txt、capture/out/05-agent-graph.txt 和 capture/out/30-state-history-forks.txt。
+caption: 从上到下阅读各行。每个青色箭头是一个检查点，带着它的步骤编号。每个检查点下方的琥珀色注释是接下来运行的节点。右侧的小标签是每个检查点里的消息，粗体标签是这一步新增的。来源：capture/out/06-agent-run.txt、capture/out/05-agent-graph.txt 和 capture/out/30-state-history-forks.txt。
 ```
 
 1. `invoke` 把输入送到图上。有 checkpointer 时，LangGraph 保存输入检查点，步骤为 `-1`。
@@ -247,7 +247,7 @@ id: fig-1-3b
 kind: tree
 title: 一次被追踪的 agent 轮次所产生的运行
 claim: 一次被追踪的轮次是一棵运行树，每个图节点对应一个 chain 运行，每次模型调用和工具调用各对应一个叶子。
-caption: 从顶部的根开始读。每个方框是一个运行，运行类型之上写着它的名字。紫色的根留在内存里，客户端收到它下面的七个运行。梅红色的叶子是模型调用，绿色的叶子是工具调用。来源：capture/out/42-langsmith.txt。
+caption: 从顶部的根开始读。每个方框是一个运行，运行类型之上写着它的名字。紫色的根留在内存里，客户端收到它下面的七个运行。梅紫色的叶子是模型调用，绿色的叶子是工具调用。来源：capture/out/42-langsmith.txt。
 ```
 
 ## 递归上限 {#s-one-create-agent-run-the-recursion-limit}

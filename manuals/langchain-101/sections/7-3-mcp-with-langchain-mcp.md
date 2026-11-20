@@ -73,7 +73,7 @@ lang: json
     }
 ```
 
-`langchain.mcp` 没有面向 MCP 资源或 prompt 的 API。迁移指南把两者都列为不支持 {{docs oss/python/migrate/langchain-mcp-adapters}}。录制工具包通过 `adapter.client`（底层的 FastMCP 客户端）读取了一个资源，得到 `calc server: multiply, divide, stats`。
+`langchain.mcp` 没有面向 MCP 资源或提示词的 API。迁移指南把两者都列为不支持 {{docs oss/python/migrate/langchain-mcp-adapters}}。录制工具包通过 `adapter.client`（底层的 FastMCP 客户端）读取了一个资源，得到 `calc server: multiply, divide, stats`。
 
 ## 字符串目标必须是 URL {#s-mcp-with-langchain-mcp-a-string-target-must-be-a-url}
 
@@ -126,14 +126,14 @@ lang: json
 
 传输层的失败则不同。它不是 `ToolException`，所以会跳过错误处理，直接从运行里抛出。文档说的也一样：服务器错误会到达模型，传输或会话失败则会抛出异常 {{docs oss/python/langchain/mcp/tools}}。录制工具包无法让进程内的服务器崩溃，所以其他情况我们在 Mac 上用真实的服务器测试。
 
-**我们测量了** Mac 上每种失败，机器是 Apple M1 Max，10 核，64 GiB，使用 `langchain` 1.5.0 和 `fastmcp` 4.2.0。FastMCP 服务器分别通过 stdio 和 Streamable HTTP 运行，每个用例运行一次。[图](#fig-7-3)展示了每个用例的结果。
+**我们测得** Mac 上每种失败，机器是 Apple M1 Max，10 核，64 GiB，使用 `langchain` 1.5.0 和 `fastmcp` 4.2.0。FastMCP 服务器分别通过 stdio 和 Streamable HTTP 运行，每个用例运行一次。[图](#fig-7-3)展示了每个用例的结果。
 
 ```figure
 id: fig-7-3
 kind: decision
 title: 每种 MCP 失败对一次运行造成的后果
 claim: 工具错误变成错误的 ToolMessage，运行继续；但慢工具没有超时，服务器崩溃会中止运行。
-caption: 请从左边的用例读到右边的结果，逐行阅读。绿色行进入下一次模型调用，灰色行在等待，玫瑰色行抛出异常。来源：capture/lab/summary/mcp-mac.json。
+caption: 请从左边的用例读到右边的结果，逐行阅读。绿色行进入下一次模型调用，灰色行在等待，玫红色行抛出异常。来源：capture/lab/summary/mcp-mac.json。
 ```
 
 - **抛出异常的工具。** 工具内部的 `ToolError` 和普通的 `RuntimeError` 都变成了 `status` 为 `error` 的 `ToolMessage`。在 `create_agent` 内部，运行继续进入下一次模型调用。
@@ -145,7 +145,7 @@ caption: 请从左边的用例读到右边的结果，逐行阅读。绿色行�
 
 ## 一次调用的成本 {#s-mcp-with-langchain-mcp-the-cost-of-a-call}
 
-**我们测量了** Mac 上每种传输方式 50 次 `add` 工具调用，使用 `langchain` 1.5.0。原始文件保存的是每 50 次调用一块的中位数和 95 分位数，而不是每次调用的时间。笔记本同时还在运行其他工作，所以请把这些时间当作上界来读。
+**我们测得** Mac 上每种传输方式 50 次 `add` 工具调用，使用 `langchain` 1.5.0。原始文件保存的是每 50 次调用一块的中位数和 95 分位数，而不是每次调用的时间。笔记本同时还在运行其他工作，所以请把这些时间当作上界来读。
 
 | 传输方式 | 中位数，适配器未打开 | 95 分位数 | 中位数，在 `async with adapter` 内 | 95 分位数 |
 |---|---|---|---|---|
@@ -175,7 +175,7 @@ So langchain-mcp-adapters 0.3.2 starts one stdio subprocess per tool call (Multi
 
 `MCPAdapter` 会让它构建的每个客户端都具备征询输入的能力。对于你传入的客户端，它启用的是用 `client.new()` 创建的副本。如果客户端已经有自己的 `elicitation_handler`，它就不去动这个客户端 {{code libs/langchain_v1/langchain/mcp/adapter.py:173-187}}。当服务器以 `InputRequiredResult` 的形式返回它的问题时，适配器用 LangGraph 的 `interrupt()` 来提问 {{code libs/langchain_v1/langchain/mcp/elicitation.py:311-364}}。所以 MCP 工具可以让 agent 的运行暂停，就像[第 6.4 节](#s-interrupt-and-resume)的审核那样。
 
-**我们测量了** Mac 上的这些用例，不用模型，使用 `langchain` 1.5.0、`fastmcp` 4.2.0、`mcp` 2.3.0 和 `langgraph` 1.2.22。每个用例运行 3 次，每次在新进程里，每个用例的 3 次运行结果相同。服务器在同一个进程里运行，其中五个用例还通过 Streamable HTTP 又运行了一遍。服务器工具 `ask_name` 请求一个表单字段 `name`。默认的适配器协商出的协议是 `2026-07-28`。
+**我们测得** Mac 上的这些用例，不用模型，使用 `langchain` 1.5.0、`fastmcp` 4.2.0、`mcp` 2.3.0 和 `langgraph` 1.2.22。每个用例运行 3 次，每次在新进程里，每个用例的 3 次运行结果相同。服务器在同一个进程里运行，其中五个用例还通过 Streamable HTTP 又运行了一遍。服务器工具 `ask_name` 请求一个表单字段 `name`。默认的适配器协商出的协议是 `2026-07-28`。
 
 在带 `InMemorySaver` 的 `create_agent` 内部，运行以 `__interrupt__` 停止，状态里的 `next` 是 `tools`。中断的值写明了工具和每个请求：
 
@@ -248,7 +248,7 @@ note: 第一个事件是 ToolMessage，第二个是 fastmcp.Client.call_tool 的
 
 原因在 `_convert_call_tool_result`，它在构建 artifact 之前就对错误结果抛出异常 {{code libs/langchain_v1/langchain/mcp/tools.py:168-179}}。随后错误处理器只返回内容块 {{code libs/langchain_v1/langchain/mcp/tools.py:104-117}}。不带 `is_error` 的同样结果保留了它的 artifact。这种丢失在两个协议版本和 HTTP 上都一样。所以，只把 `retry_after` 放在结构化内容里的服务器，会让你的代码无从读取。请让服务器在文本里再写一遍。
 
-**进度。** 服务器工具报告了三次进度。使用默认适配器时，没有任何进度到达调用方。在 agent 内部，`stream_mode="custom"` 产生了 0 个数据块，所以进度不会变成流事件。传给适配器的 `fastmcp.Client(target, progress_handler=...)` 收到了全部 3 次报告，进程内、HTTP 上和 agent 内部都是如此。进度和超时一样，需要你自己构建的客户端。
+**进度。** 服务器工具报告了三次进度。使用默认适配器时，没有任何进度到达调用方。在 agent 内部，`stream_mode="custom"` 产生了 0 个块，所以进度不会变成流事件。传给适配器的 `fastmcp.Client(target, progress_handler=...)` 收到了全部 3 次报告，进程内、HTTP 上和 agent 内部都是如此。进度和超时一样，需要你自己构建的客户端。
 
 这一版没有录制 OAuth、URL 模式的征询输入，以及同一轮里的多个输入请求。[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)列出了它们。
 

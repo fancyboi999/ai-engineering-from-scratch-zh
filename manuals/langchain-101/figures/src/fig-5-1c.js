@@ -7,7 +7,7 @@ const { chart, load } = require('../../../_shared/chart.js');
 const data = load(path.join(__dirname, '../../capture/lab/summary/streaming-mac-real.json'));
 const text = data.phases.text.variants;
 const rows = [
-  ['plain_openai', 'plain openai 循环', 'grey'],
+  ['plain_openai', '朴素 openai 循环', 'grey'],
   ['chatopenai_stream', 'ChatOpenAI.stream', 'blue'],
   ['agent_messages', 'messages 模式', 'indigo'],
   ['agent_messages_updates', 'messages 与 updates', 'indigo'],
@@ -22,7 +22,7 @@ const fmt = v => (v >= 100 ? String(Math.round(v)) : String(v));
 module.exports = figure('fig-5-1c', {
   height: 420,
   title: '按流 API 划分的每次运行的首个 token 送达延迟',
-  desc: `点图，纵轴为对数刻度，表示从代理转发 Qwen3 4B 的首个 token 到消费者看到它之间的时间，在 Mac 上，每种 API 运行 ${text.plain_openai.n} 次。中位数：plain openai ${text.plain_openai.first_delay_ms_median} ms，ChatOpenAI ${text.chatopenai_stream.first_delay_ms_median} ms，messages 模式 ${text.agent_messages.first_delay_ms_median} ms，v3 文档中的循环 ${text.stream_events_v3.first_delay_ms_median} ms，先读推理的 async v3 消费者 ${text.astream_events_v3_gather.first_delay_ms_median} ms。`,
+  desc: `点图，纵轴为对数刻度，表示从代理转发 Qwen3 4B 的首个 token 到消费者看到它之间的时间，在 Mac 上，每种 API 运行 ${text.plain_openai.n} 次。中位数：朴素 openai ${text.plain_openai.first_delay_ms_median} ms，ChatOpenAI ${text.chatopenai_stream.first_delay_ms_median} ms，messages 模式 ${text.agent_messages.first_delay_ms_median} ms，v3 文档中的循环 ${text.stream_events_v3.first_delay_ms_median} ms，先读推理的 async v3 消费者 ${text.astream_events_v3_gather.first_delay_ms_median} ms。`,
 }, f => {
   const c = chart(f, { x: 196, y: 40, w: 352, h: 288, xScale: 'log10', yDomain: [0, 9], xDomain: [0.1, 10000], xTicks: [0.1, 1, 10, 100, 1000, 10000], xFormat: String, xLabel: '从发送到消费者收到的毫秒数，对数刻度' });
   f.text(20, 28, '流 API', { size: 11.5, serif: true, hue: 'ink-soft' });

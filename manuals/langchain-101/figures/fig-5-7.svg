@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 418" role="img" aria-labelledby="fig-5-7-title fig-5-7-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-7-title">assistant 的七个进程，以及每个进程留下的内容</title>
-  <desc id="fig-5-7-desc">一张表，assistant 在 Mac 上运行的七个进程各占一行，每一列是进程结束时读到的一个计数。进程 3 批准了邮件、发出了邮件，随后以退出码 137 被终止。进程 4 恢复后发现同一个审批又在等待。进程 5 再次批准，send_email 第二次运行，幂等键检查跳过了发送。最后 send_email 一共运行了 2 次，发件箱里有 1 封邮件。新线程上的进程 7 在 store 里仍然找到 2 条记忆。</desc>
+  <desc id="fig-5-7-desc">一张表，assistant 在 Mac 上运行的七个进程各占一行，每一列是进程结束时读到的一个计数。进程 3 批准了邮件、发出了邮件，随后以退出码 137 被杀。进程 4 恢复后发现同一个审批又在等待。进程 5 再次批准，send_email 第二次运行，幂等键检查跳过了发送。最后 send_email 一共运行了 2 次，发件箱里有 1 封邮件。新线程上的进程 7 在 store 里仍然找到 2 条记忆。</desc>
   <text x="252.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">下一个</text>
   <text x="252.5" y="37" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">节点</text>
   <text x="333.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">检查点</text>
@@ -64,7 +64,7 @@
   <rect x="540" y="222" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
   <text x="576.5" y="243" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">1</text>
   <text x="20" y="283" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">6</text>
-  <text x="40" y="283" font-size="11.5" fill="var(--m-ink, #1a1a1a)">第三回合</text>
+  <text x="40" y="283" font-size="11.5" fill="var(--m-ink, #1a1a1a)">第三轮</text>
   <rect x="216" y="262" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
   <text x="252.5" y="283" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">无</text>
   <rect x="297" y="262" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>

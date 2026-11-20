@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 404" role="img" aria-labelledby="fig-5-1-title fig-5-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-5-1-title">一次 agent 运行在各个流模式下的数据块</title>
-  <desc id="fig-5-1-desc">八行，对应同一次 agent 运行的八种流，分四列：输入、第 1 步的 model 节点、第 2 步的 tools 节点、第 3 步的 model 节点。每个标记是从录制中读出的一个数据块，颜色表示它携带的内容：靛蓝是整个状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始或结束的任务。updates 有 3 个，values 4 个，messages 13 个，tasks 6 个，debug 6 个，custom 0 个，slow_sum agent 上的 tools 模式 4 个，stream_events v3 有 23 个事件。v3 流在每一步结束时发出一个 values 事件。</desc>
+  <title id="fig-5-1-title">一次 agent 运行在各个流模式下的块</title>
+  <desc id="fig-5-1-desc">八行，对应同一次 agent 运行的八种流，分四列：输入、第 1 步的 model 节点、第 2 步的 tools 节点、第 3 步的 model 节点。每个标记是从录制中读出的一个块，颜色表示它携带的内容：靛蓝是整个状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始或结束的任务。updates 有 3 个，values 4 个，messages 13 个，tasks 6 个，debug 6 个，custom 0 个，slow_sum agent 上的 tools 模式 4 个，stream_events v3 有 23 个事件。v3 流在每一步结束时发出一个 values 事件。</desc>
   <text x="138" y="24" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">输入</text>
   <line x1="106" y1="34" x2="106" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
   <text x="242" y="24" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">model，第 1 步</text>
@@ -113,7 +113,7 @@
   <text x="398" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务开始</text>
   <rect x="508" y="318" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
   <text x="520" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务结束</text>
-  <text x="20" y="362" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个标记是一个数据块。tasks 和 debug 运行时没有 checkpointer。</text>
+  <text x="20" y="362" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个标记是一个块。tasks 和 debug 运行时没有 checkpointer。</text>
   <text x="20" y="380" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tools 行来自 slow_sum agent：开始、两个增量、完成。</text>
   <text x="20" y="398" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每一列都以一个 v3 values 事件收尾。</text>
 </svg>

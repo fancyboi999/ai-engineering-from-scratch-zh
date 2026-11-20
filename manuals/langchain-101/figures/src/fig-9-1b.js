@@ -15,7 +15,7 @@ const plan = gl.layout(graph, { top: 44, hue, metaMax: 240 });
 
 module.exports = figure('fig-9-1b', {
   height: plan.bottom + 44,
-  title: '服务智能体的图',
+  title: '服务 agent 的图',
   desc: `参考服务中 build_agent 的已编译图，由 draw_mermaid 输出绘制。它有 ${s.nodes} 个节点，其中 ${hooks.length} 个是钩子节点：${hooks.join(', ')}。其他中间件只有 wrap 钩子，不增加节点。ModelCallLimitMiddleware 可以在 model 之前或之后结束运行。tools 节点含 ${tools.length} 个工具：${tools.join(', ')}。`,
 }, f => {
   f.kicker(20, 20, 'build_agent 的 get_graph()');

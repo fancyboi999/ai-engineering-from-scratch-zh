@@ -72,7 +72,7 @@ const RH = 76;
 module.exports = figure('fig-2-4', {
   height: 520,
   title: '三次调用回答并行两个节点提出的三个问题',
-  desc: `四个节点与四次调用组成的网格，在同一个线程上使用 InMemorySaver，模型为 x86 服务器虚拟机上的 Qwen3 4B。ask、approve 和 other 在 START 之后并行运行，after 最后运行。ask 和 approve 在调用 interrupt 之前，各自先让模型提出一个问题。调用 1 启动运行：ask 在它的第一个中断处停止，id 为 ${askId1}，approve 停止，id 为 ${approveId}，other 完成。调用 2a 用一个普通值恢复，抛出 ${err}，因为有两个中断在等待，且不产生任何模型调用。调用 2b 用一个从 id 到答案的映射恢复：approve 再次询问模型，得到 OK，完成。ask 再次询问模型，重放它的第一个答案，提出第二个问题，并以 id ${askId2} 停止。other 不运行，因为它已保存的写入被重新应用。调用 3 用 A2 恢复：ask 第三次运行，共两次模型调用，完成，随后 after 运行。四次调用分别产生 ${perCall['run 1']}、${perCall['run 2a']}、${perCall['run 2b']} 和 ${perCall['run 3']} 次模型调用，五个提示共 ${total} 次。线程保存了 ${history.length} 个检查点，步为 ${history.slice().reverse().join('、')}。`,
+  desc: `四个节点与四次调用组成的网格，在同一个线程上使用 InMemorySaver，模型为 x86 服务器虚拟机上的 Qwen3 4B。ask、approve 和 other 在 START 之后并行运行，after 最后运行。ask 和 approve 在调用 interrupt 之前，各自先让模型提出一个问题。调用 1 启动运行：ask 在它的第一个中断处停止，id 为 ${askId1}，approve 停止，id 为 ${approveId}，other 完成。调用 2a 用一个普通值恢复，抛出 ${err}，因为有两个中断在等待，且不产生任何模型调用。调用 2b 用一个从 id 到答案的映射恢复：approve 再次询问模型，得到 OK，完成。ask 再次询问模型，重放它的第一个答案，提出第二个问题，并以 id ${askId2} 停止。other 不运行，因为它已保存的写入被重新应用。调用 3 用 A2 恢复：ask 第三次运行，共两次模型调用，完成，随后 after 运行。四次调用分别产生 ${perCall['run 1']}、${perCall['run 2a']}、${perCall['run 2b']} 和 ${perCall['run 3']} 次模型调用，五个提示词共 ${total} 次。线程保存了 ${history.length} 个检查点，步为 ${history.slice().reverse().join('、')}。`,
 }, f => {
   f.kicker(20, 22, '第几次调用');
   f.text(20, 40, '恢复值', { size: 11, serif: true, hue: 'ink-soft' });
@@ -127,5 +127,5 @@ module.exports = figure('fig-2-4', {
   f.text(248, ky, '完成', { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(340, ky - 11, 22, 14, { hue: 'teal', dash: 'dashed' });
   f.text(368, ky, '写入重新应用，不运行', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ky + 22, `列表：进入时的恢复列表，五个提示共 ${total} 次模型调用`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ky + 22, `列表：进入时的恢复列表，五个提示词共 ${total} 次模型调用`, { size: 11, serif: true, hue: 'ink-soft' });
 });

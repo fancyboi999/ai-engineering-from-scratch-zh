@@ -11,10 +11,10 @@
 | `kit/gen_tasks.py` | 用固定数据生成 100 个任务：12 件商品的目录、含 48 位客户和 240 个订单的 SQLite 商店，以及 26 份虚构的文档 |
 | `kit/oracle.py` | 为每个任务运行正确的工具调用并检查每个任务都能通过，再检查一个不做任何工具调用的 agent 会让每个任务都失败 |
 | `kit/env.py` | 每个任务族的工具，每个都被包装起来，以记录参数、结果和耗时 |
-| `kit/harnesses.py` | 四种 harness：普通循环、`create_agent`、手工搭建的 `StateGraph` 和 `create_deep_agent`，另有第五种用于 `FilesystemBackend` |
+| `kit/harnesses.py` | 四种 harness：朴素循环、`create_agent`、手工搭建的 `StateGraph` 和 `create_deep_agent`，另有第五种用于 `FilesystemBackend` |
 | `kit/checks.py` | 检查器，以及失败类别 |
 | `kit/models.py` | 模型设置、调用计量和成本账本 |
-| `kit/run.py`, `kit/structured.py`, `kit/toolscale.py` | 三个运行器：任务套件、结构化输出和工具数量 |
+| `kit/run.py`, `kit/structured.py`, `kit/toolscale.py` | 三个运行器：任务集、结构化输出和工具数量 |
 | `summarize.py` | 读取原始行并写出 `summary-mac.json`，测试基准各节的每个数字和图表都来自它 |
 
 **检查器（checker）：** 依据工具改变了什么来判定通过与否的函数。它读取运行过的查询及其参数、数据库哈希、任务文件夹里的文件，以及笔记 store。只有对有标准答案的问题，并且模型没有调用 `submit_answer` 时，它才会读取最终文本。
@@ -31,10 +31,10 @@
 
 | 运行器 | 模型 | 每个单元格的任务数 |
 |---|---|---|
-| 任务套件，普通循环和 deep agent | Qwen3 4B, Qwen3 8B, Claude Haiku 5.5 | 99 |
-| 任务套件，普通循环和 deep agent | Claude Sonnet 5.5, gpt-oss 20B, Qwen3 14B, Qwen3 30B-A3B | 30 |
-| 任务套件，`create_agent` 和 `StateGraph` | Qwen3 4B, Qwen3 8B | 30 |
-| 任务套件，`FilesystemBackend` | Qwen3 4B, Qwen3 8B, Claude Haiku 5.5 | 20 个文件任务 |
+| 任务集，朴素循环和 deep agent | Qwen3 4B, Qwen3 8B, Claude Haiku 5.5 | 99 |
+| 任务集，朴素循环和 deep agent | Claude Sonnet 5.5, gpt-oss 20B, Qwen3 14B, Qwen3 30B-A3B | 30 |
+| 任务集，`create_agent` 和 `StateGraph` | Qwen3 4B, Qwen3 8B | 30 |
+| 任务集，`FilesystemBackend` | Qwen3 4B, Qwen3 8B, Claude Haiku 5.5 | 20 个文件任务 |
 | 结构化输出 | Qwen3 4B, Qwen3 8B, Claude Haiku 5.5 | 39 个，Qwen3 4B 上的 `ProviderStrategy` 为 10 个 |
 | 工具数量 | Qwen3 4B 和 Claude Haiku 5.5 各 4 种规模，Qwen3 8B 2 种规模 | 10 个链式任务 |
 
@@ -46,21 +46,21 @@ Claude 通过 Mac 访问 Anthropic API 运行，使用 `langchain-anthropic` 1.7
 
 所用的包是 `langchain` 1.5.0、`langchain-core` 1.8.0、`langgraph` 1.2.22、`deepagents` 0.7.38 和 `langchain-ollama` 1.1.0。
 
-## 在 Ollama 上，一次贪婪运行就够了 {#s-ref-the-bench-method-one-greedy-run-is-enough-on-ollama}
+## 在 Ollama 上，一次贪心运行就够了 {#s-ref-the-bench-method-one-greedy-run-is-enough-on-ollama}
 
-**我们测得**在 Mac 上，用两种 harness 各把 Qwen3 4B 在 30 个任务的子集上运行三次。三次运行在每个任务上都给出相同的结果、相同的 token 和相同的工具调用。temperature 为 0 且 seed 固定时，Ollama 会重复自己，所以再做一次贪婪运行没有增加任何信息。
+**我们测得**在 Mac 上，用两种 harness 各把 Qwen3 4B 在 30 个任务的子集上运行三次。三次运行在每个任务上都给出相同的结果、相同的 token 和相同的工具调用。temperature 为 0 且 seed 固定时，Ollama 会重复自己，所以再做一次贪心运行没有增加任何信息。
 
-**我们测得**在同样的 30 个任务上，用 temperature 0.7 和 seed 1、2、3 运行普通循环。它分别通过了 24、23 和 23 个，有 5 个任务的结果在不同 seed 之间发生了变化。[图](#fig-r-11)展示了每次运行。
+**我们测得**在同样的 30 个任务上，用 temperature 0.7 和 seed 1、2、3 运行朴素循环。它分别通过了 24、23 和 23 个，有 5 个任务的结果在不同 seed 之间发生了变化。[图](#fig-r-11)展示了每次运行。
 
 ```figure
 id: fig-r-11
 kind: chart
-title: 三次贪婪运行彼此重复，三次采样运行则不然
+title: 三次贪心运行彼此重复，三次采样运行则不然
 claim: temperature 为 0 时，Qwen3 4B 的三次运行在全部 30 个任务上结果相同；temperature 为 0.7 时，有五个任务的结果在 seed 之间发生变化。
-caption: 每列是子集中的一个任务，每行是一次运行。实心方块表示通过，玫瑰色方块表示失败。琥珀色标记是结果在 seed 之间发生变化的任务。数据来自 capture/lab/bench/summary-mac.json。
+caption: 每列是子集中的一个任务，每行是一次运行。实心方块表示通过，玫红色方块表示失败。琥珀色标记是结果在 seed 之间发生变化的任务。数据来自 capture/lab/bench/summary-mac.json。
 ```
 
-所以贪婪结果只是这个模型的一个样本。任务是固定的，每个只运行一次，因此单元格的区间是对这个套件上某个比率的 Wilson 区间。它不度量重复运行之间的离散程度，只适用于这个套件。换一个 seed 或 temperature 会改变个别任务，而不会改变比率：贪婪是 23 个，采样是 23 到 24 个。
+所以贪心结果只是这个模型的一个样本。任务是固定的，每个只运行一次，因此单元格的区间是对这个套件上某个比率的 Wilson 区间。它不度量重复运行之间的离散程度，只适用于这个套件。换一个 seed 或 temperature 会改变个别任务，而不会改变比率：贪心是 23 个，采样是 23 到 24 个。
 
 ## 区间 {#s-ref-the-bench-method-intervals}
 
@@ -85,7 +85,7 @@ caption: 每列是子集中的一个任务，每行是一次运行。实心方�
 
 工具包为每次 Claude 调用写一行账本记录，内容是 API 返回的用量和 2026-11-14 的标价。账本达到上限时，它会在调用之前停止。整个测试基准用了 2,589 次调用和 $0.93。下面较晚的运行单独计算。
 
-账本在每次调用上记录的缓存写入 token 都是 0，并把这些 token 按基础输入价格计价。如果 API 对缓存写入按 1.25 倍计费，我们的美元数就偏低。对普通循环单元格，偏低的上限是 12.7%。对 deep agent 单元格约为 6%：Haiku 是 4.6%，Sonnet 是 6.4%，两者合计是 6.1%。这样一来 deep agent 的比值只会更低，不会更高。
+账本在每次调用上记录的缓存写入 token 都是 0，并把这些 token 按基础输入价格计价。如果 API 对缓存写入按 1.25 倍计费，我们的美元数就偏低。对朴素循环单元格，偏低的上限是 12.7%。对 deep agent 单元格约为 6%：Haiku 是 4.6%，Sonnet 是 6.4%，两者合计是 6.1%。这样一来 deep agent 的比值只会更低，不会更高。
 
 ## 第二个测试基准与多 agent 运行 {#s-ref-the-bench-method-the-second-bench-and-the-multi-agent-runs}
 
@@ -93,12 +93,12 @@ caption: 每列是子集中的一个任务，每行是一次运行。实心方�
 
 | 目录 | 运行内容 | 文件 |
 |---|---|---|
-| `bench2/` | harness 档案 A 和 B、带与不带提示（要求使用它）的 `eval` 工具，以及配 Qwen3 14B 打分器的 `RubricMiddleware` | `kit2/run2.py` 负责运行，`kit2/summarize2.py` 写出 `summary-bench2.json`，`kit2/docs_table.py` 把文档里的表读入 `docs-eval-table.json` |
+| `bench2/` | harness profile A 和 B、带与不带提示词（要求使用它）的 `eval` 工具，以及配 Qwen3 14B 打分器的 `RubricMiddleware` | `kit2/run2.py` 负责运行，`kit2/summarize2.py` 写出 `summary-bench2.json`，`kit2/docs_table.py` 把文档里的表读入 `docs-eval-table.json` |
 | `multiagent/` | 在 Haiku 和 Qwen3 14B 上运行五种模式，并在 Haiku 上对比 Claude Agent SDK 与 deep agent | `kit/run_patterns.py` 和 `kit/run_sdk.py` 负责运行，`kit/summarize_patterns.py` 写出 `capture/lab/summary/multiagent-mac.json` |
 
-`bench2/` 的本地行是在我们专门为它们启动的第二个 Ollama 0.31.1 服务器上运行的，它有自己的模型缓存。它第一次启动时用了量化的键值缓存和 flash attention。有八个对照行来自那次启动，Qwen3 4B 四个，Qwen3 8B 四个。我们用第一个测试基准的默认设置重启了服务器，并把这八行放在 `bench2/runs/excluded/` 里。重启之后，三个对照任务给出了与第一个测试基准相同的工具调用和提示 token。
+`bench2/` 的本地行是在我们专门为它们启动的第二个 Ollama 0.31.1 服务器上运行的，它有自己的模型缓存。它第一次启动时用了量化的键值缓存和 flash attention。有八个对照行来自那次启动，Qwen3 4B 四个，Qwen3 8B 四个。我们用第一个测试基准的默认设置重启了服务器，并把这八行放在 `bench2/runs/excluded/` 里。重启之后，三个对照任务给出了与第一个测试基准相同的工具调用和提示词 token。
 
-本地模型的档案行和评估行都来自重启之后。汇总从第一个测试基准里读取普通循环和默认 deep agent 的行。Qwen3 14B 和 gpt-oss 20B 的 deep agent 单元格把 12 次旧运行和 27 次新运行（设置相同）合在一起。
+本地模型的 profile 行和评估行都来自重启之后。汇总从第一个测试基准里读取朴素循环和默认 deep agent 的行。Qwen3 14B 和 gpt-oss 20B 的 deep agent 单元格把 12 次旧运行和 27 次新运行（设置相同）合在一起。
 
 [图](#fig-r-11b)展示了第二个测试基准的每个单元格及其区间。
 
@@ -107,7 +107,7 @@ id: fig-r-11b
 kind: chart
 title: 第二个测试基准每个单元格的通过率及其区间
 claim: 99 个任务的单元格给出 18 到 19 个百分点的区间，30 个任务的单元格给出最多 34 个百分点的区间。
-caption: 每行是一个单元格。圆点是通过率，须线是 95% 的 Wilson 区间。玫瑰色的数字标出任务数少于 30 的单元格。数据来自 capture/lab/bench2/summary-bench2.json。
+caption: 每行是一个单元格。圆点是通过率，须线是 95% 的 Wilson 区间。玫红色的数字标出任务数少于 30 的单元格。数据来自 capture/lab/bench2/summary-bench2.json。
 ```
 
 `bench2/` 里的 Haiku 运行了 370 次调用，花了 $0.0695，记录在 `bench2/runs/cost-ledger.jsonl` 里。Haiku 的多 agent 运行是 1,518 行账本记录，花了 $0.150，记录在 `multiagent/runs/cost-ledger.jsonl` 里。
@@ -128,7 +128,7 @@ Qwen3 8B 的 nudged 运行在开始时就失败了。gpt-oss 20B 的多 agent �
 | `bench2/runs/excluded/kvq8-profiles.jsonl`, `bench2/runs/excluded/kvq8-rubric.jsonl` | 来自第二个服务器第一次启动的对照行，它们没能复现第一个测试基准 |
 | `bench2/runs/smoke.jsonl`, `bench2/runs/verify.jsonl` | 汇总不读取的冒烟与检查运行 |
 | `runs/excluded/structured-dev.jsonl`, `runs/excluded/toolscale-dev.jsonl` | 用于测试运行器的运行所产生的行 |
-| Claude 的结构化输出行 | 有效，但运行器没有加提示缓存，所以它们的美元数是标价 |
+| Claude 的结构化输出行 | 有效，但运行器没有加提示词缓存，所以它们的美元数是标价 |
 | 把严格通过当作质量指标 | 它统计 `submit_answer` 的使用，而小模型经常把答案直接写在文本里 |
 
 主文件保留其他所有行。`summarize.py` 在读取行时去掉 `sql19`，`summarize.py --check` 会重新生成汇总并与现有的比较。

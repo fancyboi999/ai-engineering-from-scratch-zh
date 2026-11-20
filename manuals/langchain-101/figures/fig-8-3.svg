@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-8-3-title fig-8-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-8-3-title">三次 Qwen3 4B 调用的一次运行中，模型之外的耗时</title>
-  <desc id="fig-8-3-desc">点图，展示 Mac 上每次运行在模型之外花费的毫秒数，每个程序 40 次运行，对象是 Ollama 上的 Qwen3 4B，经一个给每次模型调用计时的代理访问。中位数：plain openai 循环 25.11 ms，ChatOpenAI bind_tools 循环 29.32 ms，create_agent 37.62 ms，带 InMemorySaver 的 create_agent 37.64 ms，手写 StateGraph 36.71 ms。</desc>
+  <desc id="fig-8-3-desc">点图，展示 Mac 上每次运行在模型之外花费的毫秒数，每个程序 40 次运行，对象是 Ollama 上的 Qwen3 4B，经一个给每次模型调用计时的代理访问。中位数：朴素 openai 循环 25.11 ms，ChatOpenAI bind_tools 循环 29.32 ms，create_agent 37.62 ms，带 InMemorySaver 的 create_agent 37.64 ms，手写 StateGraph 36.71 ms。</desc>
   <line x1="70" y1="290" x2="610" y2="290" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="294" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="70" y1="227.5" x2="610" y2="227.5" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>

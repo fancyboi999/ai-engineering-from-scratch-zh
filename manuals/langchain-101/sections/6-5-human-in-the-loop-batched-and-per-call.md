@@ -192,12 +192,12 @@ id: fig-6-5
 kind: comparison
 title: 批量模式与逐调用模式
 claim: 批量模式用一个列表回答同一条消息的所有调用，逐调用模式则按中断 id 对照模式逐个回答每个调用。
-caption: 请跨两列逐行阅读。各行依次是暂停、恢复、把编辑改成另一个工具，以及跳转到 tools 的中间件。玫瑰色单元格是审核没有生效的地方。来源：capture/out/15-mw-hitl-batched.txt、capture/out/16-mw-hitl-per-call.txt 和 capture/lab/summary/approvals-x86.json。
+caption: 请跨两列逐行阅读。各行依次是暂停、恢复、把调用编辑成另一个工具，以及跳转到 tools 的中间件。玫红色单元格是审核没有生效的地方。来源：capture/out/15-mw-hitl-batched.txt、capture/out/16-mw-hitl-per-call.txt 和 capture/lab/summary/approvals-x86.json。
 ```
 
 ## 实验记录的发现 {#s-human-in-the-loop-batched-and-per-call-what-the-lab-found}
 
-**我们测量了** x86 服务器客户机上的这个中间件：25 个模型用例，每个跑 3 次。模型是 Ollama 上的 Qwen3 4B（temperature 0，seed 42）。图用例 G1 和 G2 没有模型，来自 Mac。工具是 `send_email` 和 `delete_file`，都在审核之下。
+**我们测得** x86 服务器客户机上的这个中间件：25 个模型用例，每个跑 3 次。模型是 Ollama 上的 Qwen3 4B（temperature 0，seed 42）。图用例 G1 和 G2 没有模型，来自 Mac。工具是 `send_email` 和 `delete_file`，都在审核之下。
 
 每次启动和每次恢复都在新进程里对 `SqliteSaver` 运行，所以每次恢复都是一次重启。每个用例的 3 次运行得到了相同的工具运行结果。[图](#fig-6-5b)展示了每一次运行。
 
@@ -206,7 +206,7 @@ id: fig-6-5b
 kind: chart
 title: 每个审批用例的工具运行
 claim: 每个用例在 3 次运行里都得到相同的工具运行结果，而且只有批量用例运行了没有任何审批允许的工具。
-caption: 每一列是 22 个中间件用例之一。图和严格恢复用例 G1 到 G3、S1、S2 没有画出。每个点是 x86 服务器客户机上的一次运行。落在线上的点表示工具运行与决定一致，玫瑰色点表示运行了没有任何审批允许的工具。来源：capture/lab/summary/approvals-x86.json。
+caption: 每一列是 22 个中间件用例之一。图和严格恢复用例 G1 到 G3、S1、S2 没有画出。每个点是 x86 服务器客户机上的一次运行。落在线上的点表示工具运行与决定一致，玫红色点表示运行了没有任何审批允许的工具。来源：capture/lab/summary/approvals-x86.json。
 ```
 
 图里的灰线是每个用例中审核人允许运行的工具次数。图的代码把这些次数写成了常量。它们来自下表中的决定，以及 `capture/lab/T07-approvals-x86/` 里的用例脚本。用例有简短的代号：`B` 是批量，`P` 是逐调用，`J` 表示加了一个会跳转到 `tools` 的中间件，`G` 是普通图。
@@ -246,7 +246,7 @@ J 这几行在批量模式下复现了 issue langchain#40492 {{issue langchain#4
 5. 带审核的 agent 里不要放会跳转到 `tools` 的中间件，除非你在自己的模式下测试过。
 6. 按文档所说，把 `HumanInTheLoopMiddleware` 列在工具重试和错误中间件之前 {{docs oss/python/langchain/human-in-the-loop}}。
 
-Agent Chat UI 只回答批量审批，而且输入一条消息会把待处理的审批当作成功关闭。见[聊天界面一节](#s-agent-chat-ui-in-front-of-langgraph-dev)。
+Agent Chat UI 只回答批量审批，而且输入一条消息会把待处理的审批当作成功关闭。见[Agent Chat UI 一节](#s-agent-chat-ui-in-front-of-langgraph-dev)。
 
 文档还警告了一种情况：一起发送的多个回答里有一个无效。有效回答对应的工具可能已经运行，而它们的中断看起来仍在等待，第二次回答会让它们运行两次 {{docs oss/python/langchain/human-in-the-loop}}。所以一次只回答一个中断，并让副作用具备幂等性。组合恢复失败之后，先检查工具做了什么，再重新发送回答。实验记录没有运行这种情况，也没有运行任何使用 `PostgresSaver` 的用例。两者都留到下一版，与[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)里的其他未决项放在一起。
 

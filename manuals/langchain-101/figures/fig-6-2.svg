@@ -81,5 +81,5 @@
   <rect x="434" y="369" width="118" height="18" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)" stroke-width="0.8"/>
   <text x="493" y="382" font-size="11" text-anchor="middle">publish</text>
   <text x="20" y="450" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同一超步内对 jokes 的三次写入合并成了一个列表。log 键最终有 6 条记录。</text>
-  <text x="20" y="468" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个青绿色单元格是节点返回的一个值，读自 updates 流。</text>
+  <text x="20" y="468" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个青色单元格是节点返回的一个值，读自 updates 流。</text>
 </svg>

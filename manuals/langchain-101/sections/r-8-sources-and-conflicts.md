@@ -12,7 +12,7 @@
 | 2 | 从仓库的一次提交构建出来的 LangChain 文档 | 文档记载的行为，用我们自己的话重述，并对照代码和我们的运行核对 |
 | 3 | 每个包的更新日志和发布说明 | 某项变更何时出现，以及它在哪个包版本中 |
 | 4 | 录制工具包，场景需要模型时使用 Ollama 上的 Qwen3 4B | 每个 listing |
-| 5 | 两台机器上的实验记录、针对托管 LangSmith API 的账户运行、任务套件测试基准，以及第 9 部分的生产服务。其中的 Claude 行是通过 Anthropic API 运行的 | 以“我们测得”开头的段落里的每个数字 |
+| 5 | 两台机器上的实验记录、针对托管 LangSmith API 的账户运行、任务集测试基准，以及第 9 部分的生产服务。其中的 Claude 行是通过 Anthropic API 运行的 | 以“我们测得”开头的段落里的每个数字 |
 
 GitHub 的 issue、pull request 和安全公告，是锁定版本下某种行为的证据。正文按编号引用每一条，并且从不把 issue 当作我们自己的结果。该项目的产品页面没有开放许可。[第 1.1 节](#s-langchain-langgraph-langsmith-and-deep-agents)用我们自己的话陈述它们的说法，并把每一条与一次运行放在一起对照。
 
@@ -106,7 +106,7 @@ GitHub 的 issue、pull request 和安全公告，是锁定版本下某种行为
 | D108 | 一个 LangSmith FAQ 表格把 checkpointer 称为社区代码，把流式输出称为基础功能。 | 当前的页面和代码 | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
 | D109 | Deep Agents 概览把规划列为默认功能。0.7.0 的更新日志把它改成了需主动启用。 | 更新日志和录制文件：添加 `TodoListMiddleware` | [7.4](#s-deep-agents-0-7), [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
 | D111 | 产品页面说追踪从不影响你的应用。追踪文档说 `LANGCHAIN_CALLBACKS_BACKGROUND=false` 会让回调等待。锁定版本下没有代码读取这个变量。 | 实验记录和代码：在 Qwen3 4B 上对托管 API 每次 agent 运行约增加 6 毫秒，该变量在锁定版本下没有效果 | [7.6](#s-langsmith-tracing) | 在文档 `04d4d4a` 处未解决 |
-| D113 | 提示中心页面通过 `langchain_classic` 讲解提示中心。 | 同一页面推荐的 LangSmith 客户端方法 | [7.7](#s-evaluation-with-langsmith), [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D113 | prompt hub页面通过 `langchain_classic` 讲解prompt hub。 | 同一页面推荐的 LangSmith 客户端方法 | [7.7](#s-evaluation-with-langsmith), [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
 | D114 | 一个追踪页面以 LCEL 链开头。 | 追踪 `create_agent` 的 agent | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
 | D116 | 本地服务器页面打印的是旧名称 LangGraph Studio。 | 当前名称：LangSmith Studio 和 Agent Server | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
 | D117 | v1 发布页面有一份固定的、支持内容块的提供方列表，且没有 `langchain.mcp`。 | 更新日志和当前页面 | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |

@@ -2,7 +2,7 @@
 
 > `langsmith` 0.14.17 的 `evaluate` 根据数据集和你的评估器构建一个实验，而即使设置了 `upload_results=False`，它仍会发送 agent 的每个运行。
 
-你修改了 agent 的系统 prompt，想知道它是否仍能回答你的二十个测试问题。文档把你引向 LangSmith，而它需要账户和密钥。你想先在笔记本上运行同样的检查，然后再作为实验放进你的账户。
+你修改了 agent 的系统提示词，想知道它是否仍能回答你的二十个测试问题。文档把你引向 LangSmith，而它需要账户和密钥。你想先在笔记本上运行同样的检查，然后再作为实验放进你的账户。
 
 读完本节，你能用本地评估器、不需要账户地运行 `evaluate`，并读懂它的行。你还能预测 `evaluate` 的每种模式会在账户里创建什么，以及 pytest 插件需要什么。
 
@@ -105,10 +105,10 @@ id: fig-7-7
 kind: comparison
 title: 两种目标上 upload_results=False 的 evaluate
 claim: 设置 upload_results=False 并使用录制工具包的客户端时，普通函数什么也不发送，而 create_agent 目标发送它的七个 LangChain 运行。
-caption: 请从顶部的示例往下读每一列，直到客户端收到的内容。玫瑰色方框是 agent 目标发送的请求。录制工具包的客户端为每个运行发送一个 POST 和一个 PATCH。来源：capture/out/42-langsmith.txt。
+caption: 请从顶部的示例往下读每一列，直到客户端收到的内容。玫红色方框是 agent 目标发送的请求。录制工具包的客户端为每个运行发送一个 POST 和一个 PATCH。来源：capture/out/42-langsmith.txt。
 ```
 
-**我们测量了** 同样的调用，使用 x86 服务器客户机上的默认客户端和 Qwen3 4B 的 agent，对着本地记录器。我们没有传客户端，也没有设置 `LANGSMITH_TRACING`。每种条件在 5 个新进程里运行，每次一个示例。agent 产生了 7 个 LangChain 运行。同一条件下的每个进程发送了相同的请求：
+**我们测得**同样的调用，使用 x86 服务器客户机上的默认客户端和 Qwen3 4B 的 agent，对着本地记录器。我们没有传客户端，也没有设置 `LANGSMITH_TRACING`。每种条件在 5 个新进程里运行，每次一个示例。agent 产生了 7 个 LangChain 运行。同一条件下的每个进程发送了相同的请求：
 
 | 目标 | 环境 | 5 个进程里每一个的请求 |
 |---|---|---|
@@ -140,7 +140,7 @@ lang: json
 
 ## 真实账户上的 evaluate {#s-evaluation-with-langsmith-evaluate-on-a-real-account}
 
-**我们测量了** 在 Mac 上对托管 API 的三次调用，用的是免费计划的新账户。数据集有 10 道加法题，目标是 Qwen3 4B 的 agent。评估器是 `exact`（一项代码检查）和 `judge`（通过管道接到 `ChatOllama` 和解析器的 prompt）：
+**我们测得**在 Mac 上对托管 API 的三次调用，用的是免费计划的新账户。数据集有 10 道加法题，目标是 Qwen3 4B 的 agent。评估器是 `exact`（一项代码检查）和 `judge`（通过管道接到 `ChatOllama` 和解析器的提示词）：
 
 | 调用 | 之后账户里有什么 | agent 运行 |
 |---|---|---|
@@ -192,7 +192,7 @@ lang: json
 
 ### 服务器上的孤儿运行 {#s-evaluation-with-langsmith-orphan-runs-on-the-server}
 
-**我们测量了** `upload_results=False` 那次调用的运行最后到了哪里。在 10 条追踪里的 10 条中，`LangGraph` 运行都有父 id。这个父运行是 `Target` 运行，客户端从未发送过它：
+**我们测得** `upload_results=False` 那次调用的运行最后到了哪里。在 10 条追踪里的 10 条中，`LangGraph` 运行都有父 id。这个父运行是 `Target` 运行，客户端从未发送过它：
 
 ```listing
 title: upload_results=False 的 evaluate 产生的孤儿运行
@@ -235,7 +235,7 @@ lang: python
 
 ### 开启记录还需要 LANGSMITH_TRACING {#s-evaluation-with-langsmith-tracking-on-needs-langsmith-tracing-too}
 
-**我们测量了** Mac 上这个插件对托管 API 的表现，在临时环境里使用 `pytest` 8.4.2。密钥已设置，带有套件名和实验名：
+**我们测得** Mac 上这个插件对托管 API 的表现，在临时环境里使用 `pytest` 8.4.2。密钥已设置，带有套件名和实验名：
 
 - **记录开启，`LANGSMITH_TRACING` 未设置。** 五个测试在 3 次运行里全都失败了。每个 `log_*` 调用都抛出 `ValueError`，要求有标记的测试和追踪。每次运行仍然创建了一个空的实验，第一次运行还创建了数据集。
 - **同样的情况加 `--langsmith-output`。** 表格显示 3 行，没有 `@langsmith.test` 的那个测试。每一行都是 `failed`，输入是 `{}`，平均值那一行写着 `0%`。pytest 以退出码 1 结束。
@@ -258,7 +258,7 @@ lang: json
 
 ### 没有账户时的插件 {#s-evaluation-with-langsmith-the-plugin-with-no-account}
 
-**我们测量了** 更早之前在 x86 服务器客户机上的这个插件，对着本地记录器，没有环境变量，每种条件 3 个进程：
+**我们测得**更早之前在 x86 服务器客户机上的这个插件，对着本地记录器，没有环境变量，每种条件 3 个进程：
 
 - **记录开启，没有 `LANGSMITH_` 变量。** 一次普通的 `pytest` 运行向 `api.smith.langchain.com` 发送了 `GET /info` 和 `GET /datasets`。我们拒绝了这个连接。四个被记录的测试以 `LangSmithConnectionError` 失败，未标记的测试从 `log_outputs` 抛出了 `ValueError`。
 - **记录关闭。** 设置 `LANGSMITH_TEST_TRACKING=false` 后，四个测试通过，预期失败的那个失败。无论有没有 `LANGSMITH_ENDPOINT`，都没有请求离开。`log_*` 调用以 INFO 级别记录日志，所以只有把 `log_cli` 设在这个级别才能看到它们。
@@ -291,14 +291,14 @@ note: 三个进程中的第一个。
 
 文档通过 `langchain_classic` 讲解 hub，冲突登记把它记为 D113。`langsmith` 的客户端有它自己的方法 `push_prompt` 和 `pull_prompt`。
 
-**我们测量了** 免费计划上的 hub，从 Mac 发起一次。我们两次推送了一个私有 prompt，标签是 `v1` 和 `v2`：
+**我们测得**免费计划上的 hub，从 Mac 发起一次。我们两次推送了一个私有提示词，标签是 `v1` 和 `v2`：
 
 - **拉取。** 每次拉取都返回了正确的版本。我们按标签、按哈希前 8 个字符、按完整哈希，以及按最新版本来拉取。
 - **没有变化的推送。** 它抛出了 `LangSmithConflictError`，来自 409，详情是 `Nothing to commit: prompt has not changed since latest commit`。
 - **不存在的标签。** 它抛出了 `LangSmithNotFoundError`，来自 404，详情是 `Commit not found`。
 - **客户端的缓存。** 第二次按完整哈希拉取没有发出 HTTP 请求。按标签的每次拉取每次都发出 2 个请求。
 
-所以在生产代码里，要按完整哈希锁定 prompt。标签是一个可以移动的名字，而且客户端每次都要询问服务器。
+所以在生产代码里，要按完整哈希锁定提示词。标签是一个可以移动的名字，而且客户端每次都要询问服务器。
 
 ## 仍未解决 {#s-evaluation-with-langsmith-still-open}
 
@@ -315,7 +315,7 @@ note: 三个进程中的第一个。
 - evaluate 运行之后，到 evaluators 项目和没有你前缀的项目里查看。
 - 开启记录时同时设置 LANGSMITH_TRACING=true，否则标记测试里的每个 log 调用都会抛出异常。
 - 标记测试设置 LANGSMITH_TEST_TRACKING=false，并把目标和裁判也包在 tracing_context(enabled=False) 里。
-- 版本不能变化时，按完整提交哈希拉取 prompt。
+- 版本不能变化时，按完整提交哈希拉取提示词。
 ```
 
 来源：capture/s_integrations.py, capture/out/42-langsmith.txt; capture/lab/summary/langsmith-account-mac.json, capture/lab/T21-langsmith-account-mac/06-e2-true.json, capture/lab/T21-langsmith-account-mac/06-e2-false.json, capture/lab/T21-langsmith-account-mac/06-e2-false-stdout.txt, capture/lab/T21-langsmith-account-mac/06-e2-async.json, capture/lab/T21-langsmith-account-mac/06b-e2-false-where.json, capture/lab/T21-langsmith-account-mac/04-e3-pytest-runs.jsonl, capture/lab/T21-langsmith-account-mac/04-e3-inspect.json, the stdout files of T21, capture/lab/T21-langsmith-account-mac/05-e4-hub.json, capture/lab/T21-langsmith-account-mac/05b-e4-hub-fullhash.json, capture/lab/T21-langsmith-account-mac/_scripts/t21_e2_eval.py, capture/lab/T21-langsmith-account-mac/_scripts/t21_e3_pytest.py, capture/lab/T21-langsmith-account-mac/_scripts/t21_e4_hub.py, capture/lab/T21-langsmith-account-mac/_scripts/t21_tests/test_ls_plugin.py; capture/lab/summary/evaluate-x86.json, capture/lab/T18-evaluate-leak-x86/01-evaluate-requests.jsonl, capture/lab/T18-evaluate-leak-x86/02-evaluate-noflush.jsonl, capture/lab/T18-evaluate-leak-x86/t18_real.py, capture/lab/T18-evaluate-leak-mac/04-info-origin.txt; capture/lab/summary/pytest-plugin-x86.json, capture/lab/T19-pytest-plugin-x86/01-pytest-runs.jsonl, capture/lab/T19-pytest-plugin-x86/t19_tests/test_ls_plugin.py, the stdout files of T19; src/langsmith/evaluation/_runner.py, src/langsmith/evaluation/evaluator.py, src/langsmith/_internal/_background_thread.py, src/langsmith/pytest_plugin.py, src/langsmith/testing/_internal.py, src/langsmith/testing/__init__.py, src/langsmith/utils.py, src/langsmith/client.py, and pyproject.toml at langsmith v0.14.17; libs/core/langchain_core/callbacks/manager.py at langchain==1.5.0; docs.langchain.com at docs commit 04d4d4a (langsmith/evaluate-llm-application, langsmith/pytest, langsmith/usage-and-billing, langsmith/evaluation-concepts); issues langchain-ai/langsmith-python#106 and #107, and langchain-ai/langchain#41870.
