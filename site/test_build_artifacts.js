@@ -1577,6 +1577,7 @@ test('lesson pages hide the desktop sidebar on demand and remember the choice', 
   const lesson = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
   assert.match(lesson, /<button class="lesson-sidebar-toggle" id="sidebarToggle"[^>]*>[\s\S]*?sidebar-toggle-hide[\s\S]*?<\/button>/);
   assert.match(lesson, /@media \(min-width: 901px\) \{[\s\S]*?\.sidebar-collapsed \.lesson-sidebar \{ transform: translateX\(-100%\); \}[\s\S]*?\.sidebar-collapsed \.lesson-main \{ margin-left: 0; \}/);
+  assert.match(lesson, /@media \(min-width: 901px\) \{[\s\S]*?\.lesson-sidebar-toggle \.sidebar-toggle-menu \{ display: none; \}[\s\S]*?\.sidebar-collapsed \.lesson-sidebar-toggle \.sidebar-toggle-menu,\s*\.sidebar-collapsed \.lesson-sidebar-toggle \.sidebar-toggle-label \{ display: inline; \}/, 'desktop shows only the hide arrow while open, and the menu icon with its label once collapsed');
   assert.match(lesson, /<script>try\{if\(localStorage\.getItem\('aifs:lesson-sidebar-collapsed'\)==='1'&&matchMedia\('\(min-width: 901px\)'\)\.matches\)document\.documentElement\.classList\.add\('sidebar-collapsed'\);\}catch\(e\)\{\}<\/script>/, 'the saved choice applies before first paint');
   const script = lesson.match(/      function initSidebarToggle\(\) \{[\s\S]*?\n      \}/)[0];
   const stored = new Map();
