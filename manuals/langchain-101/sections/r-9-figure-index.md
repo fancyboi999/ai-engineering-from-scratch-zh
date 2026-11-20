@@ -1,21 +1,23 @@
-# Index of figures
+# 图索引
 
-> Every figure of this manual, in order, by the one claim that its caption makes.
+> 本手册的每幅图按顺序列出，并附上图注所给出的那一条论点。
 
-Each row links to its figure, and the claim is the `claim:` field of the figure block. The build numbers the figures of each part in the order they appear, so a figure number is its place in its part. A measured number in a figure comes from [our recorded runs](manuals/langchain-101/capture/lab), and each chart reads one file of [the summary folder](manuals/langchain-101/capture/lab/summary). The charts of Part 9 read [the summaries of the production service](manuals/langchain-101/capture/lab/prodapp-mac/summary). The colours follow the palette of the front matter:
+每一行链接到对应的图，论点即图块的 `claim:` 字段。构建时按各部分内图出现的顺序给图编号，所以图号就是它在本部分里的位置。图中的实测数字来自[我们的录制运行](manuals/langchain-101/capture/lab)，每幅柱状图等图表读取[汇总文件夹](manuals/langchain-101/capture/lab/summary)中的一个文件。第 9 部分的图表读取[生产服务的汇总](manuals/langchain-101/capture/lab/prodapp-mac/summary)。配色沿用前言中的色板：
 
-- violet is your code: the caller, its input, and its config
-- blue is LangChain: `create_agent`, middleware, messages, and tools as objects
-- indigo is LangGraph: the graph, its nodes, the Pregel loop, and its streams
-- plum is the chat model and each model call
-- green is tools and the results they return
-- olive is a service outside the process, such as a provider, LangSmith, or Ollama
-- amber is lifecycle: steps, next nodes, interrupts, and resumes
-- teal is durable state: checkpoints, stores, and their rows
-- rose is a failure: an exception, an error message, or a repeated side effect
-- grey is outside LangChain: Python, packages, the machine, and the operator
+读完本节，你能按图号找到手册中的每幅图和它的论点，并读懂配色的含义。
+
+- 紫罗兰色是你的代码：调用方、它的输入和它的配置
+- 蓝色是 LangChain：`create_agent`、中间件、消息，以及作为对象的工具
+- 靛蓝色是 LangGraph：图、它的节点、Pregel 循环和它的流
+- 梅红色是聊天模型和每次模型调用
+- 绿色是工具和它们返回的结果
+- 橄榄色是进程之外的服务，例如提供方、LangSmith 或 Ollama
+- 琥珀色是生命周期：步、下一个节点、中断和恢复
+- 青色是持久状态：检查点、store 及其数据行
+- 玫瑰色是故障：异常、错误消息或重复的副作用
+- 灰色在 LangChain 之外：Python、包、机器和运维人员
 
 ```figure-index
 ```
 
-Sources: the figure blocks of front.md and of every file under sections/; manual.json (palette)
+来源：front.md 和 sections/ 下每个文件的图块；manual.json（色板）
