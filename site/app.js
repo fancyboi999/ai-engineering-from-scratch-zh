@@ -201,7 +201,7 @@
     if (exportBtn) {
       exportBtn.addEventListener('click', function () {
         if (!window.AIFSProgress) return;
-        Promise.resolve(window.AIFSProgress.exportJSON(false)).catch(function () {
+        Promise.resolve(window.AIFSProgress.exportJSON(false, true)).catch(function () {
           window.alert('导出失败，请稍后重试。');
         });
       });

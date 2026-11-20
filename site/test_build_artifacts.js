@@ -2733,3 +2733,11 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
   }
   assert.ok(checked >= 25, `only ${checked} shared headers checked`);
 });
+
+test('manual progress export always lets the reader choose where to save', () => {
+  const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  // 首页进度区块随上游删除后，弹窗导出是唯一手动入口；自动备份（reminder.js）仍静默复用已记住的文件。
+  assert.match(app, /exportJSON\(false, true\)/);
+  const reminder = fs.readFileSync(path.join(__dirname, 'reminder.js'), 'utf8');
+  assert.match(reminder, /exportJSON\(true\)/);
+});
