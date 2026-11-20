@@ -1,37 +1,37 @@
-# Retries, backup models, rate limits, and caching
+# 重试、备用模型、限流与缓存
 
-> Retry layers multiply, `ToolRetryMiddleware` repeats a tool after a timeout whose request already reached the service, and a backup model takes any exception.
+> 重试层会相乘；`ToolRetryMiddleware` 会在超时之后重复执行工具，而那次请求其实已经到达了服务；备用模型接手任何异常。
 
-Your agent calls a payment tool, the reply times out after one second, and the retry middleware calls it again. The first request had arrived. The customer now has two charges, and the run reports success.
+你的 agent 调用一个支付工具，回复在一秒后超时，重试中间件又调用了一次。第一次请求其实已经到达。客户现在被扣了两次款，而运行却报告成功。
 
-When you finish this section, you can count the attempts of each retry layer and say which failures each one retries. You can set up retries that do not repeat a side effect. You can also add a backup model and say what a rate limiter and a cache do at the pin.
+读完本节，你能数清每个重试层的尝试次数，并说出各自重试哪些失败。你能搭建不会重复副作用的重试。你还能加上备用模型，并说明限流器和缓存在锁定版本上做什么。
 
-## Two layers for the model, one for tools
+## 模型有两层，工具有一层 {#s-retries-backup-models-rate-limits-and-caching-two-layers-for-the-model-one-for-tools}
 
-**Retry layer:** one piece of code that calls the model or the tool again after a failure.
+**重试层（retry layer）：** 失败后再次调用模型或工具的一段代码。
 
-A model call has two retry layers. The client inside the provider package retries first, and `ModelRetryMiddleware` retries around it. [Section 3.2](#s-init-chat-model-and-model-profiles) counted them with `ChatOpenAI`. The client made 3 attempts, the middleware made 3, and both together made 9. [Figure](#fig-3-2b) shows each run. `ChatOllama` made 1 attempt, because its client does not retry. 
+一次模型调用有两个重试层。提供方包里的客户端先重试，`ModelRetryMiddleware` 在它外面再重试。[第 3.2 节](#s-init-chat-model-and-model-profiles)用 `ChatOpenAI` 数过它们。客户端做了 3 次尝试，中间件做了 3 次，两者合起来是 9 次。[图](#fig-3-2b)显示每一次运行。`ChatOllama` 只尝试 1 次，因为它的客户端不重试。
 
-A `RetryPolicy` on a graph node multiplies too: 9 attempts around the client default, and 27 around an agent with the middleware inside. The 6 retries of the models page did not hold for `ChatOpenAI` at the pin.
+图节点上的 `RetryPolicy` 同样会相乘：围绕客户端默认值是 9 次，围绕一个内部带中间件的 agent 是 27 次。模型页提到的 6 次重试，在锁定版本的 `ChatOpenAI` 上并不成立。
 
-A tool call has one layer, `ToolRetryMiddleware`. A tool that raises with no middleware ends the run, as [section 3.4](#s-tools-toolruntime-and-tool-errors) shows. Both retry middlewares take the same options, with these defaults {{code libs/langchain_v1/langchain/agents/middleware/tool_retry.py}}:
+工具调用只有一层，即 `ToolRetryMiddleware`。没有中间件时，抛出异常的工具会结束运行，如[第 3.4 节](#s-tools-toolruntime-and-tool-errors)所示。两个重试中间件接受相同的选项，默认值如下 {{code libs/langchain_v1/langchain/agents/middleware/tool_retry.py}}：
 
-| Option | Default | Meaning |
+| 选项 | 默认值 | 含义 |
 |---|---|---|
-| `max_retries` | `2` | retries after the first attempt, so 3 attempts in all |
-| `retry_on` | `default_retry_on` | which exceptions get a retry |
-| `on_failure` | `"continue"` | after the last attempt, return a message in place of a raise |
-| `initial_delay`, `backoff_factor`, `max_delay` | `1.0`, `2.0`, `60.0` | seconds before each retry, doubled each time |
-| `jitter` | `True` | a random change to each delay |
-| `tools` | `None` | `ToolRetryMiddleware` only: the tools to retry, or all of them |
+| `max_retries` | `2` | 第一次尝试之后的重试次数，所以一共 3 次尝试 |
+| `retry_on` | `default_retry_on` | 哪些异常会被重试 |
+| `on_failure` | `"continue"` | 最后一次尝试之后，返回一条消息，而不是抛出异常 |
+| `initial_delay`、`backoff_factor`、`max_delay` | `1.0`、`2.0`、`60.0` | 每次重试之前等待的秒数，每次翻倍 |
+| `jitter` | `True` | 给每次延迟加一点随机变化 |
+| `tools` | `None` | 仅 `ToolRetryMiddleware`：要重试的工具，或全部工具 |
 
-The kit runs a tool that fails twice and then succeeds. With `max_retries=2`, the tool ran three times with the same argument:
+工具包运行一个先失败两次再成功的工具。设 `max_retries=2` 时，工具以同样的参数运行了三次：
 
 ```listing
-title: three attempts of one tool call
+title: 一次工具调用的三次尝试
 source: capture/out/12-mw-retries.txt
 lang: json
-note: The attempts the tool recorded, in the first section of the file.
+note: 工具记录下来的尝试，在文件的第一部分。
 ---
 tool attempts:
 [
@@ -41,10 +41,10 @@ tool attempts:
 ]
 ```
 
-With `max_retries=1`, when the retries run out under `on_failure="continue"`, the model gets an error `ToolMessage` and the run goes on:
+设 `max_retries=1`，并在 `on_failure="continue"` 下重试用尽时，模型得到一条错误的 `ToolMessage`，运行继续：
 
 ```listing
-title: the ToolMessage after the retries run out
+title: 重试用尽之后的 ToolMessage
 source: capture/out/12-mw-retries.txt
 lang: json
 ---
@@ -52,59 +52,59 @@ lang: json
     "name": "flaky_fetch",
 ```
 
-With `on_failure="error"`, the run raised `ConnectionError: attempt 2 refused`.
+使用 `on_failure="error"` 时，运行抛出了 `ConnectionError: attempt 2 refused`。
 
-`ModelRetryMiddleware` retries the model call. The kit pointed `ChatOllama` at a relay that closed its first two connections and passed the third to Ollama. With `max_retries=2`, the model got three calls, and the third answered `2 + 3 = 5.`.
+`ModelRetryMiddleware` 重试模型调用。工具包把 `ChatOllama` 指向一个中继，它关闭前两次连接，把第三次转给 Ollama。设 `max_retries=2` 时，模型得到三次调用，第三次回答了 `2 + 3 = 5.`。
 
-With `max_retries=1` and `continue`, the middleware returns an `AIMessage` with the error text in place of a raise. The kit pointed a model at a port where nothing listens. So a failed model call looks like an answer: `Model call failed after 2 attempts with ConnectError: [Errno 111] Connection refused`.
+设 `max_retries=1` 并用 `continue` 时，中间件返回一条带错误文本的 `AIMessage`，而不是抛出异常。工具包把模型指向一个没人监听的端口。所以失败的模型调用看起来像一个答案：`Model call failed after 2 attempts with ConnectError: [Errno 111] Connection refused`。
 
-## What each layer retries
+## 每一层重试什么 {#s-retries-backup-models-rate-limits-and-caching-what-each-layer-retries}
 
-**default_retry_on:** the default `retry_on` of both middlewares. It retries every `Exception`, except a LangChain `ModelError` whose `is_retryable` is false {{code libs/langchain_v1/langchain/agents/middleware/_retry.py}}.
+**default_retry_on：** 两个中间件默认的 `retry_on`。它重试每一个 `Exception`，只有 `is_retryable` 为假的 LangChain `ModelError` 除外 {{code libs/langchain_v1/langchain/agents/middleware/_retry.py}}。
 
-A provider package that raises a `ModelError` gets no retry for an error that cannot pass. So the real 404 of Ollama got 1 attempt through `ChatOpenAI`. `ChatOllama` raises the `ResponseError` of the `ollama` client, which is not a `ModelError`. With `ModelRetryMiddleware`, its 404 got 3 attempts. A tool error is a plain exception, such as an `httpx` error, so the default retries all of them. The middleware cannot know if a failed tool request reached the service.
+抛出 `ModelError` 的提供方包，对无法通过的错误不会得到重试。所以 Ollama 真实的 404，经 `ChatOpenAI` 只得到 1 次尝试。`ChatOllama` 抛出 `ollama` 客户端的 `ResponseError`，它不是 `ModelError`。配上 `ModelRetryMiddleware`，它的 404 得到了 3 次尝试。工具错误是普通异常，例如 `httpx` 错误，所以默认值会全部重试。中间件无法知道一次失败的工具请求有没有到达服务。
 
-**We measured** `ToolRetryMiddleware()` with its defaults on the x86 server guest, 3 runs for each cell. Qwen3 4B on Ollama chose the tool call. The tool wrote to PostgreSQL. For a timeout, it inserted a row into a ledger table, then ran `pg_sleep(3)` under a `statement_timeout` of 1 s. All 3 runs of each cell gave the same counts:
+**我们测得**使用默认值的 `ToolRetryMiddleware()`，在 x86 服务器客户机上进行，每格 3 次运行。Ollama 上的 Qwen3 4B 选择工具调用。工具写入 PostgreSQL。对于超时，它先向账本表插入一行，再在 1 秒的 `statement_timeout` 下运行 `pg_sleep(3)`。每格的 3 次运行得到相同的计数：
 
-| Failure of the tool | No middleware | `ToolRetryMiddleware()` | Ledger rows with the middleware |
+| 工具的故障 | 没有中间件 | `ToolRetryMiddleware()` | 带中间件时的账本行数 |
 |---|---|---|---|
-| connection refused once | raised, 1 execution | 2 executions, then success | 1 |
-| connection refused on every call | raised, 1 execution | 3 executions, then an error `ToolMessage` | 0 |
-| a missing table on every call | raised, 1 execution | 3 executions, then an error `ToolMessage` | 0 |
-| timeout once | raised, 1 execution | 2 executions, then success | 2 |
-| timeout on every call | raised, 1 execution | 3 executions, then an error `ToolMessage` | 3 |
+| 拒绝连接一次 | 抛出异常，执行 1 次 | 执行 2 次，然后成功 | 1 |
+| 每次调用都拒绝连接 | 抛出异常，执行 1 次 | 执行 3 次，然后一条错误的 `ToolMessage` | 0 |
+| 每次调用都缺表 | 抛出异常，执行 1 次 | 执行 3 次，然后一条错误的 `ToolMessage` | 0 |
+| 超时一次 | 抛出异常，执行 1 次 | 执行 2 次，然后成功 | 2 |
+| 每次调用都超时 | 抛出异常，执行 1 次 | 执行 3 次，然后一条错误的 `ToolMessage` | 3 |
 
-Every attempt after a timeout wrote its ledger row before the timeout. So a tool whose reply was lost ran its action again, up to 3 times. Issue langchain#40688 reports this for tools that are not idempotent {{issue langchain#40688}}. It is open at the pin, and our runs reproduce it with a real database. The default also retried the missing table, which no retry can fix.
+超时之后的每次尝试，都在超时之前写好了它的账本行。所以回复丢失的工具，把它的动作又做了一遍，最多 3 次。langchain#40688 针对非幂等的工具报告了这一点 {{issue langchain#40688}}。在锁定版本上它仍然是开放状态，我们的运行用真实的数据库复现了它。默认值还重试了缺表，而没有任何重试能修好它。
 
-After the error `ToolMessage`, the model did not call the tool again in 9 of 9 runs. Its last message was `done`, or text that starts with `Try again`, so it read like a success. [Figure](#fig-4-7) draws the timeout case.
+错误的 `ToolMessage` 之后，模型在 9 次运行中有 9 次没有再次调用工具。它的最后一条消息是 `done`，或者以 `Try again` 开头的文本，所以读起来像是成功。[图](#fig-4-7)画出了超时的情形。
 
 ```figure
 id: fig-4-7
 kind: sequence
-title: a tool call that times out three times
-claim: Each of the 3 attempts wrote its ledger row before the timeout, so an action whose reply was lost ran 3 times before the model saw an error.
-caption: Read the rows from top to bottom. Each dashed olive arrow is an INSERT that wrote its row, and each dashed rose arrow is the QueryCanceled after 1 s. The ledger held 3 rows in each of 3 runs. From capture/lab/summary/retries-x86.json.
+title: 一次超时三次的工具调用
+claim: 3 次尝试里，每一次都在超时之前写好了它的账本行，所以回复丢失的动作在模型看到错误之前运行了 3 次。
+caption: 从上往下读各行。每个橄榄色虚线箭头是一次写入了行的 INSERT，每个玫红色虚线箭头是 1 秒后的 QueryCanceled。3 次运行里，账本每次都有 3 行。来自 capture/lab/summary/retries-x86.json。
 ```
 
-With both middlewares on, each layer kept its own count. A dropped model connection once and a refused tool connection once gave 3 model requests and 2 tool executions, and the run succeeded. A dropped model connection on every call gave 9 model requests and never reached the tool.
+两个中间件都开时，每一层各自保持自己的计数。模型连接断开一次加工具连接被拒绝一次，得到 3 次模型请求和 2 次工具执行，运行成功。每次调用都断开模型连接，得到 9 次模型请求，并且从未走到工具。
 
-## A safe configuration
+## 一种安全的配置 {#s-retries-backup-models-rate-limits-and-caching-a-safe-configuration}
 
-Choose one retry layer for each kind of call, and retry only what is safe to repeat:
+每类调用只选一个重试层，并且只重试可以安全重复的操作：
 
-1. For the model, keep the client retries and leave out `ModelRetryMiddleware`, or set `max_retries=0` on the model and add the middleware.
-2. For tools, list only idempotent tools in the `tools` option of `ToolRetryMiddleware`.
-3. Pass a `retry_on` that names the errors you know are safe, such as a refused connection or a 503.
-4. Give each side effect an idempotency key that the service checks. [Section 5.3](#s-durability-modes-and-a-crash-between-two-steps) shows the same need after a crash.
-5. Set your timeout budget from the attempts. Three attempts of 1 s, with 1 s and 2 s of delay, take 6 s for one tool call.
+1. 对于模型，保留客户端重试并省去 `ModelRetryMiddleware`，或者在模型上设 `max_retries=0` 再加上中间件。
+2. 对于工具，只在 `ToolRetryMiddleware` 的 `tools` 选项里列出幂等的工具。
+3. 传入一个 `retry_on`，只列出你确知可以安全重试的错误，例如连接被拒绝或 503。
+4. 给每个副作用一个服务会检查的幂等键。[第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)展示了崩溃之后的同样需要。
+5. 按尝试次数设定你的超时预算。三次各 1 秒的尝试，加上 1 秒和 2 秒的延迟，一次工具调用要用 6 秒。
 
-This is how the lab turned off the client layer for the middleware runs:
+实验记录是这样为中间件的运行关掉客户端层的：
 
 ```listing
-title: one retry layer for the model
+title: 模型只用一个重试层
 source: capture/lab/T05-retries-x86/t05_real.py
 lang: python
-note: Parts of the model and build functions of the lab script. The lines between them are cut at the mark.
+note: 实验脚本里模型函数和构建函数的片段。它们之间的行在标记处截去。
 ---
     kw = {"timeout": to}
     if config in ("openai_mw_only",):
@@ -117,51 +117,51 @@ def build(config, model, tl):
         mw.append(ModelRetryMiddleware())
 ```
 
-A `retry_on` tuple limits a retry to those exception types. In the kit, the refused connection raised `httpx.ConnectError`, which is not a `TimeoutError`. It got no retry and raised at once:
+`retry_on` 元组把重试限制在这些异常类型上。在工具包里，被拒绝的连接抛出 `httpx.ConnectError`，它不是 `TimeoutError`。它没有得到重试，立即抛出了异常：
 
 ```listing
-title: a retry_on filter
+title: 一个 retry_on 过滤器
 source: capture/s_middleware.py
 lang: python
 ---
         tools=[], middleware=[ModelRetryMiddleware(max_retries=2, retry_on=(TimeoutError,), on_failure="error", **fast)])
 ```
 
-## Backup models
+## 备用模型 {#s-retries-backup-models-rate-limits-and-caching-backup-models}
 
-**ModelFallbackMiddleware:** the middleware that calls the next model in its list when a model call raises.
+**ModelFallbackMiddleware：** 模型调用抛出异常时，调用列表里下一个模型的中间件。
 
-The kit gives it a primary `ChatOllama` on a port where nothing listens, and one backup on Ollama. The primary got one call that raised `httpx.ConnectError`, and the backup answered:
+工具包给它一个指向无人监听端口的主 `ChatOllama`，以及一个 Ollama 上的备用模型。主模型得到一次调用，抛出 `httpx.ConnectError`，备用模型作答：
 
 ```listing
-title: the answer after the primary model raised
+title: 主模型抛出异常之后的答案
 source: capture/out/13-mw-fallback-refusal.txt
 lang: json
-note: The message of the run.
+note: 这次运行的消息。
 ---
     "type": "AIMessage",
     "content": "2 + 3 = 5.",
 ```
 
-The middleware tries each model in order, and it takes any `Exception` {{code libs/langchain_v1/langchain/agents/middleware/model_fallback.py}}. When every model raises, the run raises the last error. The kit pointed all three models at the dead port, so the run raised `httpx.ConnectError: [Errno 111] Connection refused`. The code does not check the kind of error, so a 400 from a bad request also moves to the next model. That run is coming in the next edition, and [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) lists it.
+中间件按顺序尝试每个模型，并且接手任何 `Exception` {{code libs/langchain_v1/langchain/agents/middleware/model_fallback.py}}。每个模型都抛出异常时，运行抛出最后一个错误。工具包把三个模型都指向失效端口，运行抛出了 `httpx.ConnectError: [Errno 111] Connection refused`。代码不检查错误的种类，所以错误请求引起的 400 也会转到下一个模型。那次运行会在下一版里补上，[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)列出了它。
 
-A refusal is not an exception. `ModelRefusalMiddleware` raises `ModelRefusalError` only when the reply has a standard `refusal` content block, and it does not read the text {{code libs/langchain_v1/langchain/agents/middleware/model_refusal.py}}. List `ModelFallbackMiddleware` first and `ModelRefusalMiddleware` second, and a refusal block goes to the backup.
+拒绝不是异常。`ModelRefusalMiddleware` 只在回复里有标准的 `refusal` 内容块时才抛出 `ModelRefusalError`，它不读文本 {{code libs/langchain_v1/langchain/agents/middleware/model_refusal.py}}。把 `ModelFallbackMiddleware` 列在前面，`ModelRefusalMiddleware` 列在第二位，拒绝块就会转给备用模型。
 
-The kit asked Qwen3 4B how to pick the lock of a neighbour's door. The model refused in plain text, with `I'm sorry, but I can't assist with that.`. Ollama sends no refusal block, so the text was a normal answer in all three runs. That held with no middleware, with `ModelRefusalMiddleware`, and with both middlewares. The backup got no call. So a refusal in text needs a check of your own.
+工具包问 Qwen3 4B 怎样撬开邻居家的门锁。模型用普通文本拒绝了，内容是 `I'm sorry, but I can't assist with that.`。Ollama 不发送拒绝块，所以这段文本在三次运行中都是正常的答案。没有中间件、只有 `ModelRefusalMiddleware`、两个中间件都开，结果都一样。备用模型没有得到调用。所以文本里的拒绝，需要你自己检查。
 
-## Rate limits and caching
+## 限流与缓存 {#s-retries-backup-models-rate-limits-and-caching-rate-limits-and-caching}
 
-A chat model takes a `rate_limiter`. `InMemoryRateLimiter` is a token bucket with `requests_per_second=1` and `max_bucket_size=1` by default, in one process {{code libs/core/langchain_core/rate_limiters.py}}. The models page warns that it counts requests and not their size {{docs oss/python/langchain/models}}. Two processes each get their own bucket.
+聊天模型接受一个 `rate_limiter`。`InMemoryRateLimiter` 是令牌桶，默认 `requests_per_second=1` 和 `max_bucket_size=1`，作用于单个进程 {{code libs/core/langchain_core/rate_limiters.py}}。模型页警告说，它统计的是请求数，而不是请求的大小 {{docs oss/python/langchain/models}}。两个进程各有自己的桶。
 
-There are two caches. `set_llm_cache` caches model replies in LangChain. The `cache` argument of `create_agent` is a LangGraph node cache. We did not run either one, or the rate limiter, against a model. Those runs come in the next edition, and [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) lists them.
+有两种缓存。`set_llm_cache` 在 LangChain 里缓存模型回复。`create_agent` 的 `cache` 参数是 LangGraph 的节点缓存。我们没有对着模型运行其中任何一种，也没有运行限流器。这些运行会在下一版里补上，[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)列出了它们。
 
 ```takeaways
-- Use one retry layer for model calls, and set max_retries=0 on the model if you add ModelRetryMiddleware.
-- Pass tools= to ToolRetryMiddleware with only idempotent tools.
-- Pass a narrow retry_on, because the default retries every tool exception, including a missing table.
-- Send an idempotency key with every side effect that a retry can repeat.
-- Check the last AIMessage for a failure text when ModelRetryMiddleware uses continue.
-- List ModelFallbackMiddleware before ModelRefusalMiddleware to send refusal blocks to the backup, and check refusals in text yourself.
+- 模型调用只用一个重试层；加入 ModelRetryMiddleware 时，在模型上设 max_retries=0。
+- 给 ToolRetryMiddleware 传入 tools=，只放幂等的工具。
+- 传入范围窄的 retry_on，因为默认值会重试每一个工具异常，包括缺表。
+- 对每个重试可能重复的副作用，都发送一个幂等键。
+- ModelRetryMiddleware 使用 continue 时，检查最后一条 AIMessage 里有没有失败文本。
+- 把 ModelFallbackMiddleware 列在 ModelRefusalMiddleware 之前，让拒绝块转给备用模型；文本里的拒绝要自己检查。
 ```
 
-Sources: capture/out/12-mw-retries.txt, capture/out/13-mw-fallback-refusal.txt, capture/s_middleware.py, capture/common.py, libs/langchain_v1/langchain/agents/middleware/model_refusal.py at langchain==1.5.0; capture/lab/summary/retries-x86.json, capture/lab/T05-retries-x86/01-model-faults.jsonl, capture/lab/T05-retries-x86/02-tool-faults.jsonl, capture/lab/T05-retries-x86/03-both-faults.jsonl, capture/lab/T05-retries-x86/t05_real.py, capture/lab/T05-retries-x86/lr_common.py; issue langchain#40688; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/models, oss/python/langchain/middleware/built-in); libs/langchain_v1/langchain/agents/middleware/tool_retry.py, model_retry.py, _retry.py, and model_fallback.py at langchain==1.5.0; libs/core/langchain_core/rate_limiters.py at langchain-core 1.8.0.
+来源：capture/out/12-mw-retries.txt, capture/out/13-mw-fallback-refusal.txt, capture/s_middleware.py, capture/common.py, libs/langchain_v1/langchain/agents/middleware/model_refusal.py at langchain==1.5.0; capture/lab/summary/retries-x86.json, capture/lab/T05-retries-x86/01-model-faults.jsonl, capture/lab/T05-retries-x86/02-tool-faults.jsonl, capture/lab/T05-retries-x86/03-both-faults.jsonl, capture/lab/T05-retries-x86/t05_real.py, capture/lab/T05-retries-x86/lr_common.py; issue langchain#40688; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/models, oss/python/langchain/middleware/built-in); libs/langchain_v1/langchain/agents/middleware/tool_retry.py, model_retry.py, _retry.py, and model_fallback.py at langchain==1.5.0; libs/core/langchain_core/rate_limiters.py at langchain-core 1.8.0.

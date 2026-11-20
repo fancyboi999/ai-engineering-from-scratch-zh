@@ -1,37 +1,37 @@
-# create_agent and the graph it builds
+# create_agent 与它构建的图
 
-> `create_agent` compiles a LangGraph graph with a `model` node, a `tools` node when tools exist, and one node for each middleware hook, with a recursion limit of 9999.
+> `create_agent` 编译出一个 LangGraph 图：有一个 `model` 节点；有工具时有一个 `tools` 节点；每个中间件钩子各有一个节点；递归上限是 9999。
 
-You pass a model, two tools, and a prompt to `create_agent`, and you get back an object with `invoke` and `stream`. It looks like a chat helper. It is a compiled LangGraph graph, and every error, stream chunk, and checkpoint of the agent names one of its nodes.
+你把一个模型、两个工具和一个提示词传给 `create_agent`，得到一个带 `invoke` 和 `stream` 的对象。它看起来像个聊天辅助函数。其实它是一个编译好的 LangGraph 图，agent 的每个错误、每个流块和每个检查点，都会指名它的某个节点。
 
-When you finish this section, you can say which node each argument of `create_agent` adds, and when the loop between them stops. You can also read the defaults on the compiled graph and say what the agent layer costs.
+读完本节，你能说出 `create_agent` 的每个参数增加了哪个节点，以及它们之间的循环何时停止。你还能读出编译后图上的默认值，并说清 agent 这一层的开销。
 
-## What create_agent takes
+## create_agent 接受什么 {#s-create-agent-and-the-graph-it-builds-what-create-agent-takes}
 
-**create_agent:** the function in `langchain.agents` that turns a model, tools, a prompt, and middleware into a `CompiledStateGraph`.
+**create_agent：** `langchain.agents` 里的函数，把模型、工具、提示词和中间件变成一个 `CompiledStateGraph`。
 
-The signature at the pin has two positional parameters and thirteen keyword parameters {{code libs/langchain_v1/langchain/agents/factory.py}}. This table lists what each one changes in the graph:
+锁定版本上的签名有两个位置参数和十三个关键字参数 {{code libs/langchain_v1/langchain/agents/factory.py}}。下表列出每个参数对图改变了什么：
 
-| Parameter | Default | What it changes |
+| 参数 | 默认值 | 改变了什么 |
 |---|---|---|
-| `model` | required | A string goes through `init_chat_model`. The model is called from the `model` node. |
-| `tools` | `None` | Functions and `BaseTool` objects run in the `tools` node. A `dict` is a provider tool, which is bound to the model and never run by the graph. |
-| `system_prompt` | `None` | A string becomes a `SystemMessage`. It goes in front of the messages on each model call and stays out of the state. |
-| `middleware` | `()` | Each hook of each middleware becomes a node or a wrapper. Middleware can also add tools and state keys. |
-| `response_format` | `None` | A schema adds a structured output tool or a provider format. [Section 4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) explains both. |
-| `state_schema`, `context_schema` | `None` | The state type and the type of `context` for each run. |
-| `checkpointer`, `store` | `None` | Saved state per thread, and long-term memory. Part 5 covers both. |
-| `interrupt_before`, `interrupt_after` | `None` | Static pauses before or after named nodes. |
-| `name`, `debug`, `cache`, `transformers` | `None`, `False`, `None`, `None` | A graph name, debug output, a node cache, and stream transformers. |
+| `model` | 必填 | 字符串会经过 `init_chat_model`。模型从 `model` 节点被调用。 |
+| `tools` | `None` | 函数和 `BaseTool` 对象在 `tools` 节点里运行。`dict` 是提供方工具，它绑定到模型上，图从不运行它。 |
+| `system_prompt` | `None` | 字符串变成 `SystemMessage`。每次模型调用时它放在消息前面，并且不进入状态。 |
+| `middleware` | `()` | 每个中间件的每个钩子变成一个节点或一个包装器。中间件还可以添加工具和状态键。 |
+| `response_format` | `None` | 一个 schema 会添加结构化输出工具或提供方格式。[第 4.2 节](#s-structured-output-autostrategy-providerstrategy-toolstrategy)解释这两种。 |
+| `state_schema`、`context_schema` | `None` | 状态类型，以及每次运行的 `context` 类型。 |
+| `checkpointer`、`store` | `None` | 每个线程的已保存状态，以及长期记忆。第 5 部分讲这两者。 |
+| `interrupt_before`、`interrupt_after` | `None` | 在指定节点之前或之后的静态暂停。 |
+| `name`、`debug`、`cache`、`transformers` | `None`、`False`、`None`、`None` | 图的名称、调试输出、节点缓存和流转换器。 |
 
-[Section 3.2](#s-init-chat-model-and-model-profiles) shows how a model string resolves. [Section 3.5](#s-the-system-prompt) shows why the prompt stays out of the state.
+[第 3.2 节](#s-init-chat-model-and-model-profiles)展示模型字符串如何解析。[第 3.5 节](#s-the-system-prompt)说明提示词为什么不进入状态。
 
-## The nodes
+## 节点 {#s-create-agent-and-the-graph-it-builds-the-nodes}
 
-The kit builds the agent of [section 1.3](#s-one-create-agent-run) with one tool and no middleware. The compiled graph has four nodes:
+工具包用一个工具、不带中间件，构建了[第 1.3 节](#s-one-create-agent-run)的 agent。编译后的图有四个节点：
 
 ```listing
-title: the nodes of an agent with one tool
+title: 带一个工具的 agent 的节点
 source: capture/out/05-agent-graph.txt
 lang: json
 ---
@@ -43,10 +43,10 @@ lang: json
 ]
 ```
 
-The `tools` node exists only when the agent has a tool to run, or a middleware with a `wrap_tool_call` hook {{code libs/langchain_v1/langchain/agents/factory.py}}. With no tools, the same call builds three nodes:
+只有当 agent 有工具可运行，或者有带 `wrap_tool_call` 钩子的中间件时，才有 `tools` 节点 {{code libs/langchain_v1/langchain/agents/factory.py}}。没有工具时，同样的调用构建出三个节点：
 
 ```listing
-title: the nodes of an agent with no tools
+title: 没有工具的 agent 的节点
 source: capture/out/05-agent-graph.txt
 lang: json
 ---
@@ -57,13 +57,13 @@ lang: json
 ]
 ```
 
-Middleware adds nodes. Each `before_agent`, `before_model`, `after_model`, and `after_agent` hook becomes a node named after the middleware and the hook. The kit adds three middlewares named `A`, `B`, and `C`, each with every hook:
+中间件会增加节点。每个 `before_agent`、`before_model`、`after_model` 和 `after_agent` 钩子都变成一个节点，以中间件和钩子命名。工具包加入三个中间件，名为 `A`、`B` 和 `C`，每个都带全部钩子：
 
 ```listing
-title: the nodes with three middlewares
+title: 带三个中间件的节点
 source: capture/out/09-middleware-order.txt
 lang: json
-note: The B and C nodes are cut. They follow the same pattern.
+note: B 和 C 的节点已截去。它们遵循同样的模式。
 ---
 [
   "__start__",
@@ -78,28 +78,28 @@ note: The B and C nodes are cut. They follow the same pattern.
 ]
 ```
 
-The `wrap_model_call` and `wrap_tool_call` hooks add no node. They run inside the `model` node and the `tools` node. [Section 4.5](#s-middleware-hooks-and-their-order) gives the order of all six hooks. [Figure](#fig-4-1) maps each argument to the part of the graph it builds.
+`wrap_model_call` 和 `wrap_tool_call` 钩子不增加节点。它们在 `model` 节点和 `tools` 节点内部运行。[第 4.5 节](#s-middleware-hooks-and-their-order)给出六个钩子的顺序。[图](#fig-4-1)把每个参数对应到它构建的那部分图。
 
 ```figure
 id: fig-4-1
 kind: structure
-title: what each argument of create_agent builds
-claim: Tools build the tools node, middleware builds hook nodes and wrappers, and the prompt and response format change each model call without a node of their own.
-caption: Read the three graphs from the top. Each one adds one argument to create_agent. A solid edge has one next node, and a dashed amber edge chooses the next node at run time. From capture/out/05-agent-graph.txt and capture/out/09-middleware-order.txt.
+title: create_agent 的每个参数构建了什么
+claim: 工具构建 tools 节点，中间件构建钩子节点和包装器，提示词和响应格式改变每一次模型调用，而没有自己的节点。
+caption: 从上往下读这三张图。每一张都向 create_agent 多加一个参数。实线边只有一个下一节点，琥珀色虚线边在运行时选择下一节点。来自 capture/out/05-agent-graph.txt 和 capture/out/09-middleware-order.txt。
 ```
 
-## The state
+## 状态 {#s-create-agent-and-the-graph-it-builds-the-state}
 
-**AgentState:** the state type of every agent, with the keys `messages`, `jump_to`, and `structured_response`.
+**AgentState：** 每个 agent 的状态类型，有 `messages`、`jump_to` 和 `structured_response` 三个键。
 
-`messages` uses the `add_messages` reducer, so each node appends or replaces messages by id. `jump_to` is private and lasts for one step. A middleware sets it to move the run to `model`, `tools`, or the end. `structured_response` is in the output and never in the input {{code libs/langchain_v1/langchain/agents/middleware/types.py}}. Middleware can add keys of its own, and the `state_schema` you pass wins a conflict.
+`messages` 使用 `add_messages` reducer，所以每个节点按 id 追加或替换消息。`jump_to` 是私有的，只持续一步。中间件设置它，可以让运行跳到 `model`、`tools` 或结束。`structured_response` 在输出里，从不在输入里 {{code libs/langchain_v1/langchain/agents/middleware/types.py}}。中间件可以加自己的键，发生冲突时以你传入的 `state_schema` 为准。
 
-## The loop and when it stops
+## 循环与它何时停止 {#s-create-agent-and-the-graph-it-builds-the-loop-and-when-it-stops}
 
-The edges after `model` are conditional:
+`model` 之后的边是条件边：
 
 ```listing
-title: the edges of the agent graph
+title: agent 图的边
 source: capture/out/05-agent-graph.txt
 lang: json
 ---
@@ -111,28 +111,28 @@ lang: json
 ]
 ```
 
-The edge function reads the state after each model call, in this order {{code libs/langchain_v1/langchain/agents/factory.py:1991-2042}}:
+每次模型调用之后，边函数按下面的顺序读取状态 {{code libs/langchain_v1/langchain/agents/factory.py:1991-2042}}：
 
-1. A `jump_to` value set by a middleware wins.
-2. No AI message in the state ends the run.
-3. An AI message with no tool calls ends the run.
-4. Tool calls that have no result yet go to `tools`, each as its own `Send`, so parallel calls run as parallel tasks.
-5. A new `structured_response` ends the run.
-6. Otherwise the run goes back to `model`.
+1. 中间件设置的 `jump_to` 值优先。
+2. 状态里没有 AI 消息，运行结束。
+3. AI 消息没有工具调用，运行结束。
+4. 还没有结果的工具调用去往 `tools`，每个调用各作为一个 `Send`，所以并行调用作为并行任务运行。
+5. 出现新的 `structured_response`，运行结束。
+6. 否则运行回到 `model`。
 
-A structured output tool call is not sent to `tools`. The `model` node handles it, as [section 4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) shows. An agent with no tools and a `ToolStrategy` or `AutoStrategy` has a `model` to `model` edge in place of the `tools` node. That edge checks `jump_to`, then a new `structured_response`, and otherwise loops {{code libs/langchain_v1/langchain/agents/factory.py:2045-2068}}. With no tools and a `ProviderStrategy`, the `model` node goes straight to the end {{code libs/langchain_v1/langchain/agents/factory.py:1790-1803}}.
+结构化输出的工具调用不会发给 `tools`，而是由 `model` 节点处理，如[第 4.2 节](#s-structured-output-autostrategy-providerstrategy-toolstrategy)所示。没有工具、使用 `ToolStrategy` 或 `AutoStrategy` 的 agent，用一条 `model` 到 `model` 的边代替 `tools` 节点。这条边先检查 `jump_to`，再检查新的 `structured_response`，否则就循环 {{code libs/langchain_v1/langchain/agents/factory.py:2045-2068}}。没有工具且使用 `ProviderStrategy` 时，`model` 节点直接走向结束 {{code libs/langchain_v1/langchain/agents/factory.py:1790-1803}}。
 
-## Draw your graph
+## 画出你的图 {#s-create-agent-and-the-graph-it-builds-draw-your-graph}
 
-You built an agent and want to see its graph before you run it. The compiled graph can describe itself, with no model call and no run.
+你构建了一个 agent，想在运行前看看它的图。编译后的图可以描述自己，不需要模型调用，也不需要运行。
 
-**get_graph():** the method of a compiled graph that returns a `Graph` object from `langchain_core`, with its nodes and its edges {{code libs/langgraph/langgraph/pregel/main.py}}.
+**get_graph()：** 编译后的图的方法，返回 `langchain_core` 里的 `Graph` 对象，包含它的节点和边 {{code libs/langgraph/langgraph/pregel/main.py}}。
 
 ```listing
-title: the nodes that get_graph() returns
+title: get_graph() 返回的节点
 source: capture/out/48-draw-agent.txt
 lang: json
-note: Cut to the tools node. The other nodes have no metadata.
+note: 只保留 tools 节点。其他节点没有元数据。
 ---
 graph.nodes:
 {
@@ -150,12 +150,12 @@ graph.nodes:
 }
 ```
 
-Each node holds the object that runs it, such as the `ToolNode` of `tools`. Each edge has a `conditional` flag. The `tools` node keeps the names of its tools as metadata.
+每个节点保存着运行它的对象，例如 `tools` 的 `ToolNode`。每条边有一个 `conditional` 标志。`tools` 节点把它的工具名保存为元数据。
 
-**draw_mermaid():** the method of `Graph` that returns the graph as Mermaid flowchart text. It needs no extra package and no network {{code libs/core/langchain_core/runnables/graph_mermaid.py}}.
+**draw_mermaid()：** `Graph` 的方法，把图作为 Mermaid 流程图文本返回。它不需要额外的包，也不需要网络 {{code libs/core/langchain_core/runnables/graph_mermaid.py}}。
 
 ```listing
-title: draw_mermaid() of the agent with one tool
+title: 带一个工具的 agent 的 draw_mermaid()
 source: capture/out/48-draw-agent.txt
 lang: text
 ---
@@ -173,22 +173,22 @@ graph TD;
 	classDef last fill:#bfb6fc
 ```
 
-A node line gives an id and a label. `:::first` marks `__start__`, and `:::last` marks `__end__`. An edge line with `-->` is a plain edge, and one with `-.->` is a conditional edge. [Figure](#fig-4-1b) matches each line to the drawing. Every graph figure in this manual is drawn from such a text, captured from the compiled graph.
+节点行给出一个 id 和一个标签。`:::first` 标记 `__start__`，`:::last` 标记 `__end__`。带 `-->` 的边行是普通边，带 `-.->` 的是条件边。[图](#fig-4-1b)把每一行对应到绘制出的图上。本手册里的每张图，都是根据这样的文本绘制的，文本取自编译后的图。
 
 ```figure
 id: fig-4-1b
 kind: structure
-title: from draw_mermaid lines to a drawing
-claim: Each node line of draw_mermaid becomes one node, and each edge line becomes one arrow, solid for --> and dashed for -.->.
-caption: Match the numbered node lines on the left to the numbered nodes on the right. Each edge line shows the arrow style it becomes. From capture/out/48-draw-agent.txt.
+title: 从 draw_mermaid 的各行到一幅图
+claim: draw_mermaid 的每条节点行变成一个节点，每条边行变成一个箭头，--> 是实线，-.-> 是虚线。
+caption: 把左边带编号的节点行对应到右边带编号的节点。每条边行显示它变成的箭头样式。来自 capture/out/48-draw-agent.txt。
 ```
 
-**xray:** the argument of `get_graph` that opens each subgraph node and draws its nodes inside a box. `True` opens every level, and an integer opens that many levels {{code libs/langgraph/langgraph/pregel/main.py}}.
+**xray：** `get_graph` 的参数，会展开每个子图节点，把子图里的节点画在一个框内。`True` 展开每一层，整数则展开那么多层 {{code libs/langgraph/langgraph/pregel/main.py}}。
 
-A parent graph with one subgraph shows the difference. `get_graph()` gives the subgraph as one node, `inner`. `get_graph(xray=True)` gives its two nodes in its place:
+一个带一个子图的父图能显示两者的差别。`get_graph()` 把子图给成一个节点 `inner`。`get_graph(xray=True)` 则给出子图的两个节点来代替它：
 
 ```listing
-title: the nodes of a parent graph with xray=True
+title: xray=True 时父图的节点
 source: capture/out/52-draw-subgraph.txt
 lang: json
 ---
@@ -202,12 +202,12 @@ lang: json
 ]
 ```
 
-[Section 6.7](#s-subgraphs-and-multi-agent-patterns) draws the parent graph both ways. An agent from `create_agent` has no subgraph node, so `xray` changes nothing in its graph.
+[第 6.7 节](#s-subgraphs-and-multi-agent-patterns)用两种方式画出这个父图。`create_agent` 产生的 agent 没有子图节点，所以 `xray` 不会改变它的图。
 
-**draw_ascii():** the method of `Graph` that draws the graph as text. It needs the `grandalf` package, and `langchain-core` does not install it {{code libs/core/langchain_core/runnables/graph_ascii.py:205}}. The kit pin leaves it out, so the call raises:
+**draw_ascii()：** `Graph` 的方法，把图画成文本。它需要 `grandalf` 包，而 `langchain-core` 不会安装它 {{code libs/core/langchain_core/runnables/graph_ascii.py:205}}。工具包的锁定版本里没有它，所以这个调用会抛出异常：
 
 ```listing
-title: draw_ascii() at the pin
+title: 锁定版本上的 draw_ascii()
 source: capture/out/48-draw-agent.txt
 lang: text
 ---
@@ -216,12 +216,12 @@ draw_ascii():
 raised builtins.ImportError: Install grandalf to draw graphs: `pip install grandalf`.
 ```
 
-Install `grandalf` in your own environment when you want a drawing in the terminal.
+想在终端里看到图，就在你自己的环境里安装 `grandalf`。
 
-**draw_mermaid_png():** the method of `Graph` that turns the Mermaid text into a PNG image. Its default draw method is the API method:
+**draw_mermaid_png()：** `Graph` 的方法，把 Mermaid 文本变成 PNG 图片。它默认的绘制方法是 API 方法：
 
 ```listing
-title: the defaults of draw_mermaid_png() at the pin
+title: 锁定版本上 draw_mermaid_png() 的默认值
 source: capture/out/48-draw-agent.txt
 lang: json
 ---
@@ -234,45 +234,45 @@ keyword defaults:
 }
 ```
 
-The API method encodes the whole Mermaid text in base64. It puts the result in the URL of a GET request to a public rendering service {{code libs/core/langchain_core/runnables/graph_mermaid.py:463-501}}. So your node names, tool names, and node metadata leave your machine in that URL. Do not call the default on a graph whose names are private.
+API 方法把整段 Mermaid 文本编码成 base64，放进发往公共渲染服务的 GET 请求的 URL 里 {{code libs/core/langchain_core/runnables/graph_mermaid.py:463-501}}。因此，你的节点名、工具名和节点元数据会通过这个 URL 离开你的机器。名称属于私有信息的图，不要调用这个默认方法。
 
-`base_url` sends the same request to a Mermaid server that you run {{code libs/core/langchain_core/runnables/graph_mermaid.py:463}}. The `PYPPETEER` method renders in a local headless browser, with the `pyppeteer` package. That page still loads the Mermaid script from a public content delivery network, so it needs the network too {{code libs/core/langchain_core/runnables/graph_mermaid.py:389-393}}. The kit calls neither method. It captures the Mermaid text, and the figures of this manual draw that text offline.
+`base_url` 把同样的请求发给你自己运行的 Mermaid 服务器 {{code libs/core/langchain_core/runnables/graph_mermaid.py:463}}。`PYPPETEER` 方法借助 `pyppeteer` 包，在本地的无头浏览器里渲染。这个页面仍然从公共内容分发网络加载 Mermaid 脚本，所以也需要网络 {{code libs/core/langchain_core/runnables/graph_mermaid.py:389-393}}。工具包两种方法都没有调用。它只录制 Mermaid 文本，本手册的图就是离线地画这些文本。
 
-## Parallel tool calls and max_concurrency
+## 并行工具调用与 max_concurrency {#s-create-agent-and-the-graph-it-builds-parallel-tool-calls-and-max-concurrency}
 
-**max_concurrency:** the key of the run config that caps how many tasks of one step run at the same time.
+**max_concurrency：** 运行配置里的键，限制同一步里同时运行的任务数。
 
-**We measured** parallel tool calls on the x86 server guest, 32 vCPU. Qwen3 4B was asked for 1 to 16 parallel calls and made 2, 2, 4, 8, 16. The ToolNode cells ran its real reply, 5 times each. `create_agent` called the model in every run, asked for 8, 3 times each. The tool ran a 200 ms `pg_sleep` on PostgreSQL.
+**我们测得**并行工具调用，在 32 vCPU 的 x86 服务器客户机上进行。让 Qwen3 4B 做 1 到 16 个并行调用，它发出了 2、2、4、8、16 个。ToolNode 的各格用它的真实回复，各跑 5 次。`create_agent` 在每次运行里都调用模型，要求 8 个调用，各跑 3 次。工具在 PostgreSQL 上运行 200 ms 的 `pg_sleep`。
 
-| `ToolNode` and call | 16 calls, cap 1 | 16 calls, cap 8 | 16 calls, no cap |
+| `ToolNode` 与调用方式 | 16 个调用，上限 1 | 16 个调用，上限 8 | 16 个调用，无上限 |
 |---|---|---|---|
-| `invoke`, sync tool | 3,331.0 ms, 1 at a time | 460.0 ms, 8 at a time | 264.2 ms, 16 at a time |
-| `ainvoke`, async tool | 233.7 ms, 16 at a time | 233.1 ms, 16 at a time | 233.7 ms, 16 at a time |
-| `ainvoke`, sync tool | 267.1 ms, 16 at a time | 266.5 ms, 16 at a time | 269.2 ms, 16 at a time |
+| `invoke`，同步工具 | 3,331.0 ms，同时 1 个 | 460.0 ms，同时 8 个 | 264.2 ms，同时 16 个 |
+| `ainvoke`，异步工具 | 233.7 ms，同时 16 个 | 233.1 ms，同时 16 个 | 233.7 ms，同时 16 个 |
+| `ainvoke`，同步工具 | 267.1 ms，同时 16 个 | 266.5 ms，同时 16 个 | 269.2 ms，同时 16 个 |
 
-| `create_agent` and call | 8 calls, cap 1 | 8 calls, cap 4 | 8 calls, no cap |
+| `create_agent` 与调用方式 | 8 个调用，上限 1 | 8 个调用，上限 4 | 8 个调用，无上限 |
 |---|---|---|---|
-| `invoke`, sync tool | 1,674.0 ms, 1 at a time | 437.2 ms, 4 at a time | 229.2 ms, 8 at a time |
-| `ainvoke`, async tool | 1,668.7 ms, 1 at a time | 421.9 ms, 4 at a time | 210.5 ms, 8 at a time |
-| `ainvoke`, sync tool | 1,669.7 ms, 1 at a time | 431.0 ms, 4 at a time | 231.2 ms, 8 at a time |
+| `invoke`，同步工具 | 1,674.0 ms，同时 1 个 | 437.2 ms，同时 4 个 | 229.2 ms，同时 8 个 |
+| `ainvoke`，异步工具 | 1,668.7 ms，同时 1 个 | 421.9 ms，同时 4 个 | 210.5 ms，同时 8 个 |
+| `ainvoke`，同步工具 | 1,669.7 ms，同时 1 个 | 431.0 ms，同时 4 个 | 231.2 ms，同时 8 个 |
 
-Each `ToolNode` cell gives the median wall time and the largest number of calls that ran at one time. Each `create_agent` cell gives the median time from the first tool start to the last tool end. A whole run took 12 to 14 s with the model. Every successful run executed each call once and wrote one `ToolMessage` for it.
+每个 `ToolNode` 格给出的是总耗时的中位数，以及同一时刻运行的最大调用数。每个 `create_agent` 格给出的是从第一个工具开始到最后一个工具结束的中位耗时。带上模型，一次完整运行用时 12 到 14 秒。每次成功的运行，每个调用只执行一次，并为它写下一条 `ToolMessage`。
 
-`create_agent` applied the cap in every mode, because each call is its own `Send` task. With no cap, sync tools run in a thread pool. The Python default pool is min(32, cpu+4). That is 14 on the 10-core Mac and 32 on the guest, where 16 sync calls ran at once in 264 ms.
+`create_agent` 在每种模式下都应用了上限，因为每个调用都是它自己的 `Send` 任务。没有上限时，同步工具在线程池里运行。Python 默认线程池的大小是 min(32, cpu+4)。在 10 核的 Mac 上是 14，在客户机上是 32，16 个同步调用在客户机上同时运行，耗时 264 ms。
 
-The `max_concurrency` key also sets the size of that pool, so a value above the default makes it larger {{code libs/core/langchain_core/runnables/config.py:659-675}}. Async tools under `ainvoke` had no default cap. A tool with only an async body raised `NotImplementedError` under `invoke` in 125 of 125 ToolNode rows and 9 of 9 agent runs.
+`max_concurrency` 键也决定这个线程池的大小，所以高于默认值的取值会让线程池变大 {{code libs/core/langchain_core/runnables/config.py:659-675}}。`ainvoke` 下的异步工具没有默认上限。只有异步函数体的工具，在 `invoke` 下抛出了 `NotImplementedError`：125 个 ToolNode 行中有 125 个，9 次 agent 运行中有 9 次。
 
-A plain `ToolNode` under `ainvoke` ignored the cap, for async tools and for sync tools. Issue langgraph#8517 reports the async case {{issue langgraph#8517}}. Our runs reproduce it and show that sync tools on the async path are affected too. Under `invoke`, `ToolNode` applied the cap. Set `max_concurrency` on the run when a tool calls a service with a rate limit, and use `create_agent` when you need the cap under `ainvoke`.
+纯 `ToolNode` 在 `ainvoke` 下无视这个上限，异步工具和同步工具都是。langgraph#8517 报告了异步的情形 {{issue langgraph#8517}}。我们的运行复现了它，并显示异步路径上的同步工具也受影响。在 `invoke` 下，`ToolNode` 应用了上限。工具要调用有限流的服务时，请在运行上设置 `max_concurrency`；需要 `ainvoke` 下的上限时，请使用 `create_agent`。
 
-## The defaults on the compiled graph
+## 编译后图上的默认值 {#s-create-agent-and-the-graph-it-builds-the-defaults-on-the-compiled-graph}
 
-`create_agent` sets a config on the graph before it returns it:
+`create_agent` 在返回图之前，先在图上设置了一份配置：
 
 ```listing
-title: the config and the stream mode of every agent
+title: 每个 agent 的配置和流模式
 source: capture/out/05-agent-graph.txt
 lang: text
-note: Cut to the config, the stream mode, and the type.
+note: 只保留配置、流模式和类型。
 ---
 agent.config:
 {
@@ -287,31 +287,31 @@ agent.stream_mode = 'updates'
 type langgraph.graph.state.CompiledStateGraph
 ```
 
-The limit of 9999 steps applies to every run that does not pass its own `recursion_limit`. The default stream mode is `updates`, so a stream with no mode yields one chunk for each node that ran. [Section 1.3](#s-one-create-agent-run) runs an agent into the limit and shows the chunks. A `name` also adds `lc_agent_name` to the metadata.
+9999 步的上限适用于每个没有传入自己 `recursion_limit` 的运行。默认的流模式是 `updates`，所以不指定模式的流，会为每个运行过的节点产出一个块。[第 1.3 节](#s-one-create-agent-run)让一个 agent 运行到这个上限，并展示了这些块。设置 `name` 还会向元数据加上 `lc_agent_name`。
 
-## What the agent layer costs
+## agent 这一层的开销 {#s-create-agent-and-the-graph-it-builds-what-the-agent-layer-costs}
 
-**We measured** one task on the Mac: two tools and three model calls, against Qwen3 4B on Ollama, 40 shuffled runs each. A plain `openai` loop and `create_agent` sent the same tool schemas and got the same answer in every run. A proxy timed each model call, and the time outside the model is the rest of the run.
+**我们测得**一个任务，在 Mac 上进行：两个工具和三次模型调用，对着 Ollama 上的 Qwen3 4B，每种变体打乱顺序各跑 40 次。纯 `openai` 循环和 `create_agent` 发送同样的工具 schema，每次运行都得到同样的答案。代理给每次模型调用计时，模型之外的时间就是这次运行的其余部分。
 
-| Variant | Time outside the model, median | More than the plain loop, same round |
+| 变体 | 模型之外的时间，中位数 | 同一轮里比纯循环多出的 |
 |---|---|---|
-| plain `openai` loop | 25.1 ms | the baseline |
-| `ChatOpenAI.bind_tools` loop | 29.3 ms | 6.6 ms |
+| 纯 `openai` 循环 | 25.1 ms | 基线 |
+| `ChatOpenAI.bind_tools` 循环 | 29.3 ms | 6.6 ms |
 | `create_agent` | 37.6 ms | 15.6 ms |
-| `create_agent` with `InMemorySaver` | 37.6 ms | 12.2 ms |
-| hand-built `StateGraph` | 36.7 ms | 11.5 ms |
+| 带 `InMemorySaver` 的 `create_agent` | 37.6 ms | 12.2 ms |
+| 手工搭建的 `StateGraph` | 36.7 ms | 11.5 ms |
 
-The agent layer added about 5 ms for each model call. With `create_agent`, 2.3% of a 1.8 s run was outside the model. [Section 8.3](#s-cost-the-framework-against-a-plain-sdk-loop) gives the full cost story, with tokens, request bytes, and import time.
+agent 这一层为每次模型调用增加了约 5 ms。用 `create_agent` 时，一次 1.8 秒的运行里有 2.3% 的时间在模型之外。[第 8.3 节](#s-cost-the-framework-against-a-plain-sdk-loop)给出完整的成本分析，包括 token、请求字节数和导入时间。
 
 ```takeaways
-- Expect a tools node only when the agent has a tool or a wrap_tool_call middleware.
-- Read node names such as A.before_model to find the middleware hook that ran.
-- Pass recursion_limit on each run, because the agent default is 9999 steps.
-- Stream with no mode to get updates, the default of every agent.
-- Budget about 5 ms of agent overhead for each model call, far below model time.
-- Set max_concurrency on the run to cap parallel tool calls of create_agent, and not of a plain ToolNode under ainvoke.
-- Give each tool a sync body when the agent runs under invoke.
-- Draw a graph from draw_mermaid, because draw_mermaid_png sends the graph text to a public service.
+- 只有 agent 有工具，或有 wrap_tool_call 中间件时，才会有 tools 节点。
+- 读 A.before_model 这样的节点名，找出运行过的中间件钩子。
+- 每次运行都传入 recursion_limit，因为 agent 的默认值是 9999 步。
+- 不指定模式地流式输出，得到 updates，这是每个 agent 的默认值。
+- 为每次模型调用预算约 5 ms 的 agent 开销，它远低于模型耗时。
+- 要限制 create_agent 的并行工具调用，在运行上设置 max_concurrency；对 ainvoke 下的纯 ToolNode，这个设置不起作用。
+- agent 在 invoke 下运行时，给每个工具提供同步函数体。
+- 用 draw_mermaid 画图，因为 draw_mermaid_png 会把图的文本发送给公共服务。
 ```
 
-Sources: capture/out/05-agent-graph.txt, capture/out/09-middleware-order.txt, capture/out/48-draw-agent.txt, capture/out/52-draw-subgraph.txt, capture/s_draw.py; capture/lab/summary/parallel-tools-x86.json, capture/lab/T08-parallel-tools-x86/01-counts.jsonl, capture/lab/T08-parallel-tools-x86/04-toolnode.jsonl, capture/lab/T08-parallel-tools-x86/05-agent.jsonl, capture/lab/T08-parallel-tools-x86/t08_real.py; issue langgraph#8517; capture/lab/summary/overhead-mac-real.json, capture/lab/T01-overhead-mac-real/01-runs.jsonl, capture/lab/T01-overhead-mac-real/t01_real.py; libs/langchain_v1/langchain/agents/factory.py and libs/langchain_v1/langchain/agents/middleware/types.py, libs/core/langchain_core/runnables/config.py at langchain==1.5.0; libs/langgraph/langgraph/graph/state.py and libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22; libs/core/langchain_core/runnables/graph.py, libs/core/langchain_core/runnables/graph_mermaid.py, and libs/core/langchain_core/runnables/graph_ascii.py at langchain-core 1.8.0.
+来源：capture/out/05-agent-graph.txt, capture/out/09-middleware-order.txt, capture/out/48-draw-agent.txt, capture/out/52-draw-subgraph.txt, capture/s_draw.py; capture/lab/summary/parallel-tools-x86.json, capture/lab/T08-parallel-tools-x86/01-counts.jsonl, capture/lab/T08-parallel-tools-x86/04-toolnode.jsonl, capture/lab/T08-parallel-tools-x86/05-agent.jsonl, capture/lab/T08-parallel-tools-x86/t08_real.py; issue langgraph#8517; capture/lab/summary/overhead-mac-real.json, capture/lab/T01-overhead-mac-real/01-runs.jsonl, capture/lab/T01-overhead-mac-real/t01_real.py; libs/langchain_v1/langchain/agents/factory.py and libs/langchain_v1/langchain/agents/middleware/types.py, libs/core/langchain_core/runnables/config.py at langchain==1.5.0; libs/langgraph/langgraph/graph/state.py and libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22; libs/core/langchain_core/runnables/graph.py, libs/core/langchain_core/runnables/graph_mermaid.py, and libs/core/langchain_core/runnables/graph_ascii.py at langchain-core 1.8.0.
