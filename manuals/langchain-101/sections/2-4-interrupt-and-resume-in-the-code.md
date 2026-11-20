@@ -126,4 +126,4 @@ lang: text
 - 在你自己的数据库里，把中断 id 存为每个问题的键。
 ```
 
-来源： capture/lab/internals/04-interrupt/trace.txt, capture/lab/internals/04-interrupt/run.py, capture/lab/internals/04-interrupt/run1.trace.jsonl, capture/lab/internals/04-interrupt/run2b.trace.jsonl, capture/lab/internals/common/real.py; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/pregel/_loop.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/_runner.py at langgraph 1.2.22; libs/checkpoint/langgraph/checkpoint/base/__init__.py at langgraph-checkpoint 4.3.2.
+来源：capture/lab/internals/04-interrupt/trace.txt, capture/lab/internals/04-interrupt/run.py, capture/lab/internals/04-interrupt/run1.trace.jsonl, capture/lab/internals/04-interrupt/run2b.trace.jsonl, capture/lab/internals/common/real.py; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/pregel/_loop.py, libs/langgraph/langgraph/pregel/_algo.py, and libs/langgraph/langgraph/pregel/_runner.py at langgraph 1.2.22; libs/checkpoint/langgraph/checkpoint/base/__init__.py at langgraph-checkpoint 4.3.2.
