@@ -1,17 +1,17 @@
-# OpenTelemetry spans, with LangSmith off
+# 关闭 LangSmith，用 OpenTelemetry span 做追踪
 
-> Trace model and tool calls with your own OpenTelemetry spans, count tokens from provider usage, and confirm that LangSmith receives nothing unless its flag is true.
+> 用自己的 OpenTelemetry span 追踪模型调用和工具调用，按提供方返回的用量统计 token，并确认只要开关不为 true，LangSmith 就收不到任何数据。
 
-A customer says the assistant was slow and wrong at 10:42. You need the model calls of that run, their token counts, the tool that timed out, and the log lines, joined by one id. Your data cannot leave your network, so a hosted tracer is out.
+客户说助手在 10:42 又慢又答错了。你需要看到这次运行的模型调用、各自的 token 数、超时的那个工具，以及日志行，并且它们要靠同一个 id 串起来。数据不能离开你的网络，所以托管的追踪服务不能用。
 
-When you finish this section, you can add three kinds of spans to an agent and join them to your logs. You can find the model calls that those spans miss, and prove that no trace goes to LangSmith.
+读完本节，你能给 agent 加上三类 span，并把它们与日志关联起来。你还能找出这些 span 漏掉的模型调用，并证明没有任何追踪数据发往 LangSmith。
 
-## Three spans
+## 三类 span {#s-opentelemetry-spans-with-langsmith-off-three-spans}
 
-**Span:** one timed operation with a name, attributes, a status, and a parent. The service makes three kinds. `agent.run` wraps one run in the run task of [section 9.1](#s-the-run-endpoint-and-its-stream). A middleware makes `model.call` around each model call and `tool.<name>` around each tool attempt.
+**span：** 一次有计时的操作，带有名称、属性、状态和父 span。服务产生三类 span。`agent.run` 包住[第 9.1 节](#s-the-run-endpoint-and-its-stream)运行任务中的一次运行。中间件在每次模型调用外产生 `model.call`，在每次工具尝试外产生 `tool.<name>`。
 
 ```listing
-title: the span around each model call
+title: 包在每次模型调用外的 span
 source: capture/lab/prodapp-mac/code/app/middleware.py
 lang: python
 ---
@@ -30,49 +30,49 @@ class Tracing(AgentMiddleware):
             return response
 ```
 
-The attribute names follow the OpenTelemetry conventions for generative AI. The token counts are the provider's own. For Ollama they are `prompt_eval_count` and `eval_count`, counted by the model's tokenizer. For Anthropic they are the `usage` of the response.
+属性名遵循 OpenTelemetry 的生成式 AI 约定。token 数直接取自提供方。Ollama 的是 `prompt_eval_count` 和 `eval_count`，由模型自己的分词器计数。Anthropic 的是响应里的 `usage`。
 
-**We measured** whether Ollama reports the full prompt when the prompt is already in its cache, on the Mac. Three identical calls to Qwen3 4B each reported a `prompt_eval_count` of 65. The prompt evaluation took 1401.9 ms the first time, which included loading the model, and 68.6 and 28.7 ms after that. So the count is the prompt length, and a cache hit shows only in the time.
+**我们测得**在 Mac 上，提示已在 Ollama 缓存中时，它是否仍报告完整的提示长度。对 Qwen3 4B 发出三次相同的调用，每次报告的 `prompt_eval_count` 都是 65。提示评估第一次耗时 1401.9 ms，其中包含加载模型的时间，之后分别是 68.6 ms 和 28.7 ms。所以这个计数就是提示长度，缓存命中只体现在耗时上。
 
-The exporter writes one JSON line per span to a file. A collector or any OTLP exporter can take its place without a change to the middleware.
+导出器把每个 span 写成文件里的一行 JSON。换成 collector 或任何 OTLP 导出器，中间件都不用改。
 
 ```listing
-title: one model.call span from a Qwen3 14B run
+title: 一次 Qwen3 14B 运行中的一个 model.call span
 source: capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/test-spans.jsonl
 lang: json
-note: The first model.call span of the file, on one line.
+note: 文件中的第一个 model.call span，占一行。
 ---
 {"name": "model.call", "context": {"trace_id": "0xc31ff4d300b6481cedfbf16e6295dbf5", "span_id": "0x2d0efd6deeee8df4", "trace_state": "[]"}, "kind": "SpanKind.INTERNAL", "parent_id": "0x37bcefff7e3ac78d", "start_time": "2026-11-15T10:28:39.576564Z", "end_time": "2026-11-15T10:28:42.578468Z", "status": {"status_code": "UNSET"}, "attributes": {"gen_ai.request.model": "qwen3:14b", "gen_ai.request.message_count": 1, "gen_ai.response.model": "qwen3:14b", "gen_ai.usage.input_tokens": 454, "gen_ai.usage.output_tokens": 22, "gen_ai.response.tool_calls": 1}, "events": [], "links": [], "resource": {"attributes": {"telemetry.sdk.language": "python", "telemetry.sdk.name": "opentelemetry", "telemetry.sdk.version": "1.45.2", "service.instance.id": "a07d9619-8c5e-4163-a075-4db5bf1372bf", "service.name": "support-assistant"}, "schema_url": ""}}
 ```
 
-## What the spans held
+## span 里有什么 {#s-opentelemetry-spans-with-langsmith-off-what-the-spans-held}
 
-**We measured** the spans of the first Qwen3 14B suite run on the Mac. The file held 234 spans: 34 `agent.run`, 65 `model.call`, 36 tool spans, and 99 HTTP request spans. Each of the 65 `model.call` spans had an `agent.run` as its parent. Seven spans had status `ERROR`, and each matched an injected fault. They were one `search_faq`, three `read_order` timeouts, one `create_ticket`, and two primary model calls.
+**我们测得**在 Mac 上第一次 Qwen3 14B 套件运行的 span。文件里共有 234 个 span：34 个 `agent.run`、65 个 `model.call`、36 个工具 span 和 99 个 HTTP 请求 span。65 个 `model.call` span 的父 span 都是某个 `agent.run`。有 7 个 span 的状态是 `ERROR`，每一个都对应一个注入的故障：一次 `search_faq`、三次 `read_order` 超时、一次 `create_ticket`，以及两次主模型调用。
 
-FastAPI 0.162.7 adds its own spans, one per request, through the global tracer provider. The service turns off its operation spans with `telemetry={"operation_spans": False}`, and the request spans stay. They are useful: a slow `POST /threads/{thread_id}/runs` and its `agent.run` share a trace id.
+FastAPI 0.162.7 通过全局 tracer provider 自己加了 span，每个请求一个。服务用 `telemetry={"operation_spans": False}` 关掉了它的操作 span，请求 span 仍保留。它们有用：一个慢的 `POST /threads/{thread_id}/runs` 和它的 `agent.run` 共享同一个 trace id。
 
-## The model calls that the spans miss
+## span 漏掉的模型调用 {#s-opentelemetry-spans-with-langsmith-off-the-model-calls-that-the-spans-miss}
 
-`SummarizationMiddleware` calls the model from its own hook, outside `awrap_model_call`. So no `model.call` span wraps it {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:520-557}}, and a cost report built from spans leaves it out.
+`SummarizationMiddleware` 在自己的钩子里调用模型，不经过 `awrap_model_call`。所以没有 `model.call` span 包住这次调用 {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:520-557}}，用 span 生成的成本报告也就漏掉了它。
 
-The service also records every model call through a LangChain callback, with the provider usage and the name of the span that was current. **We measured** the 20 evals of Claude Haiku 5.5 that way and against the Anthropic usage in our cost ledger. The ledger had 64 calls and 76,076 input tokens, and the callback log had the same 64 calls and the same total. Excluding the outage case, whose calls went to the backup model, the `model.call` spans held 60,354 of those tokens.
+服务还通过 LangChain 回调记录每一次模型调用，同时记下提供方的用量和当时所在 span 的名称。**我们测得**用这种方式统计 Claude Haiku 5.5 的 20 项评估，并与成本账本里的 Anthropic 用量对照。账本有 64 次调用、76,076 个输入 token，回调日志有同样的 64 次调用和同样的总数。去掉故障案例（它的调用走了备用模型）后，`model.call` span 只含其中 60,354 个 token。
 
-The other 15,722 tokens came from two places. The summarizer made 3 calls with 3,966 input tokens, in the six-turn thread and the runaway loop. In the runaway case the test middleware replaced each model reply after the call. So the spans recorded 0 tokens for 8 billed calls with 11,756 input tokens. That second gap comes from the test. The first one is in every run of a summarizing agent.
+另外 15,722 个 token 来自两处。摘要器在六轮线程和失控循环中共发出 3 次调用，含 3,966 个输入 token。在失控循环的案例里，测试中间件在调用之后替换了每条模型回复，所以 span 对 8 次计费调用、11,756 个输入 token 记录的是 0 个 token。第二处缺口来自测试本身。第一处缺口存在于每个启用摘要的 agent 的每次运行中。
 
 ```figure
 id: fig-9-4
 kind: chart
-title: input tokens per conversation, inside model.call spans and outside them
-claim: The model.call spans held 60,354 of 76,076 billed input tokens, and the summarizer calls and the replaced replies made up the rest.
-caption: Each bar is one eval conversation with Claude Haiku 5.5, by case number. Plum is input tokens inside model.call spans, and rose is billed tokens outside them. Case 9 calls no model, and case 16 used only the backup. From capture/lab/prodapp-mac/summary/cost-mac.json.
+title: 每次对话的输入 token：model.call span 内与 span 外
+claim: model.call span 只含 76,076 个计费输入 token 中的 60,354 个，其余来自摘要器调用和被替换的回复。
+caption: 每根柱是 Claude Haiku 5.5 的一次评估对话，按案例编号排列。梅红色是 model.call span 内的输入 token，玫瑰色是 span 外的计费 token。案例 9 没有调用模型，案例 16 只用了备用模型。数据来自 capture/lab/prodapp-mac/summary/cost-mac.json。
 ```
 
-## Logs that carry the trace id
+## 带 trace id 的日志 {#s-opentelemetry-spans-with-langsmith-off-logs-that-carry-the-trace-id}
 
-Each log line is JSON, and the formatter adds the trace id and the span id of the current span. The lines below are one run of the hung-tool case on Qwen3 14B. The `tool.error` line has the span id of `agent.run` and not of a tool span. `ToolErrorMiddleware` writes it outside the retry, after the last tool span has ended. Join log lines to tool spans by the trace id.
+每行日志都是 JSON，格式化器会加上当前 span 的 trace id 和 span id。下面两行来自 Qwen3 14B 上工具卡死案例的一次运行。`tool.error` 行带的是 `agent.run` 的 span id，不是工具 span 的。`ToolErrorMiddleware` 在重试之外、最后一个工具 span 结束之后才写它。请按 trace id 把日志行与工具 span 关联起来。
 
 ```listing
-title: two log lines of one run, joined to its spans by trace_id
+title: 一次运行的两行日志，通过 trace_id 关联到它的 span
 source: capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/test-log.jsonl
 lang: json
 ---
@@ -80,25 +80,25 @@ lang: json
 {"ts": 1794738678.029, "level": "INFO", "event": "tool.error", "tool": "read_order", "error": "TimeoutError", "trace_id": "f3619cebe3ac7755ec6e9392b2581a61", "span_id": "5226b37abac5ab4b"}
 ```
 
-## LangSmith off
+## 关闭 LangSmith {#s-opentelemetry-spans-with-langsmith-off-langsmith-off}
 
-LangChain sends runs to LangSmith when `LANGSMITH_TRACING` is true. We pointed `LANGSMITH_ENDPOINT` at a local recorder and gave a dummy key, so that any upload would show up as a request. Then we ran one conversation with the flag `true`, with it `false`, and with it unset. Each conversation asked a FAQ question, asked for a refund with the amount and the reason, and rejected the approval.
+当 `LANGSMITH_TRACING` 为 true 时，LangChain 会把运行记录发给 LangSmith。我们把 `LANGSMITH_ENDPOINT` 指向一个本地记录器，并给了一个假密钥，这样任何上传都会表现为一次请求。然后我们分别在开关为 `true`、`false` 和未设置时各跑一次对话。每次对话先问一个 FAQ 问题，再请求退款并给出金额和原因，最后拒绝审批。
 
-**We measured** it once per setting on the Mac with Qwen3 4B. The model called `search_faq` and `refund_order` in all three conversations.
+**我们测得**在 Mac 上用 Qwen3 4B 每种设置各跑一次。三次对话里模型都调用了 `search_faq` 和 `refund_order`。
 
-| `LANGSMITH_TRACING` | Requests to the recorder | Bytes | Paths |
+| `LANGSMITH_TRACING` | 发往记录器的请求数 | 字节数 | 路径 |
 |---|---|---|---|
 | `true` | 10 | 337,363 | `/info`, `/runs/multipart` |
-| `false` | 0 | 0 | none |
-| unset | 0 | 0 | none |
+| `false` | 0 | 0 | 无 |
+| 未设置 | 0 | 0 | 无 |
 
-The control run proves that the recorder would see an upload: 10 requests and 337,363 bytes for one short conversation. The two other settings sent nothing. A key in the environment is not enough to send data. The flag is.
+对照运行证明记录器能看到上传：一次简短对话就产生了 10 个请求和 337,363 字节。另外两种设置什么都没发。环境里有密钥并不足以发出数据，开关才决定是否发送。
 
 ```takeaways
-- Wrap model calls and tool attempts in your own spans, with gen_ai token attributes.
-- Take token counts from provider usage, and record calls outside your spans too.
-- Put the trace id and span id on every log line.
-- Leave LANGSMITH_TRACING unset in production, and test that a recorder receives nothing.
+- 用自己的 span 包住模型调用和工具尝试，并带上 gen_ai 的 token 属性。
+- token 数取自提供方的用量，并且 span 之外的调用也要记录。
+- 每行日志都带上 trace id 和 span id。
+- 生产环境不设置 LANGSMITH_TRACING，并用测试确认记录器什么都收不到。
 ```
 
-Sources: capture/lab/prodapp-mac/code/app/middleware.py, capture/lab/prodapp-mac/code/app/telemetry.py, capture/lab/prodapp-mac/code/app/usage.py, capture/lab/prodapp-mac/code/app/server.py, capture/lab/prodapp-mac/code/scripts/service_real.py, capture/lab/prodapp-mac/code/tests/test_smith_off.py, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/test-spans.jsonl, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/test-log.jsonl, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/usage.jsonl, capture/lab/prodapp-mac/runs/service/service-properties.json, capture/lab/prodapp-mac/runs/ollama-cache-probe.txt, capture/lab/prodapp-mac/runs/suite/haiku/rep-1/usage.jsonl, capture/lab/prodapp-mac/code/scripts/cost_real.py, capture/lab/prodapp-mac/summary/cost-mac.json, capture/lab/prodapp-mac/summary/service-mac.json; libs/langchain_v1/langchain/agents/middleware/summarization.py at langchain==1.5.0.
+来源：capture/lab/prodapp-mac/code/app/middleware.py, capture/lab/prodapp-mac/code/app/telemetry.py, capture/lab/prodapp-mac/code/app/usage.py, capture/lab/prodapp-mac/code/app/server.py, capture/lab/prodapp-mac/code/scripts/service_real.py, capture/lab/prodapp-mac/code/tests/test_smith_off.py, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/test-spans.jsonl, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/test-log.jsonl, capture/lab/prodapp-mac/runs/suite/qwen3-14b/rep-1/usage.jsonl, capture/lab/prodapp-mac/runs/service/service-properties.json, capture/lab/prodapp-mac/runs/ollama-cache-probe.txt, capture/lab/prodapp-mac/runs/suite/haiku/rep-1/usage.jsonl, capture/lab/prodapp-mac/code/scripts/cost_real.py, capture/lab/prodapp-mac/summary/cost-mac.json, capture/lab/prodapp-mac/summary/service-mac.json；libs/langchain_v1/langchain/agents/middleware/summarization.py（langchain==1.5.0）。

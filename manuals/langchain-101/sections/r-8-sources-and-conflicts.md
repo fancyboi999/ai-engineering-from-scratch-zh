@@ -1,131 +1,133 @@
-# Sources and conflicts
+# 来源与冲突
 
-> The manual ranks the code at the tags above the documentation, uses its own recorded runs for every listing and measured number, and records 32 conflicts between its sources.
+> 本手册把各标签处的代码排在文档之上，每个 listing 和实测数字都用自己录制的运行，并记录了来源之间的 32 处冲突。
 
-The ranks are the same as in [How to read this manual](#s-front). When two sources disagree, the higher one wins, and the section says so. We read every source and checked every fact on 2026-11-14. [How this manual was made](#s-ref-how-this-manual-was-made) describes the machines and the method.
+排序与[如何阅读本手册](#s-front)中的相同。两个来源不一致时，排名高的获胜，对应章节会写明这一点。我们在 2026-11-14 读完了每个来源，并核对了每个事实。机器和方法见[本手册是怎么做的](#s-ref-how-this-manual-was-made)。
 
-## The ranked sources
+读完本节，你能说出手册各类内容的依据是哪一级来源，并查到来源之间每一处冲突的取舍。
 
-| Rank | Source | What the manual takes from it |
+## 来源的排序 {#s-ref-sources-and-conflicts-the-ranked-sources}
+
+| 等级 | 来源 | 手册从中取用什么 |
 |---|---|---|
-| 1 | the source code of each package at its release tag | every class, parameter, default, and error text, and the reference tables |
-| 2 | the LangChain documentation, built from one commit of its repository | the documented behaviour, in our own words, checked against the code and our runs |
-| 3 | the changelog and the release notes of each package | when a change came, and which package version holds it |
-| 4 | the capture kit, with Qwen3 4B on Ollama where a scenario needs a model | every listing |
-| 5 | the lab recordings on two machines, the account run against the hosted LangSmith API, the task-suite bench, and the production service of Part 9. Their Claude rows ran through the Anthropic API | every number in a paragraph that starts with "We measured" |
+| 1 | 每个包在其发布标签处的源代码 | 每个类、参数、默认值和错误文本，以及参考表格 |
+| 2 | 从仓库的一次提交构建出来的 LangChain 文档 | 文档记载的行为，用我们自己的话重述，并对照代码和我们的运行核对 |
+| 3 | 每个包的更新日志和发布说明 | 某项变更何时出现，以及它在哪个包版本中 |
+| 4 | 录制工具包，场景需要模型时使用 Ollama 上的 Qwen3 4B | 每个 listing |
+| 5 | 两台机器上的实验记录、针对托管 LangSmith API 的账户运行、任务套件测试基准，以及第 9 部分的生产服务。其中的 Claude 行是通过 Anthropic API 运行的 | 以“我们测得”开头的段落里的每个数字 |
 
-GitHub issues, pull requests, and security advisories are evidence for a behaviour at the pin. The text names each one by its number, and it never presents an issue as our result. The product pages of the project have no open license. [Section 1.1](#s-langchain-langgraph-langsmith-and-deep-agents) states their claims in our words and sets each one beside a run.
+GitHub 的 issue、pull request 和安全公告，是锁定版本下某种行为的证据。正文按编号引用每一条，并且从不把 issue 当作我们自己的结果。该项目的产品页面没有开放许可。[第 1.1 节](#s-langchain-langgraph-langsmith-and-deep-agents)用我们自己的话陈述它们的说法，并把每一条与一次运行放在一起对照。
 
-## Rank 1: the code
+## 第 1 级：代码 {#s-ref-sources-and-conflicts-rank-1-the-code}
 
-| Package | Version | Commit | Used in |
+| 包 | 版本 | 提交 | 使用位置 |
 |---|---|---|---|
-| `langchain` | 1.5.0, released 2026-11-11 | `c2f4036e` | every part |
-| `langchain-core` | 1.8.0 | `a4b4a7b9`, the same core tree as `c2f4036e` | every part |
-| `langgraph`, with `langgraph-checkpoint` 4.3.2 and `langgraph-prebuilt` 1.1.2 | 1.2.22 | `08a20169` | Part 2, Parts 4 to 6, Part 8 |
-| `langgraph-checkpoint-sqlite` | 3.1.3 | `5bd231cb` by the release record. We read its code at `08a20169`, which holds 3.1.3 | Part 2, Part 5 |
-| `langgraph-checkpoint-postgres` | 3.2.1, from the lab environment | the `langgraph` repository at `08a20169` | Part 5, Part 9 |
+| `langchain` | 1.5.0，2026-11-11 发布 | `c2f4036e` | 每个部分 |
+| `langchain-core` | 1.8.0 | `a4b4a7b9`，与 `c2f4036e` 的 core 目录树相同 | 每个部分 |
+| `langgraph`, with `langgraph-checkpoint` 4.3.2 and `langgraph-prebuilt` 1.1.2 | 1.2.22 | `08a20169` | 第 2 部分，第 4 到 6 部分，第 8 部分 |
+| `langgraph-checkpoint-sqlite` | 3.1.3 | 按发布记录是 `5bd231cb`。我们读的是 `08a20169` 处的代码，其中包含 3.1.3 | 第 2 部分，第 5 部分 |
+| `langgraph-checkpoint-postgres` | 3.2.1，来自实验环境 | `08a20169` 处的 `langgraph` 仓库 | 第 5 部分，第 9 部分 |
 | `deepagents` | 0.7.38 | `c858b364` | [7.4](#s-deep-agents-0-7), [7.5](#s-a-deep-agent-with-a-subagent-and-files) |
 | `langsmith` | 0.14.17 | `15dd2a78` | [7.6](#s-langsmith-tracing), [7.7](#s-evaluation-with-langsmith) |
-| `langgraph-api`, `langgraph-cli` | 0.18.0, 0.4.43 | the published packages | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) |
-| `langchain-openai`, `langchain-anthropic`, `langchain-ollama` | 1.8.0, 1.7.10, 1.1.0 | their own tags | Part 3, [1.2](#s-do-you-need-langchain), [4.3](#s-structured-output-which-strategy-on-which-provider) |
-| `fastmcp`, `mcp` | 4.2.0, 2.3.0 | the published packages | [7.3](#s-mcp-with-langchain-mcp) |
-| `fastapi`, `starlette`, `uvicorn`, `psycopg`, `opentelemetry-sdk` | 0.162.7, 1.10.0, 0.54.0, 3.3.9, 1.45.2 | the published packages, from the lockfile of the service | Part 9 |
-| `agent-chat-ui` | no release and no tag, pinned to `main` | `0d21f7ff`, committed 2026-11-03, with `@langchain/langgraph-sdk` 1.12.8 | [8.2](#s-agent-chat-ui-in-front-of-langgraph-dev) |
-| `wcmatch` | 12.0.1, from the lab environment | the published package | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
-| `langchain-mcp-adapters` | 0.3.2, archived | its last tag | [7.3](#s-mcp-with-langchain-mcp), [8.5](#s-migration-from-0-x-and-stale-advice) |
+| `langgraph-api`, `langgraph-cli` | 0.18.0, 0.4.43 | 已发布的包 | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) |
+| `langchain-openai`, `langchain-anthropic`, `langchain-ollama` | 1.8.0, 1.7.10, 1.1.0 | 各自的标签 | 第 3 部分， [1.2](#s-do-you-need-langchain), [4.3](#s-structured-output-which-strategy-on-which-provider) |
+| `fastmcp`, `mcp` | 4.2.0, 2.3.0 | 已发布的包 | [7.3](#s-mcp-with-langchain-mcp) |
+| `fastapi`, `starlette`, `uvicorn`, `psycopg`, `opentelemetry-sdk` | 0.162.7, 1.10.0, 0.54.0, 3.3.9, 1.45.2 | 已发布的包，取自服务的锁文件 | 第 9 部分 |
+| `agent-chat-ui` | 没有发布版本也没有标签，锁定到 `main` | `0d21f7ff`，2026-11-03 提交，搭配 `@langchain/langgraph-sdk` 1.12.8 | [8.2](#s-agent-chat-ui-in-front-of-langgraph-dev) |
+| `wcmatch` | 12.0.1，来自实验环境 | 已发布的包 | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
+| `langchain-mcp-adapters` | 0.3.2，已归档 | 它的最后一个标签 | [7.3](#s-mcp-with-langchain-mcp), [8.5](#s-migration-from-0-x-and-stale-advice) |
 
-## Rank 2: the documentation
+## 第 2 级：文档 {#s-ref-sources-and-conflicts-rank-2-the-documentation}
 
-The site serves its main branch, and no tag of the docs matches a package release. We read every page at docs commit `04d4d4a` of 2026-11-13. The sections cite each page by its path, and these groups of pages are the ones they use most:
+文档站点提供的是它的主分支，没有任何文档标签与包的发布版本对应。我们在 2026-11-13 的文档提交 `04d4d4a` 处读完了每个页面。各章节按路径引用每个页面，下面这几组页面是它们用得最多的：
 
-| Pages | Used in |
+| 页面 | 使用位置 |
 |---|---|
-| the agents, models, messages, tools, and install pages of LangChain | Part 1, Part 3, Part 4 |
-| structured output, the built-in middleware, custom middleware, guardrails, and human in the loop | Part 4, Part 6 |
-| streaming and event streaming of LangChain and LangGraph | Part 2, Part 5 |
-| checkpointers, persistence, stores, short-term and long-term memory, and fault tolerance | Part 2, Part 5, Part 6 |
-| the graph API, `Send` and `Command`, the functional API, interrupts, time travel, subgraphs, and Pregel | Part 2, Part 6 |
-| the MCP pages, the Deep Agents overview, and the retrieval pages | Part 7 |
-| tracing, the observability quickstart, evaluation, pytest, and usage and billing of LangSmith | Part 7 |
-| Agent Server, its scale guide, the CLI, double texting, the environment variables, and the standalone server | Part 1, Part 8 |
-| the release policy, the changelog, the v1 release notes, and the migration guides | Part 3, Part 8 |
+| LangChain 的 agents、models、messages、tools 和安装页面 | 第 1、3、4 部分 |
+| 结构化输出、内置中间件、自定义中间件、护栏和人在回路 | 第 4、6 部分 |
+| LangChain 和 LangGraph 的流式输出与事件流 | 第 2、5 部分 |
+| checkpointer、持久化、store、短期与长期记忆，以及容错 | 第 2、5、6 部分 |
+| graph API、`Send` 与 `Command`、functional API、中断、时间旅行、子图和 Pregel | 第 2、6 部分 |
+| MCP 页面、Deep Agents 概览和检索页面 | 第 7 部分 |
+| LangSmith 的追踪、可观测性快速入门、评估、pytest，以及用量与计费 | 第 7 部分 |
+| Agent Server、它的扩展指南、CLI、双重发送、环境变量和独立服务器 | 第 1、8 部分 |
+| 发布政策、更新日志、v1 发布说明和迁移指南 | 第 3、8 部分 |
 
-## Rank 3: releases
+## 第 3 级：发布 {#s-ref-sources-and-conflicts-rank-3-releases}
 
-The changelog page and the GitHub release of each package give the version of each change. [Section 8.5](#s-migration-from-0-x-and-stale-advice) uses them to date each change since 0.x.
+更新日志页面和每个包的 GitHub 发布记录给出每项变更所在的版本。[第 8.5 节](#s-migration-from-0-x-and-stale-advice)用它们来确定自 0.x 以来每项变更的时间。
 
-The LangChain, LangGraph, and Python marks in the figures belong to their owners, and we use them only to identify the projects.
+图中的 LangChain、LangGraph 和 Python 标志归其所有者所有，我们只用它们来标识这些项目。
 
-## Ranks 4 and 5: the kit and the lab
+## 第 4 级和第 5 级：工具包与实验 {#s-ref-sources-and-conflicts-ranks-4-and-5-the-kit-and-the-lab}
 
-The capture kit writes 56 files: 19 model-free, 36 recorded, and 1 sidecar. The lab holds 51 experiment folders, 48 summary files, and the bench with its own summary. The production service of Part 9 keeps its code, its raw runs, and ten summaries in one folder. The bench and the service priced each Claude call at the list prices of the Anthropic pricing page, read on 2026-11-14. [How this manual was made](#s-ref-how-this-manual-was-made) lists each experiment with its machine and its count.
+录制工具包写出 56 个文件：19 个不需要模型，36 个是录制的，1 个是附带文件。实验目录里有 51 个实验文件夹、48 个汇总文件，以及带自己汇总的测试基准。第 9 部分的生产服务把它的代码、原始运行和十个汇总放在一个文件夹里。测试基准和服务都按 Anthropic 价格页的标价给每次 Claude 调用定价，价格页读取于 2026-11-14。每个实验及其机器和数量见[本手册是怎么做的](#s-ref-how-this-manual-was-made)。
 
-## Issues and advisories
+## issue 与安全公告 {#s-ref-sources-and-conflicts-issues-and-advisories}
 
-| Issue | What it reports | Used in |
+| issue | 报告的内容 | 使用位置 |
 |---|---|---|
-| langgraph #9267 | `durability="sync"` without a checkpointer raises `AttributeError` | [5.3](#s-durability-modes-and-a-crash-between-two-steps), [8.6](#s-symptom-cause-fix) |
-| langgraph #8039 | `sync` does not fix the order of `put_writes` and `put` | [5.3](#s-durability-modes-and-a-crash-between-two-steps) |
-| langgraph #9185, #9240 | a node that raised runs again on a resume, and a request to document that durability is not exactly once | [5.3](#s-durability-modes-and-a-crash-between-two-steps) |
-| langgraph #8757 | `SqliteStore` keeps vector rows after a delete | [5.4](#s-stores-and-long-term-memory), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
-| langgraph #7714 | a measured token cost of checkpoints, closed because checkpoints are not sent to the model | [5.5](#s-context-engineering-and-summarization) |
-| langchain #38352 | orphan tool messages after a summary, which our runs did not reproduce | [5.5](#s-context-engineering-and-summarization) |
-| langgraph #8388, #8184, #8826, #8938 | values that the serializer does not rebuild, and plaintext rows under encryption | [5.6](#s-serialization-of-state-and-what-does-not-round-trip) |
-| langchain #38484, #38533 | a v3 consumer gets the final answer in one burst, and a closed pull request that changed `create_agent` and not the projection code | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode), [2.5](#s-where-each-stream-mode-comes-from) |
-| langgraph #9712 | after `InvalidUpdateError`, a saved thread raises on every read until a reducer is deployed, which we reported | [6.1](#s-stategraph-state-and-reducers), [2.2](#s-channels-and-colliding-writes), [8.6](#s-symptom-cause-fix) |
-| langchain #40492 | a middleware jump can skip a batched review | [4.5](#s-middleware-hooks-and-their-order), [6.5](#s-human-in-the-loop-batched-and-per-call), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
-| langchain #33787, langgraph #9106 | an edit that ran the old call, and a resume that ran a finished branch, which did not reproduce | [6.5](#s-human-in-the-loop-batched-and-per-call) |
-| langchain #40531, langgraph #7988 | tool calls with no id, and two tools with one name | [3.4](#s-tools-toolruntime-and-tool-errors) |
-| langchain #40688 | a tool retry runs a tool that is not idempotent again | [4.7](#s-retries-backup-models-rate-limits-and-caching) |
-| langgraph #8517 | `ToolNode` under `ainvoke` ignores `max_concurrency` | [4.1](#s-create-agent-and-the-graph-it-builds) |
-| langchain #40471 | an MCP error result loses its `structuredContent` | [7.3](#s-mcp-with-langchain-mcp) |
-| langchain #41870 | `tracing_context(enabled="local")` sends the runs of LangChain code, which we reported | [7.6](#s-langsmith-tracing), [7.7](#s-evaluation-with-langsmith) |
-| langsmith-python #106 | `evaluate(upload_results=False)` prints `%s` and gives three names to one call, which we reported | [7.7](#s-evaluation-with-langsmith) |
-| langsmith-python #107 | with tracking on, every `log_*` call of the pytest plugin raises unless `LANGSMITH_TRACING=true`, which we reported | [7.7](#s-evaluation-with-langsmith) |
+| langgraph #9267 | `durability="sync"` 在没有 checkpointer 时会抛出 `AttributeError` | [5.3](#s-durability-modes-and-a-crash-between-two-steps), [8.6](#s-symptom-cause-fix) |
+| langgraph #8039 | `sync` 没有固定 `put_writes` 与 `put` 的顺序 | [5.3](#s-durability-modes-and-a-crash-between-two-steps) |
+| langgraph #9185, #9240 | 抛出过异常的节点在恢复时会再次运行，以及要求在文档中说明持久性并不等于恰好一次 | [5.3](#s-durability-modes-and-a-crash-between-two-steps) |
+| langgraph #8757 | `SqliteStore` 在删除后仍保留向量行 | [5.4](#s-stores-and-long-term-memory), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
+| langgraph #7714 | 一项对检查点 token 成本的测量，已关闭，因为检查点不会发给模型 | [5.5](#s-context-engineering-and-summarization) |
+| langchain #38352 | 摘要之后出现孤立的工具消息，我们的运行没有复现 | [5.5](#s-context-engineering-and-summarization) |
+| langgraph #8388, #8184, #8826, #8938 | 序列化器无法重建的值，以及加密下的明文行 | [5.6](#s-serialization-of-state-and-what-does-not-round-trip) |
+| langchain #38484, #38533 | v3 的消费者一次性拿到最终答案，以及一个已关闭的 pull request，它改的是 `create_agent` 而不是投影代码 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode), [2.5](#s-where-each-stream-mode-comes-from) |
+| langgraph #9712 | 在 `InvalidUpdateError` 之后，已保存的线程在每次读取时都会抛出异常，直到部署了 reducer，我们已报告 | [6.1](#s-stategraph-state-and-reducers), [2.2](#s-channels-and-colliding-writes), [8.6](#s-symptom-cause-fix) |
+| langchain #40492 | 中间件的跳转可能跳过批量审核 | [4.5](#s-middleware-hooks-and-their-order), [6.5](#s-human-in-the-loop-batched-and-per-call), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) |
+| langchain #33787, langgraph #9106 | 一次编辑却执行了旧的调用，以及恢复时运行了已经完成的分支，两者都没有复现 | [6.5](#s-human-in-the-loop-batched-and-per-call) |
+| langchain #40531, langgraph #7988 | 没有 id 的工具调用，以及两个同名的工具 | [3.4](#s-tools-toolruntime-and-tool-errors) |
+| langchain #40688 | 工具重试会再次运行不幂等的工具 | [4.7](#s-retries-backup-models-rate-limits-and-caching) |
+| langgraph #8517 | `ToolNode` 在 `ainvoke` 下忽略 `max_concurrency` | [4.1](#s-create-agent-and-the-graph-it-builds) |
+| langchain #40471 | MCP 错误结果丢失了它的 `structuredContent` | [7.3](#s-mcp-with-langchain-mcp) |
+| langchain #41870 | `tracing_context(enabled="local")` 会发送 LangChain 代码的运行记录，我们已报告 | [7.6](#s-langsmith-tracing), [7.7](#s-evaluation-with-langsmith) |
+| langsmith-python #106 | `evaluate(upload_results=False)` 会打印 `%s`，并给同一次调用起三个名字，我们已报告 | [7.7](#s-evaluation-with-langsmith) |
+| langsmith-python #107 | 开启跟踪时，除非 `LANGSMITH_TRACING=true`，pytest 插件的每次 `log_*` 调用都会抛出异常，我们已报告 | [7.7](#s-evaluation-with-langsmith) |
 
-[Section 8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) gives the table of security advisories, with the range of each one and our result at the pin.
+[第 8.4 节](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)给出安全公告表，含每条公告的影响范围和我们在锁定版本下的结果。
 
-## The conflict register
+## 冲突登记 {#s-ref-sources-and-conflicts-the-conflict-register}
 
-Each row is one disagreement between two sources. The choice is what this manual tells you to do, and the last column says what the project had done by 2026-11-14.
+每一行是两个来源之间的一处分歧。“手册采用”一列是本手册建议你怎么做，最后一列说明截至 2026-11-14 该项目做了什么。
 
-| Id | The sources say | The manual follows | Sections | Upstream |
+| 编号 | 各来源的说法 | 手册采用 | 章节 | 上游 |
 |---|---|---|---|---|
-| D2 | The docstring of `GenericFakeChatModel` says that it does not stream, and the unit testing page says that it does. The code streams text and drops tool calls. | the code: test streaming against a real model, or a fake that streams tool calls | [8.6](#s-symptom-cause-fix) | no issue found |
-| D3 | The example in the `ToolRuntime` docstring calls `stream_writer.write`. The type is a plain callable. | the code: call `runtime.stream_writer(value)` | [3.4](#s-tools-toolruntime-and-tool-errors) | not checked |
-| D4 | `StreamMode` and the streaming page list seven modes. The loop also accepts `tools`. | the code and the capture: `tools` is a mode | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode), [R.3](#s-ref-stream-modes-and-event-types) | not checked |
-| D6 | `durability="sync"` is a documented mode. Without a checkpointer it raises `AttributeError`. | the run: use `sync` only with a checkpointer | [5.3](#s-durability-modes-and-a-crash-between-two-steps) | issue #9267 open at the pin. Fix PR #9268 closed without a merge |
-| D8 | The docstring of `create_deep_agent` names `execute` and not `delete`. The default backend binds `delete` and no `execute`. | the capture: `delete` is a default tool | [7.4](#s-deep-agents-0-7) | not checked |
-| D101 | The install page and the release policy say Python 3.10, and the policy changes the floor only in a major release. `langchain` 1.5.0 needs 3.11. | the package metadata: Python 3.11 or later | [3.1](#s-install-and-the-package-map), [8.5](#s-migration-from-0-x-and-stale-advice) | open at docs `04d4d4a` |
-| D102 | A batched example edits a call to a new tool name. The per-call text and the 1.4.6 changelog say that an edit keeps the tool. | the lab: batched mode allows the switch, and per-call mode refuses it | [6.5](#s-human-in-the-loop-batched-and-per-call) | open |
-| D104 | The agents page calls `messages` append only. The memory page removes messages with `RemoveMessage`. | the code of `add_messages`: append, replace by id, and remove | [6.1](#s-stategraph-state-and-reducers) | open |
-| D105 | The graph API page gives 10,007, and 10,000 for older versions. The server docs give 10011. Old advice gives 25. | the code and the runs: 10007 for a graph, 9999 for `create_agent`, 10007 under `langgraph dev` | [6.8](#s-error-handlers-node-timeouts-and-the-recursion-limit), [8.1](#s-agent-server-langgraph-dev-up-and-deploy), [R.5](#s-ref-environment-variables) | open |
-| D106 | The stores page links `InMemoryStore` to a class in `langchain_core.stores`. Its code imports `langgraph.store.memory`. | the code: import from `langgraph.store.memory` | [5.4](#s-stores-and-long-term-memory), [R.4](#s-ref-checkpointer-and-store-api) | open |
-| D107 | Both v1 release pages link `create_react_agent` to the function of the same name in `langchain-classic`. | the code: two functions share the name | [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D108 | A LangSmith FAQ table calls checkpointers community code and streaming basic. | the current pages and the code | [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D109 | The Deep Agents overview names planning as a default. The 0.7.0 changelog makes it opt in. | the changelog and the capture: add `TodoListMiddleware` | [7.4](#s-deep-agents-0-7), [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D111 | The product page says that tracing never affects your application. The tracing docs say that `LANGCHAIN_CALLBACKS_BACKGROUND=false` makes callbacks wait. No code at the pin reads that variable. | the lab and the code: about 6 ms per agent run on Qwen3 4B against the hosted API, and no effect from the variable at the pin | [7.6](#s-langsmith-tracing) | open at docs `04d4d4a` |
-| D113 | The prompt hub page teaches the hub through `langchain_classic`. | the LangSmith client methods that the same page recommends | [7.7](#s-evaluation-with-langsmith), [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D114 | A tracing page leads with an LCEL chain. | trace a `create_agent` agent | [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D116 | The local server page prints the old name LangGraph Studio. | the current names: LangSmith Studio and Agent Server | [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D117 | The v1 release page has a frozen list of providers with content blocks, and no `langchain.mcp`. | the changelog and the current pages | [8.5](#s-migration-from-0-x-and-stale-advice) | open |
-| D118 | The checkpointers page says that a thread must be created before a run. That rule belongs to Agent Server. | the code: the first checkpoint creates the thread | [5.2](#s-checkpointers-and-threads) | open |
-| D119 | The checkpointers page does not name the default durability. The Agent Server pages say `async`. | the code: `async` | [5.3](#s-durability-modes-and-a-crash-between-two-steps) | open |
-| D121 | The structured output page says that an agent uses tool calling when the model has no structured output, for `ProviderStrategy` too. | the code: an explicit strategy stays as it is | [4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) | open |
-| D123 | The help text of `langgraph dev` gives 10 jobs per worker. The code uses 1. The docs give 1 for Python and 10 for JS. | the code and the run: 1 | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) | open |
-| D124 | The streaming page says that `tasks` mode needs a checkpointer. The kit got chunks from `tasks` and `debug` without one. | the capture | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) | not checked |
-| D130 | The built-in middleware page lists 22 classes. `langchain` has 19, and three come from `deepagents`. | the code: 19 in `langchain` | [4.6](#s-the-built-in-middleware) | open |
-| D131 | The backends page says that `virtual_mode` defaults to `False`. The code sets it to `True`. | the code and the run: a backend built with no `virtual_mode` gave the same 28 results as `virtual_mode=True` | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | not checked |
-| D132 | The permissions page says that an allow rule on `/workspace/**`, placed first, matches `.env`, so a later deny never fires. | the run: `/workspace/**` does not match a dot name, so both orders denied `/workspace/.env` and both let `/.env` through | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | not checked |
-| D133 | The permissions examples "Deny all access", "Read-only", and "Isolate to a workspace directory" use `/**`. | the run: `/**` skips dot names, so `.env`, `.git`, and `.bashrc` stay readable or writable, and the isolate list also denies `ls` of `/workspace` | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | not checked |
-| D134 | The backends page names a legacy default that reads `assistant_id`, and says a namespace is required from v0.5.0. | the code and the run: at 0.7.38 the namespace is required, and `StoreBackend(store=s)` raised `TypeError` | [5.4](#s-stores-and-long-term-memory) | not checked |
-| D135 | The composite backend examples pass `namespace=lambda _rt: ("memories",)`. | the run: that factory is one namespace for every user, so build it from the user id | [5.4](#s-stores-and-long-term-memory), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | not checked |
-| D136 | The backends page allows a period in a namespace label and suggests the user identity as a label. The store refuses a period with `InvalidNamespaceError`. | the run: an email address as a label fails on write, so map it to a label without a period | [5.4](#s-stores-and-long-term-memory) | not checked |
-| D137 | The models page of Deep Agents shows an overall score of 0.18 for `openai:gpt-5.4` and 0.26 for `anthropic:claude-opus-4-6`. | the page itself: each overall score equals the tool use score of its row, while the file operations, retrieval, and summarization cells are 0.92 to 1.00, and each row mixes cells from 3 CI runs | [1.2](#s-do-you-need-langchain) | no upstream item |
-| D209 | Users report errors, with no switch to tool calling, from an explicit `ProviderStrategy` on Bedrock and Ollama. The docs say that it switches. | the code and the lab: no switch | [4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) | issue langchain #35119 |
-| D211 | A web page says that LangGraph streaming adds 100 to 300 ms to the first token, with no method. | the lab: under 3.5 ms at the median on Qwen3 4B | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) | no upstream item |
+| D2 | `GenericFakeChatModel` 的 docstring 说它不支持流式输出，而单元测试页面说它支持。代码会流式输出文本，但丢弃工具调用。 | 代码：用真实模型测试流式输出，或使用能流式输出工具调用的假模型 | [8.6](#s-symptom-cause-fix) | 未找到 issue |
+| D3 | `ToolRuntime` docstring 中的示例调用 `stream_writer.write`。该类型是一个普通的可调用对象。 | 代码：调用 `runtime.stream_writer(value)` | [3.4](#s-tools-toolruntime-and-tool-errors) | 未检查 |
+| D4 | `StreamMode` 和流式输出页面列出七种模式。循环还接受 `tools`。 | 代码和录制文件：`tools` 是一种模式 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode), [R.3](#s-ref-stream-modes-and-event-types) | 未检查 |
+| D6 | `durability="sync"` 是文档中记载的模式。在没有 checkpointer 时它会抛出 `AttributeError`。 | 运行结果：只在有 checkpointer 时使用 `sync` | [5.3](#s-durability-modes-and-a-crash-between-two-steps) | issue #9267 在锁定版本处未解决。修复 PR #9268 已关闭，未合并 |
+| D8 | `create_deep_agent` 的 docstring 写的是 `execute` 而不是 `delete`。默认后端绑定了 `delete`，没有 `execute`。 | 录制文件：`delete` 是默认工具 | [7.4](#s-deep-agents-0-7) | 未检查 |
+| D101 | 安装页面和发布政策写的是 Python 3.10，而该政策只在大版本中调整下限。`langchain` 1.5.0 需要 3.11。 | 包元数据：Python 3.11 或更高版本 | [3.1](#s-install-and-the-package-map), [8.5](#s-migration-from-0-x-and-stale-advice) | 在文档 `04d4d4a` 处未解决 |
+| D102 | 一个批量模式的示例把调用编辑成了新的工具名。逐调用模式的文本和 1.4.6 的更新日志说，编辑会保留原工具。 | 实验记录：批量模式允许这种切换，逐调用模式拒绝 | [6.5](#s-human-in-the-loop-batched-and-per-call) | 未解决 |
+| D104 | agents 页面说 `messages` 只追加。记忆页面用 `RemoveMessage` 删除消息。 | `add_messages` 的代码：追加、按 id 替换和删除 | [6.1](#s-stategraph-state-and-reducers) | 未解决 |
+| D105 | graph API 页面给出 10,007，旧版本是 10,000。服务器文档给出 10011。旧的建议是 25。 | 代码和运行结果：图是 10007，`create_agent` 是 9999，`langgraph dev` 下是 10007 | [6.8](#s-error-handlers-node-timeouts-and-the-recursion-limit), [8.1](#s-agent-server-langgraph-dev-up-and-deploy), [R.5](#s-ref-environment-variables) | 未解决 |
+| D106 | store 页面把 `InMemoryStore` 链接到 `langchain_core.stores` 中的一个类，而它的代码导入的是 `langgraph.store.memory`。 | 代码：从 `langgraph.store.memory` 导入 | [5.4](#s-stores-and-long-term-memory), [R.4](#s-ref-checkpointer-and-store-api) | 未解决 |
+| D107 | 两个 v1 发布页面都把 `create_react_agent` 链接到 `langchain-classic` 中同名的函数。 | 代码：有两个函数同名 | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D108 | 一个 LangSmith FAQ 表格把 checkpointer 称为社区代码，把流式输出称为基础功能。 | 当前的页面和代码 | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D109 | Deep Agents 概览把规划列为默认功能。0.7.0 的更新日志把它改成了需主动启用。 | 更新日志和录制文件：添加 `TodoListMiddleware` | [7.4](#s-deep-agents-0-7), [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D111 | 产品页面说追踪从不影响你的应用。追踪文档说 `LANGCHAIN_CALLBACKS_BACKGROUND=false` 会让回调等待。锁定版本下没有代码读取这个变量。 | 实验记录和代码：在 Qwen3 4B 上对托管 API 每次 agent 运行约增加 6 毫秒，该变量在锁定版本下没有效果 | [7.6](#s-langsmith-tracing) | 在文档 `04d4d4a` 处未解决 |
+| D113 | 提示中心页面通过 `langchain_classic` 讲解提示中心。 | 同一页面推荐的 LangSmith 客户端方法 | [7.7](#s-evaluation-with-langsmith), [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D114 | 一个追踪页面以 LCEL 链开头。 | 追踪 `create_agent` 的 agent | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D116 | 本地服务器页面打印的是旧名称 LangGraph Studio。 | 当前名称：LangSmith Studio 和 Agent Server | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D117 | v1 发布页面有一份固定的、支持内容块的提供方列表，且没有 `langchain.mcp`。 | 更新日志和当前页面 | [8.5](#s-migration-from-0-x-and-stale-advice) | 未解决 |
+| D118 | checkpointer 页面说，运行之前必须先创建线程。这条规则属于 Agent Server。 | 代码：第一个检查点就会创建线程 | [5.2](#s-checkpointers-and-threads) | 未解决 |
+| D119 | checkpointer 页面没有写出默认的持久性。Agent Server 页面写的是 `async`。 | 代码：`async` | [5.3](#s-durability-modes-and-a-crash-between-two-steps) | 未解决 |
+| D121 | 结构化输出页面说，模型不支持结构化输出时 agent 会使用工具调用，对 `ProviderStrategy` 也一样。 | 代码：显式指定的策略保持不变 | [4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) | 未解决 |
+| D123 | `langgraph dev` 的帮助文本给出每个 worker 10 个任务。代码使用 1。文档给出 Python 为 1，JS 为 10。 | 代码和运行结果：1 | [8.1](#s-agent-server-langgraph-dev-up-and-deploy) | 未解决 |
+| D124 | 流式输出页面说 `tasks` 模式需要 checkpointer。录制工具包在没有 checkpointer 时也从 `tasks` 和 `debug` 得到了块。 | 录制文件 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) | 未检查 |
+| D130 | 内置中间件页面列出 22 个类。`langchain` 有 19 个，另外三个来自 `deepagents`。 | 代码：`langchain` 中有 19 个 | [4.6](#s-the-built-in-middleware) | 未解决 |
+| D131 | backends 页面说 `virtual_mode` 默认为 `False`。代码把它设为 `True`。 | 代码和运行结果：没有传 `virtual_mode` 构建的后端，与 `virtual_mode=True` 得到相同的 28 个结果 | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | 未检查 |
+| D132 | permissions 页面说，放在最前面的 `/workspace/**` 允许规则会匹配 `.env`，所以后面的拒绝规则永远不会触发。 | 运行结果：`/workspace/**` 不匹配以点开头的名称，所以两种顺序都拒绝了 `/workspace/.env`，也都放行了 `/.env` | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | 未检查 |
+| D133 | permissions 示例“Deny all access”“Read-only”和“Isolate to a workspace directory”使用 `/**`。 | 运行结果：`/**` 会跳过以点开头的名称，所以 `.env`、`.git` 和 `.bashrc` 仍然可读或可写，而且隔离列表还会拒绝对 `/workspace` 执行 `ls` | [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | 未检查 |
+| D134 | backends 页面提到一个读取 `assistant_id` 的旧默认值，并说从 v0.5.0 起命名空间是必需的。 | 代码和运行结果：在 0.7.38 中命名空间是必需的，`StoreBackend(store=s)` 抛出了 `TypeError` | [5.4](#s-stores-and-long-term-memory) | 未检查 |
+| D135 | 组合后端示例传入 `namespace=lambda _rt: ("memories",)`。 | 运行结果：这个工厂对每个用户都是同一个命名空间，所以要用用户 id 来构造 | [5.4](#s-stores-and-long-term-memory), [8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses) | 未检查 |
+| D136 | backends 页面允许命名空间标签里有句点，并建议把用户身份作为标签。store 会以 `InvalidNamespaceError` 拒绝句点。 | 运行结果：把电子邮件地址当作标签会在写入时失败，所以要把它映射成不含句点的标签 | [5.4](#s-stores-and-long-term-memory) | 未检查 |
+| D137 | Deep Agents 的模型页面给 `openai:gpt-5.4` 的总分是 0.18，给 `anthropic:claude-opus-4-6` 的是 0.26。 | 页面本身：每个总分都等于它那一行的工具使用分，而文件操作、检索和摘要的单元格是 0.92 到 1.00，并且每一行混合了来自 3 次 CI 运行的单元格 | [1.2](#s-do-you-need-langchain) | 无上游条目 |
+| D209 | 用户报告，在 Bedrock 和 Ollama 上显式使用 `ProviderStrategy` 会报错，而不会切换到工具调用。文档说它会切换。 | 代码和实验记录：不会切换 | [4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) | issue langchain #35119 |
+| D211 | 一个网页说 LangGraph 的流式输出会让首个 token 增加 100 到 300 毫秒，没有给出方法。 | 实验记录：在 Qwen3 4B 上中位数低于 3.5 毫秒 | [5.1](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode) | 无上游条目 |
 
-The ids are not continuous. The research kept one range of ids for each kind of source. D1 to D17 are the code, and D101 to D137 are the docs. D201 to D211 are posts and issues. This register holds every id that a section cites.
+编号并不连续。研究中给每一类来源保留了一段编号：D1 到 D17 是代码，D101 到 D137 是文档，D201 到 D211 是帖子和 issue。本登记包含各章节引用过的每一个编号。
 
-Sources: front.md; manual.json (pin, sources); the Sources line and the citations of every file under sections/; capture/README.md, capture/lab/README.md.
+来源：front.md；manual.json（pin、sources）；sections/ 下每个文件的“来源”行和引用； capture/README.md, capture/lab/README.md.
