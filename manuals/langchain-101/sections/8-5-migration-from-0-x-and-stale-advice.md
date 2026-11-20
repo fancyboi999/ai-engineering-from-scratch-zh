@@ -1,122 +1,122 @@
-# Migration from 0.x, and stale advice
+# 从 0.x 迁移，以及过时的建议
 
-> Most 0.x code moved to `langchain-classic` or changed its name, and old advice survives in tutorials, notebooks, and some docs pages, so check each import against the pin.
+> 多数 0.x 代码搬到了 `langchain-classic` 或改了名字，而旧建议还留在教程、notebook 和个别文档页里，所以要对照锁定版本逐个检查导入。
 
-You open a project from 2024. It imports `AgentExecutor` from `langchain.agents`, a loader from `langchain_community`, and `MultiServerMCPClient` from `langchain_mcp_adapters`. On `langchain` 1.5.0 the first import fails, the second comes from a package that is sunset, and the third conflicts with `langchain[mcp]`.
+你打开一个 2024 年的项目。它从 `langchain.agents` 导入 `AgentExecutor`，从 `langchain_community` 导入一个加载器，从 `langchain_mcp_adapters` 导入 `MultiServerMCPClient`。在 `langchain` 1.5.0 上，第一个导入失败，第二个来自一个已经日落的包，第三个与 `langchain[mcp]` 冲突。
 
-When you finish this section, you can move 0.x code to the 1.x names, and tell a stale page or notebook from a current one.
+读完本节，你能把 0.x 代码迁到 1.x 的名称，并分辨过时的页面或 notebook 与当前的页面或 notebook。
 
-## The support window
+## 支持窗口 {#s-migration-from-0-x-and-stale-advice-the-support-window}
 
-LangChain 0.3 is in maintenance until December 2026, according to the release policy {{docs oss/python/release-policy}}. The line still gets releases: `langchain` 0.3.30 and `langchain-core` 0.3.86 came on 2026-05-07, by the release dates on PyPI. `langchain` 0.3.30 carries the hardening of `loads` and `dumps`. `langchain-core` 0.3.86 fixes a path traversal, CVE-2026-34070. So 0.3 code runs today, and its security fixes stop after 2026.
+按发布策略，LangChain 0.3 的维护期到 2026 年 12 月 {{docs oss/python/release-policy}}。这条线仍有发布：按 PyPI 上的发布日期，`langchain` 0.3.30 和 `langchain-core` 0.3.86 发布于 2026-05-07。`langchain` 0.3.30 带有对 `loads` 和 `dumps` 的加固。`langchain-core` 0.3.86 修复了一个路径穿越问题 CVE-2026-34070。所以 0.3 代码今天还能运行，而它的安全修复在 2026 年之后就停了。
 
-The same policy says that a minor upgrade inside 1.x breaks nothing. Two minor releases changed what an upgrader must do. `langchain` 1.5.0 raised the Python floor to 3.11, as [section 3.1](#s-install-and-the-package-map) shows. `langchain-core` 1.7.0 changed streamed tool call arguments from snapshots to slices, by the release notes of `langchain-core` 1.7.0. Pin the versions in a lockfile, and read the changelog of each minor before you raise it.
+同一份策略说，1.x 内部的次版本升级不会破坏任何东西。有两个次版本改变了升级者必须做的事。`langchain` 1.5.0 把 Python 下限提到了 3.11，见[第 3.1 节](#s-install-and-the-package-map)。按 `langchain-core` 1.7.0 的发布说明，`langchain-core` 1.7.0 把流式工具调用参数从快照改成了切片。用锁文件固定版本，升级每个次版本前先读它的更新日志。
 
-| Package line | Lowest Python |
+| 包的版本线 | 最低 Python |
 |---|---|
 | 0.3 | 3.9 |
-| `langchain` 1.0 to 1.4, `langchain-core` 1.0 to 1.7, by the PyPI metadata {{site pypi.org/project/langchain}} | 3.10 |
-| `langchain` 1.5.0, `langchain-core` 1.8.0, `langchain-openai` 1.8.0, and `deepagents` 0.7.38 | 3.11 |
-| `langchain-anthropic` 1.7.10 and `langchain-ollama` 1.1.0 | 3.10 |
-| `langgraph` 1.2.22, its checkpointers, and `langsmith` 0.14.17 | 3.10 |
+| `langchain` 1.0 到 1.4，`langchain-core` 1.0 到 1.7，依据 PyPI 元数据 {{site pypi.org/project/langchain}} | 3.10 |
+| `langchain` 1.5.0、`langchain-core` 1.8.0、`langchain-openai` 1.8.0 和 `deepagents` 0.7.38 | 3.11 |
+| `langchain-anthropic` 1.7.10 和 `langchain-ollama` 1.1.0 | 3.10 |
+| `langgraph` 1.2.22、它的 checkpointer 和 `langsmith` 0.14.17 | 3.10 |
 
-## Imports that moved
+## 搬家的导入 {#s-migration-from-0-x-and-stale-advice-imports-that-moved}
 
-| 0.x import | At the pin | Section |
+| 0.x 导入 | 在锁定版本上 | 章节 |
 |---|---|---|
-| `from langchain.chains import LLMChain` | `langchain_classic.chains`, deprecated since 0.1.17 with removal in 2.0.0 {{code libs/langchain/langchain_classic/chains/llm.py}} | [3.1](#s-install-and-the-package-map) |
-| `from langchain.agents import AgentExecutor, initialize_agent` | `langchain_classic.agents`, and `initialize_agent` is deprecated. New agents use `langchain.agents.create_agent` | [4.1](#s-create-agent-and-the-graph-it-builds) |
-| `from langchain import hub` | `langchain_classic.hub`, and its push and pull are deprecated for the LangSmith SDK {{code libs/langchain/langchain_classic/hub.py}} | [3.5](#s-the-system-prompt) |
-| `langchain.retrievers.MultiQueryRetriever`, `RetrievalQA` | `langchain-classic`. `BaseRetriever` stays in `langchain_core.retrievers` | [7.1](#s-embeddings-splitters-vector-stores-and-retrievers) |
-| `langchain_community.*` | sunset at 0.4.2, with an archived repository. Use the provider package where one exists | [3.1](#s-install-and-the-package-map) |
-| `from langchain_mcp_adapters.client import MultiServerMCPClient` | `langchain.mcp.MCPAdapter`, in beta, installed with `langchain[mcp]` | [7.3](#s-mcp-with-langchain-mcp) |
-| `from langgraph.prebuilt import create_react_agent` | `langchain.agents.create_agent`. The old function still imports and warns | [4.1](#s-create-agent-and-the-graph-it-builds) |
-| `from langgraph.checkpoint.memory import MemorySaver` | `InMemorySaver`. `MemorySaver` remains as an alias {{code libs/checkpoint/langgraph/checkpoint/memory/__init__.py}} | [5.2](#s-checkpointers-and-threads) |
-| `from langgraph.errors import NodeInterrupt` | `langgraph.types.interrupt`, and resume with `Command(resume=...)` | [6.4](#s-interrupt-and-resume) |
+| `from langchain.chains import LLMChain` | `langchain_classic.chains`，自 0.1.17 起弃用，将在 2.0.0 移除 {{code libs/langchain/langchain_classic/chains/llm.py}} | [3.1](#s-install-and-the-package-map) |
+| `from langchain.agents import AgentExecutor, initialize_agent` | `langchain_classic.agents`，且 `initialize_agent` 已弃用。新 agent 用 `langchain.agents.create_agent` | [4.1](#s-create-agent-and-the-graph-it-builds) |
+| `from langchain import hub` | `langchain_classic.hub`，它的 push 和 pull 已弃用，改用 LangSmith SDK {{code libs/langchain/langchain_classic/hub.py}} | [3.5](#s-the-system-prompt) |
+| `langchain.retrievers.MultiQueryRetriever`、`RetrievalQA` | `langchain-classic`。`BaseRetriever` 仍在 `langchain_core.retrievers` | [7.1](#s-embeddings-splitters-vector-stores-and-retrievers) |
+| `langchain_community.*` | 在 0.4.2 日落，仓库已归档。有对应提供方包的，就用提供方包 | [3.1](#s-install-and-the-package-map) |
+| `from langchain_mcp_adapters.client import MultiServerMCPClient` | `langchain.mcp.MCPAdapter`，处于 beta，随 `langchain[mcp]` 安装 | [7.3](#s-mcp-with-langchain-mcp) |
+| `from langgraph.prebuilt import create_react_agent` | `langchain.agents.create_agent`。旧函数仍可导入，并会发出警告 | [4.1](#s-create-agent-and-the-graph-it-builds) |
+| `from langgraph.checkpoint.memory import MemorySaver` | `InMemorySaver`。`MemorySaver` 作为别名保留 {{code libs/checkpoint/langgraph/checkpoint/memory/__init__.py}} | [5.2](#s-checkpointers-and-threads) |
+| `from langgraph.errors import NodeInterrupt` | `langgraph.types.interrupt`，并用 `Command(resume=...)` 恢复 | [6.4](#s-interrupt-and-resume) |
 | `from langgraph.constants import Send` | `from langgraph.types import Send` | [6.2](#s-edges-send-and-command) |
 
-The repository of the LangSmith SDK also moved, to `langchain-ai/langsmith-python`. The package name `langsmith` did not change.
+LangSmith SDK 的仓库也搬了家，搬到 `langchain-ai/langsmith-python`。包名 `langsmith` 没有变。
 
-## create_react_agent to create_agent
+## 从 create_react_agent 到 create_agent {#s-migration-from-0-x-and-stale-advice-create-react-agent-to-create-agent}
 
-The migration guide of the v1 release lists each argument that changed {{docs oss/python/migrate/langchain-v1}}. We checked each row against the code at the pin.
+v1 发布的迁移指南列出了每个变化的参数 {{docs oss/python/migrate/langchain-v1}}。我们把每一行对照锁定版本的代码查了一遍。
 
 | `create_react_agent` | `create_agent` |
 |---|---|
-| `prompt=` | `system_prompt=`, a string or a `SystemMessage` |
-| a callable `prompt` | the `@dynamic_prompt` middleware |
-| `pre_model_hook`, `post_model_hook` | `before_model` and `after_model` middleware |
-| a Pydantic or dataclass state | a `TypedDict` that extends `AgentState`, through `state_schema` |
-| a model chosen by a callable | `wrap_model_call` middleware with `request.override(model=...)` |
-| a model with `bind_tools` already called | not in the signature, which takes a string or a chat model, and not checked. Pass the plain model and the tools |
-| `ToolNode(handle_tool_errors=...)` | `ToolErrorMiddleware(on_error)`, or `wrap_tool_call` middleware |
-| `response_format` in an extra final node | structured output in the main loop, with `ToolStrategy`, `ProviderStrategy`, or `AutoStrategy` |
-| the node name `agent` in a stream | `model` |
-| static data in `config["configurable"]` | `context=` on `invoke`, typed by `context_schema` |
-| the recursion limit of LangGraph | 9999 steps, set by `create_agent` {{code libs/langchain_v1/langchain/agents/factory.py}} |
+| `prompt=` | `system_prompt=`，字符串或 `SystemMessage` |
+| 可调用对象形式的 `prompt` | `@dynamic_prompt` 中间件 |
+| `pre_model_hook`、`post_model_hook` | `before_model` 和 `after_model` 中间件 |
+| Pydantic 或 dataclass 状态 | 通过 `state_schema` 传入、继承 `AgentState` 的 `TypedDict` |
+| 由可调用对象选择的模型 | 带 `request.override(model=...)` 的 `wrap_model_call` 中间件 |
+| 已调用过 `bind_tools` 的模型 | 不在签名里，签名接收字符串或聊天模型，也没有检查。传入普通模型和工具 |
+| `ToolNode(handle_tool_errors=...)` | `ToolErrorMiddleware(on_error)`，或 `wrap_tool_call` 中间件 |
+| 在额外的最终节点里使用 `response_format` | 在主循环里做结构化输出，用 `ToolStrategy`、`ProviderStrategy` 或 `AutoStrategy` |
+| 流里的节点名 `agent` | `model` |
+| `config["configurable"]` 里的静态数据 | `invoke` 上的 `context=`，由 `context_schema` 定型 |
+| LangGraph 的递归上限 | 9999 步，由 `create_agent` 设置 {{code libs/langchain_v1/langchain/agents/factory.py}} |
 
-[Section 4.1](#s-create-agent-and-the-graph-it-builds) shows the graph that `create_agent` builds, and [section 4.5](#s-middleware-hooks-and-their-order) shows the hooks that replace the old ones.
+[第 4.1 节](#s-create-agent-and-the-graph-it-builds)展示了 `create_agent` 构建的图，[第 4.5 节](#s-middleware-hooks-and-their-order)展示了取代旧钩子的那些钩子。
 
-## LangGraph names that changed
+## 改了名的 LangGraph 名称 {#s-migration-from-0-x-and-stale-advice-langgraph-names-that-changed}
 
-Two deprecations show up in the kit as warnings. The first comes from a graph run with the old argument `checkpoint_during`:
+有两处弃用在工具包里表现为警告。第一处来自用旧参数 `checkpoint_during` 运行的图：
 
 ```listing
-title: checkpoint_during at the pin
+title: 锁定版本上的 checkpoint_during
 source: capture/out/31-durability.txt
 lang: text
 ---
 warning LangGraphDeprecatedSinceV10: `checkpoint_during` is deprecated and will be removed. Please use `durability` instead. Deprecated in LangGraph V1.0 to be removed in V2.0.
 ```
 
-The second comes from reading the output of `invoke(version="v2")` as a dict:
+第二处来自把 `invoke(version="v2")` 的输出当字典来读：
 
 ```listing
-title: a dict read of GraphOutput
+title: 对 GraphOutput 的字典式读取
 source: capture/out/24-stream-v2.txt
 lang: text
 ---
 warning LangGraphDeprecatedSinceV11: Accessing GraphOutput via `result[key]` is deprecated. Use `result.value` to access the output value directly, or `result.interrupts` for interrupts. Deprecated in LangGraph V1.1 to be removed in V3.0.
 ```
 
-Three more changes have no warning, and old code reads them wrong:
+另外还有三处变化没有警告，旧代码会读错：
 
-- **The recursion limit.** Old advice names 25. At the pin, a `StateGraph` stops at 10007 steps and `create_agent` at 9999. [Section 6.8](#s-error-handlers-node-timeouts-and-the-recursion-limit) gives both.
-- **`Interrupt`.** The fields `ns`, `when`, and `resumable` are gone, and `interrupt_id` gave way to `id` in 0.6.0 {{code libs/langgraph/langgraph/types.py}}.
-- **Deep Agents 0.7.0.** `create_deep_agent` no longer adds `TodoListMiddleware`, so `write_todos` is not a default tool. [Section 7.4](#s-deep-agents-0-7) shows the default tool set.
+- **递归上限。** 旧建议说是 25。在锁定版本上，`StateGraph` 在 10007 步停止，`create_agent` 在 9999 步。[第 6.8 节](#s-error-handlers-node-timeouts-and-the-recursion-limit)给出了两者。
+- **`Interrupt`。** 字段 `ns`、`when` 和 `resumable` 没有了，`interrupt_id` 在 0.6.0 让位给了 `id` {{code libs/langgraph/langgraph/types.py}}。
+- **Deep Agents 0.7.0。** `create_deep_agent` 不再添加 `TodoListMiddleware`，所以 `write_todos` 不是默认工具。[第 7.4 节](#s-deep-agents-0-7)展示了默认工具集。
 
-## Stale pages in the docs
+## 文档里的过时页面 {#s-migration-from-0-x-and-stale-advice-stale-pages-in-the-docs}
 
-The docs site serves its main branch, so most pages describe the pin or a newer state. We searched every docs page that we saved for old names, such as `AgentExecutor`, `initialize_agent`, `create_react_agent`, `MultiServerMCPClient`, and `LangGraph Platform`. The first two and the old platform names had no hit. The others appeared only on migration and release pages, which is where they belong.
+文档站点提供的是它的主分支，所以多数页面描述的是锁定版本或更新的状态。我们在保存的每个文档页面里搜索了旧名称，例如 `AgentExecutor`、`initialize_agent`、`create_react_agent`、`MultiServerMCPClient` 和 `LangGraph Platform`。前两个和旧的平台名称都没有命中。其余的只出现在迁移页和发布页，那是它们该在的地方。
 
-These pages still teach an older state at docs commit `04d4d4a`. Each one has an entry in the conflict register of this manual.
+在文档提交 `04d4d4a` 上，下面这些页面仍然在讲较旧的状态。每一项在本手册的冲突登记里都有条目。
 
-| Page | What is out of date | Conflict |
+| 页面 | 过时之处 | 冲突 |
 |---|---|---|
-| `oss/python/langchain/install` and `oss/python/release-policy` | Python 3.10 as the floor | D101 |
-| `oss/python/releases/langchain-v1` | the list of providers with content blocks, and the namespace table without `langchain.mcp` | D117 |
-| both v1 release pages | a link for `create_react_agent` that goes to the function of the same name in `langchain-classic` | D107 |
-| `langsmith/faq` | a table that calls checkpointers community code and streaming basic | D108 |
-| `langsmith/manage-prompts-programmatically` | the hub through `langchain_classic` and a prompt piped into a model | D113 |
-| `langsmith/trace-with-langchain` | an LCEL chain as the first example | D114 |
-| `oss/python/deepagents/overview` | planning named as a default in its first paragraph | D109 |
-| `oss/python/langgraph/local-server` | the old name LangGraph Studio | D116 |
+| `oss/python/langchain/install` 和 `oss/python/release-policy` | 把 Python 3.10 当作下限 | D101 |
+| `oss/python/releases/langchain-v1` | 带内容块的提供方列表，以及没有 `langchain.mcp` 的命名空间表 | D117 |
+| 两个 v1 发布页 | `create_react_agent` 的链接指向 `langchain-classic` 里的同名函数 | D107 |
+| `langsmith/faq` | 一张把 checkpointer 称为社区代码、把流式输出称为基础功能的表 | D108 |
+| `langsmith/manage-prompts-programmatically` | 通过 `langchain_classic` 使用 hub，以及把提示词用管道接进模型 | D113 |
+| `langsmith/trace-with-langchain` | 把 LCEL 链当作第一个示例 | D114 |
+| `oss/python/deepagents/overview` | 第一段里把规划写成默认功能 | D109 |
+| `oss/python/langgraph/local-server` | 旧名称 LangGraph Studio | D116 |
 
-## Old notebooks and tutorials
+## 旧 notebook 与教程 {#s-migration-from-0-x-and-stale-advice-old-notebooks-and-tutorials}
 
-A notebook or a tutorial runs on the versions that its author locked. A floor such as `langchain>=0.3.9` lets pip install 1.5.0, so the code then runs on a line that its author never tested. Read the lockfile first, then run the code with warnings shown. The table of moved imports above gives the fix for each old name.
+notebook 或教程运行在作者锁定的版本上。`langchain>=0.3.9` 这样的下限，会让 pip 安装 1.5.0，于是代码运行在作者从未测试过的版本线上。先读锁文件，再在显示警告的情况下运行代码。上面的搬家导入表给出了每个旧名称的修法。
 
-Two of those old names still import at the pin and warn. `NodeInterrupt` warns that it is deprecated and points to `interrupt` {{code libs/langgraph/langgraph/errors.py}}. An import of `Send` from `langgraph.constants` warns and points to `langgraph.types` {{code libs/langgraph/langgraph/constants.py}}.
+其中两个旧名称在锁定版本上仍可导入，并会发出警告。`NodeInterrupt` 警告它已弃用，并指向 `interrupt` {{code libs/langgraph/langgraph/errors.py}}。从 `langgraph.constants` 导入 `Send` 会发出警告，并指向 `langgraph.types` {{code libs/langgraph/langgraph/constants.py}}。
 
-Static `interrupt_before` on `compile` is not stale, because `compile` still accepts it {{code libs/langgraph/langgraph/graph/state.py}}. Teach `interrupt()` first, and keep `interrupt_before` for debugging.
+`compile` 上的静态 `interrupt_before` 并不过时，因为 `compile` 仍然接受它 {{code libs/langgraph/langgraph/graph/state.py}}。先教 `interrupt()`，把 `interrupt_before` 留给调试。
 
 ```takeaways
-- Pin every package in a lockfile before you move 0.x code.
-- Import legacy chains from langchain_classic only while you replace them with create_agent.
-- Rename prompt to system_prompt, and move hooks into middleware.
-- Run with warnings shown, and fix each LangGraphDeprecatedSinceV10 and V11 warning.
-- Check the version a notebook was locked to before you copy its code.
-- Read the changelog of each minor release before you raise it.
+- 迁移 0.x 代码之前，先在锁文件里固定每个包。
+- 只在用 create_agent 替换它们的过程中，才从 langchain_classic 导入旧链。
+- 把 prompt 改名为 system_prompt，并把钩子搬进中间件。
+- 显示警告运行，并修掉每个 LangGraphDeprecatedSinceV10 和 V11 警告。
+- 复制 notebook 的代码之前，先查它锁定的版本。
+- 升级每个次版本前，先读它的更新日志。
 ```
 
-Sources: capture/out/31-durability.txt, capture/out/24-stream-v2.txt; libs/langchain/langchain_classic/chains/llm.py, libs/langchain/langchain_classic/hub.py, libs/langchain/langchain_classic/agents/initialize.py, and libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/errors.py, libs/langgraph/langgraph/constants.py, libs/langgraph/langgraph/graph/state.py, libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py, and libs/checkpoint/langgraph/checkpoint/memory/__init__.py at langgraph 1.2.22; the GitHub releases langchain==0.3.30, langchain-core==0.3.86, langchain-core==1.7.0, langchain==1.5.0, and deepagents==0.7.0; docs.langchain.com at docs commit 04d4d4a (oss/python/migrate/langchain-v1, oss/python/migrate/langgraph-v1, oss/python/release-policy, oss/python/releases/changelog, and the pages in the stale table).
+来源：capture/out/31-durability.txt, capture/out/24-stream-v2.txt; libs/langchain/langchain_classic/chains/llm.py, libs/langchain/langchain_classic/hub.py, libs/langchain/langchain_classic/agents/initialize.py, and libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0; libs/langgraph/langgraph/types.py, libs/langgraph/langgraph/errors.py, libs/langgraph/langgraph/constants.py, libs/langgraph/langgraph/graph/state.py, libs/prebuilt/langgraph/prebuilt/chat_agent_executor.py, and libs/checkpoint/langgraph/checkpoint/memory/__init__.py at langgraph 1.2.22; the GitHub releases langchain==0.3.30, langchain-core==0.3.86, langchain-core==1.7.0, langchain==1.5.0, and deepagents==0.7.0; docs.langchain.com at docs commit 04d4d4a (oss/python/migrate/langchain-v1, oss/python/migrate/langgraph-v1, oss/python/release-policy, oss/python/releases/changelog, and the pages in the stale table).

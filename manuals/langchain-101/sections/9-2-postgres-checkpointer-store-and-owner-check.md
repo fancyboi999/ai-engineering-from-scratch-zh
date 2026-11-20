@@ -1,17 +1,17 @@
-# AsyncPostgresSaver, AsyncPostgresStore, and the owner check
+# AsyncPostgresSaver、AsyncPostgresStore 与所有者检查
 
-> Neither the checkpointer nor the store knows users, so check thread ownership in your route and take the user id from the run context, never from the model.
+> checkpointer 和 store 都不认识用户，所以要在你的路由里检查线程所有权，并从运行上下文里取用户 id，绝不从模型那里取。
 
-A second customer signs up. Their client sends a thread id that it read in a log, and asks for that thread's state. `AsyncPostgresSaver` returns it, because a checkpoint row has a thread id and nothing else that names a person. The same holds for `AsyncPostgresStore`, which keys items by a namespace that you choose.
+第二位客户注册了。他们的客户端发来一个在日志里读到的线程 id，请求该线程的状态。`AsyncPostgresSaver` 把它返回了，因为检查点行里只有线程 id，没有任何指向某个人的字段。`AsyncPostgresStore` 也一样，它按你选定的命名空间给条目设键。
 
-When you finish this section, you can put the checkpointer, the store, and your own tables on one connection pool. You can add the owner check that the savers do not have, and keep each tool on the right user's rows.
+读完本节，你能把 checkpointer、store 和你自己的表放在同一个连接池上。你能加上 saver 没有的所有者检查，并让每个工具只碰正确用户的行。
 
-## One pool for three kinds of rows
+## 三类行共用一个池 {#s-postgres-checkpointer-store-and-owner-check-one-pool-for-three-kinds-of-rows}
 
-**Checkpointer:** the saver that writes the state of each thread after each step, here `AsyncPostgresSaver`. **Store:** the key-value saver for data that outlives a thread, here `AsyncPostgresStore`. The service opens one `psycopg` pool and gives it to both, and its own tables use the same pool.
+**checkpointer：** 在每一步之后写入每个线程状态的 saver，这里是 `AsyncPostgresSaver`。**store：** 保存比线程活得更久的数据的键值 saver，这里是 `AsyncPostgresStore`。服务打开一个 `psycopg` 连接池，交给两者，它自己的表也用同一个池。
 
 ```listing
-title: one pool for the checkpointer, the store, and the app tables
+title: checkpointer、store 和应用表共用的一个池
 source: capture/lab/prodapp-mac/code/app/server.py
 lang: python
 ---
@@ -25,18 +25,18 @@ lang: python
                 await db.setup(pool, set(settings.tokens.values()))
 ```
 
-The three settings in `kwargs` are the ones that `from_conn_string` of each saver uses {{code libs/checkpoint-postgres/langgraph/checkpoint/postgres/aio.py:87}}. A pool that you pass in yourself must set them too: `autocommit`, `prepare_threshold=0`, and `dict_row`. 
+`kwargs` 里的三项设置，是每个 saver 的 `from_conn_string` 所用的设置 {{code libs/checkpoint-postgres/langgraph/checkpoint/postgres/aio.py:87}}。你自己传入的池也必须设置它们：`autocommit`、`prepare_threshold=0` 和 `dict_row`。
 
-The last setting has a cost. **We measured** it on the Mac: on a connection with `prepare_threshold=0`, `select 1; select 2` failed with `cannot insert multiple commands into a prepared statement`. Without the setting it ran. So the app creates its tables one statement at a time.
+`prepare_threshold=0` 有代价。**我们测得**：在 Mac 上，用 `prepare_threshold=0` 的连接，`select 1; select 2` 失败了，报 `cannot insert multiple commands into a prepared statement`。不带这项设置，它能运行。所以应用一次只执行一条语句来创建它的表。
 
-The setup runs under a Postgres advisory lock. Two workers that start together would otherwise run the same `CREATE TABLE` and index statements at once. The lock connection sits outside the pool, and [section 9.7](#s-workers-the-advisory-lock-and-cost) explains why.
+初始化在一把 Postgres advisory lock（咨询锁）下运行。否则，同时启动的两个 worker 会同时运行同样的 `CREATE TABLE` 和索引语句。锁的连接在池之外，原因见[第 9.7 节](#s-workers-the-advisory-lock-and-cost)。
 
-## The owner check
+## 所有者检查 {#s-postgres-checkpointer-store-and-owner-check-the-owner-check}
 
-The service keeps its own `threads` table with one row for each thread and the user who made it. Every route that names a thread depends on this function.
+服务有自己的 `threads` 表，每个线程一行，记着创建它的用户。每条指明线程的路由，都依赖这个函数。
 
 ```listing
-title: the owner check on every thread route
+title: 每条线程路由上的所有者检查
 source: capture/lab/prodapp-mac/code/app/server.py
 lang: python
 ---
@@ -49,16 +49,16 @@ lang: python
         return thread_id
 ```
 
-A thread that belongs to someone else returns 404, the same as a thread that does not exist. A 403 would tell the caller that the id is real.
+属于别人的线程返回 404，与不存在的线程一样。返回 403 会告诉调用方这个 id 是真的。
 
-The check answers who owns a thread. It does not answer who can approve a refund, so the customer who made a thread can approve its refund. A real service needs a separate approver identity. The tokens `tok-alice` and `tok-bob` in the example configuration are demo values, so set your own `AUTH_TOKENS` before you deploy.
+这个检查回答的是谁拥有线程，不回答谁能批准退款，所以创建线程的客户能批准它的退款。真正的服务需要单独的审批人身份。示例配置里的令牌 `tok-alice` 和 `tok-bob` 是演示值，部署之前要设置你自己的 `AUTH_TOKENS`。
 
-## The user comes from the context
+## 用户来自上下文 {#s-postgres-checkpointer-store-and-owner-check-the-user-comes-from-the-context}
 
-A tool needs the user too. The model chooses an order id, and it can choose any string. So no tool takes a user id as an argument. The service puts the user in the run context, and each tool reads it from `runtime.context`.
+工具也需要用户。模型选择订单 id，而它可以选择任何字符串。所以没有工具把用户 id 当作参数。服务把用户放进运行上下文，每个工具从 `runtime.context` 读取它。
 
 ```listing
-title: two tools that scope every query to the user in the context
+title: 两个把每个查询都限定在上下文里那位用户的工具
 source: capture/lab/prodapp-mac/code/app/tools.py
 lang: python
 ---
@@ -75,44 +75,44 @@ async def save_note(text: str, runtime: ToolRuntime[Ctx]) -> str:
     await runtime.store.aput(("memories", runtime.context.user_id), str(uuid.uuid4()), {"text": text})
 ```
 
-**We measured** what real models do with another customer's order id, on the Mac. User `e05` asked `Where is my order ORD-alice-1?`. Qwen3 4B and Qwen3 14B each called `read_order` with `ORD-alice-1`, in 3 of 3 runs each. Claude Haiku 5.5 did the same in its one run. The query returned no row, the tool returned an error, and the item name never reached the thread state. The model did ask, and only the `user_id` filter stopped it.
+**我们测得**：在 Mac 上，真实模型拿到另一位客户的订单 id 时会怎么做。用户 `e05` 问 `Where is my order ORD-alice-1?`。Qwen3 4B 和 Qwen3 14B 各自用 `ORD-alice-1` 调用了 `read_order`，各 3 次运行都是如此。Claude Haiku 5.5 在它的一次运行里也这样做了。查询没有返回行，工具返回了一个错误，商品名从未到达线程状态。模型确实去查了，是 `user_id` 过滤拦住了它。
 
-## Isolation, measured
+## 隔离，实测 {#s-postgres-checkpointer-store-and-owner-check-isolation-measured}
 
-The isolation test in the suite saves a note through the model, and Qwen3 4B never called `save_note`. So that test proved nothing on 4B. We ran the isolation check again with the note written straight into the store, so that it does not depend on a tool call.
+测试套件里的隔离测试，通过模型保存一条笔记，而 Qwen3 4B 从未调用 `save_note`。所以这个测试在 4B 上什么也没证明。我们把隔离检查又跑了一遍，这次把笔记直接写进 store，使它不依赖工具调用。
 
-**We measured** it once on the Mac with Qwen3 4B. The script wrote `door code is 4471` into the namespace `("memories", "alice")`. Then alice made a thread, and bob used his own token on it.
+**我们测得**：在 Mac 上用 Qwen3 4B 跑了一次。脚本把 `door code is 4471` 写入命名空间 `("memories", "alice")`。然后 alice 创建了一个线程，bob 用他自己的令牌去访问它。
 
-| Request by bob | Result |
+| bob 的请求 | 结果 |
 |---|---|
 | `GET /threads/{alice's thread}/state` | 404 |
 | `POST /threads/{alice's thread}/runs` | 404 |
 | `POST /threads/{alice's thread}/approve` | 404 |
 | `GET /memories` | `[]` |
-| `What do you remember about me?` in his own thread | the model called `recall_notes`, which returned `[]` |
+| 在他自己的线程里问 `What do you remember about me?` | 模型调用了 `recall_notes`，它返回 `[]` |
 
-The same question from alice called `recall_notes`, which returned `["door code is 4471"]`. The string `4471` was nowhere in bob's thread state. The model never saw another user's namespace, because the tool built the namespace from the context.
+alice 问同一个问题，调用了 `recall_notes`，它返回 `["door code is 4471"]`。字符串 `4471` 在 bob 的线程状态里哪里都没有。模型从未见过别的用户的命名空间，因为工具用上下文来构建命名空间。
 
-## What one conversation writes
+## 一段对话写入什么 {#s-postgres-checkpointer-store-and-owner-check-what-one-conversation-writes}
 
-**We measured** the rows of the load test in [section 9.7](#s-workers-the-advisory-lock-and-cost), with Qwen3 4B. Each user had one thread with four runs: an order question, a FAQ question, a refund request, and the approval. With 10 users, each run wrote 27.2 rows to the three checkpoint tables, about 20.3 to 20.4 KB of row data. That held in all three 10-user cells. A fourth cell was run again and replaced. With 50 users it was 29.5 to 30.1 rows and 21.6 to 22.1 KB, because some runs ended early when their clients timed out.
+**我们测得**：[第 9.7 节](#s-workers-the-advisory-lock-and-cost)负载测试的行，用 Qwen3 4B。每个用户有一个线程，四次运行：一个订单问题、一个 FAQ 问题、一个退款请求和批准。有 10 个用户时，每次运行向三张检查点表写入 27.2 行，约 20.3 到 20.4 KB 的行数据。三个 10 用户的格子都是这样。第四个格子重跑过并被替换。有 50 个用户时是 29.5 到 30.1 行、21.6 到 22.1 KB，因为有些运行在客户端超时时提前结束了。
 
-None of those rows names a user. A request for a thread reaches its rows only through the owner check, and a tool reaches a user's rows only through the context.
+这些行里没有一行写着用户。对线程的请求只能经过所有者检查到达它的行，工具只能经过上下文到达用户的行。
 
 ```figure
 id: fig-9-2
 kind: structure
-title: the rows of one conversation, and who can read them
-claim: Checkpoint rows carry only a thread id, so the owner check in the route and the user in the tool context are the only isolation.
-caption: Each box is a Postgres table or a store namespace, with its key and the rows written for each run of the load test. Ink arrows are reads. The amber bar is the owner check. From capture/lab/prodapp-mac/summary/load-mac.json and capture/lab/prodapp-mac/summary/service-mac.json.
+title: 一段对话的行，以及谁能读它们
+claim: 检查点行只带线程 id，所以路由里的所有者检查和工具上下文里的用户，是仅有的隔离。
+caption: 每个方框是一张 Postgres 表或一个 store 命名空间，带它的键，以及负载测试里每次运行写入的行数。墨色箭头是读取。琥珀色条是所有者检查。来源：capture/lab/prodapp-mac/summary/load-mac.json 和 capture/lab/prodapp-mac/summary/service-mac.json。
 ```
 
 ```takeaways
-- Give the checkpointer, the store, and your tables one pool with autocommit, dict_row, and prepare_threshold 0.
-- Run saver setup under an advisory lock when several workers start at once.
-- Keep a threads table with the owner, and return 404 for a thread that another user owns.
-- Read the user id in tools from runtime.context, and never accept it as a tool argument.
-- Put the user id in every store namespace that holds personal data.
+- 给 checkpointer、store 和你的表同一个池，设 autocommit、dict_row 和 prepare_threshold 0。
+- 多个 worker 同时启动时，在 advisory lock 下运行 saver 的 setup。
+- 保存一张带所有者的 threads 表，对别的用户拥有的线程返回 404。
+- 在工具里从 runtime.context 读用户 id，绝不把它当作工具参数。
+- 在每个存放个人数据的 store 命名空间里放入用户 id。
 ```
 
-Sources: capture/lab/prodapp-mac/code/app/server.py, capture/lab/prodapp-mac/code/app/tools.py, capture/lab/prodapp-mac/code/app/db.py, capture/lab/prodapp-mac/code/app/locks.py, capture/lab/prodapp-mac/summary/service-mac.json, capture/lab/prodapp-mac/summary/load-mac.json, capture/lab/prodapp-mac/summary/evals-mac.json, capture/lab/prodapp-mac/runs/service/service-properties.json, capture/lab/prodapp-mac/runs/psycopg-multistatement.txt, capture/lab/prodapp-mac/runs/summary/suite-mac.json; libs/checkpoint-postgres/langgraph/checkpoint/postgres/aio.py and libs/checkpoint-postgres/langgraph/store/postgres/aio.py at langgraph-checkpoint-postgres 3.2.1.
+来源：capture/lab/prodapp-mac/code/app/server.py, capture/lab/prodapp-mac/code/app/tools.py, capture/lab/prodapp-mac/code/app/db.py, capture/lab/prodapp-mac/code/app/locks.py, capture/lab/prodapp-mac/summary/service-mac.json, capture/lab/prodapp-mac/summary/load-mac.json, capture/lab/prodapp-mac/summary/evals-mac.json, capture/lab/prodapp-mac/runs/service/service-properties.json, capture/lab/prodapp-mac/runs/psycopg-multistatement.txt, capture/lab/prodapp-mac/runs/summary/suite-mac.json; libs/checkpoint-postgres/langgraph/checkpoint/postgres/aio.py and libs/checkpoint-postgres/langgraph/store/postgres/aio.py at langgraph-checkpoint-postgres 3.2.1.

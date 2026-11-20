@@ -1,38 +1,38 @@
-# A failure drill
+# 故障演练
 
-> One script causes seven failures with Qwen3 4B on a local Ollama and prints the symptom, the state, the fix, and the time for each, in about 100 seconds.
+> 一个脚本用本地 Ollama 上的 Qwen3 4B 制造七种故障，并为每种打印症状、状态、修法和耗时，全程约 100 秒。
 
-Your agent fails in production with a symptom that the logs do not explain. A model call took six seconds and nothing raised. A customer has two charges. An email went out that nobody approved. Each of these failures has a section in this manual, and each one is easier to fix when you have seen it before.
+你的 agent 在生产环境里出了故障，症状却是日志解释不了的。一次模型调用花了六秒，什么都没抛。一位客户被扣了两次款。一封没人批准的邮件发了出去。这些故障在本手册里各有一节，而你事先见过，修起来就容易些。
 
-When you finish this section, you can run seven documented failures on your own machine. You can also read the symptom of each and apply its fix.
+读完本节，你能在自己的机器上运行七种有文档记录的故障。你还能读懂每种故障的症状，并用上它的修法。
 
-## What the drill does
+## 演练做什么 {#s-a-failure-drill-what-the-drill-does}
 
-**Failure drill:** a script that causes each known failure on purpose, on a machine you can lose, and prints what you would see.
+**故障演练：** 一个脚本，在你丢得起的机器上，故意制造每一种已知故障，并打印你会看到的现象。
 
-Qwen3 4B on Ollama plays the model. A relay in front of Ollama drops every connection for the retry case. No request leaves the machine. Two cases start child processes, one to kill and one to watch at exit.
+Ollama 上的 Qwen3 4B 扮演模型。Ollama 前面的一个中继，在重试用例里丢掉每一个连接。没有请求离开这台机器。有两个用例会启动子进程，一个用来杀掉，一个用来在退出时观察。
 
 ```bash
 cd capture/demos/failure-drill
 ./run.sh
 ```
 
-For each case, the drill prints five lines: the symptom, the state, the fix, the result after the fix, and the time. The seven cases come from these sections:
+每个用例，演练都打印五行：症状、状态、修法、修复后的结果和耗时。这七个用例来自以下章节：
 
-| Case | Failure | Section |
+| 用例 | 故障 | 章节 |
 |---|---|---|
-| 1 | retry layers stack on one model call | [4.7](#s-retries-backup-models-rate-limits-and-caching) |
-| 2 | a crash between a side effect and its checkpoint | [5.3](#s-durability-modes-and-a-crash-between-two-steps) |
-| 3 | an approval skipped by a middleware that jumps to tools | [6.5](#s-human-in-the-loop-batched-and-per-call) |
-| 4 | a run that ends with no structured response | [4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) |
-| 5 | a tracing endpoint that is down | [7.6](#s-langsmith-tracing) |
-| 6 | two tools with the same name | [3.4](#s-tools-toolruntime-and-tool-errors) |
-| 7 | a model that calls a tool forever | [6.8](#s-error-handlers-node-timeouts-and-the-recursion-limit) |
+| 1 | 重试层叠加在一次模型调用上 | [4.7](#s-retries-backup-models-rate-limits-and-caching) |
+| 2 | 副作用与它的检查点之间发生崩溃 | [5.3](#s-durability-modes-and-a-crash-between-two-steps) |
+| 3 | 一个跳转到 tools 的中间件跳过了审批 | [6.5](#s-human-in-the-loop-batched-and-per-call) |
+| 4 | 一次运行结束时没有结构化响应 | [4.2](#s-structured-output-autostrategy-providerstrategy-toolstrategy) |
+| 5 | 追踪端点宕机 | [7.6](#s-langsmith-tracing) |
+| 6 | 两个同名的工具 | [3.4](#s-tools-toolruntime-and-tool-errors) |
+| 7 | 模型无休止地调用一个工具 | [6.8](#s-error-handlers-node-timeouts-and-the-recursion-limit) |
 
-Each case is a short function. This is the middleware of case 3. It returns `jump_to="tools"` after any model message with a tool call:
+每个用例都是一个短函数。下面是用例 3 的中间件。它在任何带工具调用的模型消息之后返回 `jump_to="tools"`：
 
 ```listing
-title: the middleware that jumps past the review
+title: 跳过审核的中间件
 source: capture/demos/failure-drill/drill.py
 lang: python
 ---
@@ -44,10 +44,10 @@ class JumpToTools(AgentMiddleware):
         return None
 ```
 
-Case 2 runs this tool in a child process on `SqliteSaver`. In the first process it writes the charge, syncs the file, and kills its own process. A second process resumes the thread with `invoke(None)`. With `keyed` on, the tool checks its `tool_call_id` first:
+用例 2 在子进程里，基于 `SqliteSaver` 运行这个工具。第一个进程写入扣款，同步文件，然后杀掉自己。第二个进程用 `invoke(None)` 恢复线程。开启 `keyed` 时，工具先检查自己的 `tool_call_id`：
 
 ```listing
-title: the charge tool of case 2
+title: 用例 2 的扣款工具
 source: capture/demos/failure-drill/drill.py
 lang: python
 ---
@@ -66,19 +66,19 @@ lang: python
         return f"charged {amount}"
 ```
 
-## The recorded run
+## 记录下来的运行 {#s-a-failure-drill-the-recorded-run}
 
-**We measured** three runs on the x86 server guest, n=3 for each case. Each run took 101 to 103 s. Most of it went to model calls on CPU. The tracing case took the longest, about 27 s, because it waited for the exit.
+**我们测得**：在 x86 服务器客户机上跑了三次，每个用例 n=3。每次运行用了 101 到 103 秒，大部分花在 CPU 上的模型调用。追踪用例耗时最长，约 27 秒，因为它要等退出。
 
-The drill prints the section numbers of the earlier layout of this manual. Read sections 3.5, 4.3, 5.5, 3.2, 6.4, 2.4, and 5.8 in its output as sections 4.7, 5.3, 6.5, 4.2, 7.6, 3.4, and 6.8.
+演练打印的是本手册旧版结构里的章节号。把它输出里的 3.5、4.3、5.5、3.2、6.4、2.4 和 5.8 节，分别读作 4.7、5.3、6.5、4.2、7.6、3.4 和 6.8 节。
 
-The first two cases are silent. Nothing raised, and the damage is in a count:
+前两个用例是无声的。什么都没抛，损害体现在一个计数上：
 
 ```listing
-title: retry layers and a crash after a side effect
+title: 重试层，以及副作用之后的崩溃
 source: capture/lab/failure-drill-x86/drill-run1.log
 lang: text
-note: The first of three runs.
+note: 三次运行中的第一次。
 ---
 == 1 retry layers stack on one model call (section 3.5)
   symptom   one model call sent 9 requests to a relay in front of Ollama that drops every connection, in 6.8 s
@@ -95,17 +95,17 @@ note: The first of three runs.
   time      14.32 s
 ```
 
-In case 1, `ChatOpenAI` made 3 attempts inside each of the 3 attempts of `ModelRetryMiddleware`. The run then ended with the error as the text of an `AIMessage`, so a caller that reads only the last message sees an answer. In case 2, the exit code `-9` is the SIGKILL. The model asked for two charges in one reply, and the key cannot stop that second call. Check the order before the charge.
+在用例 1 里，`ChatOpenAI` 在 `ModelRetryMiddleware` 的 3 次尝试里，每次又做了 3 次尝试。运行随后以错误作为一条 `AIMessage` 的文本结束，所以只读最后一条消息的调用方会以为得到了一个答案。在用例 2 里，退出码 `-9` 是 SIGKILL。模型在一次回复里要求了两次扣款，而这个键拦不住第二个调用。扣款之前先查订单。
 
-Without the key, the three runs left 4, 4, and 3 charges. With the key, each run left 2: one for each call id. The saved AI message keeps its call ids, so the key matched each call on the resume.
+没有这个键时，三次运行分别留下 4、4 和 3 笔扣款。有这个键时，每次运行都留下 2 笔：每个调用 id 一笔。保存下来的 AI 消息保留了它的调用 id，所以恢复时这个键匹配上了每个调用。
 
-The next two cases change what a run does without an error:
+接下来的两个用例，会在没有错误的情况下改变一次运行做的事：
 
 ```listing
-title: a skipped approval and a missing structured response
+title: 被跳过的审批，以及缺失的结构化响应
 source: capture/lab/failure-drill-x86/drill-run1.log
 lang: text
-note: The first of three runs. The last messages of the three None runs are cut at the mark.
+note: 三次运行中的第一次。三次 None 运行的最后几条消息在标记处截断。
 ---
 == 3 an approval skipped by a middleware that jumps to tools (section 5.5)
   symptom   send_email ran 1 time before any decision, with 0 interrupts, to ['all-staff@example.org']
@@ -122,15 +122,15 @@ note: The first of three runs. The last messages of the three None runs are cut 
   time      15.56 s
 ```
 
-In case 4, the two arithmetic prompts gave a structured response. The other three ended with plain text and no exception, in 3 of 3 runs. For the empty order, the model wrote `Answer(total=0)` as text in place of a call of the `Answer` tool.
+在用例 4 里，两个算术提示词给出了结构化响应。另外三个以纯文本结束，没有异常，3 次运行都是这样。对空订单，模型把 `Answer(total=0)` 写成了文本，而没有调用 `Answer` 工具。
 
-The last three cases are a slow exit, a lost tool, and an endless loop:
+最后三个用例是退出缓慢、丢失工具和无休止的循环：
 
 ```listing
-title: a tracing endpoint that is down, a duplicate tool name, and the recursion limit
+title: 宕机的追踪端点、重复的工具名，以及递归上限
 source: capture/lab/failure-drill-x86/drill-run1.log
 lang: text
-note: The first of three runs. The rest of the GraphRecursionError message is cut at the mark.
+note: 三次运行中的第一次。GraphRecursionError 消息的其余部分在标记处截断。
 ---
 == 5 a tracing endpoint that is down (section 6.4)
   symptom   the agent run took 4436.9 ms, and the process exited 16.9 s after it (22.0 s in all)
@@ -155,43 +155,43 @@ note: The first of three runs. The rest of the GraphRecursionError message is cu
   time      23.61 s
 ```
 
-Case 6 is a failure that the earlier sections do not show. The tool node of `create_agent` keeps its tools in a dict keyed by name, so the second `lookup` replaced the first {{code libs/prebuilt/langgraph/prebuilt/tool_node.py}}. The model saw one tool, the agent raised nothing, and every call went to the refunds function. So the answer said it found nothing about order 7 in the refunds table. Two instances of one middleware raise an `AssertionError`, as [section 4.5](#s-middleware-hooks-and-their-order) shows. Two tools with one name raise nothing.
+用例 6 是前面各节没有展示的一种故障。`create_agent` 的工具节点把工具放在一个以名称为键的字典里，所以第二个 `lookup` 替换了第一个 {{code libs/prebuilt/langgraph/prebuilt/tool_node.py}}。模型只看到一个工具，agent 什么都没抛，每次调用都进了退款函数。所以答案说它在退款表里找不到订单 7 的任何信息。同一个中间件的两个实例会抛 `AssertionError`，见[第 4.5 节](#s-middleware-hooks-and-their-order)。两个同名工具却什么都不抛。
 
-Case 7 shows a fix that needs a second change. `ModelCallLimitMiddleware` adds its own node to each loop of the agent, so three model calls needed more than 10 steps. With `recursion_limit` 10 the run still raised. With 25 it ended by itself after the third call. [Figure](#fig-8-7) sets each symptom beside its result after the fix.
+用例 7 展示了一个需要再做一处改动的修法。`ModelCallLimitMiddleware` 给 agent 的每个循环加了自己的节点，所以三次模型调用需要超过 10 步。`recursion_limit` 为 10 时，运行仍然抛出。设为 25 时，它在第三次调用之后自己结束了。[图 8.7](#fig-8-7)把每个症状和修复后的结果并排放在一起。
 
 ```figure
 id: fig-8-7
 kind: comparison
-title: seven failures of the drill, before and after each fix
-claim: Six of the seven failures raised nothing, and each fix in the right column comes from the section that documents the failure.
-caption: Read each row from the symptom on the left to the result after the fix on the right. Rose cells are the failure, teal cells the result with the fix. From capture/lab/summary/failure-drill-x86.json.
+title: 演练里七种故障，每种修复前后
+claim: 七种故障里有六种什么都没抛，右栏里的每个修法，都来自记录这种故障的那一节。
+caption: 每行从左边的症状读到右边修复后的结果。玫红色格子是故障，青绿色格子是用了修法之后的结果。来源：capture/lab/summary/failure-drill-x86.json。
 ```
 
-## What the drill adds to the earlier sections
+## 演练对前面各节的补充 {#s-a-failure-drill-what-the-drill-adds-to-the-earlier-sections}
 
-Three cases repeat a measured result of an earlier part on a smaller scale. Compare the counts, not the seconds, because the runs differ in size and machine.
+有三个用例，以更小的规模重复了前面某部分测得的结果。比较计数，不要比较秒数，因为这些运行的规模和机器都不同。
 
-| Case | Earlier result | The drill |
+| 用例 | 前面的结果 | 演练 |
 |---|---|---|
-| retry layers | 9 model requests for a dropped connection on every call, 3 runs, section 3.2 | 9 requests, 3 runs |
-| crash after a side effect | the effect ran twice in 80 of 150 graph trials, section 5.3 | 3 or 4 charges without the key, 2 with it, 3 trials |
-| tracing endpoint down | the exit waited 9.9 s after 50 runs, section 7.6 | the exit waited 16.9 to 17.3 s after 1 run |
+| 重试层 | 每次调用都丢连接时，9 次模型请求，3 次运行，第 3.2 节 | 9 次请求，3 次运行 |
+| 副作用之后崩溃 | 150 次图试验中有 80 次副作用运行了两次，第 5.3 节 | 没有键时 3 或 4 笔扣款，有键时 2 笔，3 次试验 |
+| 追踪端点宕机 | 50 次运行之后，退出等了 9.9 秒，第 7.6 节 | 1 次运行之后，退出等了 16.9 到 17.3 秒 |
 
-The tracing numbers come from processes of different sizes, 350 traced runs against 7, so do not compare their seconds. Both show the same symptom: a process with tracing on waits at exit for an endpoint that does not answer. The probe in case 5 is our own fix. Section 7.6 gives two others: call `wait_for_all_tracers()` at a point you choose, and put a timeout on the job.
+追踪的数字来自规模不同的进程，350 次被追踪的运行对 7 次，所以不要比较它们的秒数。两者显示的是同一个症状：开着追踪的进程，在退出时等一个不应答的端点。用例 5 里的探测是我们自己的修法。第 7.6 节给出另外两种：在你选定的位置调用 `wait_for_all_tracers()`，以及给任务设超时。
 
-## Limits of the drill
+## 演练的局限 {#s-a-failure-drill-limits-of-the-drill}
 
-- The saved AI message keeps its call ids, so the key matches on resume. A real model can still ask for the same charge twice in one reply.
-- The retry case uses `ChatOpenAI` through a relay that drops connections. Other provider packages have their own client retries. `ChatOllama` makes 1 attempt.
-- The drill covers the failures that need only Ollama. The MCP, Postgres, and Agent Server failures of Parts 7 and 8 need their services. [Part 9](#p-9) runs the Postgres failures in a service: a crash after a refund, a SIGTERM, and a hung tool.
-- Three runs show that the cases repeat, not how often they fail on other models.
+- 保存下来的 AI 消息保留了它的调用 id，所以恢复时键能匹配上。真实的模型仍可能在一次回复里要求同一笔扣款两次。
+- 重试用例通过一个丢连接的中继使用 `ChatOpenAI`。其他提供方的包有各自的客户端重试。`ChatOllama` 只尝试 1 次。
+- 演练涵盖只需要 Ollama 的故障。第 7 和第 8 部分的 MCP、Postgres 和 Agent Server 故障需要它们的服务。[第 9 部分](#p-9)在一个服务里运行 Postgres 故障：退款之后的崩溃、一次 SIGTERM 和一个挂起的工具。
+- 三次运行说明这些用例会重复出现，不说明它们在其他模型上出现的频率。
 
 ```takeaways
-- Run the drill after each upgrade of the stack, and compare its log with the recorded one.
-- Count requests, charges, and tool runs, because six of the seven failures raise nothing.
-- Check tool names for duplicates before create_agent.
-- Raise recursion_limit when you add a call limit, because the middleware adds steps.
-- Probe the tracing endpoint at start, and turn tracing off when it does not answer.
+- 每次升级技术栈之后运行演练，并把它的日志与记录的日志对比。
+- 数请求数、扣款数和工具运行数，因为七种故障里有六种什么都不抛。
+- 在 create_agent 之前检查工具名有没有重复。
+- 添加调用上限时同时提高 recursion_limit，因为这个中间件会增加步数。
+- 启动时探测追踪端点，它不应答时就关闭追踪。
 ```
 
-Sources: capture/demos/failure-drill/drill.py, capture/demos/failure-drill/real.py, capture/demos/failure-drill/run.sh, capture/demos/failure-drill/README.md; capture/lab/failure-drill-x86/drill-run1.log, capture/lab/failure-drill-x86/drill-run1.jsonl, capture/lab/failure-drill-x86/drill-run2.jsonl, capture/lab/failure-drill-x86/drill-run3.jsonl, capture/lab/summary/failure-drill-x86.json, capture/lab/summary/retries-x86.json, capture/lab/summary/crash-resume-mac.json, capture/lab/summary/tracing-mac-real.json; libs/prebuilt/langgraph/prebuilt/tool_node.py at langgraph 1.2.22; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0.
+来源：capture/demos/failure-drill/drill.py, capture/demos/failure-drill/real.py, capture/demos/failure-drill/run.sh, capture/demos/failure-drill/README.md; capture/lab/failure-drill-x86/drill-run1.log, capture/lab/failure-drill-x86/drill-run1.jsonl, capture/lab/failure-drill-x86/drill-run2.jsonl, capture/lab/failure-drill-x86/drill-run3.jsonl, capture/lab/summary/failure-drill-x86.json, capture/lab/summary/retries-x86.json, capture/lab/summary/crash-resume-mac.json, capture/lab/summary/tracing-mac-real.json; libs/prebuilt/langgraph/prebuilt/tool_node.py at langgraph 1.2.22; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0.

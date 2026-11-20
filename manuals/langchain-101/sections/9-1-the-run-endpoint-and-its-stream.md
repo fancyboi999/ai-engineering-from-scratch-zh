@@ -1,42 +1,42 @@
-# The run endpoint: StreamingResponse and one task per run
+# 运行端点：StreamingResponse 与每次运行一个任务
 
-> Start each run as its own asyncio task that writes events to a queue, so the HTTP response only reads, and a client that leaves cannot cancel the run.
+> 把每次运行作为独立的 asyncio 任务启动，让它把事件写进队列，这样 HTTP 响应只负责读，离开的客户端也取消不了运行。
 
-You put `agent.astream` inside a FastAPI route and return its chunks as server-sent events. It works until a phone loses signal halfway through a refund. When a client disconnects, Starlette cancels the task group of the response {{code starlette/responses.py:247-285}}. The cancel reaches `astream` too, because it runs in that group.
+你把 `agent.astream` 放进一个 FastAPI 路由，并把它的块作为服务器发送事件（SSE）返回。它一直好用，直到某部手机在退款进行到一半时丢了信号。客户端断开时，Starlette 会取消响应的任务组 {{code starlette/responses.py:247-285}}。取消也会传到 `astream`，因为它就运行在那个组里。
 
-When you finish this section, you can build the shape that this part uses. A route starts a run, a task owns it, and a stream only reads. You can also say which events the client gets, and in what order.
+读完本节，你能搭出本部分使用的结构：路由启动一次运行，一个任务拥有它，流只负责读。你还能说出客户端会收到哪些事件，以及它们的顺序。
 
-## The service on one page
+## 一页看完这个服务 {#s-the-run-endpoint-and-its-stream-the-service-on-one-page}
 
-The reference service is one FastAPI app with one `create_agent` and one Postgres database. It has six routes.
+参考服务是一个 FastAPI 应用，带一个 `create_agent` 和一个 Postgres 数据库。它有六条路由。
 
-| Route | What it does |
+| 路由 | 作用 |
 |---|---|
-| `POST /threads` | creates a thread and records its owner |
-| `POST /threads/{id}/runs` | starts a run with a user message, and streams its events |
-| `POST /threads/{id}/approve` | answers a pending approval, and streams the rest of the run |
-| `GET /threads/{id}/state` | returns the messages, the next nodes, and the pending interrupts |
-| `GET /memories` | lists the notes saved for the caller |
-| `GET /healthz` | reports that the process is up |
+| `POST /threads` | 创建线程并记录它的所有者 |
+| `POST /threads/{id}/runs` | 用一条用户消息启动一次运行，并流式返回它的事件 |
+| `POST /threads/{id}/approve` | 回答一个待处理的审批，并流式返回运行的其余部分 |
+| `GET /threads/{id}/state` | 返回消息、下一批节点和待处理的中断 |
+| `GET /memories` | 列出为调用方保存的笔记 |
+| `GET /healthz` | 报告进程在运行 |
 
-The agent has six tools, a middleware stack that [section 9.5](#s-timeouts-retries-backup-model-and-shutdown) explains, and the Postgres checkpointer and store of [section 9.2](#s-postgres-checkpointer-store-and-owner-check). The model is a setting: `ollama:<name>` or `anthropic:<name>`.
+这个 agent 有六个工具，一个由[第 9.5 节](#s-timeouts-retries-backup-model-and-shutdown)解释的中间件栈，以及[第 9.2 节](#s-postgres-checkpointer-store-and-owner-check)的 Postgres checkpointer 和 store。模型是一项设置：`ollama:<name>` 或 `anthropic:<name>`。
 
-The stack has eight middleware, and three of them add nodes. [Figure](#fig-9-1b) draws the compiled graph of `build_agent` from its Mermaid text. The kit builds it with models that are never called, and with a stand-in for the OpenTelemetry module. `Tracing` and `ToolTimeout` have only wrap hooks, so the stand-in changes no node.
+这个栈有八个中间件，其中三个会增加节点。[图 9.1b](#fig-9-1b)根据 `build_agent` 的 Mermaid 文本画出了编译后的图。工具包用从不被调用的模型构建它，并用一个 OpenTelemetry 模块的替身。`Tracing` 和 `ToolTimeout` 只有 wrap 钩子，所以这个替身不改变任何节点。
 
 ```figure
 id: fig-9-1b
 kind: structure
-title: the graph of the service agent
-claim: Four hook nodes from three middleware sit around model, and ModelCallLimitMiddleware can end the run before or after the model call.
-caption: Read from __start__ at the top. Blue boxes are hook nodes. The other five middleware wrap the model call or the tool calls and add no node. From capture/out/54-draw-service-agent.txt.
+title: 服务 agent 的图
+claim: 来自三个中间件的四个钩子节点围在 model 周围，ModelCallLimitMiddleware 可以在模型调用之前或之后结束运行。
+caption: 从顶部的 __start__ 读起。蓝色方框是钩子节点。其他五个中间件包装模型调用或工具调用，不增加节点。来源：capture/out/54-draw-service-agent.txt。
 ```
 
-## A task owns the run
+## 由任务拥有运行 {#s-the-run-endpoint-and-its-stream-a-task-owns-the-run}
 
-**Run task:** the `asyncio` task that iterates `agent.astream` for one run and puts each event on a queue. The route starts it and returns at once. The response reads the queue.
+**运行任务：** 为一次运行迭代 `agent.astream`、并把每个事件放进队列的 `asyncio` 任务。路由启动它并立即返回。响应读取队列。
 
 ```listing
-title: the route starts a task, and the response reads its queue
+title: 路由启动一个任务，响应读取它的队列
 source: capture/lab/prodapp-mac/code/app/server.py
 lang: python
 ---
@@ -50,10 +50,10 @@ lang: python
         return queue
 ```
 
-Three things come from that split. A client that disconnects ends the response, and the run task does not see it. The service keeps a list of active tasks, so a shutdown can wait for them, as [section 9.5](#s-timeouts-retries-backup-model-and-shutdown) shows. The thread lock is taken before the task starts and released in its `finally`. So a second run on the same thread gets 409 at once.
+这种拆分带来三件事。客户端断开会结束响应，而运行任务感知不到。服务保存着活动任务的列表，所以关闭时可以等待它们，见[第 9.5 节](#s-timeouts-retries-backup-model-and-shutdown)。线程锁在任务启动之前获取，在任务的 `finally` 里释放。所以同一线程上的第二次运行会立即得到 409。
 
 ```listing
-title: the run task releases the lock, then sends done
+title: 运行任务先释放锁，再发送 done
 source: capture/lab/prodapp-mac/code/app/server.py
 lang: python
 ---
@@ -69,19 +69,19 @@ lang: python
             queue.put_nowait(None)
 ```
 
-The order in the `finally` matters. The lock is released before `done` is sent. Otherwise a client that starts its next run when it reads `done` can race the release and get a 409.
+`finally` 里的顺序很重要。锁在发送 `done` 之前释放。否则，客户端一读到 `done` 就启动下一次运行，会和释放抢跑，得到 409。
 
-**We measured** what a client that leaves does to a run, on the Mac with Qwen3 4B, five trials. Each trial asked a FAQ question and closed the connection after the first SSE event, 245 to 1910 ms after the request. It then posted a second message to the thread at once, and read the state until the run ended.
+**我们测得**：在 Mac 上用 Qwen3 4B，做了五次试验，看离开的客户端对运行有什么影响。每次试验问一个 FAQ 问题，在第一个 SSE 事件之后关闭连接，那是请求之后 245 到 1910 ms。随后它立即向线程发第二条消息，并读取状态直到运行结束。
 
-- The second post got 409 in 5 of 5 trials, because the first run still held the thread.
-- The run finished in 5 of 5 trials, with status `done` after 3.56 to 4.71 s. Each thread ended with the human message, a `search_faq` call, its result, and a final answer.
+- 第二次 post 在 5 次试验中有 5 次得到 409，因为第一次运行仍占着线程。
+- 运行在 5 次试验中有 5 次完成，状态为 `done`，用时 3.56 到 4.71 秒。每个线程最后都有人类消息、一次 `search_faq` 调用、它的结果和一个最终答案。
 
-## The events on the stream
+## 流上的事件 {#s-the-run-endpoint-and-its-stream-the-events-on-the-stream}
 
-The run task asks `astream` for two stream modes at once, `messages` and `updates`, with `version="v2"`. It turns each part into `token`, `tool_call`, `tool_result`, or `interrupt`. The run task adds `done` at the end, and `error` when the run raises.
+运行任务让 `astream` 同时使用两种流模式，`messages` 和 `updates`，并设 `version="v2"`。它把每一部分转成 `token`、`tool_call`、`tool_result` 或 `interrupt`。运行任务在末尾添加 `done`，在运行抛出时添加 `error`。
 
 ```listing
-title: how stream parts become SSE events
+title: 流的各部分如何变成 SSE 事件
 source: capture/lab/prodapp-mac/code/app/server.py
 lang: python
 ---
@@ -100,34 +100,34 @@ def to_events(part):
             continue
 ```
 
-The filter on the node name is there for a reason. The summarization middleware runs as a node of its own. Its update removes every message and writes the summary and the kept messages back {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:551-557}}. So it repeats AI messages that the client has already seen. Without the filter, a client would get those `tool_call` events again. Tokens come only from the `model` node, so the text of a summary never reaches the client.
+按节点名过滤是有原因的。摘要中间件作为它自己的节点运行。它的更新会删除每条消息，再把摘要和保留的消息写回去 {{code libs/langchain_v1/langchain/agents/middleware/summarization.py:551-557}}。所以它会重复客户端已经见过的 AI 消息。没有这个过滤，客户端会再次收到这些 `tool_call` 事件。token 只来自 `model` 节点，所以摘要的文本永远到不了客户端。
 
-**We measured** one conversation of three requests on the Mac with Qwen3 4B, and recorded the time that each event reached the client. The model was already loaded.
+**我们测得**：在 Mac 上用 Qwen3 4B，做了一段三个请求的对话，并记录每个事件到达客户端的时间。模型已经加载好。
 
-| Request | First event | Events, in order | `done` |
+| 请求 | 第一个事件 | 事件，按顺序 | `done` |
 |---|---|---|---|
-| order question | `tool_call` at 682 ms | `tool_call`, `tool_result` at 698 ms, 30 tokens from 1016 ms | 1527 ms |
-| refund of 8900 cents | `tool_call` at 2090 ms | `tool_call`, `interrupt` at 2122 ms | 2125 ms, status `interrupted` |
-| approve | `tool_result` at 32 ms | `tool_result`, 38 tokens from 765 ms | 2158 ms |
+| 订单问题 | 682 ms 时的 `tool_call` | `tool_call`，698 ms 时的 `tool_result`，从 1016 ms 起 30 个 token | 1527 ms |
+| 退款 8900 美分 | 2090 ms 时的 `tool_call` | `tool_call`，2122 ms 时的 `interrupt` | 2125 ms，状态 `interrupted` |
+| 批准 | 32 ms 时的 `tool_result` | `tool_result`，从 765 ms 起 38 个 token | 2158 ms |
 
-Each `tool_call` event reached the client within 30 ms of the end of its model call. The approval request was one `interrupt` event, and the stream ended 3 ms after it with `done` and status `interrupted`. The approve request skipped the model: its first event was the refund result, 32 ms after the request.
+每个 `tool_call` 事件，都在它的模型调用结束后 30 ms 内到达客户端。审批请求是一个 `interrupt` 事件，流在它之后 3 ms 以 `done` 和状态 `interrupted` 结束。批准请求跳过了模型：它的第一个事件是退款结果，在请求之后 32 ms。
 
-The first request of an earlier capture, sent right after the drain trials had used Qwen3 14B, took 15.42 s. Its first model call took 13.4 s while Qwen3 4B loaded again. Keep the model loaded on a shared server, or the first customer after a switch waits for it.
+更早的一次录制里，第一个请求紧跟在排空试验用过 Qwen3 14B 之后发出，用了 15.42 秒。它的第一次模型调用用了 13.4 秒，那时 Qwen3 4B 在重新加载。在共享服务器上，保持模型已加载，否则切换之后的第一位客户要等它。
 
 ```figure
 id: fig-9-1
 kind: timeline
-title: three requests, the spans of each run, and the events the client read
-claim: The client read each tool call when its model call ended, and the approval request arrived as one interrupt event that ended the stream.
-caption: Each panel is one HTTP request, in milliseconds after it was sent. The upper row is the run task, with model and tool spans. The lower row is the client, with each SSE event at the time it arrived. From capture/lab/prodapp-mac/summary/stream-mac.json.
+title: 三个请求、每次运行的 span，以及客户端读到的事件
+claim: 客户端在每个工具调用的模型调用结束时读到它，审批请求以一个结束了流的 interrupt 事件到达。
+caption: 每个面板是一个 HTTP 请求，单位是发出之后的毫秒数。上面一行是运行任务，带模型和工具的 span。下面一行是客户端，每个 SSE 事件放在它到达的时间。来源：capture/lab/prodapp-mac/summary/stream-mac.json。
 ```
 
-## A heartbeat while a run waits
+## 运行等待时的心跳 {#s-the-run-endpoint-and-its-stream-a-heartbeat-while-a-run-waits}
 
-A run can wait a long time before its first event, for example behind other runs at the model server. Until then the stream sends no byte, and an HTTP client counts that as a dead connection. The service writes an SSE comment line when no event has come for 15 s. A client must ignore lines that start with a colon, so the comment carries no data.
+一次运行在第一个事件之前可能等很久，例如在模型服务器处排在其他运行后面。在那之前流不发送任何字节，而 HTTP 客户端会把这当成连接已死。服务在 15 秒没有事件时，写一行 SSE 注释。客户端必须忽略以冒号开头的行，所以这行注释不带数据。
 
 ```listing
-title: the stream reader, with a comment line every 15 s of silence
+title: 流读取器，每 15 秒静默就发一行注释
 source: capture/lab/prodapp-mac/code/app/server.py
 lang: python
 ---
@@ -147,32 +147,32 @@ async def sse(queue):
         yield f"event: {name}\ndata: {json.dumps(data, default=str)}\n\n"
 ```
 
-**We measured** the 50-user load cell of [section 9.7](#s-workers-the-advisory-lock-and-cost) again, with one worker and Qwen3 4B on the Mac, one run. The clients kept their read timeout of 120 s.
+**我们测得**：在 Mac 上用一个 worker 和 Qwen3 4B，把[第 9.7 节](#s-workers-the-advisory-lock-and-cost)的 50 用户负载格再测了一次，一次运行。客户端保持它们 120 秒的读取超时。
 
-| | Requests | Client read timeouts | Runs the clients saw end | Runs the server ended | Median and max s per run |
+| | 请求数 | 客户端读取超时 | 客户端看到结束的运行 | 服务器结束的运行 | 每次运行秒数的中位数和最大值 |
 |---|---|---|---|---|---|
-| without a heartbeat | 157 | 48 | 107 | 155, of which 19 `cancelled` at shutdown | 164.7 and 193.8 |
-| with a heartbeat | 200 | 0 | 192 | 192, none cancelled | 194.8 and 286.7 |
+| 没有心跳 | 157 | 48 | 107 | 155，其中 19 个在关闭时被 `cancelled` | 164.7 和 193.8 |
+| 有心跳 | 200 | 0 | 192 | 192，没有被取消的 | 194.8 和 286.7 |
 
-With the heartbeat every session sent all four requests, and the slowest run took 286.7 s with no timeout. The other 8 requests were approves that got 409, because the model had proposed no refund. The runs took longer because more of them reached the model, and the server still finished 0.231 runs each second.
+有了心跳，每个会话都发完了全部四个请求，最慢的一次运行用了 286.7 秒，没有超时。另外 8 个请求是得到 409 的批准，因为模型没有提出退款。运行用时更长，是因为有更多运行到达了模型，而服务器仍然每秒完成 0.231 次运行。
 
-The Mac was loaded for this run, at a load average of 32.78. Read the seconds as upper bounds and the counts as the result. The heartbeat keeps a client attached. It does not make the model faster.
+这次运行时 Mac 负载很高，平均负载为 32.78。把秒数当作上限，把计数当作结果。心跳让客户端保持连接，并不会让模型变快。
 
 ```figure
 id: fig-9-1c
 kind: comparison
-title: what 50 clients saw, without and with a heartbeat on the stream
-claim: With a comment line every 15 s, 0 of 200 requests timed out, against 48 sessions lost to read timeouts without it.
-caption: Each bar is one run of the load cell with 50 users and one worker. The parts are the requests that ended done, interrupted for approval, rejected with 409, and lost to a client read timeout. From capture/lab/prodapp-mac/summary/fix-mac.json.
+title: 50 个客户端看到的情况，流上没有心跳与有心跳
+claim: 每 15 秒一行注释时，200 个请求有 0 个超时，而没有注释时有 48 个会话因读取超时而丢失。
+caption: 每根条是 50 个用户、一个 worker 的负载格的一次运行。各部分是以 done 结束的请求、因审批而 interrupted 的请求、以 409 拒绝的请求，以及因客户端读取超时而丢失的请求。来源：capture/lab/prodapp-mac/summary/fix-mac.json。
 ```
 
 ```takeaways
-- Run each agent run in its own asyncio task, and stream from a queue that the task fills.
-- Keep a registry of active run tasks, so shutdown can wait for them.
-- Release the thread lock before you send the done event.
-- Send tool events from the model and tools nodes only, so summaries do not repeat them.
-- Answer 409 while a thread has a pending approval or an active run.
-- Send an SSE comment line when a run has been silent for 15 s.
+- 让每次 agent 运行在自己的 asyncio 任务里，并从任务填充的队列里流式输出。
+- 保存活动运行任务的登记表，让关闭时能等待它们。
+- 在发送 done 事件之前释放线程锁。
+- 只从 model 和 tools 节点发送工具事件，这样摘要不会重复它们。
+- 线程有待处理的审批或活动的运行时，回答 409。
+- 一次运行静默了 15 秒，就发送一行 SSE 注释。
 ```
 
-Sources: capture/lab/prodapp-mac/code/app/server.py, capture/lab/prodapp-mac/code/app/agent.py, capture/out/54-draw-service-agent.txt, capture/s_draw.py, capture/lab/prodapp-mac/code/scripts/capture_stream.py, capture/lab/prodapp-mac/code/scripts/disconnect_real.py, capture/lab/prodapp-mac/summary/stream-mac.json, capture/lab/prodapp-mac/summary/disconnect-mac.json, capture/lab/prodapp-mac/runs/stream/stream-events.jsonl, capture/lab/prodapp-mac/runs/stream/stream.spans.jsonl, capture/lab/prodapp-mac/runs/disconnect/disconnect-trials.json, capture/lab/prodapp-mac/summary/fix-mac.json, capture/lab/prodapp-mac/runs/fix/load/load-summary.json, capture/lab/prodapp-mac/runs/load/load-summary.json; libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22; starlette/responses.py at starlette 1.10.0.
+来源：capture/lab/prodapp-mac/code/app/server.py, capture/lab/prodapp-mac/code/app/agent.py, capture/out/54-draw-service-agent.txt, capture/s_draw.py, capture/lab/prodapp-mac/code/scripts/capture_stream.py, capture/lab/prodapp-mac/code/scripts/disconnect_real.py, capture/lab/prodapp-mac/summary/stream-mac.json, capture/lab/prodapp-mac/summary/disconnect-mac.json, capture/lab/prodapp-mac/runs/stream/stream-events.jsonl, capture/lab/prodapp-mac/runs/stream/stream.spans.jsonl, capture/lab/prodapp-mac/runs/disconnect/disconnect-trials.json, capture/lab/prodapp-mac/summary/fix-mac.json, capture/lab/prodapp-mac/runs/fix/load/load-summary.json, capture/lab/prodapp-mac/runs/load/load-summary.json; libs/langgraph/langgraph/pregel/main.py at langgraph 1.2.22; starlette/responses.py at starlette 1.10.0.
