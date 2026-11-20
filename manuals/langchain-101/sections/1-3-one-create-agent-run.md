@@ -8,7 +8,7 @@
 
 ## 这次运行 {#s-one-create-agent-run-the-run}
 
-[第一次运行](#s-front)里的 agent 有一个工具 `add`，系统提示词是 `You add numbers.`。它的模型是 Ollama 上的 Qwen3 4B。它用 2 和 3 调用了 `add`，然后给出回答。下面是运行结束时的状态：
+[第一次运行](#s-front)里的 agent 有一个工具 `add`，系统 prompt 是 `You add numbers.`。它的模型是 Ollama 上的 Qwen3 4B。它用 2 和 3 调用了 `add`，然后给出回答。下面是运行结束时的状态：
 
 ```listing
 title: 一次运行的最终状态
@@ -51,11 +51,11 @@ note: 键列表和每条回复的元数据被截掉了。四条消息全部展�
     "id": "lc_run--<uuid-5>-0",
 ```
 
-状态里只有一个键 `messages`，系统提示词不在其中。两条模型回复的 id 以 `lc_run--` 开头，因为 LangChain 把每次模型输出所属运行的 id 给了它。人类消息和工具消息在图添加它们时得到一个普通的 UUID。工具调用 id 也是 UUID，因为 `ChatOllama` 为每次调用生成一个。每条回复还带着来自 Ollama 的 `response_metadata` 和 `usage_metadata`，里面是该次调用的 token 数。
+状态里只有一个键 `messages`，系统 prompt 不在其中。两条模型回复的 id 以 `lc_run--` 开头，因为 LangChain 把每次模型输出所属运行的 id 给了它。人类消息和工具消息在图添加它们时得到一个普通的 UUID。工具调用 id 也是 UUID，因为 `ChatOllama` 为每次调用生成一个。每条回复还带着来自 Ollama 的 `response_metadata` 和 `usage_metadata`，里面是该次调用的 token 数。
 
 ## 模型收到了什么 {#s-one-create-agent-run-what-the-model-received}
 
-工具包用一个回调处理器记录每次调用。模型运行了两次，两次调用都先收到系统提示词，并绑定了同一个工具：
+工具包用一个回调处理器记录每次调用。模型运行了两次，两次调用都先收到系统 prompt，并绑定了同一个工具：
 
 ```listing
 title: 两次模型调用
@@ -81,7 +81,7 @@ note: 截取消息和绑定的工具。模型标签被截掉了。
     ],
 ```
 
-所以 agent 在每次调用里都发送整段对话，并把系统提示词加到每个请求的最前面。[第 3.5 节](#s-the-system-prompt)解释为什么提示词不放在状态里。
+所以 agent 在每次调用里都发送整段对话，并把系统 prompt 加到每个请求的最前面。[第 3.5 节](#s-the-system-prompt)解释为什么 prompt 不放在状态里。
 
 ## 逐步看 {#s-one-create-agent-run-step-by-step}
 
@@ -97,7 +97,7 @@ caption: 从上到下阅读各行。每个青色箭头是一个检查点，带�
 
 1. `invoke` 把输入送到图上。有 checkpointer 时，LangGraph 保存输入检查点，步骤为 `-1`。
 2. `__start__` 节点把人类消息写进 `messages`。步骤 `0` 的检查点说明下一个节点是 `model`。
-3. `model` 节点加上系统提示词，绑定工具，并调用模型。模型用一次工具调用作答。步骤 `1` 的检查点说明下一个节点是 `tools`。
+3. `model` 节点加上系统 prompt，绑定工具，并调用模型。模型用一次工具调用作答。步骤 `1` 的检查点说明下一个节点是 `tools`。
 4. `tools` 节点运行 `add(a=2, b=3)`，并追加一条 `ToolMessage`，它的 `tool_call_id` 就是那次调用的 id。步骤 `2` 的检查点说明下一个节点是 `model`。
 5. `model` 节点带着全部三条消息再次调用模型。模型用文本作答，没有工具调用。
 6. `model` 之后的边看到没有工具调用，就走向 `__end__`。步骤 `3` 的检查点没有下一个节点，`invoke` 返回状态。
@@ -274,7 +274,7 @@ note: 编译后的图的配置，取自同一个文件。
 **我们测得**一个循环的 agent，在 x86 服务器客户机上。用 Qwen3 4B 时，它做了 121 次模型调用，脚本在 1200 秒时把它停掉，而它没有任何要停的迹象。`recursion_limit=25` 让它在 13 次模型调用之后停下，3 次运行里 3 次如此。设一个适合你任务的上限，因为循环会为它做的每一次模型调用付费。
 
 ```takeaways
-- 预期模型在每次调用里都会收到系统提示词和整段对话。
+- 预期模型在每次调用里都会收到系统 prompt 和整段对话。
 - 读检查点上的 next，就知道恢复时哪个节点会运行。
 - 需要保存各步骤时，传入 checkpointer 和 thread_id。
 - 不带模式地流式输出，就为每次节点运行得到一个块。

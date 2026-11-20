@@ -32,8 +32,8 @@ const BLOCK = 4 * RH + 56;
 
 module.exports = figure('fig-7-4d', {
   height: Y0 + 2 * BLOCK + 40,
-  title: '每个任务的美元成本：朴素循环与 deep agent，有无提示词缓存',
-  desc: `在对数刻度上用点带展示每个任务的美元成本：Claude Haiku 5.5 的 99 个任务，Claude Sonnet 5.5 的 30 个任务。标价是按基础价格计算的输入与输出 token。计费是计入 API 报告的提示词缓存读取之后的成本。对所有任务，deep agent 在 Haiku 上按标价是 朴素循环的 ${ratio('claude-haiku-5-5', 'cost_u').toFixed(2)} 倍，按计费是 ${ratio('claude-haiku-5-5', 'cost').toFixed(2)} 倍，在 Sonnet 上分别是 ${ratio('claude-sonnet-5-5', 'cost_u').toFixed(2)} 倍和 ${ratio('claude-sonnet-5-5', 'cost').toFixed(2)} 倍。`,
+  title: '每个任务的美元成本：朴素循环与 deep agent，有无 prompt 缓存',
+  desc: `在对数刻度上用点带展示每个任务的美元成本：Claude Haiku 5.5 的 99 个任务，Claude Sonnet 5.5 的 30 个任务。标价是按基础价格计算的输入与输出 token。计费是计入 API 报告的 prompt 缓存读取之后的成本。对所有任务，deep agent 在 Haiku 上按标价是 朴素循环的 ${ratio('claude-haiku-5-5', 'cost_u').toFixed(2)} 倍，按计费是 ${ratio('claude-haiku-5-5', 'cost').toFixed(2)} 倍，在 Sonnet 上分别是 ${ratio('claude-sonnet-5-5', 'cost_u').toFixed(2)} 倍和 ${ratio('claude-sonnet-5-5', 'cost').toFixed(2)} 倍。`,
 }, f => {
   f.kicker(20, 22, '每个任务的美元成本，对数刻度');
   f.kicker(620, 22, '全部任务', { anchor: 'end' });

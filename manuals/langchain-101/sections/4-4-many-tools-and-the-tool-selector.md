@@ -9,7 +9,7 @@
 ## 结论 {#s-many-tools-and-the-tool-selector-the-position}
 
 - **把全部工具绑定给前沿模型。** Claude Haiku 5.5 在 5、20、50 和 100 个工具时都是 10 个任务全过，40 次运行中只出现一次干扰调用。
-- **开启提示词缓存，因为工具列表就是成本。** 100 个工具时，中位的运行发送了 44,645 个提示词 token，缓存把账单压到了标价的 36%。
+- **开启 prompt 缓存，因为工具列表就是成本。** 100 个工具时，中位的运行发送了 44,645 个 prompt token，缓存把账单压到了标价的 36%。
 - **在 `langchain` 1.5.0 上不要使用 `LLMToolSelectorMiddleware`。** 它的选择请求在消息里没有任何工具描述。在 Claude 上，它让调用次数、耗时和费用翻倍，却一无所获。在 Qwen3 4B 上，它让每种规模下的通过数都降到 10 个中的 1 个。
 - **在小型本地模型上，保持列表简短。** Qwen3 8B 在 5 到 50 个工具之间，从 10 个中 5 个降到 0 个。Qwen3 4B 在 100 个工具时仍保持 10 个中 5 个，但中位的一次运行耗时 53 秒。
 
@@ -22,7 +22,7 @@
 每种规模运行三种设置：
 
 - **无选择器：** 每次调用都绑定所有工具。
-- **选择器：** `LLMToolSelectorMiddleware`，用 agent 的模型，`max_tools=6`，`always_include=["submit_answer"]`，使用它的默认提示词。
+- **选择器：** `LLMToolSelectorMiddleware`，用 agent 的模型，`max_tools=6`，`always_include=["submit_answer"]`，使用它的默认 prompt。
 - **带列表的选择器：** 同上，另用我们自己的 `system_prompt`，其中加上每个工具的名称和描述。只有 Qwen3 模型运行了它。
 
 **我们测得**每次运行，在 Mac 上进行。Qwen3 4B 在四种规模上运行，Qwen3 8B 在 5 和 50 个工具上运行，都在 Ollama 上、温度为 0。Claude Haiku 5.5 通过 API 在四种规模上运行。每个格子是 10 个任务各一次。
@@ -56,14 +56,14 @@ caption: 每个方块是一个任务的一次运行。蓝色和梅紫色是通�
 
 ## 选择器发送什么 {#s-many-tools-and-the-tool-selector-what-the-selector-sends}
 
-`LLMToolSelectorMiddleware` 在 `wrap_model_call` 里运行，位于 agent 的每次模型调用之前。它构建一个两条消息的请求：它的系统提示词，附一句关于 `max_tools` 的说明，以及最后一条用户消息 {{code libs/langchain_v1/langchain/agents/middleware/tool_selection.py:402-405}}。它请求结构化输出，这个 schema 把每个工具名列为字面值，工具描述作为字段描述 {{code libs/langchain_v1/langchain/agents/middleware/tool_selection.py:63-94}}。
+`LLMToolSelectorMiddleware` 在 `wrap_model_call` 里运行，位于 agent 的每次模型调用之前。它构建一个两条消息的请求：它的系统 prompt，附一句关于 `max_tools` 的说明，以及最后一条用户消息 {{code libs/langchain_v1/langchain/agents/middleware/tool_selection.py:402-405}}。它请求结构化输出，这个 schema 把每个工具名列为字面值，工具描述作为字段描述 {{code libs/langchain_v1/langchain/agents/middleware/tool_selection.py:63-94}}。
 
 所以消息里没有工具列表。模块里有一个函数，把每个名称连同描述渲染出来，但在 1.5.0 里没有任何地方调用它 {{code libs/langchain_v1/langchain/agents/middleware/tool_selection.py:109-118}}。只有提供方把 schema 的字段描述展示给模型，描述才会到达模型。
 
 两个提供方的做法不同。`ChatAnthropic` 默认把 schema 变成工具 {{code libs/partners/anthropic/langchain_anthropic/chat_models.py:2880-2890}}，所以 Claude 把描述当作工具定义的一部分来读。`ChatOllama` 把 schema 作为请求的 `format` 发送 {{code libs/partners/ollama/langchain_ollama/chat_models.py}}。在 Qwen3 上，选择看起来像是只凭名称做出的挑选：
 
 - 在 20 个工具时，Qwen3 4B 在 10 次运行中有 8 次从未调用 `get_item_info`。它改为调用 `search_catalog` 和 `get_item_price_history` 这样的工具。
-- 我们在系统提示词里放上列表后，它在 20 个工具的 10 次运行里没有做干扰调用，却仍然只通过了 2 次。五个答案是错的，三次运行把工具调用写成了文本。
+- 我们在系统 prompt 里放上列表后，它在 20 个工具的 10 次运行里没有做干扰调用，却仍然只通过了 2 次。五个答案是错的，三次运行把工具调用写成了文本。
 
 选择器还只能看到最后一条用户消息。它永远看不到工具结果，所以不能添加 agent 在第一次查询之后才需要的工具。
 
@@ -86,39 +86,39 @@ note: 一行记录，只保留检查项、错误、答案和工具调用。
 
 ## token、耗时与费用 {#s-many-tools-and-the-tool-selector-tokens-time-and-dollars}
 
-**我们测得**每次运行的提示词 token，包含选择器调用。[图](#fig-4-4b)显示每一次运行。
+**我们测得**每次运行的 prompt token，包含选择器调用。[图](#fig-4-4b)显示每一次运行。
 
 ```figure
 id: fig-4-4b
 kind: chart
-title: 每次运行的提示词 token 与工具数量的关系
-claim: 在 Claude 上，提示词 token 从 5 个工具到 100 个增长了六倍；选择器削减了它们，同时让调用次数翻倍，加上缓存之后连费用也翻倍。
+title: 每次运行的 prompt token 与工具数量的关系
+claim: 在 Claude 上，prompt token 从 5 个工具到 100 个增长了六倍；选择器削减了它们，同时让调用次数翻倍，加上缓存之后连费用也翻倍。
 caption: 每个点是一次运行，纵轴是对数刻度，每条线连接各组的中位数。蓝色是无选择器，梅紫色是选择器。表格给出 10 次 Claude 运行的计费金额，以及 Qwen3 4B 运行的中位秒数。来自 capture/lab/bench/summary-mac.json。
 ```
 
-在 Claude Haiku 5.5 上、没有选择器时，中位的运行在 5 个工具时发送 7,380 个提示词 token，在 100 个工具时发送 44,645 个。每个工具 schema 都给每次调用增加负担。选择器把 100 个工具时的中位数削减到 33,277，却在 5 个工具时把它抬高了。带选择器的每次运行有 9 或 10 次模型调用，对比 4.5 至 5 次。
+在 Claude Haiku 5.5 上、没有选择器时，中位的运行在 5 个工具时发送 7,380 个 prompt token，在 100 个工具时发送 44,645 个。每个工具 schema 都给每次调用增加负担。选择器把 100 个工具时的中位数削减到 33,277，却在 5 个工具时把它抬高了。带选择器的每次运行有 9 或 10 次模型调用，对比 4.5 至 5 次。
 
 选择器让一次运行的耗时翻倍：中位数 10.2 至 12.6 秒，对比 5.0 至 5.9 秒。它也让账单翻倍。100 个工具时，10 次运行在没有选择器时花费 $0.016，有选择器时花费 $0.033。
 
 缓存解释了这笔账单。没有选择器时，100 个工具的 10 次运行按标价的 36% 计费。有选择器时，按 87% 计费。我们的解读是：选择会改变每次请求的工具列表，而工具位于缓存所匹配前缀的最前面。按标价、不用缓存的话，选择器在 100 个工具时本可节省 15%，在 5 和 20 个工具时则花得更多。
 
-在 Qwen3 4B 上，选择器确实节省了时间。没有它时，100 个工具的一次运行中位耗时 53 秒，5 个工具时是 8 秒。那次运行里，Ollama 读了 29,000 个提示词 token。有选择器时，一次运行耗时 6 到 18 秒。但它也在 10 次里失败了 9 次。
+在 Qwen3 4B 上，选择器确实节省了时间。没有它时，100 个工具的一次运行中位耗时 53 秒，5 个工具时是 8 秒。那次运行里，Ollama 读了 29,000 个 prompt token。有选择器时，一次运行耗时 6 到 18 秒。但它也在 10 次里失败了 9 次。
 
 ## 面对很长的工具列表怎么办 {#s-many-tools-and-the-tool-selector-what-to-do-with-a-long-tool-list}
 
 | 情形 | 这样做 | 背后的数字 |
 |---|---|---|
-| Claude Haiku 5.5，最多 100 个工具 | 全部绑定，并开启提示词缓存 | 40 次运行全过，100 个工具时 10 次运行花费 $0.016 |
+| Claude Haiku 5.5，最多 100 个工具 | 全部绑定，并开启 prompt 缓存 | 40 次运行全过，100 个工具时 10 次运行花费 $0.016 |
 | 小型本地模型 | 让列表贴近任务所需的工具 | Qwen3 8B 在 5 个工具时 10 个中 5 个，50 个时 10 个中 0 个 |
 | 你仍想用 `LLMToolSelectorMiddleware` | 传入一个列出每个名称和描述的 `system_prompt`，并在运行外围处理 `ValueError` | 有列表时 10 个中 2 至 4 个，没有时 10 个中 1 个 |
 | 运行之前你就知道任务类型 | 在自己的代码里选择工具，只绑定这些 | 我们没有测量这一项，它也不增加模型调用 |
 
 ```takeaways
-- 把每个工具都绑定给前沿模型，并为工具 schema 开启提示词缓存。
+- 把每个工具都绑定给前沿模型，并为工具 schema 开启 prompt 缓存。
 - 在 langchain 1.5.0 上，不要在生产里使用 LLMToolSelectorMiddleware。
-- 无论如何都要用选择器时，在选择器提示词里加一份工具描述列表。
+- 无论如何都要用选择器时，在选择器 prompt 里加一份工具描述列表。
 - 在带选择器的运行外围处理 ValueError，因为未知的工具名会结束运行。
-- 在本地模型上加工具之前，先测每次运行的耗时，因为读提示词的时间占主导。
+- 在本地模型上加工具之前，先测每次运行的耗时，因为读 prompt 的时间占主导。
 ```
 
 来源：capture/lab/bench/summary-mac.json, capture/lab/bench/summarize.py, capture/lab/bench/runs/toolscale.jsonl, capture/lab/bench/runs/cost-ledger.jsonl, capture/lab/bench/kit/toolscale.py, capture/lab/bench/kit/run.py, capture/lab/bench/kit/harnesses.py; libs/langchain_v1/langchain/agents/middleware/tool_selection.py at langchain==1.5.0; libs/partners/ollama/langchain_ollama/chat_models.py at langchain-ollama 1.1.0; libs/partners/anthropic/langchain_anthropic/chat_models.py at langchain-anthropic 1.7.10.

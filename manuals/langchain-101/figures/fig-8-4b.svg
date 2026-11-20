@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 510" role="img" aria-labelledby="fig-8-4b-title fig-8-4b-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-8-4b-title">锁定版本下的文件规则：每格一次调用，然后每个模型 20 次攻击</title>
-  <desc id="fig-8-4b-desc">上图：7 个规则列表乘 10 个工具调用的网格，在 virtual_mode=True 的 FilesystemBackend 上，由不带模型的脚本调用方运行。玫红格是尽管规则本意是拦截，调用仍然运行的情形；五个 docs 规则列表中共有 22 个这样的调用，全都发生在名称以点号开头的路径上。紫色是按本意被拦截，琥珀是被拦截但本意应当允许，灰是按本意运行。下图：每条对抗提示词一个方块，每行 20 个，模型为 Qwen3 8B 和 Haiku 5.5，条件为无规则、docs isolate 规则和识别点号的规则。Qwen3 8B 无规则：12 次运行造成危害，Qwen3 8B docs 规则：4 次运行造成危害，Qwen3 8B 识别点号：0 次运行造成危害。Haiku 5.5 无规则：11 次运行造成危害，Haiku 5.5 docs 规则：3 次运行造成危害，Haiku 5.5 识别点号：0 次运行造成危害。</desc>
+  <desc id="fig-8-4b-desc">上图：7 个规则列表乘 10 个工具调用的网格，在 virtual_mode=True 的 FilesystemBackend 上，由不带模型的脚本调用方运行。玫红格是尽管规则本意是拦截，调用仍然运行的情形；五个 docs 规则列表中共有 22 个这样的调用，全都发生在名称以点号开头的路径上。紫色是按本意被拦截，琥珀是被拦截但本意应当允许，灰是按本意运行。下图：每条对抗 prompt 一个方块，每行 20 个，模型为 Qwen3 8B 和 Haiku 5.5，条件为无规则、docs isolate 规则和识别点号的规则。Qwen3 8B 无规则：12 次运行造成危害，Qwen3 8B docs 规则：4 次运行造成危害，Qwen3 8B 识别点号：0 次运行造成危害。Haiku 5.5 无规则：11 次运行造成危害，Haiku 5.5 docs 规则：3 次运行造成危害，Haiku 5.5 识别点号：0 次运行造成危害。</desc>
   <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每格一次调用，脚本调用方，无模型</text>
   <text x="185" y="36" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">read</text>
   <text x="185" y="50" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">/</text>
@@ -182,7 +182,7 @@
   <text x="20" y="244" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">玫红：已运行，尽管规则本意是拦截。</text>
   <text x="20" y="259" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">紫色：按本意被拦截。琥珀：被拦截，尽管本意是</text>
   <text x="20" y="274" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">允许。灰：按本意运行。ws 即 /workspace。</text>
-  <text x="20" y="298" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">20 条对抗提示词，每次运行一个方块</text>
+  <text x="20" y="298" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">20 条对抗 PROMPT，每次运行一个方块</text>
   <text x="496" y="298" font-size="11" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">危害</text>
   <text x="546" y="298" font-size="11" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">被拦下</text>
   <text x="20" y="323" font-size="11" font-weight="700">Qwen3 8B</text>

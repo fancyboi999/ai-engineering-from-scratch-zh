@@ -2,7 +2,7 @@
   "id": "langchain-101",
   "title": "LangChain 101",
   "subtitle": "用 LangChain 1.5、LangGraph 1.2 和 Deep Agents 0.7 构建、运行、持久化并调试 agent，每项决策都有一份录制的实测答案",
-  "summary": "LangChain Python 技术栈如何把模型、工具和提示词变成 agent，以及你到底需不需要它。一套带状态检查器的任务集，把朴素循环、create_agent、LangGraph 和 Deep Agents 放在本地模型与 Claude 模型上并排比较。真实运行的追踪展示运行时内部，一个带 Postgres 与审批的 FastAPI 服务把它跑进生产。每份代码清单都来自对 langchain 1.5.0、langchain-core 1.8.0、langgraph 1.2.22 和 deepagents 0.7.38 的一次真实运行录制，每个实测数字都来自在真实模型上的录制运行。",
+  "summary": "LangChain Python 技术栈如何把模型、工具和 prompt 变成 agent，以及你到底需不需要它。一套带状态检查器的任务集，把朴素循环、create_agent、LangGraph 和 Deep Agents 放在本地模型与 Claude 模型上并排比较。真实运行的追踪展示运行时内部，一个带 Postgres 与审批的 FastAPI 服务把它跑进生产。每份代码清单都来自对 langchain 1.5.0、langchain-core 1.8.0、langgraph 1.2.22 和 deepagents 0.7.38 的一次真实运行录制，每个实测数字都来自在真实模型上的录制运行。",
   "audience": "你会写 Python，调用过聊天模型 API，也读过一些 LangChain 代码，可能是 0.x 年代的。你想在基于 1.x 技术栈构建之前，先弄清它到底做了什么。",
   "edition": "2026.11",
   "status": "ready",
@@ -187,7 +187,7 @@
       "number": 3,
       "title": "模型、消息与工具",
       "thesis": "模型提供方的包决定了 agent 能做的很多事，在我们的运行中 ChatOllama 丢掉了 tool_choice，所以信任默认值之前先测试每个包。",
-      "summary": "包地图与安装、init_chat_model 与模型档案、消息与内容块、带 ToolRuntime 的工具及其错误，以及系统提示词。",
+      "summary": "包地图与安装、init_chat_model 与模型档案、消息与内容块、带 ToolRuntime 的工具及其错误，以及系统 prompt。",
       "accent": "green",
       "sections": [
         {
@@ -338,7 +338,7 @@
     {
       "number": 7,
       "title": "生态",
-      "thesis": "每项集成都有可测量的成本；同样的任务，一个 deep agent 发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。",
+      "thesis": "每项集成都有可测量的成本；同样的任务，一个 deep agent 发送的 prompt token 是朴素循环的 3.6 到 4.3 倍。",
       "summary": "检索器与向量存储、检索 agent，以及通过 langchain.mcp 接入的 MCP 工具。然后是在任务集上实测的 Deep Agents 0.7、带子 agent 的 deep agent、LangSmith 追踪和评估。",
       "accent": "olive",
       "sections": [

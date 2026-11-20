@@ -14,7 +14,7 @@
 
 - [嵌入、切分器、向量存储与检索器](#s-embeddings-splitters-vector-stores-and-retrievers)：切分器、存储和 `create_retriever_tool`。
 - [工具、ToolRuntime 与工具错误](#s-tools-toolruntime-and-tool-errors)：模型只能看到 `ToolMessage` 的内容，所以来源路径要写进那段文本。
-- [系统提示词](#s-the-system-prompt)：每条论断都要引用来源，课程没有涉及某个问题时要说明。
+- [系统 prompt](#s-the-system-prompt)：每条论断都要引用来源，课程没有涉及某个问题时要说明。
 
 ## 流水线 {#s-a-retrieval-agent-over-a-local-corpus-the-pipeline}
 
@@ -38,7 +38,7 @@ class NomicEmbeddings(Embeddings):
 
 切分器把文件切成最多 1,000 个字符的块，重叠 150 个字符。`add_start_index=True` 保留每个块的偏移量，所以一个命中能指出文件里的位置。存储是 `InMemoryVectorStore`，每次运行都重建。
 
-工具来自 `create_retriever_tool`。它的文档提示词在每个段落前面用方括号写出路径。使用 `content_and_artifact` 时，文档还会作为 artifact 保留在消息上，脚本因此可以对照搜索返回的内容检查每条引用：
+工具来自 `create_retriever_tool`。它的文档 prompt 在每个段落前面用方括号写出路径。使用 `content_and_artifact` 时，文档还会作为 artifact 保留在消息上，脚本因此可以对照搜索返回的内容检查每条引用：
 
 ```listing
 title: 作为工具的检索器
@@ -110,7 +110,7 @@ note: 前四个命中已截掉，它们与 Qwen3 8B 那次运行相同。
 | 检查点的键 | 是 | 没有搜索，说没有涉及 | 搜索了，引用了正确的文件 |
 | 该买哪块 GPU | 语料里没有 | 说没有涉及 | 说没有涉及 |
 
-对语料能回答的四个问题，检索器都把正确的文件排在第一位。失败全是模型造成的。Qwen3 4B 对每个问题都凭自己对提示词的理解作答，从没调用 `search_lessons`。Qwen3 8B 有一次跳过了搜索，就是 reducer 那个问题。两个模型写出的每条引用，都是那次运行中某次搜索返回过的文件。
+对语料能回答的四个问题，检索器都把正确的文件排在第一位。失败全是模型造成的。Qwen3 4B 对每个问题都凭自己对 prompt 的理解作答，从没调用 `search_lessons`。Qwen3 8B 有一次跳过了搜索，就是 reducer 那个问题。两个模型写出的每条引用，都是那次运行中某次搜索返回过的文件。
 
 所以当回答说文档没有涉及某个问题时，先在追踪里查有没有工具调用，再去调检索器。没有搜索的运行是模型问题。有搜索但段落不对的运行是检索器问题。
 

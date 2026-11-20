@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 414" role="img" aria-labelledby="fig-7-4-title fig-7-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-4-title">三种框架下每次模型调用的提示词 token</title>
-  <desc id="fig-7-4-desc">点图，展示在 Mac 上用 Qwen3 8B 时每次模型调用的提示词 token 数，每个任务和框架各运行三次。trivial 任务中，朴素循环和 create_agent 发送了 28 个 token，Deep Agents 发送了 2279 个。tools 任务的各次调用为 205 和 275，对比 2374 和 2444。files 任务为 214, 262, 297，对比 2293, 2337, 2383。create_agent 每次调用发送的 token 数都与 朴素循环相同。</desc>
+  <title id="fig-7-4-title">三种框架下每次模型调用的 prompt token</title>
+  <desc id="fig-7-4-desc">点图，展示在 Mac 上用 Qwen3 8B 时每次模型调用的 prompt token 数，每个任务和框架各运行三次。trivial 任务中，朴素循环和 create_agent 发送了 28 个 token，Deep Agents 发送了 2279 个。tools 任务的各次调用为 205 和 275，对比 2374 和 2444。files 任务为 214, 262, 297，对比 2293, 2337, 2383。create_agent 每次调用发送的 token 数都与 朴素循环相同。</desc>
   <line x1="70" y1="306" x2="610" y2="306" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="310" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="70" y1="257.92" x2="610" y2="257.92" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -15,7 +15,7 @@
   <text x="64" y="69.62" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">2.5k</text>
   <line x1="70" y1="306" x2="610" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <line x1="70" y1="56" x2="70" y2="306" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
-  <text x="70" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次模型调用的提示词 token</text>
+  <text x="70" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次模型调用的 prompt token</text>
   <text x="160" y="22" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">TRIVIAL</text>
   <circle cx="115" cy="303.31" r="2.4" fill="var(--m-olive-ink, #515f26)"/>
   <circle cx="115" cy="303.31" r="3" fill="var(--m-olive-ink, #515f26)"/>
@@ -104,6 +104,6 @@
   <text x="565" y="324" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">deep</text>
   <text x="70" y="350" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个点是一次模型调用。同一次运行的各次调用并排排列。</text>
   <text x="70" y="368" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">同一格的三次运行相互重叠，因为每次重复发送的 token 数都相同。</text>
-  <text x="70" y="386" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">格子上方的数字是一次运行的提示词总数。</text>
+  <text x="70" y="386" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">格子上方的数字是一次运行的 prompt 总数。</text>
   <text x="70" y="404" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">朴素循环：基于 ollama 的循环。agent：create_agent。deep：create_deep_agent。</text>
 </svg>

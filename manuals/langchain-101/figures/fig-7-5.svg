@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-7-5-title fig-7-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-5-title">deep agent 每次模型调用的提示词 token</title>
-  <desc id="fig-7-5-desc">在 Mac 上用 Qwen3 8B 运行一次 deep agent，其 7 次模型调用的提示词 token 点图。主 agent 调用了 5 次，token 数为 3651, 3872, 4016, 4225, 4446，共 20210，绑定了 9 个工具。editor 子 agent 调用了 2 次，token 数为 1977 和 2113，共 4090，绑定了 7 个工具。</desc>
+  <title id="fig-7-5-title">deep agent 每次模型调用的 prompt token</title>
+  <desc id="fig-7-5-desc">在 Mac 上用 Qwen3 8B 运行一次 deep agent，其 7 次模型调用的 prompt token 点图。主 agent 调用了 5 次，token 数为 3651, 3872, 4016, 4225, 4446，共 20210，绑定了 9 个工具。editor 子 agent 调用了 2 次，token 数为 1977 和 2113，共 4090，绑定了 7 个工具。</desc>
   <line x1="70" y1="276" x2="610" y2="276" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="280" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">0</text>
   <line x1="70" y1="232" x2="610" y2="232" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
@@ -30,7 +30,7 @@
   <line x1="571.43" y1="276" x2="571.43" y2="280" stroke="var(--m-ink, #1a1a1a)" stroke-width="1"/>
   <text x="571.43" y="293" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">7</text>
   <text x="340" y="310" font-size="11.5" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型调用，按运行顺序</text>
-  <text x="70" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">该次调用的提示词 token</text>
+  <text x="70" y="44" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">该次调用的 prompt token</text>
   <circle cx="108.57" cy="115.36" r="4" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect class="m-knock" x="92.37" y="94.78" width="32.4" height="15" fill="var(--m-panel, #f3f1e8)"/>
   <text x="108.57" y="105.36" font-size="11" text-anchor="middle" fill="var(--m-blue-ink, #2f5d9a)">3651</text>

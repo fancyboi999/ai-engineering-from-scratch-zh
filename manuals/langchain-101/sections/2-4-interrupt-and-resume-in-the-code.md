@@ -79,7 +79,7 @@ caption: 列是按顺序排列的调用，行是四个节点。琥珀色单元�
 
 ## 重放的代价 {#s-interrupt-and-resume-in-the-code-what-the-replay-costs}
 
-这张图有五个模型提示词：`ask` 里两个，`approve`、`other` 和 `after` 里各一个。三次调用做了 9 次模型调用：
+这张图有五个模型 prompt：`ask` 里两个，`approve`、`other` 和 `after` 里各一个。三次调用做了 9 次模型调用：
 
 ```listing
 title: 图的每次调用的模型调用数

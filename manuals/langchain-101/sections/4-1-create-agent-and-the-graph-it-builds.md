@@ -2,13 +2,13 @@
 
 > `create_agent` 编译出一个 LangGraph 图：有一个 `model` 节点；有工具时有一个 `tools` 节点；每个中间件钩子各有一个节点；递归上限是 9999。
 
-你把一个模型、两个工具和一个提示词传给 `create_agent`，得到一个带 `invoke` 和 `stream` 的对象。它看起来像个聊天辅助函数。其实它是一个编译好的 LangGraph 图，agent 的每个错误、每个流块和每个检查点，都会指名它的某个节点。
+你把一个模型、两个工具和一个 prompt 传给 `create_agent`，得到一个带 `invoke` 和 `stream` 的对象。它看起来像个聊天辅助函数。其实它是一个编译好的 LangGraph 图，agent 的每个错误、每个流块和每个检查点，都会指名它的某个节点。
 
 读完本节，你能说出 `create_agent` 的每个参数增加了哪个节点，以及它们之间的循环何时停止。你还能读出编译后图上的默认值，并说清 agent 这一层的开销。
 
 ## create_agent 接受什么 {#s-create-agent-and-the-graph-it-builds-what-create-agent-takes}
 
-**create_agent：** `langchain.agents` 里的函数，把模型、工具、提示词和中间件变成一个 `CompiledStateGraph`。
+**create_agent：** `langchain.agents` 里的函数，把模型、工具、prompt 和中间件变成一个 `CompiledStateGraph`。
 
 锁定版本上的签名有两个位置参数和十三个关键字参数 {{code libs/langchain_v1/langchain/agents/factory.py}}。下表列出每个参数对图改变了什么：
 
@@ -24,7 +24,7 @@
 | `interrupt_before`、`interrupt_after` | `None` | 在指定节点之前或之后的静态暂停。 |
 | `name`、`debug`、`cache`、`transformers` | `None`、`False`、`None`、`None` | 图的名称、调试输出、节点缓存和流转换器。 |
 
-[第 3.2 节](#s-init-chat-model-and-model-profiles)展示模型字符串如何解析。[第 3.5 节](#s-the-system-prompt)说明提示词为什么不进入状态。
+[第 3.2 节](#s-init-chat-model-and-model-profiles)展示模型字符串如何解析。[第 3.5 节](#s-the-system-prompt)说明 prompt 为什么不进入状态。
 
 ## 节点 {#s-create-agent-and-the-graph-it-builds-the-nodes}
 
@@ -84,7 +84,7 @@ note: B 和 C 的节点已截去。它们遵循同样的模式。
 id: fig-4-1
 kind: structure
 title: create_agent 的每个参数构建了什么
-claim: 工具构建 tools 节点，中间件构建钩子节点和包装器，提示词和响应格式改变每一次模型调用，而没有自己的节点。
+claim: 工具构建 tools 节点，中间件构建钩子节点和包装器，prompt 和响应格式改变每一次模型调用，而没有自己的节点。
 caption: 从上往下读这三张图。每一张都向 create_agent 多加一个参数。实线边只有一个下一节点，琥珀色虚线边在运行时选择下一节点。来自 capture/out/05-agent-graph.txt 和 capture/out/09-middleware-order.txt。
 ```
 

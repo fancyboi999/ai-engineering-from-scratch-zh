@@ -30,7 +30,7 @@ const line = (f, x, y, w, content, hue, options = {}) => {
 module.exports = figure('fig-3-5', {
   height: 400,
   title: 'model 节点如何构建每个请求',
-  desc: `两行，每行对应 06-agent-run.txt 中那次运行的一次模型调用。每行左侧是调用之前的 state.messages，青色：调用 1 之前有 ${calls[0].messages.length - 1} 条消息，调用 2 之前有 ${calls[1].messages.length - 1} 条。中间是聊天模型收到的请求：先是紫色的系统提示词“${system.slice(8)}”，因为它不在状态里，所以用虚线；然后是来自状态的同样那些消息。一条梅紫色箭头把请求送到聊天模型。一条青色箭头把回复带回，model 节点把它追加到 state.messages：调用 1 之后是对 ${replies[0].tool_calls[0].name} 的工具调用，调用 2 之后是“${replies[1].content}”。两行之间，tools 节点追加 ToolMessage。状态最终有 ${final.length} 条消息，不含系统消息。`,
+  desc: `两行，每行对应 06-agent-run.txt 中那次运行的一次模型调用。每行左侧是调用之前的 state.messages，青色：调用 1 之前有 ${calls[0].messages.length - 1} 条消息，调用 2 之前有 ${calls[1].messages.length - 1} 条。中间是聊天模型收到的请求：先是紫色的系统 prompt“${system.slice(8)}”，因为它不在状态里，所以用虚线；然后是来自状态的同样那些消息。一条梅紫色箭头把请求送到聊天模型。一条青色箭头把回复带回，model 节点把它追加到 state.messages：调用 1 之后是对 ${replies[0].tool_calls[0].name} 的工具调用，调用 2 之后是“${replies[1].content}”。两行之间，tools 节点追加 ToolMessage。状态最终有 ${final.length} 条消息，不含系统消息。`,
 }, f => {
   f.kicker(20, 18, 'state.messages');
   f.kicker(236, 18, '请求');
@@ -64,7 +64,7 @@ module.exports = figure('fig-3-5', {
   f.beat(5);
   const end = 34 + 2 * ROW + 6;
   f.text(20, end + 10, `随后 tools 节点追加“${short(final[2])}”，调用 2 能看到它。`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, end + 28, `运行结束后 state.messages 有 ${final.length} 条消息，其中不含系统提示词。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, end + 28, `运行结束后 state.messages 有 ${final.length} 条消息，其中不含系统 prompt。`, { size: 11, serif: true, hue: 'ink-soft' });
   f.rect(20, end + 40, 14, 12, { fill: color('violet-fill'), stroke: color('violet-ink'), dash: 'dashed' });
   f.text(40, end + 50, 'create_agent 的 system_prompt：每次调用都先发送，从不保存', { size: 11, serif: true, hue: 'ink-soft' });
 });

@@ -12,7 +12,7 @@
 
 有三个限制决定了这一版能运行什么。带 Postgres 和 Redis 的完整 Agent Server，没有 LangSmith API 密钥或许可证密钥就起不来，见[第 8.1 节](#s-agent-server-langgraph-dev-up-and-deploy)。
 
-我们的 LangSmith 账户是新注册的免费计划账户。它跑过追踪、`evaluate`、pytest 插件和prompt hub，下面的列表里是它没覆盖到的内容。我们的本地模型是 Ollama 上的 Qwen3 0.6B 到 30B-A3B 和 gpt-oss 20B。Claude Haiku 5.5 和 Claude Sonnet 5.5 在固定预算下运行了[第 1.2 节](#s-do-you-need-langchain)的任务集。Claude Haiku 5.5 还运行了[第 9.6 节](#s-evals-that-check-state)的 20 个评估。下面其他托管服务的用例还没有运行。
+我们的 LangSmith 账户是新注册的免费计划账户。它跑过追踪、`evaluate`、pytest 插件和 prompt hub，下面的列表里是它没覆盖到的内容。我们的本地模型是 Ollama 上的 Qwen3 0.6B 到 30B-A3B 和 gpt-oss 20B。Claude Haiku 5.5 和 Claude Sonnet 5.5 在固定预算下运行了[第 1.2 节](#s-do-you-need-langchain)的任务集。Claude Haiku 5.5 还运行了[第 9.6 节](#s-evals-that-check-state)的 20 个评估。下面其他托管服务的用例还没有运行。
 
 下面每个列表都写明用例，以及文字在哪一节停下来。大多数图的用例不需要账户，只需要录制工具包里的一个新场景。
 
@@ -106,9 +106,9 @@
 - 开着默认遥测的 Agent Chat UI、生产构建，以及托管版本。[第 8.2 节](#s-agent-chat-ui-in-front-of-langgraph-dev)运行的是关闭遥测的开发构建。
 - 对着 `langgraph up`、带已部署的图，以及在它的透传路由前放上你自己的认证的 Agent Chat UI。[第 8.2 节](#s-agent-chat-ui-in-front-of-langgraph-dev)
 - 每种审批回答，以及在待处理审批上输入消息，不止一次试验。批准、编辑和拒绝各运行了一次，输入消息在每种模式下运行了一次。[第 8.2 节](#s-agent-chat-ui-in-front-of-langgraph-dev)
-- 文件规则攻击的发生率。20 个提示词在每个规则列表下各运行一次，所以表里数的是提示词，不是重复试验。[第 8.4 节](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)
+- 文件规则攻击的发生率。20 个 prompt 在每个规则列表下各运行一次，所以表里数的是 prompt，不是重复试验。[第 8.4 节](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)
 - 带 `interrupt` 模式、有真人回答的文件规则，以及没有 `execute` 路由的沙箱后端。[第 8.4 节](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)
-- `StoreBackend` 的命名空间工厂在其他模型上，以及用不点名 `/memories/` 的提示词。有一次用了更含糊的提示词，没有调用任何工具。[第 5.4 节](#s-stores-and-long-term-memory)
+- `StoreBackend` 的命名空间工厂在其他模型上，以及用不点名 `/memories/` 的 prompt。有一次用了更含糊的 prompt，没有调用任何工具。[第 5.4 节](#s-stores-and-long-term-memory)
 
 ## 没有这些运行时，哪些仍然成立 {#s-limits-at-the-pin-and-what-comes-in-the-next-edition-what-holds-without-these-runs}
 

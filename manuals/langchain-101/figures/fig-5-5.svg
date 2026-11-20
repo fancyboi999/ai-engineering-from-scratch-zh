@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-5-5-title fig-5-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-5-5-title">Qwen3 4B 上 200 轮的每轮耗时，有无摘要的对比</title>
-  <desc id="fig-5-5-desc">点图，展示每 25 轮为一块的每轮耗时中位数，纵轴为 1 到 1,000 秒的对数刻度，每个变体在 x86 服务器虚拟机上运行一次。没有摘要时，中位数从 4.7 s 增长到 18.6 s，运行在第 94 轮之后停止。空心圆圈标出它的第 88 到 94 轮，此时提示词已达 8,191 个 token，每轮耗时 308 到 621 s。设置了触发条件后，200 轮里每块的中位数都保持在 4.4 到 9.2 s 之间。每条线后面的阴影带覆盖每块中各轮的第 10 到第 90 百分位，其顶部是包含一次摘要调用的轮。</desc>
+  <desc id="fig-5-5-desc">点图，展示每 25 轮为一块的每轮耗时中位数，纵轴为 1 到 1,000 秒的对数刻度，每个变体在 x86 服务器虚拟机上运行一次。没有摘要时，中位数从 4.7 s 增长到 18.6 s，运行在第 94 轮之后停止。空心圆圈标出它的第 88 到 94 轮，此时 prompt 已达 8,191 个 token，每轮耗时 308 到 621 s。设置了触发条件后，200 轮里每块的中位数都保持在 4.4 到 9.2 s 之间。每条线后面的阴影带覆盖每块中各轮的第 10 到第 90 百分位，其顶部是包含一次摘要调用的轮。</desc>
   <line x1="70" y1="290" x2="450" y2="290" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>
   <text x="64" y="294" font-size="11" text-anchor="end" fill="var(--m-ink-soft, #4a4a4a)">1</text>
   <line x1="70" y1="250.24" x2="450" y2="250.24" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.25"/>

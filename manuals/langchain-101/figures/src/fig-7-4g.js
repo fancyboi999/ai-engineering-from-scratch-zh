@@ -6,10 +6,10 @@ const { load } = require('../../../_shared/chart.js');
 
 const S = load(path.join(__dirname, '../../capture/lab/bench2/summary-bench2.json'));
 const H = S.ptc['claude-haiku-5-5'];
-const ARMS = [['ptc', 'eval 工具，普通提示词', 'green'], ['nudge', 'eval 工具，提示词要求使用', 'indigo']];
+const ARMS = [['ptc', 'eval 工具，普通 prompt', 'green'], ['nudge', 'eval 工具，prompt 要求使用', 'indigo']];
 const METRICS = [
   ['模型调用', c => c.calls_sum, v => String(v)],
-  ['提示词 token', c => c.in_sum, v => `${(v / 1e6).toFixed(2)}M`],
+  ['prompt token', c => c.in_sum, v => `${(v / 1e6).toFixed(2)}M`],
   ['输出 token', c => c.out_sum, v => `${(v / 1000).toFixed(1)}k`],
   ['美元', c => c.cost, v => `$${v.toFixed(3)}`],
   ['eval 调用', c => c.eval_calls, v => String(v)],
@@ -30,8 +30,8 @@ const ev = a => ids.filter(t => H[a].tasks[t].ev > 0).length;
 
 module.exports = figure('fig-7-4g', {
   height: BARS_Y + METRICS.length * (2 * RH + GAP) + 50,
-  title: 'Claude Haiku 5.5 带 eval 工具，提示词有无要求使用',
-  desc: `两条带，对应 39 个 chain 与 sql 任务，每个任务一个方块，显示哪些运行调用了 eval 工具：提示词没有要求时 ${ev('ptc')} 次，提示词要求时 ${ev('nudge')} 次。两组中每个任务都通过。下方的成对条形比较两组的模型调用数、提示词 token、输出 token、美元、eval 调用数和 eval 错误数：调用数分别为 ${H.ptc.calls_sum} 和 ${H.nudge.calls_sum}，成本分别为 $${H.ptc.cost.toFixed(3)} 和 $${H.nudge.cost.toFixed(3)}。`,
+  title: 'Claude Haiku 5.5 带 eval 工具，prompt 有无要求使用',
+  desc: `两条带，对应 39 个 chain 与 sql 任务，每个任务一个方块，显示哪些运行调用了 eval 工具：prompt 没有要求时 ${ev('ptc')} 次，prompt 要求时 ${ev('nudge')} 次。两组中每个任务都通过。下方的成对条形比较两组的模型调用数、prompt token、输出 token、美元、eval 调用数和 eval 错误数：调用数分别为 ${H.ptc.calls_sum} 和 ${H.nudge.calls_sum}，成本分别为 $${H.ptc.cost.toFixed(3)} 和 $${H.nudge.cost.toFixed(3)}。`,
 }, f => {
   f.kicker(20, 22, '每个方块是一个任务');
   f.kicker(620, 22, `${ids.length} 个任务，全部通过`, { anchor: 'end' });
@@ -64,5 +64,5 @@ module.exports = figure('fig-7-4g', {
     y += 2 * RH + GAP;
   });
   f.beat(0);
-  f.text(20, y + 2, '绿色是普通提示词，靛蓝是要求使用 eval 的提示词。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 2, '绿色是普通 prompt，靛蓝是要求使用 eval 的 prompt。', { size: 11, serif: true, hue: 'ink-soft' });
 });

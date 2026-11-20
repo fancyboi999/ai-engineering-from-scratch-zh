@@ -20,7 +20,7 @@
 
 ## 录下一次 agent 运行 {#s-the-superstep-loop-plan-execute-update-one-agent-run-captured}
 
-我们给 `langgraph` 1.2.22 的循环函数打了补丁，记录每次调用。然后在 x86 服务器客户机上，用 Ollama 上的 Qwen3 4B，在 temperature 0 下运行 `create_agent`。提示词是 `Weather in Paris and Oslo?`。模型在第一次回复里要求两次 `get_weather` 调用，用了 3.64 秒，在第二次回复里作答，用了 1.59 秒。这些时间来自负载较高的客户机上的一次运行，所以请看顺序和计数，不要看秒数。下面是追踪的步骤 1 和步骤 2：
+我们给 `langgraph` 1.2.22 的循环函数打了补丁，记录每次调用。然后在 x86 服务器客户机上，用 Ollama 上的 Qwen3 4B，在 temperature 0 下运行 `create_agent`。prompt 是 `Weather in Paris and Oslo?`。模型在第一次回复里要求两次 `get_weather` 调用，用了 3.64 秒，在第二次回复里作答，用了 1.59 秒。这些时间来自负载较高的客户机上的一次运行，所以请看顺序和计数，不要看秒数。下面是追踪的步骤 1 和步骤 2：
 
 ```listing
 title: 模型步骤和工具步骤的计划、执行与更新
@@ -116,7 +116,7 @@ caption: 每一行是一次运行。左边是节点按返回顺序排列，带�
 
 循环把 `stop` 设为当前步骤加上限再加一，当步骤超过 `stop` 时失败 {{code libs/langgraph/langgraph/pregel/_loop.py:1923}} {{code libs/langgraph/langgraph/pregel/_loop.py:666}}。所以这个上限数的是超步，而隐藏的 `__start__` 步骤也是其中之一。
 
-**我们测得**这个计数，在 x86 服务器客户机上用 Qwen3 4B，每个上限一次运行。提示词让模型在每一轮都调用工具：
+**我们测得**这个计数，在 x86 服务器客户机上用 Qwen3 4B，每个上限一次运行。prompt 让模型在每一轮都调用工具：
 
 | `recursion_limit` | 运行的超步数 | 报错前的模型调用数 |
 |---|---|---|

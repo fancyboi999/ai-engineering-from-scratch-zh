@@ -152,7 +152,7 @@ note: 四个块中的第一个和最后一个。
 
 ## 多个 agent 的模式 {#s-subgraphs-and-multi-agent-patterns-patterns-for-several-agents}
 
-文档的 multi-agent 页面列出了五种模式：subagents、`handoffs`、skills、路由器（router）和自定义工作流 {{docs oss/python/langchain/multi-agent/index}}。它还说，配备合适工具和提示词的单个 agent，往往和多个 agent 做得一样好。subagents 页面说，`langgraph-supervisor` 包已不再维护 {{docs oss/python/langchain/multi-agent/subagents}}。
+文档的 multi-agent 页面列出了五种模式：subagents、`handoffs`、skills、路由器（router）和自定义工作流 {{docs oss/python/langchain/multi-agent/index}}。它还说，配备合适工具和 prompt 的单个 agent，往往和多个 agent 做得一样好。subagents 页面说，`langgraph-supervisor` 包已不再维护 {{docs oss/python/langchain/multi-agent/subagents}}。
 
 **子 agent（subagent）：** 被另一个 agent 当作工具调用的 agent。调用方只能看到子 agent 的最后一条消息。
 
@@ -177,23 +177,23 @@ note: 主 agent 的第四次模型调用，以及回答它的 ToolMessage。
     "name": "task",
 ```
 
-子 agent 的模型调用是六次调用中的第五次。它收到两条消息，即它自己的系统提示词和那条描述，而且它的工具里没有 `task`。主 agent 只看到一条带有子 agent 回答的 `ToolMessage`。所以子 agent 把它的工作过程挡在调用方的上下文之外。第 7 部分会讲 Deep Agents。
+子 agent 的模型调用是六次调用中的第五次。它收到两条消息，即它自己的系统 prompt 和那条描述，而且它的工具里没有 `task`。主 agent 只看到一条带有子 agent 回答的 `ToolMessage`。所以子 agent 把它的工作过程挡在调用方的上下文之外。第 7 部分会讲 Deep Agents。
 
 ## 同一套任务上的五种模式 {#s-subgraphs-and-multi-agent-patterns-five-patterns-on-one-task-suite}
 
 **我们测得**五种模式，任务取自[第 1.2 节](#s-do-you-need-langchain)那 30 个任务的子集，使用 `langchain` 1.5.0 和 `deepagents` 0.7.38。五个领域 agent 分担任务集的工具：`shop`、`orders_db`、`docs`、`files` 和 `notes`。这些模式是：
 
-- **single：** 一个 agent 拥有全部工具，提示词里带着五份领域指南。
+- **single：** 一个 agent 拥有全部工具，prompt 里带着五份领域指南。
 - **subagents：** 一个 Deep Agents 协调者，通过 `task` 调用每个领域 agent。
 - **`handoffs`：** 领域 agent 作为图的节点，配有返回 `Command(goto=..., graph=Command.PARENT)` 的 `transfer_to_<agent>` 工具。
-- **skills：** 一个 agent 带有 `load_skill` 工具，把领域指南加进自己的提示词。
+- **skills：** 一个 agent 带有 `load_skill` 工具，把领域指南加进自己的 prompt。
 - **router：** 一个分类器把并行请求发给各个领域 agent，再交给一个综合者 agent。
 
 Claude Haiku 5.5 从 Mac 通过 API 运行。Qwen3 14B 在同一台 Mac 上的 Ollama 0.31.1 上运行，temperature 为 0，seed 为 42。每个单元格对 30 个任务各运行一次。
 
 这台 Mac 是共享的。我们记录的六次采样里，负载均值在 2.7 到 9.1 之间。Ollama 服务器还在忙别的任务。我们在 gpt-oss 20B 的第一个任务之前就停掉了它的运行，所以它没有数据行。
 
-| 模式 | Haiku 通过数 | Haiku 调用数 | Haiku 提示词 token | Haiku 费用 | 14B 通过数 | 14B 调用数 | 14B 提示词 token |
+| 模式 | Haiku 通过数 | Haiku 调用数 | Haiku prompt token | Haiku 费用 | 14B 通过数 | 14B 调用数 | 14B prompt token |
 |---|---|---|---|---|---|---|---|
 | single | 30 | 160 | 521,013 | $0.0130 | 22 | 140 | 251,620 |
 | subagents | 30 | 271 | 1,247,292 | $0.0380 | 17 | 164 | 425,288 |
@@ -201,7 +201,7 @@ Claude Haiku 5.5 从 Mac 通过 API 运行。Qwen3 14B 在同一台 Mac 上的 O
 | skills | 30 | 194 | 314,352 | $0.0129 | 15 | 159 | 151,631 |
 | router | 25 | 226 | 317,648 | $0.0237 | 18 | 187 | 105,174 |
 
-在 Haiku 上，四种模式 30 个任务全部通过，router 通过 25 个。router 丢了 3 个链式任务，sql 和检索各丢 1 个，类别都是 `wrong_final_state`。成本的差异比得分的差异更大。subagents 模式用掉的提示词 token 是单个 agent 的 2.4 倍，费用是 2.9 倍。`handoffs` 和 skills 模式的费用与单个 agent 相当。[图](#fig-6-7c)展示了每种模式里的一个链式任务。
+在 Haiku 上，四种模式 30 个任务全部通过，router 通过 25 个。router 丢了 3 个链式任务，sql 和检索各丢 1 个，类别都是 `wrong_final_state`。成本的差异比得分的差异更大。subagents 模式用掉的 prompt token 是单个 agent 的 2.4 倍，费用是 2.9 倍。`handoffs` 和 skills 模式的费用与单个 agent 相当。[图](#fig-6-7c)展示了每种模式里的一个链式任务。
 
 ```figure
 id: fig-6-7c
@@ -211,7 +211,7 @@ claim: 在同一个链式任务上，五种模式用了 5 到 7 次模型调用�
 caption: 每个方框是一次模型调用，按顺序编号，位于发起它的 agent 所在的泳道。三角形标记工具调用。来源：capture/lab/summary/multiagent-mac.json。
 ```
 
-有三个用户轮次的任务，更能看出一种模式的成本。在 `multi07` 上，每种模式都通过了。单个 agent 发起 9 次模型调用，读了 30.2k 个提示词 token。subagents 模式发起 16 次调用，读了 72.6k，router 发起 18 次调用。[图](#fig-6-7d)画出了这五次运行，并标出每个用户轮次的开始。
+有三个用户轮次的任务，更能看出一种模式的成本。在 `multi07` 上，每种模式都通过了。单个 agent 发起 9 次模型调用，读了 30.2k 个 prompt token。subagents 模式发起 16 次调用，读了 72.6k，router 发起 18 次调用。[图](#fig-6-7d)画出了这五次运行，并标出每个用户轮次的开始。
 
 ```figure
 id: fig-6-7d

@@ -47,16 +47,16 @@ note: Qwen3 8B 用朴素循环的一行记录，截取结果、工具调用、�
 
 **严格通过：** 答案同时通过 `submit_answer` 给出的通过。Qwen3 4B 用朴素循环通过了 99 个任务中的 70 个，严格通过 20 个。它经常在回复里写出正确的数字，却从不调用那个工具。Claude Haiku 5.5 每次都调用。
 
-## 四种 harness，同一个提示词 {#s-do-you-need-langchain-four-harnesses-one-prompt}
+## 四种 harness，同一个 prompt {#s-do-you-need-langchain-four-harnesses-one-prompt}
 
-每种 harness 拿到同样的系统提示词、同样的工具，以及每个用户轮次最多 10 次模型调用的上限。
+每种 harness 拿到同样的系统 prompt、同样的工具，以及每个用户轮次最多 10 次模型调用的上限。
 
 - **朴素循环：** 我们自己写在 `bind_tools` 上的循环。它调用模型，运行每个工具调用，追加一条 `ToolMessage`，并在模型不再要求工具时停止。它在工具包里是 27 行。
 - **`create_agent`：** `langchain` 1.5.0 的 agent，带 `InMemorySaver`。
 - **手写 `StateGraph`：** 一个模型节点、一个 `ToolNode`，以及来自 `langgraph` 1.2.22 的 `tools_condition`，带 `InMemorySaver`。它就是 `create_agent` 构建的那张图，只是手写。
 - **Deep agent：** `deepagents` 0.7.38 的 `create_deep_agent`，用它的默认后端和我们的工具。它增加文件工具、一个 `task` 工具和它的中间件栈，[第 7.4 节](#s-deep-agents-0-7)会展示。
 
-本地模型在 Ollama 上以 temperature 0 和 seed 42 运行。Claude 对这些模型不接受 temperature，所以工具包没有发送，每个任务只运行一次。在 Claude 上，朴素循环把它的系统提示词标记为提示词缓存。deep agent 自己增加了一个缓存中间件。
+本地模型在 Ollama 上以 temperature 0 和 seed 42 运行。Claude 对这些模型不接受 temperature，所以工具包没有发送，每个任务只运行一次。在 Claude 上，朴素循环把它的系统 prompt 标记为 prompt 缓存。deep agent 自己增加了一个缓存中间件。
 
 ## 结果 {#s-do-you-need-langchain-results}
 
@@ -84,9 +84,9 @@ caption: 每一列是一个任务，按家族分组，每一行是一个模型�
 
 ### 三种 harness，同一组请求 {#s-do-you-need-langchain-three-harnesses-one-set-of-requests}
 
-在 Qwen3 4B 和 Qwen3 8B 上，朴素循环、`create_agent` 和 `StateGraph` 在各自的 30 个任务中，每一个的结果都相同。它们的最终文本、工具调用和 token 数也相同。工具包为其中 42 组任务对保留了每次调用的提示词 token，全部 198 次调用都一致。
+在 Qwen3 4B 和 Qwen3 8B 上，朴素循环、`create_agent` 和 `StateGraph` 在各自的 30 个任务中，每一个的结果都相同。它们的最终文本、工具调用和 token 数也相同。工具包为其中 42 组任务对保留了每次调用的 prompt token，全部 198 次调用都一致。
 
-用贪心解码时，输出相同意味着模型看到的是同一个请求。所以 `create_agent` 和 LangGraph 没有增加隐藏的提示词、额外的工具或重新排序。[第 8.3 节](#s-cost-the-framework-against-a-plain-sdk-loop)用代理也找到了相同的提示词 token。
+用贪心解码时，输出相同意味着模型看到的是同一个请求。所以 `create_agent` 和 LangGraph 没有增加隐藏的 prompt、额外的工具或重新排序。[第 8.3 节](#s-cost-the-framework-against-a-plain-sdk-loop)用代理也找到了相同的 prompt token。
 
 ### Deep Agents：在 Claude 上持平，在小模型上更差 {#s-do-you-need-langchain-deep-agents-equal-on-claude-worse-on-small-models}
 
@@ -135,16 +135,16 @@ caption: 顶部各行给出这 30 个任务的通过数、模型调用数的中�
 ```figure
 id: fig-1-2b
 kind: chart
-title: 模型之外的耗时，以及 deep agent 的提示词 token
+title: 模型之外的耗时，以及 deep agent 的 prompt token
 claim: 框架每个任务的中位数为 6 到 67 毫秒，而模型耗时以秒计，deep agent 发送的 token 是 3.6 到 4.3 倍。
-caption: 左图每个点是一个任务，纵轴为对数刻度，黑线是中位数。右图每个点是一个任务：deep agent 的提示词 token 除以朴素循环的。黑线是总和之比。来源：capture/lab/bench/summary-mac.json。
+caption: 左图每个点是一个任务，纵轴为对数刻度，黑线是中位数。右图每个点是一个任务：deep agent 的 prompt token 除以朴素循环的。黑线是总和之比。来源：capture/lab/bench/summary-mac.json。
 ```
 
 在 30 个任务的子集上用 Qwen3 4B，朴素循环的中位数是 6.2 毫秒，`create_agent` 是 22.5 毫秒。`StateGraph` 是 18.5 毫秒，deep agent 是 55.2 毫秒。朴素循环下每个任务的模型耗时是 9.7 秒。用 Claude Haiku 5.5 跑 99 个任务，朴素的中位数是 8.4 毫秒，deep 的是 66.5 毫秒，模型耗时则是 5.0 秒。
 
 按占墙钟时间的比例算，框架在每个本地单元格里都不到 0.5%。在 Claude 上，朴素循环占 0.24%，deep agent 占 1.43%，因为托管模型回答得更快。在 Claude Sonnet 5.5 上，deep agent 的中位数是 90.8 毫秒。在 498 次模型调用上，Haiku 上的 deep agent 每次调用比朴素循环多花约 14 毫秒。
 
-deep agent 在每个模型上发送的 token 都更多。在两种 harness 都运行过的任务上，它发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。原因是每次调用都带着它自己那些工具的 schema。在 Qwen3 4B 和 8B、gpt-oss 和 Claude 上，它的调用次数中位数与朴素循环一致：本地是 4，Claude 上是 5。在 Qwen3 14B 上，朴素循环是 5，deep agent 是 4。在 30B 模型上，朴素循环是 3.5，deep agent 是 4。
+deep agent 在每个模型上发送的 token 都更多。在两种 harness 都运行过的任务上，它发送的 prompt token 是朴素循环的 3.6 到 4.3 倍。原因是每次调用都带着它自己那些工具的 schema。在 Qwen3 4B 和 8B、gpt-oss 和 Claude 上，它的调用次数中位数与朴素循环一致：本地是 4，Claude 上是 5。在 Qwen3 14B 上，朴素循环是 5，deep agent 是 4。在 30B 模型上，朴素循环是 3.5，deep agent 是 4。
 
 在本地模型上，这些 token 要花时间。在 Qwen3 4B 上，任务耗时的中位数，deep agent 是 22.6 秒，朴素循环是 9.1 秒。
 
@@ -159,7 +159,7 @@ deep agent 在每个模型上发送的 token 都更多。在两种 harness 都�
 | Claude Sonnet 5.5，朴素循环 | 30 | $0.263 | $0.0088 | $0.507 |
 | Claude Sonnet 5.5，deep agent | 30 | $0.327 | $0.0109 | $1.591 |
 
-提示词缓存抹平了 token 差距的大部分。在 Haiku 上，deep agent 花费是朴素循环的 1.16 倍，在 Sonnet 上是 1.24 倍。按标价不用缓存的话，分别是 3.10 倍和 3.14 倍。[第 7.4 节](#s-deep-agents-0-7)展示每个任务。
+prompt 缓存抹平了 token 差距的大部分。在 Haiku 上，deep agent 花费是朴素循环的 1.16 倍，在 Sonnet 上是 1.24 倍。按标价不用缓存的话，分别是 3.10 倍和 3.14 倍。[第 7.4 节](#s-deep-agents-0-7)展示每个任务。
 
 整个测试基准用 2,589 次 API 调用，花费 $0.93。[第 9.6 节](#s-evals-that-check-state)的评估增加了 64 次 Claude 调用，花费 $0.011。第二个测试基准增加了 370 次调用，花费 $0.069，[第 6.7 节](#s-subgraphs-and-multi-agent-patterns)的多 agent 运行增加了 1,518 次调用，花费 $0.150。
 
@@ -197,7 +197,7 @@ Deep Agents 的模型页展示了 13 个模型在一套评估集上的分数 {{d
 | 单进程里的工具循环，不暂停，不恢复，重启后没有历史 | 朴素循环 | 在 60 个任务中的 60 个上，结果、token 和文本与 `create_agent` 相同，每个任务 6 毫秒 |
 | 你需要 checkpointer、流模式、审批或中间件 | `create_agent` | 请求与朴素循环相同，每个任务多 12 到 16 毫秒，占任务耗时的 0.20% 到 0.25% |
 | 你需要分支、并行节点或子图 | 手写 `StateGraph` | 在循环形态上与 `create_agent` 的请求相同，每个任务 18.5 毫秒 |
-| 带提示词缓存的前沿模型，并且你想要文件工具和子 agent | Deep Agents | Haiku 上 99 个中的 99 个，Sonnet 上 30 个中的 30 个，花费是 1.16 到 1.24 倍 |
+| 带 prompt 缓存的前沿模型，并且你想要文件工具和子 agent | Deep Agents | Haiku 上 99 个中的 99 个，Sonnet 上 30 个中的 30 个，花费是 1.16 到 1.24 倍 |
 | Ollama 上的本地模型 | 朴素循环或 `create_agent`，绝不用默认的 deep agent | Qwen3 4B 和 8B 在 99 个里分别少 15 和 16 个，14B 和 20B 在 30 个里少 2 到 4 个 |
 | 前沿模型，并且你想要不带框架的 Claude 工具循环 | Claude Agent SDK | Haiku 上 30 个中的 30 个，输入 token 中位数 9.3k，deep agent 是 23.7k |
 | 你想要更好的分数 | 更好的模型 | 不同模型之间是 30 个里的 15 到 30 个，三种朴素 harness 之间是 0 |
@@ -215,7 +215,7 @@ Claude 的几行已经到了天花板。两个 Claude 模型都全部通过的�
 - 按工具留下的状态检查 agent，绝不按它的最终文本。
 - 换 harness 之前，先在两个模型上跑你自己的任务。
 - 别让小型本地模型用默认的 deep agent。
-- 评判 Deep Agents 的 token 成本之前，先打开提示词缓存。
+- 评判 Deep Agents 的 token 成本之前，先打开 prompt 缓存。
 ```
 
 来源：capture/lab/bench/summary-mac.json, capture/lab/bench/summarize.py, capture/lab/bench2/docs-eval-table.json, capture/lab/bench2/summary-bench2.json, capture/lab/summary/multiagent-mac.json, capture/lab/multiagent/runs/n9-sdk-haiku.jsonl, capture/lab/multiagent/runs/n9-deep-haiku.jsonl, capture/lab/bench/runs/main.jsonl, capture/lab/bench/runs/models.jsonl, capture/lab/bench/runs/cost-ledger.jsonl, capture/lab/bench/data/tasks.jsonl, capture/lab/bench/data/subset30.txt, capture/lab/bench/data/anthropic-prices.json, capture/lab/bench/kit/harnesses.py, capture/lab/bench/kit/checks.py, capture/lab/bench/kit/env.py, capture/lab/bench/kit/gen_tasks.py, capture/lab/bench/kit/oracle.py, capture/lab/bench/kit/run.py, capture/lab/bench/kit/models.py; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0; libs/langgraph/langgraph/prebuilt at langgraph 1.2.22; libs/deepagents/deepagents/graph.py at deepagents==0.7.38; the Anthropic pricing page, read 2026-11-14; docs.langchain.com at docs commit 04d4d4a (oss/python/deepagents/models).

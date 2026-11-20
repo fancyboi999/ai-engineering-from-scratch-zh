@@ -27,7 +27,7 @@ class FinalAnswer(BaseModel):
     answer: str = Field(description="Only the final answer value: a number or a name, with no units and no explanation.")
 ```
 
-agent 有该族的查询工具，没有 `submit_answer`。系统提示词要求它以最终答案的值结束。四种方法在同样的任务上运行：
+agent 有该族的查询工具，没有 `submit_answer`。系统 prompt 要求它以最终答案的值结束。四种方法在同样的任务上运行：
 
 - **自由文本：** 没有 `response_format`。工具包取最终回复的最后一个数字，名称则取整条回复。
 - **`ToolStrategy`：** `response_format=ToolStrategy(FinalAnswer)`。
@@ -117,7 +117,7 @@ note: 自由文本方法的一行记录，只保留工具包读到的值、真�
 
 ## 成本与时间 {#s-structured-output-which-strategy-on-which-provider-cost-and-time}
 
-**我们测得**四种方法的成本，在 Claude Haiku 5.5 上对 39 个任务按标价计算。工具包的结构化输出运行器没有加提示词缓存，所以这些数字没有缓存折扣。
+**我们测得**四种方法的成本，在 Claude Haiku 5.5 上对 39 个任务按标价计算。工具包的结构化输出运行器没有加 prompt 缓存，所以这些数字没有缓存折扣。
 
 | Claude Haiku 5.5 上的方法 | 正确数 | 模型调用，中位数 | 39 个任务的成本 | 每个任务的时间，中位数 |
 |---|---|---|---|---|
@@ -126,7 +126,7 @@ note: 自由文本方法的一行记录，只保留工具包读到的值、真�
 | `ProviderStrategy` | 39 | 4 | $0.0284 | 5.0 秒 |
 | 提取调用 | 39 | 5 | $0.0307 | 4.3 秒 |
 
-提取调用比 `ProviderStrategy` 贵 8%，换来多一次带短提示词的模型调用。在 Qwen3 4B 上，它每个任务的中位耗时是 9.3 秒，自由文本是 9.8 秒，因为简短的提取调用很快。
+提取调用比 `ProviderStrategy` 贵 8%，换来多一次带短 prompt 的模型调用。在 Qwen3 4B 上，它每个任务的中位耗时是 9.3 秒，自由文本是 9.8 秒，因为简短的提取调用很快。
 
 ## 哪个提供方用哪种方法 {#s-structured-output-which-strategy-on-which-provider-which-method-on-which-provider}
 

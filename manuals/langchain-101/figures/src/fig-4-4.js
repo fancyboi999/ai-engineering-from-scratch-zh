@@ -74,5 +74,5 @@ module.exports = figure('fig-4-4', {
   f.rect(510, ly - 10, 6, 12, { fill: color('ink'), stroke: 'none' });
   f.text(522, ly, '抛出异常', { size: 11, serif: true, hue: 'ink-soft' });
   f.text(20, ly + 22, '每组后面的数字是 10 次中的通过数。工具：5 个查询、干扰项，以及 submit_answer。', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ly + 40, '选择器 + 列表：我们自己的系统提示词，附上每个工具的名称和描述。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ly + 40, '选择器 + 列表：我们自己的系统 prompt，附上每个工具的名称和描述。', { size: 11, serif: true, hue: 'ink-soft' });
 });

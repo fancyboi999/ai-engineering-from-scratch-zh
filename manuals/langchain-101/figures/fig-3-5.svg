@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-labelledby="fig-3-5-title fig-3-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-3-5-title">model 节点如何构建每个请求</title>
-  <desc id="fig-3-5-desc">两行，每行对应 06-agent-run.txt 中那次运行的一次模型调用。每行左侧是调用之前的 state.messages，青色：调用 1 之前有 1 条消息，调用 2 之前有 3 条。中间是聊天模型收到的请求：先是紫色的系统提示词“You add numbers.”，因为它不在状态里，所以用虚线；然后是来自状态的同样那些消息。一条梅紫色箭头把请求送到聊天模型。一条青色箭头把回复带回，model 节点把它追加到 state.messages：调用 1 之后是对 add 的工具调用，调用 2 之后是“2 + 3 = 5.”。两行之间，tools 节点追加 ToolMessage。状态最终有 4 条消息，不含系统消息。</desc>
+  <desc id="fig-3-5-desc">两行，每行对应 06-agent-run.txt 中那次运行的一次模型调用。每行左侧是调用之前的 state.messages，青色：调用 1 之前有 1 条消息，调用 2 之前有 3 条。中间是聊天模型收到的请求：先是紫色的系统 prompt“You add numbers.”，因为它不在状态里，所以用虚线；然后是来自状态的同样那些消息。一条梅紫色箭头把请求送到聊天模型。一条青色箭头把回复带回，model 节点把它追加到 state.messages：调用 1 之后是对 add 的工具调用，调用 2 之后是“2 + 3 = 5.”。两行之间，tools 节点追加 ToolMessage。状态最终有 4 条消息，不含系统消息。</desc>
   <defs><marker id="fig-3-5-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-3-5-head-plum" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-plum-ink, #8a3d72)"/></marker><marker id="fig-3-5-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker></defs>
   <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">STATE.MESSAGES</text>
   <text x="236" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">请求</text>
@@ -73,7 +73,7 @@
   </g>
   <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
   <text x="20" y="350" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">随后 tools 节点追加“tool: 5”，调用 2 能看到它。</text>
-  <text x="20" y="368" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行结束后 state.messages 有 4 条消息，其中不含系统提示词。</text>
+  <text x="20" y="368" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行结束后 state.messages 有 4 条消息，其中不含系统 prompt。</text>
   <rect x="20" y="380" width="14" height="12" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)" stroke-dasharray="5 4"/>
   <text x="40" y="390" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">create_agent 的 system_prompt：每次调用都先发送，从不保存</text>
   </g>

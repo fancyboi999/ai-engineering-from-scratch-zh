@@ -13,13 +13,13 @@
 - Deep Agents 是一个 harness，在 LangGraph 之上增加规划、子 agent、文件工具和上下文管理。
 - LangChain 是框架，提供模型、工具和 agent 循环的接口与集成。
 - LangGraph 是运行时，提供持久执行、流式输出、人工审核和持久化。
-- LangSmith 是面向追踪、评估、提示词和部署的平台，适用于任何框架。
+- LangSmith 是面向追踪、评估、prompt 和部署的平台，适用于任何框架。
 
 **LangChain：** agent 框架，位于 `langchain` 和 `langchain-core` 两个包里。`langchain` 里有 `create_agent`、中间件和 `init_chat_model`。`langchain-core` 里有消息、工具、基础聊天模型和假模型。
 
 **LangGraph：** 把 agent 作为节点图来运行的运行时，位于 `langgraph` 包里。它包含 `StateGraph`、运行它的循环、检查点、中断和流式输出。
 
-**LangSmith：** 面向追踪、评估、提示词和部署的托管平台，以及它的客户端包 `langsmith`。Agent Server，即在 HTTP API 之后运行图的服务器，属于 LangSmith。
+**LangSmith：** 面向追踪、评估、prompt 和部署的托管平台，以及它的客户端包 `langsmith`。Agent Server，即在 HTTP API 之后运行图的服务器，属于 LangSmith。
 
 **Deep Agents：** 构建在 `create_agent` 之上的 harness，位于 `deepagents` 包里。它给 agent 增加文件工具、子 agent 和摘要。
 

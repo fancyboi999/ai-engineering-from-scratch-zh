@@ -40,14 +40,14 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 | 设置 | 值 | 原因 |
 |---|---|---|
 | `model` | `qwen3:4b-instruct-2507-q4_K_M` | 一个会调用工具、没有思考输出的小型 instruct 模型 |
-| `temperature` | `0` | 在同一台机器上，同一个提示词大多数时候得到同样的回复 |
+| `temperature` | `0` | 在同一台机器上，同一个 prompt 大多数时候得到同样的回复 |
 | `seed` | `42` | 在 temperature 0 仍留有选择余地的地方固定采样器 |
-| `num_ctx` | `16384` | Deep Agents 的系统提示词和它的工具需要比默认值更多 |
+| `num_ctx` | `16384` | Deep Agents 的系统 prompt 和它的工具需要比默认值更多 |
 | `num_predict` | `512` | 给每次回复设上限，让自我重复的模型能停下来 |
 
 `20-mw-decisions.txt` 还构建了 `qwen3:8b`，作为 `ModelRouterMiddleware` 的 `deep` 路线。它是路由器可以选的一个选项，在这次录制里路由器选了 `fast`，所以 `qwen3:8b` 没有被调用。没有场景需要推理输出，所以没有别的场景构建 `qwen3:8b`。
 
-模型是真实的，所以工具包的提示词会要求场景要展示的行为，例如一次回复里调用两个工具，或者用文字给出一个值。模型并不总是照提示词做，文件记录的是它实际做了什么。手册的每一节描述的是录制下来的运行，而不是请求。
+模型是真实的，所以工具包的 prompt 会要求场景要展示的行为，例如一次回复里调用两个工具，或者用文字给出一个值。模型并不总是照 prompt 做，文件记录的是它实际做了什么。手册的每一节描述的是录制下来的运行，而不是请求。
 
 失败也是真实的：
 
@@ -135,11 +135,11 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 | `01-init-chat-model.txt` | 用于 OpenAI、Anthropic 和 Ollama 的 `init_chat_model`、模型档案（model profile）、提供方推断、未知名称的错误、可配置模型、工具包 `ChatOllama` 的设置 |
 | `02-messages.txt` | 消息类型、dict 与 tuple 的强制转换、`content_blocks`、多模态块、被解析成标准块的 Anthropic 风格推理、块相加、工具调用块合并、`trim_messages` |
 | `03-tools.txt` | `@tool` 的 schema、对模型隐藏的 `ToolRuntime` 参数、在 agent 之外调用的 `ToolRuntime` 工具 |
-| `04-tool-errors.txt` | 抛出异常的工具（运行随之抛出）、模型自己修正的错误参数请求、模型拒绝的超出 schema 的值、`ToolErrorMiddleware`、指名一个不存在的工具的提示词，以及两次部署之间被移除的工具（一条错误 `ToolMessage`） |
+| `04-tool-errors.txt` | 抛出异常的工具（运行随之抛出）、模型自己修正的错误参数请求、模型拒绝的超出 schema 的值、`ToolErrorMiddleware`、指名一个不存在的工具的 prompt，以及两次部署之间被移除的工具（一条错误 `ToolMessage`） |
 | `05-agent-graph.txt` | `create_agent` 的节点、边、Mermaid、`recursion_limit` 9999、默认流模式 `updates` |
-| `06-agent-run.txt` | 一次完整运行，以及模型在每次调用中收到的内容，含系统提示词 |
+| `06-agent-run.txt` | 一次完整运行，以及模型在每次调用中收到的内容，含系统 prompt |
 | `07-structured-output.txt` | `AutoStrategy` 按档案选择 `ToolStrategy` 或 `ProviderStrategy`、作为 Ollama JSON schema 格式的 `ProviderStrategy`、带 TypedDict 和 dataclass 的 `ToolStrategy`（Ollama 以 400 拒绝了第三个请求）、原始 JSON schema、联合类型、绑定了 `add` 工具的 `ToolStrategy` 和 `ProviderStrategy` |
-| `08-structured-errors.txt` | 要求无效值的提示词（模型发回的是有效值）、一条消息里的两次结构化调用及其重试、自定义重试消息、`handle_errors=False`、用于单词、小数和纯文本提示词的 `ProviderStrategy`、结构化调用之前的普通工具 |
+| `08-structured-errors.txt` | 要求无效值的 prompt（模型发回的是有效值）、一条消息里的两次结构化调用及其重试、自定义重试消息、`handle_errors=False`、用于单词、小数和纯文本 prompt 的 `ProviderStrategy`、结构化调用之前的普通工具 |
 | `09-middleware-order.txt` | 三个带全部钩子的中间件：图节点、边，以及一次工具往返的钩子顺序 |
 | `10-mw-summarization.txt` | 带消息触发条件和不带触发条件的 `SummarizationMiddleware` |
 | `11-mw-call-limits.txt` | `ModelCallLimitMiddleware` 的运行与线程上限，以及 `ToolCallLimitMiddleware` 的 `continue`、`end` 和 `error` |
@@ -173,7 +173,7 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 | `38-recursion-limit.txt` | `recursion_limit=5`、默认上限（10007）、`RemainingSteps` |
 | `39-retrieval.txt` | `RecursiveCharacterTextSplitter`、带 `nomic-embed-text` 的 `OllamaEmbeddings`、`InMemoryVectorStore` 对三个查询的搜索、过滤、删除、MMR |
 | `40-mcp.txt` | `langchain.mcp` 的 beta 警告、进程内 FastMCP 服务器上的 `MCPAdapter.list_tools()`、工具结果与产物、一个 MCP 工具错误、经 `adapter.client` 读取的资源、裸字符串目标的错误 |
-| `41-deep-agent.txt` | `create_deep_agent` 的节点、一次用到 `add`、`write_file`、`ls` 和一个 `task` 子 agent 的运行、状态里的 `files`、每次调用绑定的工具、两份系统提示词 |
+| `41-deep-agent.txt` | `create_deep_agent` 的节点、一次用到 `add`、`write_file`、`ls` 和一个 `task` 子 agent 的运行、状态里的 `files`、每次调用绑定的工具、两份系统 prompt |
 | `42-langsmith.txt` | 追踪关闭时的 `traceable`、经 `on_end` 的 `tracing_context(enabled="local")` 运行树、一个错误运行、本地追踪包住一次 `create_agent` 运行时发送的请求、`enabled=False` 的 `collect_runs`，以及对一个函数、一个 agent 和一个关闭追踪的 agent 做的 `evaluate(upload_results=False)` |
 | `43-tool-runtime-agent.txt` | agent 内部一个 `ToolRuntime` 工具的 `context` 和自定义流 |
 | `44-store-agent.txt` | 一个通过 `ToolRuntime` 读取 store 的工具，面向两个用户 |
@@ -200,7 +200,7 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 - 带真实延迟的 `ProviderToolSearchMiddleware`。它需要 Anthropic 或 OpenAI 模型，所以在 `ChatOllama` 上它会抛出 `ValueError`。
 - 抛出异常的 `ModelRefusalMiddleware`。它作用于 `refusal` 内容块，而 Ollama 从不发送这种块。Qwen3 4B 以纯文本拒绝，会被直接放行。
 - 来自真实模型的校验错误。让 Qwen3 4B 给整数字段填小数、给数字填单词，或填超出范围的值，它发回的是有效参数，或者用文字拒绝。工具包里的错误参数来自 `19` 里的 shell 工具。
-- LangSmith 追踪到服务器、数据集、会上传的实验，以及prompt hub。工具包把追踪发给一个带录制 HTTP 会话的客户端，用 `upload_results=False` 运行 `evaluate`，并记录客户端本来会发送的内容。
+- LangSmith 追踪到服务器、数据集、会上传的实验，以及 prompt hub。工具包把追踪发给一个带录制 HTTP 会话的客户端，用 `upload_results=False` 运行 `evaluate`，并记录客户端本来会发送的内容。
 - 基于 stdio 和 HTTP 传输的 `langchain.mcp`、征询输入和 OAuth。工具包只用进程内传输。
 - `PostgresSaver` 和 `PostgresStore`。它们需要一个运行中的 Postgres。
 - Agent Server（`langgraph dev`、`up`、`deploy`）。

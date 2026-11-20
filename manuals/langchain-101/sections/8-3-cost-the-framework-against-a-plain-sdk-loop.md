@@ -13,9 +13,9 @@
 | 成本 | 朴素循环 | LangChain | 机器和次数 | 章节 |
 |---|---|---|---|---|
 | 三次 Qwen3 4B 调用的一次运行里，模型之外的时间 | 25.1 ms（占该次运行 1.3%） | `create_agent` 为 37.6 ms（2.3%），同一轮里多 15.6 ms | Mac，每种 40 次运行 | 本节 |
-| 该次运行三次调用的提示词 token，Qwen3 4B | 261、300、340 | 相同 | Mac，每种 40 次运行 | 本节 |
+| 该次运行三次调用的 prompt token，Qwen3 4B | 261、300、340 | 相同 | Mac，每种 40 次运行 | 本节 |
 | 这三次调用的请求字节数，Qwen3 4B | 679、936、1,199 | 696、948、1,206 | Mac，每种 40 次运行 | 本节 |
-| 一句话回答的提示词 token，Qwen3 8B | 28 | `create_agent` 为 28，`create_deep_agent` 为 2,279 | Mac，每种 3 次运行 | [7.4](#s-deep-agents-0-7) |
+| 一句话回答的 prompt token，Qwen3 8B | 28 | `create_agent` 为 28，`create_deep_agent` 为 2,279 | Mac，每种 3 次运行 | [7.4](#s-deep-agents-0-7) |
 | 导入时间，已写入字节码 | `openai` 为 0.329 秒 | `create_agent` 加 `ChatOpenAI` 为 0.831 秒 | Mac，每种 10 次运行 | [3.1](#s-install-and-the-package-map) |
 | 安装 | 14 个包，26,356 KiB | 44 个包，54,312 KiB | Mac，各安装一次 | [3.1](#s-install-and-the-package-map) |
 | `PostgresSaver` 一次检查点写入，5,000 步中最后 10 次的中位数 | 无 | 普通情况 148.65 ms，用 `DeltaChannel` 为 1.13 ms | x86 服务器客户机，一次运行 | [5.5](#s-context-engineering-and-summarization) |
@@ -53,9 +53,9 @@ caption: 每个点是 Mac 上的一次运行，每个程序 40 次，轮次打�
 
 ## token 与请求字节数 {#s-cost-the-framework-against-a-plain-sdk-loop-tokens-and-request-bytes}
 
-框架可能增加 token：自带的系统提示词、额外的工具字段，或一个 schema。`create_agent` 一个都不加。**我们测得**：用一个记录每个请求的代理，读取 Ollama 为每次调用返回的用量，在 Mac 上每个程序 40 次运行。同一个程序的每次运行都有相同的三次调用：
+框架可能增加 token：自带的系统 prompt、额外的工具字段，或一个 schema。`create_agent` 一个都不加。**我们测得**：用一个记录每个请求的代理，读取 Ollama 为每次调用返回的用量，在 Mac 上每个程序 40 次运行。同一个程序的每次运行都有相同的三次调用：
 
-| 调用 | 朴素循环：字节数、提示词 token、补全 token | `create_agent`：字节数、提示词 token、补全 token |
+| 调用 | 朴素循环：字节数、prompt token、补全 token | `create_agent`：字节数、prompt token、补全 token |
 |---|---|---|
 | 1 | 679, 261, 25 | 696, 261, 25 |
 | 2 | 936, 300, 25 | 948, 300, 25 |
@@ -96,9 +96,9 @@ note: 截取到每个请求的账目。其余字节是同样的键和值，只�
 
 请求头有两个字段不同。LangChain 程序发送 `x-stainless-raw-response: true`，因为 `ChatOpenAI` 通过 `with_raw_response` 调用客户端 {{code libs/partners/openai/langchain_openai/chat_models/base.py}}。在录制的请求里，它们也没有朴素循环发送的 `x-stainless-read-timeout`。
 
-Deep Agents 的 harness 是例外。在 Qwen3 8B 上，`create_deep_agent` 每次调用比朴素循环多发 2,075 到 2,251 个提示词 token。一句话回答的 token 是朴素循环的 81.4 倍，两次工具调用是 10.0 倍，文件任务是 9.1 倍。[第 7.4 节](#s-deep-agents-0-7)和[图](#fig-7-4)展示了每次调用。只有用到规划、文件或子 agent 时，才值得付这些 token。
+Deep Agents 的 harness 是例外。在 Qwen3 8B 上，`create_deep_agent` 每次调用比朴素循环多发 2,075 到 2,251 个 prompt token。一句话回答的 token 是朴素循环的 81.4 倍，两次工具调用是 10.0 倍，文件任务是 9.1 倍。[第 7.4 节](#s-deep-agents-0-7)和[图](#fig-7-4)展示了每次调用。只有用到规划、文件或子 agent 时，才值得付这些 token。
 
-[第 1.2 节](#s-do-you-need-langchain)的任务集在更大规模上给出同样的图景。deep agent 发送的提示词 token 是朴素循环的 3.6 到 4.3 倍。在 Claude Haiku 5.5 上，每次调用多约 3,570 个。提示词缓存会改变账单。在 Claude 上，deep agent 的花费是朴素循环的 1.16 到 1.24 倍；不用缓存、按标价算则是 3.10 到 3.14 倍。
+[第 1.2 节](#s-do-you-need-langchain)的任务集在更大规模上给出同样的图景。deep agent 发送的 prompt token 是朴素循环的 3.6 到 4.3 倍。在 Claude Haiku 5.5 上，每次调用多约 3,570 个。prompt 缓存会改变账单。在 Claude 上，deep agent 的花费是朴素循环的 1.16 到 1.24 倍；不用缓存、按标价算则是 3.10 到 3.14 倍。
 
 ## 导入与磁盘 {#s-cost-the-framework-against-a-plain-sdk-loop-imports-and-disk}
 
@@ -150,8 +150,8 @@ checkpointer 在每一步写入整个状态，除非某个通道只保存变化�
 
 ```takeaways
 - 为 create_agent 在模型之外预留每次模型调用约 5 ms，不到本地模型运行的 3%。
-- 预期 create_agent 的提示词 token 与你的朴素循环相同。
-- 为了 Deep Agents 的工具才选它，并打开提示词缓存，因为每次调用多带几千个 token。
+- 预期 create_agent 的 prompt token 与你的朴素循环相同。
+- 为了 Deep Agents 的工具才选它，并打开 prompt 缓存，因为每次调用多带几千个 token。
 - 线程长到几千步时，用 DeltaChannel 或摘要。
 - 在每个短命进程里，例如 CLI 工具或处理函数，都要把导入时间算进去。
 - 被追踪的进程退出前，调用 wait_for_all_tracers()。

@@ -26,7 +26,7 @@
 | 内容块（content block） | 消息中一个带类型的部分，是带 `type` 的字典，`type` 例如 `text`、`reasoning`、`image`、`file` 或 `tool_call`。 | [3.3](#s-messages-and-content-blocks) |
 | 上下文工程（context engineering） | 选择模型每次调用时接收什么：哪些消息、哪些工具、哪些指令。 | [5.5](#s-context-engineering-and-summarization) |
 | 上下文窗口（context window） | 模型一次调用最多接受的 token 数，输入和输出合计。 | [5.5](#s-context-engineering-and-summarization) |
-| `create_agent` | `langchain.agents` 中的函数，把模型、工具、提示词和中间件变成一个 `CompiledStateGraph`。 | [4.1](#s-create-agent-and-the-graph-it-builds) |
+| `create_agent` | `langchain.agents` 中的函数，把模型、工具、prompt 和中间件变成一个 `CompiledStateGraph`。 | [4.1](#s-create-agent-and-the-graph-it-builds) |
 | 决定（decision） | 对一次暂停的工具调用的回答，`type` 为 `approve`、`edit`、`reject` 或 `respond`。 | [6.5](#s-human-in-the-loop-batched-and-per-call) |
 | 决策模型（decision model） | 来自 `langchain_core.decisions` 的 `BaseDecisionModel`，在 `langchain-core` 1.8.0 中新增，用来回答带类型的问题。 | [4.8](#s-guardrails-pii-and-the-decision-middleware-beta) |
 | deep agent | 由 `deepagents` 的 `create_deep_agent` 创建的 agent。它是一个 `create_agent` 图，在你自己的中间件外围套了一组固定的中间件。 | [7.4](#s-deep-agents-0-7) |
@@ -65,7 +65,7 @@
 | 实验记录（lab recording） | 在我们的某台机器上，对真实模型或真实数据库进行的一次运行，以原始文件保存在 `capture/lab/` 中。 | [本手册是怎么做的](#s-ref-how-this-manual-was-made) |
 | LangChain | agent 框架，位于 `langchain` 和 `langchain-core` 两个包中。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
 | LangGraph | 把 agent 作为节点图来运行的运行时，位于 `langgraph` 包中。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
-| LangSmith | 用于追踪、评估、提示词和部署的托管平台，以及它的客户端包 `langsmith`。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
+| LangSmith | 用于追踪、评估、prompt 和部署的托管平台，以及它的客户端包 `langsmith`。 | [1.1](#s-langchain-langgraph-langsmith-and-deep-agents) |
 | `max_concurrency` | 运行配置中的键，限制一步里同时运行的任务数。 | [4.1](#s-create-agent-and-the-graph-it-builds) |
 | MCP 适配器（MCP adapter） | `langchain.mcp` 中的 `MCPAdapter` 类。它通过 FastMCP 连接 MCP 服务器，并把服务器的工具作为 LangChain 工具返回。 | [7.3](#s-mcp-with-langchain-mcp) |
 | MCP 工具错误（MCP tool error） | `isError` 设为 true 的工具结果。工具抛出异常时，FastMCP 服务器会发出这样的结果。 | [7.3](#s-mcp-with-langchain-mcp) |
@@ -116,7 +116,7 @@
 | 子图（subgraph） | 用作另一个图的节点的已编译图。两个 schema 共有的键在它们之间传递。 | [6.7](#s-subgraphs-and-multi-agent-patterns) |
 | 汇总评估器（summary evaluator） | 一次给实验的所有行打分的函数，例如计算准确率。 | [7.7](#s-evaluation-with-langsmith) |
 | 摘要消息（summary message） | `SummarizationMiddleware` 用来代替旧消息写入的用户消息。 | [5.5](#s-context-engineering-and-summarization) |
-| 系统提示词（system 提示词） | 排在 agent 每次模型请求最前面的指令。 | [3.5](#s-the-system-prompt) |
+| 系统 prompt（system prompt） | 排在 agent 每次模型请求最前面的指令。 | [3.5](#s-the-system-prompt) |
 | 目标（评估的） | `evaluate` 用每个示例的输入去调用的函数。 | [7.7](#s-evaluation-with-langsmith) |
 | 目标（MCP 适配器的） | `MCPAdapter` 的第一个参数：`http` 或 `https` URL、`Path`、传输、服务器或配置。 | [7.3](#s-mcp-with-langchain-mcp) |
 | 任务（task） | 用 `@task` 装饰的函数。调用返回一个 future，LangGraph 在它完成时保存其结果。 | [6.3](#s-the-functional-api-entrypoint-and-task) |

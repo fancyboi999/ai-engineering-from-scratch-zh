@@ -23,7 +23,7 @@ const CW = 104;
 module.exports = figure('fig-1-2c', {
   height: 236,
   title: 'Deep Agents 与 Claude Agent SDK 在同样 30 项任务上的对比',
-  desc: `Claude Haiku 5.5 在两个 harness 里使用相同工具和相同系统提示词的点状表。${SIDES.map(x => `${x.name}：${x.s.n} 项中通过 ${x.s.pass} 项，每项任务模型调用中位数 ${x.s.calls_med} 次、输入 ${(x.s.in_med / 1000).toFixed(1)}k token，全部任务共 $${x.s.cost_sum.toFixed(4)}`).join('；')}。两个 harness 在 ${S.n_common} 项任务中有 ${S.agree} 项结果一致。下方每个点是一项任务的输入 token 数。`,
+  desc: `Claude Haiku 5.5 在两个 harness 里使用相同工具和相同系统 prompt 的点状表。${SIDES.map(x => `${x.name}：${x.s.n} 项中通过 ${x.s.pass} 项，每项任务模型调用中位数 ${x.s.calls_med} 次、输入 ${(x.s.in_med / 1000).toFixed(1)}k token，全部任务共 $${x.s.cost_sum.toFixed(4)}`).join('；')}。两个 harness 在 ${S.n_common} 项任务中有 ${S.agree} 项结果一致。下方每个点是一项任务的输入 token 数。`,
 }, f => {
   COLS.forEach((c, i) => {
     const x = X0 + i * (CW + 14);

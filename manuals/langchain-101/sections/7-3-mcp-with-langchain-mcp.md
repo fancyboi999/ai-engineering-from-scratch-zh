@@ -73,7 +73,7 @@ lang: json
     }
 ```
 
-`langchain.mcp` 没有面向 MCP 资源或提示词的 API。迁移指南把两者都列为不支持 {{docs oss/python/migrate/langchain-mcp-adapters}}。录制工具包通过 `adapter.client`（底层的 FastMCP 客户端）读取了一个资源，得到 `calc server: multiply, divide, stats`。
+`langchain.mcp` 没有面向 MCP 资源或 prompt 的 API。迁移指南把两者都列为不支持 {{docs oss/python/migrate/langchain-mcp-adapters}}。录制工具包通过 `adapter.client`（底层的 FastMCP 客户端）读取了一个资源，得到 `calc server: multiply, divide, stats`。
 
 ## 字符串目标必须是 URL {#s-mcp-with-langchain-mcp-a-string-target-must-be-a-url}
 

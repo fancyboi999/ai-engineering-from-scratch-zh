@@ -59,7 +59,7 @@ const groups = [
 module.exports = figure('fig-1-3', {
   height: 610,
   title: '一次 create_agent 运行，逐步展开',
-  desc: `五条生命线，上方各有一幅小图：你的代码画成终端，model 节点，聊天模型，tools 节点，以及画成圆柱的 checkpointer。第六列用小方块显示每个检查点里的消息。六个编号步骤与正文中的列表一一对应：1，第 ${checkpoints[0].step} 步的输入检查点，没有消息，next 为 __start__。2，第 ${checkpoints[1].step} 步的检查点，含用户消息，next 为 model。3，model 节点带着系统提示词“${system}”和用户消息调用聊天模型，得到工具调用 ${call.name}，参数为 ${Object.values(call.args).join(' 和 ')}，并保存第 ${checkpoints[2].step} 步，next 为 tools。4，model 节点把工具调用发给 tools 节点，tools 节点保存第 ${checkpoints[3].step} 步，其中含 ${call.id} 对应的 ToolMessage，next 为 model。5，第二次模型调用收到 ${calls[1].messages.length} 条消息，回答“${answer}”。6，第 ${checkpoints[4].step} 步的检查点含 ${final.length} 条消息，没有下一个节点，invoke 把它们返回。`,
+  desc: `五条生命线，上方各有一幅小图：你的代码画成终端，model 节点，聊天模型，tools 节点，以及画成圆柱的 checkpointer。第六列用小方块显示每个检查点里的消息。六个编号步骤与正文中的列表一一对应：1，第 ${checkpoints[0].step} 步的输入检查点，没有消息，next 为 __start__。2，第 ${checkpoints[1].step} 步的检查点，含用户消息，next 为 model。3，model 节点带着系统 prompt“${system}”和用户消息调用聊天模型，得到工具调用 ${call.name}，参数为 ${Object.values(call.args).join(' 和 ')}，并保存第 ${checkpoints[2].step} 步，next 为 tools。4，model 节点把工具调用发给 tools 节点，tools 节点保存第 ${checkpoints[3].step} 步，其中含 ${call.id} 对应的 ToolMessage，next 为 model。5，第二次模型调用收到 ${calls[1].messages.length} 条消息，回答“${answer}”。6，第 ${checkpoints[4].step} 步的检查点含 ${final.length} 条消息，没有下一个节点，invoke 把它们返回。`,
 }, f => {
   lanes.forEach((lane, index) => {
     lane.draw(f, cx(index));

@@ -93,10 +93,10 @@ caption: 每列是子集中的一个任务，每行是一次运行。实心方�
 
 | 目录 | 运行内容 | 文件 |
 |---|---|---|
-| `bench2/` | harness profile A 和 B、带与不带提示词（要求使用它）的 `eval` 工具，以及配 Qwen3 14B 打分器的 `RubricMiddleware` | `kit2/run2.py` 负责运行，`kit2/summarize2.py` 写出 `summary-bench2.json`，`kit2/docs_table.py` 把文档里的表读入 `docs-eval-table.json` |
+| `bench2/` | harness profile A 和 B、带与不带 prompt（要求使用它）的 `eval` 工具，以及配 Qwen3 14B 打分器的 `RubricMiddleware` | `kit2/run2.py` 负责运行，`kit2/summarize2.py` 写出 `summary-bench2.json`，`kit2/docs_table.py` 把文档里的表读入 `docs-eval-table.json` |
 | `multiagent/` | 在 Haiku 和 Qwen3 14B 上运行五种模式，并在 Haiku 上对比 Claude Agent SDK 与 deep agent | `kit/run_patterns.py` 和 `kit/run_sdk.py` 负责运行，`kit/summarize_patterns.py` 写出 `capture/lab/summary/multiagent-mac.json` |
 
-`bench2/` 的本地行是在我们专门为它们启动的第二个 Ollama 0.31.1 服务器上运行的，它有自己的模型缓存。它第一次启动时用了量化的键值缓存和 flash attention。有八个对照行来自那次启动，Qwen3 4B 四个，Qwen3 8B 四个。我们用第一个测试基准的默认设置重启了服务器，并把这八行放在 `bench2/runs/excluded/` 里。重启之后，三个对照任务给出了与第一个测试基准相同的工具调用和提示词 token。
+`bench2/` 的本地行是在我们专门为它们启动的第二个 Ollama 0.31.1 服务器上运行的，它有自己的模型缓存。它第一次启动时用了量化的键值缓存和 flash attention。有八个对照行来自那次启动，Qwen3 4B 四个，Qwen3 8B 四个。我们用第一个测试基准的默认设置重启了服务器，并把这八行放在 `bench2/runs/excluded/` 里。重启之后，三个对照任务给出了与第一个测试基准相同的工具调用和 prompt token。
 
 本地模型的 profile 行和评估行都来自重启之后。汇总从第一个测试基准里读取朴素循环和默认 deep agent 的行。Qwen3 14B 和 gpt-oss 20B 的 deep agent 单元格把 12 次旧运行和 27 次新运行（设置相同）合在一起。
 
@@ -128,7 +128,7 @@ Qwen3 8B 的 nudged 运行在开始时就失败了。gpt-oss 20B 的多 agent �
 | `bench2/runs/excluded/kvq8-profiles.jsonl`, `bench2/runs/excluded/kvq8-rubric.jsonl` | 来自第二个服务器第一次启动的对照行，它们没能复现第一个测试基准 |
 | `bench2/runs/smoke.jsonl`, `bench2/runs/verify.jsonl` | 汇总不读取的冒烟与检查运行 |
 | `runs/excluded/structured-dev.jsonl`, `runs/excluded/toolscale-dev.jsonl` | 用于测试运行器的运行所产生的行 |
-| Claude 的结构化输出行 | 有效，但运行器没有加提示词缓存，所以它们的美元数是标价 |
+| Claude 的结构化输出行 | 有效，但运行器没有加 prompt 缓存，所以它们的美元数是标价 |
 | 把严格通过当作质量指标 | 它统计 `submit_answer` 的使用，而小模型经常把答案直接写在文本里 |
 
 主文件保留其他所有行。`summarize.py` 在读取行时去掉 `sql19`，`summarize.py --check` 会重新生成汇总并与现有的比较。

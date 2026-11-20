@@ -139,7 +139,7 @@ def refund_description(tool_call, state, runtime):
 
 `HumanInTheLoopMiddleware` 为每个工具接收一个 `description`，可以是字符串，也可以是接收工具调用、状态和运行时的可调用对象 {{code libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py:613-620}}。这个可调用对象是同步的，所以它为一次查询开一个短暂的同步连接。
 
-**我们测得**：在 Mac 上，用同样的提示词和种子，对每个模型各三次运行，把六个退款评估又测了一遍。[图](#fig-9-3b)展示了 0 美分的用例。
+**我们测得**：在 Mac 上，用同样的 prompt 和种子，对每个模型各三次运行，把六个退款评估又测了一遍。[图](#fig-9-3b)展示了 0 美分的用例。
 
 | 模型 | 通过的退款评估，之前与之后 | 有 0 美分行的运行，之前与之后 | 审批人对 0 美分提案读到的内容 |
 |---|---|---|---|

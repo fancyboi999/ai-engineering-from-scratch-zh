@@ -97,7 +97,7 @@ warning LangGraphDeprecatedSinceV11: Accessing GraphOutput via `result[key]` is 
 | `oss/python/releases/langchain-v1` | 带内容块的提供方列表，以及没有 `langchain.mcp` 的命名空间表 | D117 |
 | 两个 v1 发布页 | `create_react_agent` 的链接指向 `langchain-classic` 里的同名函数 | D107 |
 | `langsmith/faq` | 一张把 checkpointer 称为社区代码、把流式输出称为基础功能的表 | D108 |
-| `langsmith/manage-prompts-programmatically` | 通过 `langchain_classic` 使用 hub，以及把提示词用管道接进模型 | D113 |
+| `langsmith/manage-prompts-programmatically` | 通过 `langchain_classic` 使用 hub，以及把 prompt 用管道接进模型 | D113 |
 | `langsmith/trace-with-langchain` | 把 LCEL 链当作第一个示例 | D114 |
 | `oss/python/deepagents/overview` | 第一段里把规划写成默认功能 | D109 |
 | `oss/python/langgraph/local-server` | 旧名称 LangGraph Studio | D116 |
@@ -113,7 +113,7 @@ notebook 或教程运行在作者锁定的版本上。`langchain>=0.3.9` 这样�
 ```takeaways
 - 迁移 0.x 代码之前，先在锁文件里固定每个包。
 - 只在用 create_agent 替换它们的过程中，才从 langchain_classic 导入旧链。
-- 把提示词改名为 system_prompt，并把钩子搬进中间件。
+- 把 prompt 改名为 system_prompt，并把钩子搬进中间件。
 - 显示警告运行，并修掉每个 LangGraphDeprecatedSinceV10 和 V11 警告。
 - 复制 notebook 的代码之前，先查它锁定的版本。
 - 升级每个次版本前，先读它的更新日志。

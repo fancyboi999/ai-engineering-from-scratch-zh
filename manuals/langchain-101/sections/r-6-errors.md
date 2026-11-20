@@ -76,7 +76,7 @@
 | `ValueError` | `log_outputs should only be called within a pytest test decorated with @pytest.mark.langsmith, and with tracing enabled (by setting the LANGSMITH_TRACING environment variable to 'true').` | `langsmith`，针对开启跟踪时未加标记的测试 | `T19-pytest-plugin-x86` |
 | `ValueError`，表现为退出码为 3 的 pytest `INTERNALERROR` | `--langsmith-output not supported when env varLANGSMITH_TEST_TRACKING='false'. Please remove the'--langsmith-output' option or enable test tracking.` 代码里本身就缺了这两个空格 | `langsmith`，位于 {{code src/langsmith/pytest_plugin.py:311-317}} | `T19-pytest-plugin-x86` |
 | `ValueError` | `log_inputs should only be called within a pytest test decorated with @pytest.mark.langsmith, and with tracing enabled (by setting the LANGSMITH_TRACING environment variable to 'true').` | `langsmith`，针对开启跟踪、`LANGSMITH_TRACING` 未设置的已标记测试，位于 {{code src/langsmith/testing/_internal.py:1166-1168}} | `T21-langsmith-account-mac` |
-| `LangSmithConflictError`，来自 HTTP 409 | `Nothing to commit: prompt has not changed since latest commit` | 托管 API，针对提示词未变化的 `push_prompt` | `T21-langsmith-account-mac` |
+| `LangSmithConflictError`，来自 HTTP 409 | `Nothing to commit: prompt has not changed since latest commit` | 托管 API，针对 prompt 未变化的 `push_prompt` | `T21-langsmith-account-mac` |
 | `LangSmithNotFoundError`，来自 HTTP 404 | `Commit not found` | 托管 API，针对标签不存在的 `pull_prompt` | `T21-langsmith-account-mac` |
 | `LangSmithNotFoundError` | `Project healthy-coast-30 not found` | `langsmith`，读取 `evaluate(upload_results=False)` 返回的 `experiment_name` 时 | `T21-langsmith-account-mac` |
 | CLI 错误，退出码 2 | `Error: Docker not installed or not running` | `langgraph-cli` 0.4.43，针对没有 Docker 守护进程时的 `langgraph up`，发生在任何密钥检查之前 | `T21-langsmith-account-mac` |

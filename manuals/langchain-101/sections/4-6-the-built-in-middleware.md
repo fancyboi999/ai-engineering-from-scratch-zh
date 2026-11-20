@@ -27,7 +27,7 @@
 | `PIIMiddleware` | `before_model`、`after_model` | 找出一种个人数据，并加以脱敏、遮盖、哈希或拦截。默认只处理输入。 | [4.8](#s-guardrails-pii-and-the-decision-middleware-beta) |
 | `ModelRouterMiddleware` | `before_agent`、`wrap_model_call` | 让一个决策模型决定这次运行用哪个模型。Beta，按发布说明是 1.5.0 新增。 | [4.8](#s-guardrails-pii-and-the-decision-middleware-beta) |
 | `AutoModeMiddleware` | `wrap_tool_call` | 让一个决策模型判断工具调用是否有风险，并拦截它。Beta，按发布说明是 1.5.0 新增。 | [4.8](#s-guardrails-pii-and-the-decision-middleware-beta) |
-| `TodoListMiddleware` | `wrap_model_call`、`after_model` | 添加 `write_todos` 工具和一段提示词，并把列表存在 `state["todos"]` 里。 | 本节 |
+| `TodoListMiddleware` | `wrap_model_call`、`after_model` | 添加 `write_todos` 工具和一段 prompt，并把列表存在 `state["todos"]` 里。 | 本节 |
 | `LLMToolSelectorMiddleware` | `wrap_model_call` | 在每次模型调用之前，问一个模型要绑定哪些工具，默认问的是 agent 模型本身。 | 本节、[4.4](#s-many-tools-and-the-tool-selector) |
 | `LLMToolEmulator` | `wrap_tool_call` | 让模型编造工具的结果，用于测试。工具从不运行。 | 本节 |
 | `ProviderToolSearchMiddleware` | `wrap_model_call` | 把工具推迟给 Anthropic 或 OpenAI 的服务端工具搜索。 | 本节 |
@@ -94,7 +94,7 @@ note: 两条 ToolMessage。id 已截去。
 
 ## 规划与上下文 {#s-the-built-in-middleware-planning-and-context}
 
-`TodoListMiddleware` 添加 `write_todos` 工具，以及一段关于它的系统提示词。每次调用都会替换 `state["todos"]` 里的列表。工具包让 Qwen3 4B 制定计划、做加法，再把计划标为完成。它调用了 `write_todos`、`add`，然后再次调用 `write_todos`，它自己的计划有两项。运行之后，状态里留着最终的列表：
+`TodoListMiddleware` 添加 `write_todos` 工具，以及一段关于它的系统 prompt。每次调用都会替换 `state["todos"]` 里的列表。工具包让 Qwen3 4B 制定计划、做加法，再把计划标为完成。它调用了 `write_todos`、`add`，然后再次调用 `write_todos`，它自己的计划有两项。运行之后，状态里留着最终的列表：
 
 ```listing
 title: 运行之后的 state["todos"]
@@ -198,7 +198,7 @@ caption: 每一行是一个任务。方块按顺序给出评分器的裁决，�
 
 三个任务通过了：`r06`、`sql03` 和 `sql09`。十二次运行在第一次评审就得到 `satisfied`，其中 11 次没通过检查。十一次运行在轮数上限处结束，`r06` 是其中之一。
 
-评分标准把 worker 的调用从 108 次增加到 173 次，把 worker 的提示词 token 从 75,987 增加到 174,192。评分器增加了 56 次调用和 113,851 个提示词 token。三轮任务 `multi13` 在每一轮里都有评分轮次，一共 9 次评分调用和 22 次 worker 调用。25 次运行总共用了 16,841 秒，纯运行是 446 秒，其中 11,379 秒是评分器的时间。这台 Mac 是共用的，所以这些时间是上限。
+评分标准把 worker 的调用从 108 次增加到 173 次，把 worker 的 prompt token 从 75,987 增加到 174,192。评分器增加了 56 次调用和 113,851 个 prompt token。三轮任务 `multi13` 在每一轮里都有评分轮次，一共 9 次评分调用和 22 次 worker 调用。25 次运行总共用了 16,841 秒，纯运行是 446 秒，其中 11,379 秒是评分器的时间。这台 Mac 是共用的，所以这些时间是上限。
 
 所以评分器的好坏取决于它的模型。14B 的评分器对状态检查没有通过的运行说了满意。依赖评分器的裁决之前，先拿你的状态检查器去核对它。
 

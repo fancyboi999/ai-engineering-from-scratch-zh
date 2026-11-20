@@ -80,7 +80,7 @@
 | `PIIMiddleware` | `before_model`, `after_model` | `pii_type` 必填，`strategy="redact"`, `apply_to_input=True`, `apply_to_output=False`, `apply_to_tool_results=False` | `pii.py:513`, `:577` |
 | `ModelRouterMiddleware` | `before_agent`, `wrap_model_call` | `choices`、`instructions` 和 `classifier` 必填。Beta，带 `@beta` 标记，据发布说明在 1.5.0 中新增 | `model_router.py:72`, `:121` |
 | `AutoModeMiddleware` | `wrap_tool_call` | `tools` 和 `classifier` 必填，`criteria=None`。仅在 docstring 中标注为 Beta，没有 `@beta` 标记也没有警告，据发布说明在 1.5.0 中新增 | `auto_mode.py:64`, `:117` |
-| `TodoListMiddleware` | `wrap_model_call`, `after_model` | 默认的系统提示词和工具描述 | `todo.py:174`, `:203` |
+| `TodoListMiddleware` | `wrap_model_call`, `after_model` | 默认的系统 prompt 和工具描述 | `todo.py:174`, `:203` |
 | `LLMToolSelectorMiddleware` | `wrap_model_call` | `model=None`, `max_tools=None`, `always_include=None`, `max_retries=1` | `tool_selection.py:121`, `:150` |
 | `LLMToolEmulator` | `wrap_tool_call` | `tools=None`, `model=None` | `tool_emulator.py:27`, `:71` |
 | `ProviderToolSearchMiddleware` | `wrap_model_call` | `searchable_tools=None` | `provider_tool_search.py:57`, `:93` |

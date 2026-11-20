@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 490" role="img" aria-labelledby="fig-7-4g-title fig-7-4g-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-4g-title">Claude Haiku 5.5 带 eval 工具，提示词有无要求使用</title>
-  <desc id="fig-7-4g-desc">两条带，对应 39 个 chain 与 sql 任务，每个任务一个方块，显示哪些运行调用了 eval 工具：提示词没有要求时 0 次，提示词要求时 12 次。两组中每个任务都通过。下方的成对条形比较两组的模型调用数、提示词 token、输出 token、美元、eval 调用数和 eval 错误数：调用数分别为 173 和 187，成本分别为 $0.028 和 $0.038。</desc>
+  <title id="fig-7-4g-title">Claude Haiku 5.5 带 eval 工具，prompt 有无要求使用</title>
+  <desc id="fig-7-4g-desc">两条带，对应 39 个 chain 与 sql 任务，每个任务一个方块，显示哪些运行调用了 eval 工具：prompt 没有要求时 0 次，prompt 要求时 12 次。两组中每个任务都通过。下方的成对条形比较两组的模型调用数、prompt token、输出 token、美元、eval 调用数和 eval 错误数：调用数分别为 173 和 187，成本分别为 $0.028 和 $0.038。</desc>
   <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">每个方块是一个任务</text>
   <text x="620" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">39 个任务，全部通过</text>
   <line x1="20" y1="32" x2="620" y2="32" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
-  <text x="20" y="64" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">eval 工具，普通提示词：39 次运行中有 0 次调用了 eval</text>
+  <text x="20" y="64" font-size="11" font-weight="700" fill="var(--m-green-ink, #336b40)">eval 工具，普通 prompt：39 次运行中有 0 次调用了 eval</text>
   <rect x="20" y="70" width="11" height="11" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8"/>
   <rect x="34.4" y="70" width="11" height="11" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8"/>
   <rect x="48.8" y="70" width="11" height="11" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8"/>
@@ -47,7 +47,7 @@
   <rect x="567.2" y="70" width="11" height="11" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)" stroke-width="0.8"/>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
-  <text x="20" y="114" font-size="11" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">eval 工具，提示词要求使用：39 次运行中有 12 次调用了 eval</text>
+  <text x="20" y="114" font-size="11" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">eval 工具，prompt 要求使用：39 次运行中有 12 次调用了 eval</text>
   <rect x="20" y="120" width="11" height="11" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8"/>
   <rect x="34.4" y="120" width="11" height="11" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8"/>
   <rect x="48.8" y="120" width="11" height="11" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="0.8"/>
@@ -98,7 +98,7 @@
   <text x="458" y="212" font-size="11" font-weight="700" fill="var(--m-ink, #1a1a1a)">187</text>
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
-  <text x="20" y="247" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">提示词 token</text>
+  <text x="20" y="247" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">prompt token</text>
   <rect x="150" y="230" width="267.68" height="11" fill="var(--m-green-ink, #336b40)"/>
   <text x="425.68" y="239" font-size="11" font-weight="700" fill="var(--m-ink, #1a1a1a)">1.71M</text>
   <rect x="150" y="245" width="300" height="11" fill="var(--m-indigo-ink, #4b4f9e)"/>
@@ -132,5 +132,5 @@
   <rect x="150" y="413" width="300" height="11" fill="var(--m-indigo-ink, #4b4f9e)"/>
   <text x="458" y="422" font-size="11" font-weight="700" fill="var(--m-ink, #1a1a1a)">3</text>
   </g>
-  <text x="20" y="442" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">绿色是普通提示词，靛蓝是要求使用 eval 的提示词。</text>
+  <text x="20" y="442" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">绿色是普通 prompt，靛蓝是要求使用 eval 的 prompt。</text>
 </svg>

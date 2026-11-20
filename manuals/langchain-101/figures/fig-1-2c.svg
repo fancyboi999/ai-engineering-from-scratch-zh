@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 236" role="img" aria-labelledby="fig-1-2c-title fig-1-2c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
   <title id="fig-1-2c-title">Deep Agents 与 Claude Agent SDK 在同样 30 项任务上的对比</title>
-  <desc id="fig-1-2c-desc">Claude Haiku 5.5 在两个 harness 里使用相同工具和相同系统提示词的点状表。Deep Agents：30 项中通过 30 项，每项任务模型调用中位数 5 次、输入 23.7k token，全部任务共 $0.0168；Claude Agent SDK：30 项中通过 30 项，每项任务模型调用中位数 4.5 次、输入 9.3k token，全部任务共 $0.0139。两个 harness 在 30 项任务中有 30 项结果一致。下方每个点是一项任务的输入 token 数。</desc>
+  <desc id="fig-1-2c-desc">Claude Haiku 5.5 在两个 harness 里使用相同工具和相同系统 prompt 的点状表。Deep Agents：30 项中通过 30 项，每项任务模型调用中位数 5 次、输入 23.7k token，全部任务共 $0.0168；Claude Agent SDK：30 项中通过 30 项，每项任务模型调用中位数 4.5 次、输入 9.3k token，全部任务共 $0.0139。两个 harness 在 30 项任务中有 30 项结果一致。下方每个点是一项任务的输入 token 数。</desc>
   <text x="168" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过的任务</text>
   <text x="168" y="38" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">共 30 项</text>
   <text x="286" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">模型调用</text>
