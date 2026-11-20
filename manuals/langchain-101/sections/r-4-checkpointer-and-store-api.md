@@ -4,8 +4,6 @@
 
 这些类位于 `langgraph-checkpoint` 4.3.2、`langgraph-checkpoint-sqlite` 3.1.3 和 `langgraph-checkpoint-postgres` 3.2.1，均来自 1.2.22 版的 `langgraph` 仓库。下文的路径都从该仓库的 `libs/` 开始。[第 5.2 节](#s-checkpointers-and-threads)运行了各个 checkpointer，[第 5.4 节](#s-stores-and-long-term-memory)运行了各个 store。
 
-读完本节，你能查到每个 checkpointer 和 store 的类、方法、记录类型与表结构。
-
 ## checkpointer {#s-ref-checkpointer-and-store-api-the-checkpointers}
 
 | 类 | 导入路径 | 行号 | 说明 |

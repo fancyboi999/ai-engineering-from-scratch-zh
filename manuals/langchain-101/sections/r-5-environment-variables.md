@@ -4,8 +4,6 @@
 
 请在进程启动之前设置每个变量。`LANGGRAPH_DEFAULT_RECURSION_LIMIT`、delta 设置和 `LANGGRAPH_STRICT_MSGPACK` 在模块导入时读取。LangSmith SDK 在第一次读取后会缓存每个值 {{code src/langsmith/utils.py:394}}。它读取每个名称时先试前缀 `LANGSMITH_`，再试 `LANGCHAIN_` {{code src/langsmith/utils.py:377-381}}。追踪开关是例外：任一前缀的 `TRACING_V2` 变量都优先于 `LANGSMITH_TRACING`。只有文档支持的行会注明这一点。
 
-读完本节，你能查到每个环境变量的默认值、作用和读取它的代码位置。
-
 ## LangGraph {#s-ref-environment-variables-langgraph}
 
 | 变量 | 默认值 | 作用 | 读取位置 | 章节 |

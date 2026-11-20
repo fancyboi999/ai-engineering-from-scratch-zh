@@ -4,8 +4,6 @@
 
 每一行链接到对应的图，论点即图块的 `claim:` 字段。构建时按各部分内图出现的顺序给图编号，所以图号就是它在本部分里的位置。图中的实测数字来自[我们的录制运行](manuals/langchain-101/capture/lab)，每幅柱状图等图表读取[汇总文件夹](manuals/langchain-101/capture/lab/summary)中的一个文件。第 9 部分的图表读取[生产服务的汇总](manuals/langchain-101/capture/lab/prodapp-mac/summary)。配色沿用前言中的色板：
 
-读完本节，你能按图号找到手册中的每幅图和它的论点，并读懂配色的含义。
-
 - 紫罗兰色是你的代码：调用方、它的输入和它的配置
 - 蓝色是 LangChain：`create_agent`、中间件、消息，以及作为对象的工具
 - 靛蓝色是 LangGraph：图、它的节点、Pregel 循环和它的流

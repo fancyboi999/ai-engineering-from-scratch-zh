@@ -4,8 +4,6 @@
 
 表格列出每个参数、它在锁定版本下的类型和默认值，以及代码对它做了什么。每一行的引用都标出 `langchain==1.5.0` 中 `libs/langchain_v1/langchain/agents/factory.py` 的行号。[第 4.1 节](#s-create-agent-and-the-graph-it-builds)解释这张图，最后一列链接到运行每个参数的章节。
 
-读完本节，你能查到 `create_agent` 每个参数的类型、默认值和作用，也能说出它返回的图具有哪些属性。
-
 ## 函数签名 {#s-ref-create-agent-parameters-the-signature}
 
 用 `from langchain.agents import create_agent` 导入。函数从第 895 行开始，前面有三个带类型的重载，位于第 827、849 和 873 行 {{code libs/langchain_v1/langchain/agents/factory.py:827-914}}。前两个参数是位置参数，其余都是仅限关键字参数。

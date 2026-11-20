@@ -4,8 +4,6 @@
 
 每个中间件都是 `langchain.agents.middleware` 中 `AgentMiddleware` 的子类。该模块导出 50 个名称 {{code libs/langchain_v1/langchain/agents/middleware/__init__.py}}。除非写明属于其他包，本页的路径都相对于 `langchain==1.5.0` 的 `libs/langchain_v1/langchain/agents/middleware/`。[第 4.5 节](#s-middleware-hooks-and-their-order)给出钩子的执行顺序，[第 4.6 节](#s-the-built-in-middleware)说明每个类该在什么时候使用。
 
-读完本节，你能查到每个钩子的签名和执行顺序，也能查到 19 个内置中间件类的构造参数默认值。
-
 ## 六个钩子 {#s-ref-middleware-hooks-and-classes-the-six-hooks}
 
 `AgentMiddleware` 从 `types.py` 的第 387 行开始 {{code libs/langchain_v1/langchain/agents/middleware/types.py:387}}.

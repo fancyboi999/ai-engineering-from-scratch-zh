@@ -4,8 +4,6 @@
 
 本页的每一行都来自 `langgraph` 1.2.22 的代码，或来自同一次 agent 运行的录制文件。那次运行有两次模型调用和一次工具调用。[第 5.1 节](#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode)说明每种模式该在什么时候使用。
 
-读完本节，你能查出每种流模式在 v1、v2 和 v3 下产出的数据形状。
-
 ## stream 的模式 {#s-ref-stream-modes-and-event-types-the-modes-of-stream}
 
 类型 `StreamMode` 列出七种模式 {{code libs/langgraph/langgraph/types.py:132-134}}。循环还接受 `tools`，类型里没有列出它 {{code libs/langgraph/langgraph/pregel/main.py:2949-2950}}。这处缺口在[来源页](#s-ref-sources-and-conflicts)的冲突登记里记为 D4。
