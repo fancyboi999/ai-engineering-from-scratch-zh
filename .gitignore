@@ -42,6 +42,7 @@ Thumbs.db
 *.log
 # 手册录制原始日志是正文 listing 的证据来源，必须随手册跟踪。
 !manuals/*/capture/lab/**/*.log
+manuals/*/capture/demos/**/*.db
 
 data/
 models/
