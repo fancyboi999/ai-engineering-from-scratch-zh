@@ -1,51 +1,51 @@
-# Human in the loop: HumanInTheLoopMiddleware, batched and per call
+# 人在回路：HumanInTheLoopMiddleware 的批量模式与逐调用模式
 
-> `HumanInTheLoopMiddleware` pauses tool calls for review, and `per_call` mode is the safe choice, because batched mode lets an edit switch tools and a jumping middleware skip review.
+> `HumanInTheLoopMiddleware` 会暂停工具调用等待审核，而 `per_call` 模式更安全：批量模式下，编辑可以把调用换成另一个工具，会跳转的中间件也能跳过审核。
 
-Your agent can send email and delete files, and a person must approve each of those calls before it runs. You add one middleware with a list of tool names. The reviewer edits one call to point at a different tool, and in one mode that tool runs. In the other mode the same edit raises an error.
+你的 agent 能发邮件、删文件，每个调用执行之前都必须有人审批。你只需添加一个中间件，并给它一份工具名列表。审核人把某个调用改成指向另一个工具，在一种模式下那个工具会真的运行，在另一种模式下同样的编辑会报错。
 
-When you finish this section, you can pause chosen tool calls for review and answer each pause with one of four decisions. You can also choose the settings that keep the review in force.
+读完本节，你能暂停指定的工具调用等待审核，并用四种决定之一回应每次暂停。你还能选出让审核始终生效的配置。
 
-## Which calls pause
+## 哪些调用会暂停 {#s-human-in-the-loop-batched-and-per-call-which-calls-pause}
 
-**HumanInTheLoopMiddleware:** the middleware that pauses an agent when the model asks for a tool in its `interrupt_on` map. It waits for a decision on each such call.
+**HumanInTheLoopMiddleware：** 当模型请求的工具出现在 `interrupt_on` 映射里时，让 agent 暂停的中间件。它会为每个这样的调用等待一个决定。
 
-The `interrupt_on` map takes a tool name and `True`, which allows all four decisions, or a config with `allowed_decisions`. The kit gives `add` every decision and `lookup_order` two:
+`interrupt_on` 映射接受工具名加 `True`（允许全部四种决定），或者带 `allowed_decisions` 的配置。录制工具包给 `add` 开放了全部决定，给 `lookup_order` 只开放两种：
 
 ```listing
-title: an agent with two tools under review, batched mode
+title: 两个工具受审核的 agent，批量模式
 source: capture/s_middleware.py
 lang: python
 ---
     agent = create_agent(m, tools=[add, lookup_order], middleware=[HumanInTheLoopMiddleware(interrupt_on={"add": True, "lookup_order": {"allowed_decisions": ["approve", "reject"]}})], checkpointer=checkpointer)
 ```
 
-A tool that is not in the map runs with no pause. The middleware pauses with `interrupt`, so the agent needs a checkpointer, as [section 6.4](#s-interrupt-and-resume) showed. The human-in-the-loop page names `AsyncPostgresSaver` for production {{docs oss/python/langchain/human-in-the-loop}}.
+不在映射里的工具直接运行，不会暂停。这个中间件通过 `interrupt` 暂停，所以 agent 需要 checkpointer，[第 6.4 节](#s-interrupt-and-resume)已经展示过。human-in-the-loop 文档页在生产环境推荐 `AsyncPostgresSaver` {{docs oss/python/langchain/human-in-the-loop}}。
 
-## The four decisions
+## 四种决定 {#s-human-in-the-loop-batched-and-per-call-the-four-decisions}
 
-**Decision:** the answer to one paused tool call. Its `type` is `approve`, `edit`, `reject`, or `respond`.
+**决定（decision）：** 对一个已暂停工具调用的回答。它的 `type` 是 `approve`、`edit`、`reject` 或 `respond`。
 
-| Decision | The reviewer sends | Does the tool run | The ToolMessage the model gets |
+| 决定 | 审核人发送 | 工具是否运行 | 模型收到的 ToolMessage |
 |---|---|---|---|
-| `approve` | `{"type": "approve"}` | yes, with the arguments of the model | the tool result, status `success` |
-| `edit` | `edited_action` with a `name` and `args` | yes, with the edited arguments | a notice, then the tool result |
-| `reject` | an optional `message` | no | the reason, status `error` |
-| `respond` | a `message` | no | the message, status `success` |
+| `approve` | `{"type": "approve"}` | 是，使用模型给出的参数 | 工具结果，状态为 `success` |
+| `edit` | 带 `name` 和 `args` 的 `edited_action` | 是，使用编辑后的参数 | 先是一条通知，然后是工具结果 |
+| `reject` | 可选的 `message` | 否 | 拒绝理由，状态为 `error` |
+| `respond` | 一条 `message` | 否 | 这条消息，状态为 `success` |
 
-`respond` is for a tool whose real answer comes from the person. The model reads its message as a successful result. The docs say not to use `respond` to refuse a tool with side effects {{docs oss/python/langchain/human-in-the-loop}}. The kit shows why: the model cannot tell the answer from a tool result. Use `reject` to refuse.
+`respond` 适用于真正的答案要由人来给的工具。模型会把它的消息当作一次成功的结果来读。文档说，不要用 `respond` 拒绝有副作用的工具 {{docs oss/python/langchain/human-in-the-loop}}。录制工具包说明了原因：模型分不清这条回答和真正的工具结果。要拒绝，就用 `reject`。
 
-## Batched mode
+## 批量模式 {#s-human-in-the-loop-batched-and-per-call-batched-mode}
 
-**Batched mode:** the default `interrupt_mode`. One interrupt holds every paused call of one model message, and one resume answers all of them in order.
+**批量模式：** 默认的 `interrupt_mode`。一次中断装下同一条模型消息里所有暂停的调用，一次恢复按顺序回答它们全部。
 
-The kit asked Qwen3 4B to call `add` and `lookup_order` in one reply, and it did. The run paused with one interrupt. Its value lists the calls and the decisions that each one allows:
+录制工具包让 Qwen3 4B 在一条回复里同时调用 `add` 和 `lookup_order`，它做到了。运行因此只暂停了一次。中断的值列出了各个调用，以及每个调用允许的决定：
 
 ```listing
-title: one interrupt for two calls
+title: 两个调用共用一次中断
 source: capture/out/15-mw-hitl-batched.txt
 lang: json
-note: The descriptions and the arguments of lookup_order are cut.
+note: 已截掉描述和 lookup_order 的参数。
 ---
 interrupts:
 [
@@ -82,13 +82,13 @@ interrupts:
       ]
 ```
 
-While the run waits, `next` is `HumanInTheLoopMiddleware.after_model`. The resume sends a list of decisions, one for each call, in the order of `action_requests`. The kit edited `add` to 20 and 30, and rejected `lookup_order`:
+运行等待期间，`next` 是 `HumanInTheLoopMiddleware.after_model`。恢复时发送一个决定列表，每个调用一个，顺序与 `action_requests` 相同。录制工具包把 `add` 编辑成 20 和 30，并拒绝了 `lookup_order`：
 
 ```listing
-title: the resume for two calls in batched mode
+title: 批量模式下两个调用的恢复
 source: capture/s_middleware.py
 lang: python
-note: The kit builds the list from the interrupt, so it holds one decision for each call that the model made.
+note: 录制工具包根据中断构造这个列表，所以模型发出的每个调用都有一个决定。
 ---
     decisions = []
     for request in gated(result):
@@ -99,13 +99,13 @@ note: The kit builds the list from the interrupt, so it holds one decision for e
     result = agent.invoke(Command(resume={"decisions": decisions}), cfg, version="v2")
 ```
 
-The model got two `ToolMessage` objects. The rejected call came first. The edited call ran with the new arguments, and its result starts with a notice that tells the model what ran:
+模型收到了两条 `ToolMessage`。被拒绝的调用排在前面。被编辑的调用用新参数运行，它的结果以一条通知开头，告诉模型实际运行了什么：
 
 ```listing
-title: the two ToolMessages after the resume
+title: 恢复之后的两条 ToolMessage
 source: capture/out/15-mw-hitl-batched.txt
 lang: json
-note: The names and the ids are cut.
+note: 已截掉名称和 id。
 ---
     "type": "ToolMessage",
     "content": "User rejected the tool call for `lookup_order` with reason: Do not look up orders.",
@@ -120,27 +120,27 @@ note: The names and the ids are cut.
     "status": "success"
 ```
 
-The model then answered `The result of the addition is 50.`. The `AIMessage` in the state still holds the original call with 2 and 3. A list with one decision for two calls raised `ValueError: Number of human decisions (1) does not match number of hanging tool calls (2).`, and nothing ran.
+随后模型回答 `The result of the addition is 50.`。状态里的 `AIMessage` 仍然保留着原始调用，参数是 2 和 3。给两个调用只发一个决定的列表，会抛出 `ValueError: Number of human decisions (1) does not match number of hanging tool calls (2).`，什么都不会运行。
 
-## Per-call mode
+## 逐调用模式 {#s-human-in-the-loop-batched-and-per-call-per-call-mode}
 
-**Per-call mode:** `interrupt_mode="per_call"`. Each paused call gets its own interrupt with a `response_schema`, and a resume answers any of them by interrupt id.
+**逐调用模式：** `interrupt_mode="per_call"`。每个暂停的调用有自己的中断和一个 `response_schema`，一次恢复可以按中断 id 回答其中任意一个。
 
 ```listing
-title: an agent in per-call mode
+title: 逐调用模式下的 agent
 source: capture/s_middleware.py
 lang: python
 ---
     agent = create_agent(m, tools=[add], middleware=[HumanInTheLoopMiddleware(interrupt_on={"add": True}, interrupt_mode="per_call")], checkpointer=InMemorySaver())
 ```
 
-The model asked for `add` twice in one reply, for 2 and 3 and for 4 and 5. The run paused with two interrupts, and `next` was `["tools", "tools"]`. Each interrupt names one call:
+模型在一条回复里请求了两次 `add`，参数分别是 2 和 3、4 和 5。运行暂停后有两个中断，`next` 是 `["tools", "tools"]`。每个中断对应一个调用：
 
 ```listing
-title: the interrupt for the first call
+title: 第一个调用的中断
 source: capture/out/16-mw-hitl-per-call.txt
 lang: json
-note: The description is cut.
+note: 已截掉描述。
 ---
 interrupt for add(2, 3):
 {
@@ -155,13 +155,13 @@ interrupt for add(2, 3):
     },
 ```
 
-The `response_schema` of each interrupt allows the four decisions. In its `EditedAction`, the tool name is a constant, so an edit cannot name a different tool:
+每个中断的 `response_schema` 都允许四种决定。在它的 `EditedAction` 里，工具名是常量，所以编辑不能指向另一个工具：
 
 ```listing
-title: the edited action in the response schema
+title: 响应模式里的 edited action
 source: capture/out/16-mw-hitl-per-call.txt
 lang: json
-note: One definition from the schema of the first interrupt.
+note: 取自第一个中断的模式中的一个定义。
 ---
     "EditedAction": {
       "properties": {
@@ -172,91 +172,91 @@ note: One definition from the schema of the first interrupt.
         },
 ```
 
-The kit resumed with a map from each interrupt id to its decision: approve the first call, reject the second. The first `add` returned `5`, and the second got the reason with status `error`. The model did not report the 5. It answered `I see that the tool call was rejected.` and offered to try again. An answer that the schema rejects raises, and the run keeps waiting. The kit allowed only `approve` on one tool and sent `reject`:
+录制工具包用一个从中断 id 到决定的映射来恢复：批准第一个调用，拒绝第二个。第一个 `add` 返回了 `5`，第二个收到了状态为 `error` 的拒绝理由。模型没有报告那个 5，而是回答 `I see that the tool call was rejected.`，并提出再试一次。被模式拒绝的回答会抛出异常，运行继续等待。录制工具包在一个工具上只允许 `approve`，然后发送了 `reject`：
 
 ```listing
-title: a decision outside the allowed decisions
+title: 超出允许范围的决定
 source: capture/out/16-mw-hitl-per-call.txt
 lang: text
-note: The help line of pydantic is cut.
+note: 已截掉 pydantic 的帮助行。
 ---
 raised pydantic_core._pydantic_core.ValidationError: 1 validation error for ApproveDecision
 type
   Input should be 'approve' [type=literal_error, input_value='reject', input_type=str]
 ```
 
-After the error, `next` was still `["tools"]`. Per-call mode needs `langchain` 1.4.6 or later. The docs suggest it for new agents and plan to make it the default in the next major release {{docs oss/python/langchain/human-in-the-loop}}. [Figure](#fig-6-5) sets the two modes side by side.
+报错之后，`next` 仍然是 `["tools"]`。逐调用模式需要 `langchain` 1.4.6 或更高版本。文档建议新 agent 使用它，并计划在下一个主版本把它设为默认 {{docs oss/python/langchain/human-in-the-loop}}。[图](#fig-6-5)把两种模式并排放在一起。
 
 ```figure
 id: fig-6-5
 kind: comparison
-title: batched mode and per-call mode
-claim: Batched mode answers one list for all calls of a message, and per-call mode answers each call by its interrupt id against a schema.
-caption: Read each row across the two columns. The rows are the pause, the resume, an edit to another tool, and a middleware that jumps to tools. Rose cells are where a review did not hold. From capture/out/15-mw-hitl-batched.txt, capture/out/16-mw-hitl-per-call.txt, and capture/lab/summary/approvals-x86.json.
+title: 批量模式与逐调用模式
+claim: 批量模式用一个列表回答同一条消息的所有调用，逐调用模式则按中断 id 对照模式逐个回答每个调用。
+caption: 请跨两列逐行阅读。各行依次是暂停、恢复、把编辑改成另一个工具，以及跳转到 tools 的中间件。玫瑰色单元格是审核没有生效的地方。来源：capture/out/15-mw-hitl-batched.txt、capture/out/16-mw-hitl-per-call.txt 和 capture/lab/summary/approvals-x86.json。
 ```
 
-## What the lab found
+## 实验记录的发现 {#s-human-in-the-loop-batched-and-per-call-what-the-lab-found}
 
-**We measured** the middleware on the x86 server guest in 25 model cases, 3 runs of each. The model was Qwen3 4B on Ollama (temperature 0, seed 42). The graph cases G1 and G2 have no model and come from the Mac. The tools were `send_email` and `delete_file`, both under review.
+**我们测量了** x86 服务器客户机上的这个中间件：25 个模型用例，每个跑 3 次。模型是 Ollama 上的 Qwen3 4B（temperature 0，seed 42）。图用例 G1 和 G2 没有模型，来自 Mac。工具是 `send_email` 和 `delete_file`，都在审核之下。
 
-Each start and each resume ran in a new process against `SqliteSaver`, so every resume was a restart. All 3 runs of each case gave the same tool runs. [Figure](#fig-6-5b) shows each run.
+每次启动和每次恢复都在新进程里对 `SqliteSaver` 运行，所以每次恢复都是一次重启。每个用例的 3 次运行得到了相同的工具运行结果。[图](#fig-6-5b)展示了每一次运行。
 
 ```figure
 id: fig-6-5b
 kind: chart
-title: tool runs in each approval case
-claim: Each case gave the same tool runs in 3 of 3 runs, and only batched cases ran a tool that no approval allowed.
-caption: Read one column for each of the 22 middleware cases. The graph and strict resume cases G1 to G3, S1, and S2 are not drawn. Each dot is one run on the x86 server guest. A dot on the line is a run whose tools matched the decisions, and a rose dot ran a tool that no approval allowed. From capture/lab/summary/approvals-x86.json.
+title: 每个审批用例的工具运行
+claim: 每个用例在 3 次运行里都得到相同的工具运行结果，而且只有批量用例运行了没有任何审批允许的工具。
+caption: 每一列是 22 个中间件用例之一。图和严格恢复用例 G1 到 G3、S1、S2 没有画出。每个点是 x86 服务器客户机上的一次运行。落在线上的点表示工具运行与决定一致，玫瑰色点表示运行了没有任何审批允许的工具。来源：capture/lab/summary/approvals-x86.json。
 ```
 
-The grey line of the figure is the number of tool runs that the reviewer allowed in each case. The figure code holds these counts as constants. They come from the decisions in the table below and from the case scripts in `capture/lab/T07-approvals-x86/`. The cases have short codes. `B` is batched, `P` is per call, `J` adds a middleware that jumps to `tools`, and `G` is a plain graph.
+图里的灰线是每个用例中审核人允许运行的工具次数。图的代码把这些次数写成了常量。它们来自下表中的决定，以及 `capture/lab/T07-approvals-x86/` 里的用例脚本。用例有简短的代号：`B` 是批量，`P` 是逐调用，`J` 表示加了一个会跳转到 `tools` 的中间件，`G` 是普通图。
 
-| Case | What the reviewer did | Result, in 3 of 3 runs |
+| 用例 | 审核人做了什么 | 结果，3 次运行都一样 |
 |---|---|---|
-| B2, P2 | edit the arguments of `send_email` | only the edited call ran |
-| B3 | edit `send_email` into a call of `delete_file` | `delete_file` ran |
-| P3 | the same edit in per-call mode | `ValidationError`, nothing ran |
-| B4, P4 | reject | nothing ran, status `error` |
-| B5, P5 | respond | nothing ran, status `success` |
-| P7 | answer two calls one at a time | each call ran once |
-| P8 | a plain value for two waiting calls | `RuntimeError`, nothing ran |
-| J1, J3 | batched, the jumping middleware after the review middleware in the list | `send_email` ran at the start, before any decision |
-| J2 | batched, the jumping middleware first, reject | `send_email` ran, and the state held two ToolMessages for one call |
-| J4, J5 | per call, either order, reject | nothing ran |
-| G1, G2 | two parallel interrupts in a graph and a subgraph, answered one at a time | each branch ran its side effect once |
+| B2、P2 | 编辑 `send_email` 的参数 | 只有编辑后的调用运行 |
+| B3 | 把 `send_email` 编辑成对 `delete_file` 的调用 | `delete_file` 运行了 |
+| P3 | 在逐调用模式下做同样的编辑 | `ValidationError`，没有任何运行 |
+| B4、P4 | 拒绝 | 没有任何运行，状态为 `error` |
+| B5、P5 | respond | 没有任何运行，状态为 `success` |
+| P7 | 逐个回答两个调用 | 每个调用只运行一次 |
+| P8 | 给两个等待中的调用一个普通值 | `RuntimeError`，没有任何运行 |
+| J1、J3 | 批量，会跳转的中间件在列表里排在审核中间件之后 | `send_email` 一开始就运行了，早于任何决定 |
+| J2 | 批量，会跳转的中间件排在最前，拒绝 | `send_email` 运行了，状态里有两条 ToolMessage 对应同一个调用 |
+| J4、J5 | 逐调用，两种顺序，拒绝 | 没有任何运行 |
+| G1、G2 | 图和子图里的两个并行中断，逐个回答 | 每个分支的副作用只运行一次 |
 
-In 10 two-action requests, Qwen3 4B and Qwen3 8B each made two or more calls in 9. So a batched review of several calls is the common case.
+在 10 个含两个动作的请求中，Qwen3 4B 和 Qwen3 8B 各有 9 次发出了两个或更多调用。所以批量审核多个调用是常见情形。
 
-The B3 row settles conflict D102. One batched example in the docs edits a call to a new tool name, and the per-call text keeps the name. The changelog for 1.4.6 says that an edit cannot switch tools {{docs oss/python/releases/changelog}}. At the pin, batched mode still allows the switch, and per-call mode refuses it.
+B3 这一行解决了冲突 D102。文档里有一个批量示例把调用编辑成新工具名，而逐调用部分的文字保持名称不变。1.4.6 的更新日志说，编辑不能切换工具 {{docs oss/python/releases/changelog}}。在锁定版本上，批量模式仍然允许切换，逐调用模式则拒绝。
 
-The J rows reproduce issue langchain#40492 in batched mode {{issue langchain#40492}}. The jumping middleware returns `jump_to="tools"` from `after_model`. `after_model` hooks run in the reverse order of the middleware list. So in J1 and J3 its hook ran before the review hook and skipped it.
+J 这几行在批量模式下复现了 issue langchain#40492 {{issue langchain#40492}}。会跳转的中间件在 `after_model` 里返回 `jump_to="tools"`。`after_model` 钩子按中间件列表的相反顺序运行。所以在 J1 和 J3 里，它的钩子先于审核钩子运行，并跳过了审核。
 
-In J2 the review ran, the call was rejected, and the jump still ran the tool. The two ToolMessages for one call in J2 break the rule of [section 3.4](#s-tools-toolruntime-and-tool-errors): one answer for each tool call. Per-call mode puts its pause in the tool call itself, and the jump did not skip it.
+在 J2 里，审核运行了，调用被拒绝，但跳转仍然运行了工具。J2 里同一个调用对应两条 ToolMessage，违反了[第 3.4 节](#s-tools-toolruntime-and-tool-errors)的规则：每个工具调用只有一个回答。逐调用模式把暂停放在工具调用本身，跳转没有跳过它。
 
-Two older issues did not reproduce. Issue langchain#33787 said that an edit could still run the original call {{issue langchain#33787}}. In B2 and P2 only the edited call ran. Issue langgraph#9106 said that a resume ran a finished parallel branch again {{issue langgraph#9106}}. In G1 and G2 the finished branch did not run again. The branch still waiting ran its node up to `interrupt` on each resume, which is the rule of section 6.4.
+另外两个较早的 issue 没有复现。issue langchain#33787 说，编辑之后仍可能运行原始调用 {{issue langchain#33787}}。在 B2 和 P2 里，只有编辑后的调用运行。issue langgraph#9106 说，恢复会让已完成的并行分支再次运行 {{issue langgraph#9106}}。在 G1 和 G2 里，已完成的分支没有再次运行。仍在等待的分支每次恢复时会把节点运行到 `interrupt` 为止，这是第 6.4 节的规则。
 
-## The safe configuration
+## 安全配置 {#s-human-in-the-loop-batched-and-per-call-the-safe-configuration}
 
-These settings kept every review in force in the lab runs:
+在实验记录的运行里，这些设置让每次审核都保持有效：
 
-1. Set `interrupt_mode="per_call"`, so an edit stays on its tool and a jump to `tools` does not skip the review.
-2. Use a checkpointer that survives a restart, such as `SqliteSaver` or `PostgresSaver`.
-3. Allow only the decisions you need for each tool. Leave out `respond` and `edit` for a tool with side effects, and refuse with `reject`.
-4. Answer each interrupt by its id, and check `next` with `get_state` before you resume.
-5. Put no middleware that jumps to `tools` in an agent with review, unless you test it in your mode.
-6. List `HumanInTheLoopMiddleware` before tool retry and error middleware, as the docs say {{docs oss/python/langchain/human-in-the-loop}}.
+1. 设置 `interrupt_mode="per_call"`，让编辑停留在原工具上，让跳转到 `tools` 的操作不能跳过审核。
+2. 使用能挺过重启的 checkpointer，例如 `SqliteSaver` 或 `PostgresSaver`。
+3. 为每个工具只允许你需要的决定。有副作用的工具去掉 `respond` 和 `edit`，用 `reject` 拒绝。
+4. 按 id 回答每个中断，并在恢复之前用 `get_state` 检查 `next`。
+5. 带审核的 agent 里不要放会跳转到 `tools` 的中间件，除非你在自己的模式下测试过。
+6. 按文档所说，把 `HumanInTheLoopMiddleware` 列在工具重试和错误中间件之前 {{docs oss/python/langchain/human-in-the-loop}}。
 
-Agent Chat UI answers batched approvals only, and a typed message closes a pending approval as a success. See [the chat UI section](#s-agent-chat-ui-in-front-of-langgraph-dev).
+Agent Chat UI 只回答批量审批，而且输入一条消息会把待处理的审批当作成功关闭。见[聊天界面一节](#s-agent-chat-ui-in-front-of-langgraph-dev)。
 
-The docs also warn about one invalid answer among several sent together. The tools of the valid answers can run while their interrupts still look pending, and a second answer runs them twice {{docs oss/python/langchain/human-in-the-loop}}. So answer one interrupt at a time, and make the side effects idempotent. After a failed combined resume, check what the tools did before you send the answer again. The lab did not run that case, or any case with `PostgresSaver`. Both come in the next edition, with the other open items of [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition).
+文档还警告了一种情况：一起发送的多个回答里有一个无效。有效回答对应的工具可能已经运行，而它们的中断看起来仍在等待，第二次回答会让它们运行两次 {{docs oss/python/langchain/human-in-the-loop}}。所以一次只回答一个中断，并让副作用具备幂等性。组合恢复失败之后，先检查工具做了什么，再重新发送回答。实验记录没有运行这种情况，也没有运行任何使用 `PostgresSaver` 的用例。两者都留到下一版，与[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)里的其他未决项放在一起。
 
 ```takeaways
-- Set interrupt_mode="per_call" on every new agent with review.
-- Refuse a call with reject, never with respond.
-- Remove edit from allowed_decisions when a reviewer must not change the call.
-- Answer each per-call interrupt by its id after you check get_state().next.
-- Keep middleware that jumps to tools out of an agent with review.
-- Use a checkpointer that survives a restart, because the reviewer can answer hours later.
+- 每个带审核的新 agent 都设置 interrupt_mode="per_call"。
+- 用 reject 拒绝调用，不要用 respond。
+- 审核人不能修改调用时，从 allowed_decisions 里去掉 edit。
+- 先检查 get_state().next，再按 id 回答每个逐调用中断。
+- 带审核的 agent 里不要放会跳转到 tools 的中间件。
+- 使用能挺过重启的 checkpointer，因为审核人可能数小时后才回答。
 ```
 
-Sources: capture/s_middleware.py, capture/out/15-mw-hitl-batched.txt, capture/out/16-mw-hitl-per-call.txt; capture/lab/summary/approvals-x86.json, capture/lab/T07-approvals-x86/00-survey.jsonl, capture/lab/T07-approvals-x86/01-cases.jsonl, capture/lab/T07-approvals-x86/02-g3-rerun.jsonl, capture/lab/T07-approvals-x86/t07_child_real.py; capture/lab/summary/approvals-mac.json, capture/lab/T07-approvals-mac/01-cases.jsonl; libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py at langchain==1.5.0; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/human-in-the-loop, oss/python/releases/changelog); issues langchain-ai/langchain#40492, #33787, and langchain-ai/langgraph#9106, read 2026-11-14.
+来源：capture/s_middleware.py, capture/out/15-mw-hitl-batched.txt, capture/out/16-mw-hitl-per-call.txt; capture/lab/summary/approvals-x86.json, capture/lab/T07-approvals-x86/00-survey.jsonl, capture/lab/T07-approvals-x86/01-cases.jsonl, capture/lab/T07-approvals-x86/02-g3-rerun.jsonl, capture/lab/T07-approvals-x86/t07_child_real.py; capture/lab/summary/approvals-mac.json, capture/lab/T07-approvals-mac/01-cases.jsonl; libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py at langchain==1.5.0; docs.langchain.com at docs commit 04d4d4a (oss/python/langchain/human-in-the-loop, oss/python/releases/changelog); issues langchain-ai/langchain#40492, #33787, and langchain-ai/langgraph#9106, read 2026-11-14.

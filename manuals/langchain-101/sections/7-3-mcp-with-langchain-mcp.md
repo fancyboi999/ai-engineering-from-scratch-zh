@@ -1,36 +1,36 @@
-# MCP with langchain.mcp
+# 用 langchain.mcp 接入 MCP
 
-> `MCPAdapter` turns the tools of an MCP server into LangChain tools, refuses a string that is not a URL, and lets a server crash end the run.
+> `MCPAdapter` 把 MCP 服务器的工具变成 LangChain 工具，会拒绝不是 URL 的字符串，并且服务器崩溃会让整次运行结束。
 
-You find an MCP server for your issue tracker and want its tools in your agent. Every example you find imports `MultiServerMCPClient` from `langchain_mcp_adapters`. You install that package next to `langchain[mcp]`, and pip downgrades `mcp` under the new adapter.
+你找到了一个问题追踪系统的 MCP 服务器，想把它的工具放进你的 agent。你找到的每个示例都从 `langchain_mcp_adapters` 导入 `MultiServerMCPClient`。你把这个包装在 `langchain[mcp]` 旁边，pip 就把新适配器下面的 `mcp` 降了级。
 
-When you finish this section, you can load MCP tools into an agent with `langchain.mcp`. You can also predict what a tool error, a slow tool, and a server crash do to a run. And you can set the timeout that the adapter lacks, and answer a server that asks for input.
+读完本节，你能用 `langchain.mcp` 把 MCP 工具加载进 agent。你还能预测工具错误、慢工具和服务器崩溃会对一次运行造成什么后果。你也能设置适配器缺少的超时，并回答服务器提出的输入请求。
 
-## The package and its beta warning
+## 包与它的 beta 警告 {#s-mcp-with-langchain-mcp-the-package-and-its-beta-warning}
 
-**MCP adapter:** the class `MCPAdapter` in `langchain.mcp`. It connects to an MCP server through FastMCP and returns the tools of that server as LangChain tools.
+**MCP 适配器：** `langchain.mcp` 里的 `MCPAdapter` 类。它通过 FastMCP 连接 MCP 服务器，并把该服务器的工具作为 LangChain 工具返回。
 
-`langchain` 1.4.0 added `langchain.mcp` in place of the archived `langchain-mcp-adapters` package {{docs oss/python/releases/changelog}}. You install it with the extra `langchain[mcp]`, which asks for `fastmcp` 4.0.11 or later. The kit resolved `fastmcp` 4.2.0 and `mcp` 2.3.0. The first import warns once per process:
+`langchain` 1.4.0 添加了 `langchain.mcp`，取代已归档的 `langchain-mcp-adapters` 包 {{docs oss/python/releases/changelog}}。安装时使用附加项 `langchain[mcp]`，它要求 `fastmcp` 4.0.11 或更高版本。录制工具包解析出 `fastmcp` 4.2.0 和 `mcp` 2.3.0。第一次导入时，每个进程会警告一次：
 
 ```listing
-title: importing langchain.mcp
+title: 导入 langchain.mcp
 source: capture/out/40-mcp.txt
 lang: text
 ---
 warning LangChainBetaWarning: `langchain.mcp` is in beta. It is actively being worked on, so the API may change.
 ```
 
-The package exports three names: `MCPAdapter`, `MCPToolArtifact`, and `as_langchain_tool`. Do not install the old adapter in the same environment. `langchain-mcp-adapters` 0.3.2 requires `mcp` below 2.0 {{code langchain-mcp-adapters pyproject.toml}}, and `fastmcp` 4.2.0 needs `mcp` 2.3.0. In the environment of the old adapter, the resolver picked `mcp` 1.30.0.
+这个包导出三个名字：`MCPAdapter`、`MCPToolArtifact` 和 `as_langchain_tool`。不要把旧适配器装在同一个环境里。`langchain-mcp-adapters` 0.3.2 要求 `mcp` 低于 2.0 {{code langchain-mcp-adapters pyproject.toml}}，而 `fastmcp` 4.2.0 需要 `mcp` 2.3.0。在旧适配器的环境里，解析器选了 `mcp` 1.30.0。
 
-## From a server to an agent
+## 从服务器到 agent {#s-mcp-with-langchain-mcp-from-a-server-to-an-agent}
 
-The kit builds a FastMCP server named `calc` in the same process and passes the server object to `MCPAdapter`. An in-process server needs no port and no subprocess. `list_tools()` returns one LangChain tool for each MCP tool:
+录制工具包在同一个进程里构建了一个名为 `calc` 的 FastMCP 服务器，并把服务器对象传给 `MCPAdapter`。进程内的服务器不需要端口，也不需要子进程。`list_tools()` 为每个 MCP 工具返回一个 LangChain 工具：
 
 ```listing
-title: one of the three tools from list_tools
+title: list_tools 返回的三个工具之一
 source: capture/out/40-mcp.txt
 lang: json
-note: The first tool. divide and stats are cut.
+note: 第一个工具。divide 和 stats 已截掉。
 ---
   {
     "name": "multiply",
@@ -47,10 +47,10 @@ note: The first tool. divide and stats are cut.
   },
 ```
 
-Each tool has `response_format` set to `content_and_artifact`. The model sees the content, a list of text blocks. On a successful call, the structured result of the server stays in the artifact, where your code can read it and the model cannot:
+每个工具的 `response_format` 都设为 `content_and_artifact`。模型看到的是内容，也就是一个文本块列表。调用成功时，服务器的结构化结果保留在 artifact 里，你的代码可以读它，模型读不到：
 
 ```listing
-title: the ToolMessage of multiply
+title: multiply 的 ToolMessage
 source: capture/out/40-mcp.txt
 lang: json
 ---
@@ -73,16 +73,16 @@ lang: json
     }
 ```
 
-`langchain.mcp` has no API for MCP resources or prompts. The migration guide lists both as not supported {{docs oss/python/migrate/langchain-mcp-adapters}}. The kit read a resource through `adapter.client`, which is the FastMCP client underneath, and got `calc server: multiply, divide, stats`.
+`langchain.mcp` 没有面向 MCP 资源或 prompt 的 API。迁移指南把两者都列为不支持 {{docs oss/python/migrate/langchain-mcp-adapters}}。录制工具包通过 `adapter.client`（底层的 FastMCP 客户端）读取了一个资源，得到 `calc server: multiply, divide, stats`。
 
-## A string target must be a URL
+## 字符串目标必须是 URL {#s-mcp-with-langchain-mcp-a-string-target-must-be-a-url}
 
-**Target:** the first argument of `MCPAdapter`. It can be an `http` or `https` URL, a `Path` to a script, or a FastMCP transport. It can also be an in-process `FastMCP` server, an `MCPConfig` dict, or a `fastmcp.Client`.
+**目标（target）：** `MCPAdapter` 的第一个参数。它可以是 `http` 或 `https` URL、脚本的 `Path`，或 FastMCP 传输。它也可以是进程内的 `FastMCP` 服务器、`MCPConfig` dict 或 `fastmcp.Client`。
 
-The type of the target chooses the transport. A `Path` starts the script as a subprocess over stdio. A `str` must be an `http` or `https` URL. Any other string raises when you build the adapter:
+目标的类型决定传输方式。`Path` 通过 stdio 把脚本作为子进程启动。`str` 必须是 `http` 或 `https` URL。其他任何字符串都会在你构建适配器时抛出异常：
 
 ```listing
-title: a string that names a file
+title: 指向文件的字符串
 source: capture/out/40-mcp.txt
 lang: text
 ---
@@ -91,22 +91,22 @@ MCPAdapter('server.py'):
 raised builtins.ValueError: MCP target 'server.py' is not a valid URL. To run a local MCP server over stdio, ask for it explicitly with `Path('server.py')`, a `fastmcp` transport, or an `MCPConfig` — a bare string is read as a URL so that it cannot silently become a subprocess.
 ```
 
-The check is `_validate_url_target`, which runs before the adapter builds a FastMCP client {{code libs/langchain_v1/langchain/mcp/adapter.py}}. It also refuses a `file://` URL, because its scheme is not `http` or `https`.
+检查由 `_validate_url_target` 完成，它在适配器构建 FastMCP 客户端之前运行 {{code libs/langchain_v1/langchain/mcp/adapter.py}}。它也会拒绝 `file://` URL，因为这个 scheme 不是 `http` 或 `https`。
 
-The MCP page of the docs warns that a string naming an existing `.py` or `.js` file would start that file as a subprocess {{docs oss/python/langchain/mcp}}. That describes `fastmcp.Client`, and the same paragraph says that `MCPAdapter` refuses such a string. Our run agrees on both points.
+文档的 MCP 页面警告说，指向已存在的 `.py` 或 `.js` 文件的字符串会把该文件作为子进程启动 {{docs oss/python/langchain/mcp}}。这描述的是 `fastmcp.Client`，同一段还说 `MCPAdapter` 会拒绝这样的字符串。我们的运行在这两点上都与文档一致。
 
-On the Mac, we gave `MCPAdapter` three strings for an existing server script: a relative path, an absolute path, and a `file://` URL. Each one raised `ValueError` and launched nothing. `fastmcp.Client` with the same relative path started the script. The lab script filtered warnings, so the run did not record one. So the danger is real only when you build a `fastmcp.Client` from a string yourself, and then pass it to the adapter.
+在 Mac 上，我们给 `MCPAdapter` 三个指向已有服务器脚本的字符串：相对路径、绝对路径和 `file://` URL。每个都抛出了 `ValueError`，没有启动任何东西。`fastmcp.Client` 用同一个相对路径则启动了脚本。实验脚本过滤了警告，所以这次运行没有记录警告。因此，只有在你自己用字符串构建 `fastmcp.Client`，再把它传给适配器时，这个危险才是真实的。
 
-A target that comes from configuration or from a model is a string. Keep it a string, and the adapter reaches it only over HTTP. To start a local server, write `Path("server.py")` in your own code.
+来自配置或来自模型的目标是字符串。让它保持为字符串，适配器就只会通过 HTTP 访问它。要启动本地服务器，请在你自己的代码里写 `Path("server.py")`。
 
-## Errors, timeouts, and crashes
+## 错误、超时与崩溃 {#s-mcp-with-langchain-mcp-errors-timeouts-and-crashes}
 
-**MCP tool error:** a tool result with `isError` set to true. A FastMCP server sends it when the tool raises `ToolError` or any other exception.
+**MCP 工具错误：** `isError` 为 true 的工具结果。当工具抛出 `ToolError` 或其他任何异常时，FastMCP 服务器会发送它。
 
-The adapter turns a tool error into a `ToolMessage` with `status` `error` {{code libs/langchain_v1/langchain/mcp/tools.py}}. The model reads the text of the server, and the run goes on. Here the model reported each result, and said that the division gave `division by zero`. In the kit, Qwen3 4B called `multiply`, `divide`, and `stats` in one reply. `divide` with a zero divisor raised `ToolError`:
+适配器把工具错误转成 `status` 为 `error` 的 `ToolMessage` {{code libs/langchain_v1/langchain/mcp/tools.py}}。模型读到服务器的文本，运行继续。这里模型报告了每个结果，并说除法得到 `division by zero`。在录制工具包里，Qwen3 4B 在一条回复里调用了 `multiply`、`divide` 和 `stats`。除数为零的 `divide` 抛出了 `ToolError`：
 
 ```listing
-title: a tool error becomes an error ToolMessage
+title: 工具错误变成错误的 ToolMessage
 source: capture/out/40-mcp.txt
 lang: json
 ---
@@ -124,66 +124,66 @@ lang: json
     "status": "error"
 ```
 
-A failure of the transport is different. It is not a `ToolException`, so it skips the error handling and raises out of the run. The docs say the same: a server error reaches the model, and a transport or session failure raises {{docs oss/python/langchain/mcp/tools}}. The kit cannot crash an in-process server, so we tested the other cases with a real server on the Mac.
+传输层的失败则不同。它不是 `ToolException`，所以会跳过错误处理，直接从运行里抛出。文档说的也一样：服务器错误会到达模型，传输或会话失败则会抛出异常 {{docs oss/python/langchain/mcp/tools}}。录制工具包无法让进程内的服务器崩溃，所以其他情况我们在 Mac 上用真实的服务器测试。
 
-**We measured** each failure on the Mac, Apple M1 Max, 10 cores, 64 GiB, with `langchain` 1.5.0 and `fastmcp` 4.2.0. The FastMCP server ran over stdio and over Streamable HTTP, and we ran each case once. [Figure](#fig-7-3) shows the result of each case.
+**我们测量了** Mac 上每种失败，机器是 Apple M1 Max，10 核，64 GiB，使用 `langchain` 1.5.0 和 `fastmcp` 4.2.0。FastMCP 服务器分别通过 stdio 和 Streamable HTTP 运行，每个用例运行一次。[图](#fig-7-3)展示了每个用例的结果。
 
 ```figure
 id: fig-7-3
 kind: decision
-title: what each MCP failure does to a run
-claim: A tool error becomes an error ToolMessage and the run goes on, but a slow tool has no timeout and a server crash aborts the run.
-caption: Read each row from the case on the left to the result on the right. Green rows go on to the next model call, the grey row waits, and rose rows raise. From capture/lab/summary/mcp-mac.json.
+title: 每种 MCP 失败对一次运行造成的后果
+claim: 工具错误变成错误的 ToolMessage，运行继续；但慢工具没有超时，服务器崩溃会中止运行。
+caption: 请从左边的用例读到右边的结果，逐行阅读。绿色行进入下一次模型调用，灰色行在等待，玫瑰色行抛出异常。来源：capture/lab/summary/mcp-mac.json。
 ```
 
-- **A tool that raises.** `ToolError` and a plain `RuntimeError` inside the tool each became a `ToolMessage` with `status` `error`. Inside `create_agent`, the run went on to the next model call.
-- **A slow tool.** `MCPAdapter` takes only the target, so it has no timeout setting {{code libs/langchain_v1/langchain/mcp/adapter.py}}. A tool that slept 2 s returned after 2.0 s. To set a limit, build `fastmcp.Client(target, timeout=1)` and pass the client to the adapter. A tool that slept 5 s then raised `MCPError: Request 'tools/call' timed out` after 1.0 s, and the next call on the same client worked.
-- **A crash over stdio.** The server called `os._exit(3)` in the middle of a call. The call raised `MCPError: Connection closed` within 0.01 s, and the agent run ended with that exception. The next call started the server again, which took 1.66 s.
-- **A crash over HTTP.** The direct call raised `RemoteProtocolError`. The agent run after it, and every later call, raised `RuntimeError: Client failed to connect`, because nothing starts an HTTP server again for you.
+- **抛出异常的工具。** 工具内部的 `ToolError` 和普通的 `RuntimeError` 都变成了 `status` 为 `error` 的 `ToolMessage`。在 `create_agent` 内部，运行继续进入下一次模型调用。
+- **慢工具。** `MCPAdapter` 只接受目标，所以它没有超时设置 {{code libs/langchain_v1/langchain/mcp/adapter.py}}。睡眠 2 秒的工具在 2.0 秒后返回。要设置上限，请构建 `fastmcp.Client(target, timeout=1)` 并把客户端传给适配器。睡眠 5 秒的工具随后在 1.0 秒后抛出 `MCPError: Request 'tools/call' timed out`，同一个客户端上的下一次调用正常工作。
+- **stdio 上的崩溃。** 服务器在调用中途调用了 `os._exit(3)`。调用在 0.01 秒内抛出 `MCPError: Connection closed`，agent 的运行以这个异常结束。下一次调用重新启动了服务器，用了 1.66 秒。
+- **HTTP 上的崩溃。** 直接调用抛出 `RemoteProtocolError`。之后的 agent 运行以及此后每次调用都抛出 `RuntimeError: Client failed to connect`，因为没有任何东西会替你重新启动 HTTP 服务器。
 
-A crash ends the whole run, and the model never sees an error message. A local tool that raises ends a run the same way, as [section 3.4](#s-tools-toolruntime-and-tool-errors) shows. Wrap the agent call in your own retry when a server can die, and resume it from its checkpoint. A server can finish a write and die before it answers. Retry only idempotent tools, or send a durable idempotency key.
+崩溃会结束整次运行，模型永远看不到错误消息。抛出异常的本地工具会以同样的方式结束运行，[第 3.4 节](#s-tools-toolruntime-and-tool-errors)已经展示过。服务器可能死掉时，用你自己的重试包住 agent 调用，并从它的检查点恢复。服务器可能完成了一次写入，却在回答之前死掉。只重试幂等的工具，或者发送持久的幂等键。
 
-## The cost of a call
+## 一次调用的成本 {#s-mcp-with-langchain-mcp-the-cost-of-a-call}
 
-**We measured** 50 calls of an `add` tool on each transport on the Mac, with `langchain` 1.5.0. The raw file keeps the median and the 95th percentile of each block of 50 calls, not each call. The laptop ran other work at the same time, so read the times as upper bounds.
+**我们测量了** Mac 上每种传输方式 50 次 `add` 工具调用，使用 `langchain` 1.5.0。原始文件保存的是每 50 次调用一块的中位数和 95 分位数，而不是每次调用的时间。笔记本同时还在运行其他工作，所以请把这些时间当作上界来读。
 
-| Transport | Median, adapter not open | 95th percentile | Median, inside `async with adapter` | 95th percentile |
+| 传输方式 | 中位数，适配器未打开 | 95 分位数 | 中位数，在 `async with adapter` 内 | 95 分位数 |
 |---|---|---|---|---|
 | stdio | 9.5 ms | 27.3 ms | 5.9 ms | 15.0 ms |
 | Streamable HTTP | 24.7 ms | 52.5 ms | 10.7 ms | 19.6 ms |
 
-The stdio server started once, for `list_tools`, which took 1.54 s. All later calls used the same process. Open the adapter with `async with` around the whole agent run when it makes many calls, so the session stays open between them.
+stdio 服务器只启动了一次，用于 `list_tools`，花了 1.54 秒。之后所有调用都用同一个进程。当 agent 要发起很多次调用时，用 `async with` 包住整个 agent 运行来打开适配器，这样会话在调用之间保持打开。
 
-The archived adapter behaves differently. We ran `langchain-mcp-adapters` 0.3.2 in a separate environment, with `mcp` 1.30.0, against the same server:
+已归档的适配器表现不同。我们在单独的环境里运行了 `langchain-mcp-adapters` 0.3.2，使用 `mcp` 1.30.0，对着同一个服务器：
 
 ```listing
-title: server launches under langchain-mcp-adapters 0.3.2
+title: langchain-mcp-adapters 0.3.2 下的服务器启动
 source: capture/lab/T12-mcp-mac/03-adapters-launch-count.txt
 lang: text
-note: The first, third, and fourth lines of the count.
+note: 计数的第一、第三和第四行。
 ---
 Server launch markers in T12/_marks after the langchain-mcp-adapters 0.3.2 run: 57.
 02 stdio: 1 (get_tools) + 3 single calls + 50 timed calls + crash + call after crash = 56 stdio launches, plus 1 HTTP server process = 57.
 So langchain-mcp-adapters 0.3.2 starts one stdio subprocess per tool call (MultiServerMCPClient without an explicit session).
 ```
 
-Each stdio call started a new server, and the median call took 1,887 ms over 50 calls. Over HTTP, a server crash in the middle of a call never returned, and our script cut it after 40 s. Older code that uses the adapter carries both behaviours. Move it to `langchain.mcp`.
+每次 stdio 调用都启动了一个新服务器，50 次调用的中位数是 1,887 毫秒。在 HTTP 上，调用中途的服务器崩溃始终没有返回，我们的脚本在 40 秒后把它切断。使用这个适配器的旧代码两种行为都带着。请把它迁移到 `langchain.mcp`。
 
-## Elicitation, structured errors, and progress
+## 征询输入、结构化错误与进度 {#s-mcp-with-langchain-mcp-elicitation-structured-errors-and-progress}
 
-**Elicitation:** a request from an MCP server for input from the user during a tool call, such as a form with one field.
+**征询输入（elicitation）：** MCP 服务器在工具调用期间向用户请求输入，例如一个只有一个字段的表单。
 
-`MCPAdapter` arms each client that it builds for elicitation. For a client that you pass in, it arms a copy made with `client.new()`. It leaves a client alone when that client already has its own `elicitation_handler` {{code libs/langchain_v1/langchain/mcp/adapter.py:173-187}}. When a server returns its questions as an `InputRequiredResult`, the adapter asks them with a LangGraph `interrupt()` {{code libs/langchain_v1/langchain/mcp/elicitation.py:311-364}}. So an MCP tool can pause an agent run, like the review of [section 6.4](#s-interrupt-and-resume).
+`MCPAdapter` 会让它构建的每个客户端都具备征询输入的能力。对于你传入的客户端，它启用的是用 `client.new()` 创建的副本。如果客户端已经有自己的 `elicitation_handler`，它就不去动这个客户端 {{code libs/langchain_v1/langchain/mcp/adapter.py:173-187}}。当服务器以 `InputRequiredResult` 的形式返回它的问题时，适配器用 LangGraph 的 `interrupt()` 来提问 {{code libs/langchain_v1/langchain/mcp/elicitation.py:311-364}}。所以 MCP 工具可以让 agent 的运行暂停，就像[第 6.4 节](#s-interrupt-and-resume)的审核那样。
 
-**We measured** these cases on the Mac, with no model, with `langchain` 1.5.0, `fastmcp` 4.2.0, `mcp` 2.3.0, and `langgraph` 1.2.22. Each case ran 3 times, each in a new process, and the 3 runs of every case gave the same result. The server ran in the same process, and five cases ran again over Streamable HTTP. The server tool `ask_name` asked for one form field, `name`. The default adapter negotiated protocol `2026-07-28`.
+**我们测量了** Mac 上的这些用例，不用模型，使用 `langchain` 1.5.0、`fastmcp` 4.2.0、`mcp` 2.3.0 和 `langgraph` 1.2.22。每个用例运行 3 次，每次在新进程里，每个用例的 3 次运行结果相同。服务器在同一个进程里运行，其中五个用例还通过 Streamable HTTP 又运行了一遍。服务器工具 `ask_name` 请求一个表单字段 `name`。默认的适配器协商出的协议是 `2026-07-28`。
 
-Inside `create_agent` with an `InMemorySaver`, the run stopped with `__interrupt__`, and the state had `next` set to `tools`. The interrupt value names the tool and each request:
+在带 `InMemorySaver` 的 `create_agent` 内部，运行以 `__interrupt__` 停止，状态里的 `next` 是 `tools`。中断的值写明了工具和每个请求：
 
 ```listing
-title: the interrupt value of an MCP elicitation
+title: MCP 征询输入的中断值
 source: capture/lab/summary/mcp-edges-mac.json
 lang: json
-note: The schema of the field is cut.
+note: 字段的模式已截掉。
 ---
        "value": {
         "requests": [
@@ -198,10 +198,10 @@ note: The schema of the field is cut.
        }
 ```
 
-You resume with a `Command` whose `responses` map the key of each request to an answer:
+恢复时使用一个 `Command`，它的 `responses` 把每个请求的键映射到一个回答：
 
 ```listing
-title: three answers to the request, and the resume
+title: 对这个请求的三种回答，以及恢复
 source: capture/lab/T20-mcp-edges-mac/t20_mcp.py
 lang: python
 ---
@@ -210,23 +210,23 @@ lang: python
                     out = await agent.ainvoke(Command(resume={"responses": {"name": action[which]}}), cfg)
 ```
 
-- **Accept.** The tool returned a success `ToolMessage` with the greeting, and the run ended normally, in process and over HTTP.
-- **Decline and cancel.** The server received the action and chose its own answer, `no name (decline)` or `no name (cancel)`. The adapter did not end the call on a cancel.
-- **The cost of a resume.** The server ran `ask_name` 3 times for one answered question. On a resume, the adapter calls the tool again from the first round {{code libs/langchain_v1/langchain/mcp/elicitation.py:318-320}}. Make a tool that asks for input ask before it does any work.
-- **No checkpointer.** The stream yielded `__interrupt__`, and the run ended with no exception and nothing to resume.
-- **Outside a graph.** A direct `ainvoke` of the tool raised `KeyError: '__pregel_scratchpad'`, because `interrupt()` reads the config of a running graph {{code libs/langgraph/langgraph/types.py:1030}}. That is not a `ToolException`, so it is not an error `ToolMessage`.
-- **Your own handler.** A `fastmcp.Client` with an `elicitation_handler`, passed to `MCPAdapter`, answered the question itself. The handler ran once, the tool returned success, and no interrupt happened, on both protocol versions and over HTTP.
-- **A legacy server.** On protocol `2025-11-25`, a server that called `ctx.elicit` got no answer from the default adapter. The tool returned an error `ToolMessage`, and the agent went on to its next model call. [Errors](#s-ref-errors) gives the text.
+- **接受。** 工具返回了带问候语的成功 `ToolMessage`，运行正常结束，进程内和 HTTP 上都是如此。
+- **拒绝与取消。** 服务器收到这个动作，并选择自己的回答，`no name (decline)` 或 `no name (cancel)`。适配器在取消时没有结束这次调用。
+- **一次恢复的成本。** 一个被回答的问题，服务器运行了 3 次 `ask_name`。恢复时，适配器会从第一轮起重新调用工具 {{code libs/langchain_v1/langchain/mcp/elicitation.py:318-320}}。要求输入的工具，应当在做任何工作之前先提问。
+- **没有 checkpointer。** 流产生了 `__interrupt__`，运行结束，没有异常，也没有可恢复的内容。
+- **在图之外。** 直接 `ainvoke` 这个工具抛出了 `KeyError: '__pregel_scratchpad'`，因为 `interrupt()` 读取的是正在运行的图的 config {{code libs/langgraph/langgraph/types.py:1030}}。这不是 `ToolException`，所以它不会变成错误的 `ToolMessage`。
+- **你自己的处理器。** 带 `elicitation_handler` 的 `fastmcp.Client` 传给 `MCPAdapter` 后，自己回答了问题。处理器运行一次，工具返回成功，没有发生中断，两个协议版本和 HTTP 上都是如此。
+- **旧版服务器。** 在协议 `2025-11-25` 上，调用 `ctx.elicit` 的服务器没有从默认适配器得到回答。工具返回了错误的 `ToolMessage`，agent 继续进入下一次模型调用。[错误](#s-ref-errors)一节给出了文本。
 
-Two more cases raised `MCPError` out of the tool instead of returning an error `ToolMessage`. A `fastmcp.Client` with no handler, given to `as_langchain_tool` on protocol `2026-07-28`, raised `Elicitation not supported`. A legacy client with no handler, asked through `ctx.elicit`, returned an error `ToolMessage` with that text. A legacy connection to a tool that returns an `InputRequiredResult` raised too, because that result exists only at `2026-07-28`. We ran both raising cases outside an agent only. An exception that is not a `ToolException` ends an agent run, as the crash cases above show.
+另有两个用例让 `MCPError` 从工具里抛出，而没有返回错误的 `ToolMessage`。一个没有处理器的 `fastmcp.Client` 交给 `as_langchain_tool`，在协议 `2026-07-28` 上抛出了 `Elicitation not supported`。一个没有处理器的旧版客户端，通过 `ctx.elicit` 提问，返回了带有该文本的错误 `ToolMessage`。用旧版连接去调用返回 `InputRequiredResult` 的工具也会抛出异常，因为这种结果只存在于 `2026-07-28`。这两个抛出异常的用例，我们都只在 agent 之外运行过。不是 `ToolException` 的异常会结束 agent 的运行，上面的崩溃用例已经说明了这一点。
 
-**Structured content on an error.** Issue langchain#40471 reports that an error result loses its `structuredContent` {{issue langchain#40471}}. Our server tool returned `is_error` with the text `quota exceeded, retry in 30 s` and a structured payload. The raw `fastmcp` result kept both. The `ToolMessage` of the adapter kept only the text:
+**错误时的结构化内容。** issue langchain#40471 报告说，错误结果会丢失它的 `structuredContent` {{issue langchain#40471}}。我们的服务器工具返回了 `is_error`，文本是 `quota exceeded, retry in 30 s`，并带有结构化载荷。原始的 `fastmcp` 结果两者都保留了，适配器产生的 `ToolMessage` 只保留了文本：
 
 ```listing
-title: one error result, through the adapter and through fastmcp
+title: 一个错误结果，分别经过适配器和 fastmcp
 source: capture/lab/summary/mcp-edges-mac.json
 lang: json
-note: The first event is the ToolMessage, and the second is the raw result of fastmcp.Client.call_tool.
+note: 第一个事件是 ToolMessage，第二个是 fastmcp.Client.call_tool 的原始结果。
 ---
       {
        "artifact": null,
@@ -246,21 +246,21 @@ note: The first event is the ToolMessage, and the second is the raw result of fa
        },
 ```
 
-The cause is in `_convert_call_tool_result`, which raises on an error result before it builds the artifact {{code libs/langchain_v1/langchain/mcp/tools.py:168-179}}. The error handler then returns only the content blocks {{code libs/langchain_v1/langchain/mcp/tools.py:104-117}}. The same result without `is_error` kept its artifact. The loss was the same on both protocol versions and over HTTP. So a server that puts `retry_after` only in its structured content gives your code nothing to read. Ask the server to repeat it in the text.
+原因在 `_convert_call_tool_result`，它在构建 artifact 之前就对错误结果抛出异常 {{code libs/langchain_v1/langchain/mcp/tools.py:168-179}}。随后错误处理器只返回内容块 {{code libs/langchain_v1/langchain/mcp/tools.py:104-117}}。不带 `is_error` 的同样结果保留了它的 artifact。这种丢失在两个协议版本和 HTTP 上都一样。所以，只把 `retry_after` 放在结构化内容里的服务器，会让你的代码无从读取。请让服务器在文本里再写一遍。
 
-**Progress.** A server tool reported progress three times. With the default adapter, nothing about progress reached the caller. Inside an agent, `stream_mode="custom"` yielded 0 chunks, so progress does not become a stream event. A `fastmcp.Client(target, progress_handler=...)` passed to the adapter got all 3 reports, in process, over HTTP, and inside an agent. Progress, like the timeout, needs a client that you build.
+**进度。** 服务器工具报告了三次进度。使用默认适配器时，没有任何进度到达调用方。在 agent 内部，`stream_mode="custom"` 产生了 0 个数据块，所以进度不会变成流事件。传给适配器的 `fastmcp.Client(target, progress_handler=...)` 收到了全部 3 次报告，进程内、HTTP 上和 agent 内部都是如此。进度和超时一样，需要你自己构建的客户端。
 
-This edition did not record OAuth, URL-mode elicitation, or several input requests in one round. [Section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition) lists them.
+这一版没有录制 OAuth、URL 模式的征询输入，以及同一轮里的多个输入请求。[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)列出了它们。
 
 ```takeaways
-- Install langchain[mcp] and remove langchain-mcp-adapters from the same environment.
-- Pass a URL string for a remote server and a Path for a local script.
-- Pass a fastmcp.Client with a timeout, because MCPAdapter has none.
-- Expect a server crash to raise out of the run, and retry the run in your own code.
-- Read structured MCP results from the artifact of a successful ToolMessage, because an error result drops them.
-- Give an agent with MCP tools a checkpointer, so a server that asks for input can resume.
-- Pass a fastmcp.Client with a progress_handler when you need the progress of a server.
-- Keep the adapter open with async with for the whole agent run.
+- 安装 langchain[mcp]，并从同一个环境里移除 langchain-mcp-adapters。
+- 远程服务器传 URL 字符串，本地脚本传 Path。
+- 传入带超时的 fastmcp.Client，因为 MCPAdapter 没有超时。
+- 预期服务器崩溃会从运行里抛出异常，并在你自己的代码里重试这次运行。
+- 从成功的 ToolMessage 的 artifact 里读结构化的 MCP 结果，因为错误结果会丢掉它们。
+- 给带 MCP 工具的 agent 配上 checkpointer，让会请求输入的服务器可以恢复。
+- 需要服务器的进度时，传入带 progress_handler 的 fastmcp.Client。
+- 用 async with 让适配器在整个 agent 运行期间保持打开。
 ```
 
-Sources: capture/s_integrations.py, capture/out/40-mcp.txt; capture/lab/summary/mcp-mac.json, capture/lab/T12-mcp-mac/01-langchain-mcp.jsonl, capture/lab/T12-mcp-mac/02-langchain-mcp-adapters-0.3.2.jsonl, capture/lab/T12-mcp-mac/03-adapters-launch-count.txt, capture/lab/T12-mcp-mac/00-venv-adapters-freeze.txt; capture/lab/summary/mcp-edges-mac.json, capture/lab/T20-mcp-edges-mac/01-mcp-edges.jsonl, capture/lab/T20-mcp-edges-mac/t20_mcp.py, capture/lab/T20-mcp-edges-mac/t20_server.py; libs/langchain_v1/langchain/mcp/adapter.py, libs/langchain_v1/langchain/mcp/elicitation.py, libs/langchain_v1/langchain/mcp/tools.py, and libs/langchain_v1/pyproject.toml at langchain==1.5.0; libs/langgraph/langgraph/types.py at langgraph 1.2.22; issue langchain#40471; pyproject.toml of langchain-mcp-adapters 0.3.2 (cc0f2843); docs.langchain.com at docs commit 04d4d4a (oss/python/releases/changelog, oss/python/langchain/mcp, oss/python/langchain/mcp/tools, oss/python/migrate/langchain-mcp-adapters).
+来源：capture/s_integrations.py, capture/out/40-mcp.txt; capture/lab/summary/mcp-mac.json, capture/lab/T12-mcp-mac/01-langchain-mcp.jsonl, capture/lab/T12-mcp-mac/02-langchain-mcp-adapters-0.3.2.jsonl, capture/lab/T12-mcp-mac/03-adapters-launch-count.txt, capture/lab/T12-mcp-mac/00-venv-adapters-freeze.txt; capture/lab/summary/mcp-edges-mac.json, capture/lab/T20-mcp-edges-mac/01-mcp-edges.jsonl, capture/lab/T20-mcp-edges-mac/t20_mcp.py, capture/lab/T20-mcp-edges-mac/t20_server.py; libs/langchain_v1/langchain/mcp/adapter.py, libs/langchain_v1/langchain/mcp/elicitation.py, libs/langchain_v1/langchain/mcp/tools.py, and libs/langchain_v1/pyproject.toml at langchain==1.5.0; libs/langgraph/langgraph/types.py at langgraph 1.2.22; issue langchain#40471; pyproject.toml of langchain-mcp-adapters 0.3.2 (cc0f2843); docs.langchain.com at docs commit 04d4d4a (oss/python/releases/changelog, oss/python/langchain/mcp, oss/python/langchain/mcp/tools, oss/python/migrate/langchain-mcp-adapters).

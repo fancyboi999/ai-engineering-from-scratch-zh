@@ -1,22 +1,22 @@
-# Time travel: replay, update_state, and forks
+# 时间旅行：重放、update_state 与分叉
 
-> A replay from a past checkpoint runs every later node again, and `update_state` adds a new branch next to the old one, so neither reads saved results or erases history.
+> 从过去的检查点重放会把之后的每个节点再运行一遍，`update_state` 则在旧分支旁边添加新分支，所以两者既不读取已保存的结果，也不会抹掉历史。
 
-An agent charged a card, and you want to see what it would have done with a different instruction. You pick an earlier checkpoint from the history and run from it. The card is charged a second time, because a replay does not read the old tool result. It calls the tool again.
+一个 agent 刷了一次卡，你想看看换一条指令它会怎么做。你从历史里选了一个更早的检查点，从那里开始运行。卡被刷了第二次，因为重放不读取旧的工具结果，它会再次调用工具。
 
-When you finish this section, you can list the history of a thread, replay from any checkpoint, and fork it with `update_state`. You can also say which nodes run again.
+读完本节，你能列出线程（thread）的历史，从任意检查点重放，并用 `update_state` 分叉。你还能说出哪些节点会再次运行。
 
-## The history of a thread
+## 线程的历史 {#s-time-travel-replay-update-state-and-forks-the-history-of-a-thread}
 
-**State history:** the list of checkpoints of one thread, newest first, from `get_state_history(config)`.
+**状态历史：** 一个线程的检查点列表，最新的在前，来自 `get_state_history(config)`。
 
-The kit agent has one tool, `charge`, which records each amount it charges. One turn with `Charge 10.` saved five checkpoints. Each one names its parent, and the newest has no next node:
+录制工具包里的 agent 只有一个工具 `charge`，它会记录每次刷卡的金额。一轮 `Charge 10.` 保存了五个检查点。每个检查点都写明它的父检查点，最新的那个没有下一个节点：
 
 ```listing
-title: the history of one turn
+title: 一轮对话的历史
 source: capture/out/30-state-history-forks.txt
 lang: json
-note: Cut to the step, the source, the next nodes, and the ids of the first two checkpoints. The messages are cut.
+note: 只保留前两个检查点的 step、source、下一个节点和 id。消息已截掉。
 ---
   "step": 3,
   "source": "loop",
@@ -33,16 +33,16 @@ note: Cut to the step, the source, the next nodes, and the ids of the first two 
   "parent_checkpoint_id": "<uuid-3>",
 ```
 
-The `config` of each entry holds `thread_id`, `checkpoint_ns`, and `checkpoint_id`. That config is the address of the checkpoint for every call below.
+每个条目的 `config` 包含 `thread_id`、`checkpoint_ns` 和 `checkpoint_id`。下面每个调用都用这个 config 作为检查点的地址。
 
-## Replay
+## 重放 {#s-time-travel-replay-update-state-and-forks-replay}
 
-**Replay:** an `invoke(None, config)` where `config` names a past checkpoint. The run starts from that checkpoint and runs the nodes in its `next` again.
+**重放：** 一次 `invoke(None, config)`，其中 `config` 指向过去的某个检查点。运行从该检查点开始，并把它的 `next` 里的节点再运行一遍。
 
-The kit replays from the checkpoint whose `next` is `tools`. The tool ran a second time, and the thread grew from 5 to 8 checkpoints:
+录制工具包从 `next` 为 `tools` 的检查点重放。工具第二次运行，线程的检查点从 5 个增加到 8 个：
 
 ```listing
-title: a replay from the checkpoint before tools
+title: 从 tools 之前的检查点重放
 source: capture/out/30-state-history-forks.txt
 lang: text
 ---
@@ -55,16 +55,16 @@ charge calls so far (the tool ran again on replay):
 checkpoints on the thread now: 8
 ```
 
-The model got the same messages as on the first run. At temperature 0 it gave the same answer, `The card has been successfully charged with 10 units.`, and the card had two charges. A model with sampling on can answer in another way on a replay. The time travel page says the same: a replay runs the nodes again, with their model calls, API requests, and interrupts {{docs oss/python/langgraph/use-time-travel}}.
+模型收到的消息与第一次运行相同。在 temperature 0 下它给出了同样的回答 `The card has been successfully charged with 10 units.`，而这张卡被刷了两次。开启采样的模型在重放时可能给出不同的回答。时间旅行页面说的也一样：重放会再次运行这些节点，包括其中的模型调用、API 请求和中断 {{docs oss/python/langgraph/use-time-travel}}。
 
-## update_state makes a fork
+## update_state 产生分叉 {#s-time-travel-replay-update-state-and-forks-update-state-makes-a-fork}
 
-**Fork:** a new checkpoint whose parent is a past checkpoint. Runs from it form a branch beside the old one, and the old checkpoints stay.
+**分叉：** 一个新的检查点，它的父检查点是过去的某个检查点。从它开始的运行会形成一条与旧分支并列的新分支，旧检查点都保留。
 
-`update_state(config, values)` writes `values` into a new checkpoint after the one that `config` names. The update goes through the reducers, as if a node had returned it. The kit adds a human message to the first `model` checkpoint:
+`update_state(config, values)` 把 `values` 写入一个新检查点，位置在 `config` 所指检查点之后。更新要经过 reducer，就像某个节点返回了它一样。录制工具包往第一个 `model` 检查点上添加了一条人类消息：
 
 ```listing
-title: a fork with one more human message
+title: 多一条人类消息的分叉
 source: capture/s_persist.py
 lang: python
 ---
@@ -72,13 +72,13 @@ lang: python
     forked = agent.update_state(first_model.config, {"messages": [{"role": "user", "content": "Actually, charge 99."}]})
 ```
 
-The new checkpoint has the source `update` and the step 1, and its parent is the step 0 checkpoint. Its `next` is still `model`. Running from it charged 99, and the charges of the first branch stayed in the list:
+新检查点的 source 是 `update`，step 是 1，它的父检查点是 step 0 的检查点。它的 `next` 仍然是 `model`。从它开始运行，刷了 99，第一条分支的刷卡记录仍留在列表里：
 
 ```listing
-title: the fork and the run from it
+title: 分叉以及从它开始的运行
 source: capture/out/30-state-history-forks.txt
 lang: json
-note: The fork cut to its step, source, next, and parent, then the charges after the run.
+note: 分叉只保留 step、source、next 和父检查点，然后是运行之后的刷卡记录。
 ---
   "step": 1,
   "source": "update",
@@ -96,14 +96,14 @@ charge calls:
 ]
 ```
 
-The time travel page warns that `update_state` does not roll a thread back {{docs oss/python/langgraph/use-time-travel}}. The thread now has three branches: the first run, the replay, and the fork.
+时间旅行页面警告，`update_state` 不会把线程回滚 {{docs oss/python/langgraph/use-time-travel}}。这个线程现在有三条分支：第一次运行、重放和分叉。
 
-## Write as a node with as_node
+## 用 as_node 以节点身份写入 {#s-time-travel-replay-update-state-and-forks-write-as-a-node-with-as-node}
 
-`update_state` takes `as_node`, the node that the update counts as. LangGraph then picks the next node as if that node had run. The kit agent stops before `tools` with `interrupt_before=["tools"]`. It writes the tool result by hand as the node `tools`, and the run goes on to `model`:
+`update_state` 接受 `as_node`，也就是这次更新被算作哪个节点写的。LangGraph 随后会像那个节点刚运行过一样选出下一个节点。录制工具包里的 agent 用 `interrupt_before=["tools"]` 在 `tools` 之前停下。它以节点 `tools` 的身份手工写入工具结果，运行接着进入 `model`：
 
 ```listing
-title: a tool result written by hand
+title: 手工写入的工具结果
 source: capture/out/30-state-history-forks.txt
 lang: json
 ---
@@ -122,36 +122,36 @@ charge calls (unchanged):
 ]
 ```
 
-The tool did not run. The model then answered that it cannot charge a card manually, so it misread the result written by hand. Write such a result in the words the tool would use, such as `charged 5`. Use this when a person did the work of a tool outside the agent. The `ToolMessage` must carry the `tool_call_id` of the waiting call.
+工具没有运行。随后模型回答说它不能手工刷卡，也就是误读了手工写入的结果。写这类结果时，要用工具本来会用的措辞，例如 `charged 5`。当有人在 agent 之外完成了工具的工作时，才用这个办法。`ToolMessage` 必须带有那个等待中调用的 `tool_call_id`。
 
-## The address must be complete
+## 地址必须完整 {#s-time-travel-replay-update-state-and-forks-the-address-must-be-complete}
 
-`update_state` needs the full address of a checkpoint. The lab called it with a config that held only `thread_id` and `checkpoint_id`, and it raised `KeyError: 'checkpoint_ns'`. Pass the `config` of an entry from `get_state_history`, or add `"checkpoint_ns": ""` for a graph with no subgraph.
+`update_state` 需要检查点的完整地址。实验记录里有一次调用只给了含 `thread_id` 和 `checkpoint_id` 的 config，结果抛出 `KeyError: 'checkpoint_ns'`。要传入 `get_state_history` 里某个条目的 `config`，或者对没有子图的图补上 `"checkpoint_ns": ""`。
 
-## What the lab counted
+## 实验记录的计数 {#s-time-travel-replay-update-state-and-forks-what-the-lab-counted}
 
-**We measured** replays and forks on the Mac, one run of each case, with `InMemorySaver`. A graph ran three nodes `a`, `b`, and `c` in a row, and each added one to `x`. The first run saved 5 checkpoints. A replay from the checkpoint before `b` ran `b` once and `c` once, ran `a` zero times, and added 3 checkpoints. One of the three had the source `fork`.
+**我们测量了** Mac 上的重放和分叉，每个用例运行一次，使用 `InMemorySaver`。一个图依次运行三个节点 `a`、`b` 和 `c`，每个节点给 `x` 加一。第一次运行保存了 5 个检查点。从 `b` 之前的检查点重放，`b` 运行一次，`c` 运行一次，`a` 运行零次，并增加了 3 个检查点。这三个里有一个的 source 是 `fork`。
 
-`update_state` on the same checkpoint set `x` to 100. It ran no node, added one checkpoint with the source `update`, and kept every old checkpoint. The run from it ran `b` and `c` once each and ended with `x` at 102. The thread then held 11 checkpoints in three branches. [Figure](#fig-6-6) draws them.
+在同一个检查点上调用 `update_state`，把 `x` 设为 100。它没有运行任何节点，只增加了一个 source 为 `update` 的检查点，并保留了所有旧检查点。从它开始运行，`b` 和 `c` 各运行一次，最终 `x` 为 102。此时线程在三条分支里共有 11 个检查点。[图](#fig-6-6)画出了它们。
 
 ```figure
 id: fig-6-6
 kind: tree
-title: three branches of one thread
-claim: A replay and an update_state from the checkpoint before b each start a branch beside the first run, and every old checkpoint stays.
-caption: Read from the input checkpoint at the top. Each box is one checkpoint with its step and the value of x. The amber box is the fork of the replay, and the violet box is the update. From capture/lab/summary/replay-fork-mac.json.
+title: 一个线程的三条分支
+claim: 从 b 之前的检查点重放和调用 update_state，各自在第一次运行旁边开出一条分支，而且所有旧检查点都保留。
+caption: 请从顶部的输入检查点开始读。每个方框是一个检查点，带有 step 和 x 的值。琥珀色方框是重放的分叉，紫色方框是更新。来源：capture/lab/summary/replay-fork-mac.json。
 ```
 
-An agent with Qwen3 4B and one tool, 3 runs on the x86 server guest, gave the same counts in every run. A replay from step 0, whose `next` is `model`, made 2 model calls and 1 tool call. A replay from step 1, whose `next` is `tools`, made 1 model call and 1 tool call. So a replay costs what the original run cost from that point on. Make every node after the checkpoint safe to run twice before you replay.
+在 x86 服务器客户机上，用 Qwen3 4B 和一个工具的 agent 运行了 3 次，每次的计数都相同。从 step 0（`next` 是 `model`）重放，发起 2 次模型调用和 1 次工具调用。从 step 1（`next` 是 `tools`）重放，发起 1 次模型调用和 1 次工具调用。所以重放的成本等于原始运行从该点往后的成本。重放之前，先让检查点之后的每个节点都能安全地运行两次。
 
-The docs say that you cannot time travel to a point between the nodes of a default subgraph {{docs oss/python/langgraph/use-time-travel}}. The lab did not run time travel inside a subgraph. It comes in the next edition, with the other open items of [section 8.8](#s-limits-at-the-pin-and-what-comes-in-the-next-edition).
+文档说，你不能时间旅行到默认子图的节点之间的某个点 {{docs oss/python/langgraph/use-time-travel}}。实验记录没有在子图内部运行时间旅行。它留到下一版，与[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)里的其他未决项放在一起。
 
 ```takeaways
-- Read get_state_history newest first, and use the config of an entry as its address.
-- Expect a replay to run every later node again, with its model calls and tool calls.
-- Use update_state to fork a thread, and expect the old checkpoints to stay.
-- Pass as_node="tools" to record a tool result that a person produced.
-- Pass the full config from the history to update_state, with checkpoint_ns.
+- 按从新到旧的顺序读 get_state_history，并用条目的 config 作为它的地址。
+- 预期重放会把之后的每个节点再运行一遍，包括其中的模型调用和工具调用。
+- 用 update_state 分叉线程，并预期旧检查点会保留。
+- 传入 as_node="tools"，记录由人产生的工具结果。
+- 把历史里完整的 config（含 checkpoint_ns）传给 update_state。
 ```
 
-Sources: capture/s_persist.py, capture/out/30-state-history-forks.txt; capture/lab/summary/replay-fork-mac.json, capture/lab/T17-claims-mac/02-replay-and-fork.jsonl, capture/lab/summary/replay-fork-x86.json, capture/lab/T17-claims-x86/01-claims.jsonl; libs/langgraph/langgraph/pregel/main.py and libs/checkpoint/langgraph/checkpoint/memory/__init__.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/use-time-travel).
+来源：capture/s_persist.py, capture/out/30-state-history-forks.txt; capture/lab/summary/replay-fork-mac.json, capture/lab/T17-claims-mac/02-replay-and-fork.jsonl, capture/lab/summary/replay-fork-x86.json, capture/lab/T17-claims-x86/01-claims.jsonl; libs/langgraph/langgraph/pregel/main.py and libs/checkpoint/langgraph/checkpoint/memory/__init__.py at langgraph 1.2.22; docs.langchain.com at docs commit 04d4d4a (oss/python/langgraph/use-time-travel).

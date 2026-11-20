@@ -1,27 +1,27 @@
-# A deep agent with a subagent and files
+# 带子 agent 和文件的 deep agent
 
-> A deep agent on a local model plans, writes, and delegates a review in seven model calls, and its first call sends 3,651 prompt tokens for a short task.
+> 本地模型上的 deep agent 用七次模型调用完成计划、写作和委派审阅，对一个简短任务，它的第一次调用就发送了 3,651 个 prompt token。
 
-You want an agent that drafts a document, asks a second agent to review it, and applies the fixes. Deep Agents gives you the file tools, the `task` tool, and the subagents in one call. You still need to know what each call costs, and which part of a bad result came from the model.
+你想要一个 agent 起草文档，请第二个 agent 审阅，再套用修改。Deep Agents 一次调用就给了你文件工具、`task` 工具和子 agent。你仍然需要知道每次调用花费多少，以及一个糟糕的结果里哪一部分来自模型。
 
-When you finish this section, you can build a deep agent with one subagent on a local model. You can also record the tokens of each model call and read a run call by call.
+读完本节，你能在本地模型上构建带一个子 agent 的 deep agent。你还能记录每次模型调用的 token，并逐次调用地读懂一次运行。
 
-## What the demo builds
+## 演示构建了什么 {#s-a-deep-agent-with-a-subagent-and-files-what-the-demo-builds}
 
-The code is our own. It uses `deepagents` 0.7.38 with `ChatOllama` and Qwen3 8B, at temperature 0, seed 42, and with reasoning off.
+代码是我们自己写的。它使用 `deepagents` 0.7.38 和 `ChatOllama` 上的 Qwen3 8B，temperature 为 0，seed 为 42，关闭推理。
 
-The demo keeps the default backend, which holds the files in the agent state, so you can read every call. On the task suite of [section 1.2](#s-do-you-need-langchain), that setup lost to a plain loop on Qwen3 4B and 8B, on file and retrieval tasks. When the work is on real files, pass `FilesystemBackend`, as [section 7.4](#s-deep-agents-0-7) shows.
+演示保留了默认后端，它把文件保存在 agent 的状态里，所以你可以读到每一次调用。在[第 1.2 节](#s-do-you-need-langchain)的任务套件上，这个配置在文件和检索任务上输给了 Qwen3 4B 和 8B 上的朴素循环。当工作在真实文件上时，请传入 `FilesystemBackend`，[第 7.4 节](#s-deep-agents-0-7)展示了这一点。
 
-The demo applies these sections:
+演示用到了这几节：
 
-- [Deep Agents 7.4](#s-deep-agents-0-7): the tools, the virtual filesystem, and `TodoListMiddleware`, which 0.7 leaves out.
-- [Subgraphs and multi-agent patterns](#s-subgraphs-and-multi-agent-patterns): the `task` tool runs the subagent as a separate agent.
-- [Cost: the framework against a plain SDK loop](#s-cost-the-framework-against-a-plain-sdk-loop): tokens per call, read from `usage_metadata`.
+- [Deep Agents 7.4](#s-deep-agents-0-7)：工具、虚拟文件系统，以及 0.7 去掉的 `TodoListMiddleware`。
+- [子图与多 agent 模式](#s-subgraphs-and-multi-agent-patterns)：`task` 工具把子 agent 作为独立的 agent 运行。
+- [成本：框架对比朴素 SDK 循环](#s-cost-the-framework-against-a-plain-sdk-loop)：每次调用的 token，读自 `usage_metadata`。
 
-The agent has one subagent, `editor`. A subagent is a dict with a name, a description that the main agent reads, and a system prompt of its own:
+这个 agent 有一个子 agent `editor`。子 agent 是一个 dict，包含名称、主 agent 会读的描述，以及它自己的系统 prompt：
 
 ```listing
-title: the deep agent and its editor
+title: deep agent 和它的 editor
 source: capture/demos/deep-agent/deep_agent.py
 lang: python
 ---
@@ -34,16 +34,16 @@ lang: python
     )
 ```
 
-The task asks for release notes of three changes, a review by the editor, the fixes, and the final text. The system prompt of the editor asks for sentences over 25 words and sentences in the passive voice. The editor returns fixes and edits nothing.
+任务要求写出三项改动的发布说明，由 editor 审阅，套用修改，并给出最终文本。editor 的系统 prompt 要求找出超过 25 个词的句子和被动语态的句子。editor 只返回修改建议，自己不改任何东西。
 
-A callback records each model call. It reads `usage_metadata` from the reply and `lc_agent_name` from the metadata of the call. Deep Agents sets that name to `editor` for the subagent, so the callback can tell the two agents apart.
+一个回调记录每次模型调用。它从回复里读 `usage_metadata`，从调用的元数据里读 `lc_agent_name`。Deep Agents 把子 agent 的这个名字设为 `editor`，所以回调能分辨这两个 agent。
 
-## The recorded run
+## 录制的运行 {#s-a-deep-agent-with-a-subagent-and-files-the-recorded-run}
 
-The run made seven model calls in 62.0 s. The first call took 22.6 s, which includes the load of the model into Ollama:
+这次运行用 62.0 秒发起了七次模型调用。第一次调用用了 22.6 秒，其中包括把模型加载进 Ollama 的时间：
 
 ```listing
-title: the seven model calls
+title: 七次模型调用
 source: capture/lab/deep-agent/run.log
 lang: text
 ---
@@ -56,21 +56,21 @@ lang: text
   call  7  main    in  4446  out  111    7.4 s  -> answer
 ```
 
-The main agent wrote a todo list, wrote `/notes/release-2.0.md`, and called `task`. The editor read the file and answered. The main agent then marked its todos and replied with the text of the file. It never called `edit_file`, because the editor returned no fixes:
+主 agent 写了待办列表，写了 `/notes/release-2.0.md`，并调用了 `task`。editor 读了文件并作了回答。随后主 agent 标记了它的待办，并用文件的文本作了回复。它从未调用 `edit_file`，因为 editor 没有返回修改建议：
 
 ```listing
-title: what the editor returned
+title: editor 返回了什么
 source: capture/lab/deep-agent/run.log
 lang: text
-note: The copy of the file inside the reply is cut at the mark.
+note: 回复里文件的副本在标记处截断。
 ---
   result    task: The file `/notes/release-2.0.md` has been read successfully. Here is the content: ``` ## Version 2.0 Release Notes The sync command now resumes an interrupted upload from the last finished part, ensuring seamless continuity for large file transfers. … ``` No sentences in this file exceed 25 words, and there are no sentences in passive voice. Therefore, no fixes or improvements are needed.
 ```
 
-The file that the run wrote holds two sentences in the passive voice:
+这次运行写出的文件里有两个被动语态的句子：
 
 ```listing
-title: two sentences of the final file
+title: 最终文件里的两个句子
 source: capture/lab/deep-agent/run.log
 lang: text
 ---
@@ -79,31 +79,31 @@ The config file has been moved from ~/.tool.toml to the XDG config folder. The o
 The --verbose flag has been removed. Use --log-level debug in its place for detailed logging and debugging information.
 ```
 
-## What the run shows
+## 这次运行说明了什么 {#s-a-deep-agent-with-a-subagent-and-files-what-the-run-shows}
 
-**We measured** one run on the Mac, Apple M1 Max, 10 cores, 64 GiB, with Ollama 0.31.1. The main agent made 5 model calls with 20,210 prompt tokens. The editor made 2 calls with 4,090 prompt tokens. Together they sent 24,300 prompt tokens and got 687 output tokens, for a file of 458 characters. [Figure](#fig-7-5) shows each call.
+**我们测量了** Mac 上的一次运行，机器是 Apple M1 Max，10 核，64 GiB，使用 Ollama 0.31.1。主 agent 发起了 5 次模型调用，共 20,210 个 prompt token。editor 发起了 2 次调用，共 4,090 个 prompt token。两者一共发送了 24,300 个 prompt token，得到 687 个输出 token，产出一个 458 个字符的文件。[图](#fig-7-5)展示了每次调用。
 
 ```figure
 id: fig-7-5
 kind: chart
-title: prompt tokens of each model call of the deep agent
-claim: Every call of the main agent sent more than 3,600 prompt tokens, and the editor calls sent about half that, with two tools fewer.
-caption: Each dot is one model call of one run on the Mac with Qwen3 8B. Blue dots are the main agent and indigo dots the editor. The label on the axis is the tool the call asked for. From capture/lab/summary/demos-mac.json.
+title: deep agent 每次模型调用的 prompt token
+claim: 主 agent 的每次调用都发送了超过 3,600 个 prompt token，editor 的调用只发送大约一半，少了两个工具。
+caption: 每个点是 Mac 上 Qwen3 8B 一次运行里的一次模型调用。蓝点是主 agent，靛蓝点是 editor。坐标轴上的标签是这次调用所请求的工具。来源：capture/lab/summary/demos-mac.json。
 ```
 
-The first call of the main agent sent 3,651 tokens for a task of about 100 words. Most of that is the harness: the system prompt of Deep Agents and the schemas of 9 tools. [Section 7.4](#s-deep-agents-0-7) measured the extra cost of the harness at 2,075 to 2,251 tokens per call on Qwen3 8B. Each later call adds the messages of the run on top.
+主 agent 的第一次调用，为一个约 100 词的任务发送了 3,651 个 token。其中大部分是 harness：Deep Agents 的系统 prompt 和 9 个工具的 schema。[第 7.4 节](#s-deep-agents-0-7)测得 harness 的额外成本是在 Qwen3 8B 上每次调用 2,075 到 2,251 个 token。之后每次调用还要在上面叠加这次运行的消息。
 
-The editor had 7 tools: the file tools without `task` and `write_todos`. Its messages held its own system prompt and the task description from the main agent. So its calls were about half the size. A subagent is a way to keep a long side task out of the context of the main agent.
+editor 有 7 个工具：文件工具，没有 `task` 和 `write_todos`。它的消息里有它自己的系统 prompt，以及来自主 agent 的任务描述。所以它的调用大约小一半。子 agent 是把冗长的支线任务挡在主 agent 上下文之外的一种办法。
 
-The review failure is a model result. The editor missed two sentences in the passive voice, and the main agent trusted the review. LangChain ran each step that the model asked for: the file write, the `task` call, the read, and the todo updates. A stronger model, or a check in code for the passive voice, could change the outcome. The first is a choice of model, and the second is a tool you write.
+审阅的失败是模型造成的。editor 漏掉了两个被动语态的句子，而主 agent 相信了审阅结果。LangChain 执行了模型要求的每一步：写文件、`task` 调用、读取，以及待办的更新。换一个更强的模型，或者用代码来检查被动语态，可能改变结果。前一个是选择模型，后一个是你自己写的工具。
 
 ```takeaways
-- Record usage_metadata and lc_agent_name on every model call of a deep agent.
-- Expect more than 3,600 prompt tokens on each call of the main agent, at this pin.
-- Give a subagent a narrow system prompt, because it sees only the description of its task.
-- Check the work of a reviewer subagent in code when the rule is mechanical.
-- Pass TodoListMiddleware when you want write_todos at 0.7.
-- Pass FilesystemBackend on a local model of 8B or less when the files are real.
+- 对 deep agent 的每次模型调用，都记录 usage_metadata 和 lc_agent_name。
+- 在这个锁定版本上，预期主 agent 的每次调用都超过 3,600 个 prompt token。
+- 给子 agent 一个范围很窄的系统 prompt，因为它只能看到它那个任务的描述。
+- 规则是机械的时候，用代码检查审阅子 agent 的工作。
+- 在 0.7 里想要 write_todos，就传入 TodoListMiddleware。
+- 8B 或更小的本地模型处理真实文件时，传入 FilesystemBackend。
 ```
 
-Sources: capture/demos/deep-agent/deep_agent.py, capture/demos/deep-agent/run.sh, capture/demos/deep-agent/README.md; capture/lab/deep-agent/run.log, capture/lab/deep-agent/run.jsonl, capture/lab/summary/demos-mac.json; libs/deepagents/deepagents/graph.py and libs/deepagents/deepagents/middleware/subagents.py at deepagents 0.7.38; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0.
+来源：capture/demos/deep-agent/deep_agent.py, capture/demos/deep-agent/run.sh, capture/demos/deep-agent/README.md; capture/lab/deep-agent/run.log, capture/lab/deep-agent/run.jsonl, capture/lab/summary/demos-mac.json; libs/deepagents/deepagents/graph.py and libs/deepagents/deepagents/middleware/subagents.py at deepagents 0.7.38; libs/langchain_v1/langchain/agents/factory.py at langchain==1.5.0.

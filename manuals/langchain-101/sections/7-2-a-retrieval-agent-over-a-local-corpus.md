@@ -1,27 +1,27 @@
-# A retrieval agent over a local corpus
+# 基于本地语料的检索 agent
 
-> A retrieval agent has two parts that fail apart: the retriever finds the right passage or not, and the model calls the retriever or not, so test each one.
+> 检索 agent 有两个会各自出错的部分：检索器找不找得到正确的段落，以及模型调不调用检索器，所以要分别测试。
 
-Your team wants answers from its own documents, with the file named after each claim. You build a vector store and give the agent a search tool. The first answers look fine. Then someone asks a question that a document answers word for word, and the agent says the documents do not cover it.
+你的团队想让 agent 用自己的文档回答问题，并在每条论断后面写出文件名。你建了一个向量存储，给 agent 一个搜索工具。最初的几个回答看起来不错。然后有人问了一个文档里逐字写着答案的问题，agent 却说文档没有涉及。
 
-When you finish this section, you can build a retrieval agent on a local embedding model and record the source of each answer. You can also say if a wrong answer came from the retriever or from the model.
+读完本节，你能基于本地嵌入模型构建检索 agent，并记录每个回答的来源。你还能判断一个错误回答来自检索器还是来自模型。
 
-## What the demo builds
+## 演示构建了什么 {#s-a-retrieval-agent-over-a-local-corpus-what-the-demo-builds}
 
-The corpus is six lesson files of this repository, on embeddings, RAG, LangGraph, agent frameworks, and durable execution. They hold about 89,600 characters. The repository is MIT licensed, so the demo reads the files where they are, and records their SHA-256.
+语料是本仓库的六个课程文件，内容涉及嵌入、RAG、LangGraph、agent 框架和持久执行，共约 89,600 个字符。仓库使用 MIT 许可，所以演示直接读取这些文件的原位置，并记录它们的 SHA-256。
 
-The demo applies these sections:
+演示用到了这几节：
 
-- [Embeddings, splitters, vector stores, and retrievers](#s-embeddings-splitters-vector-stores-and-retrievers): the splitter, the store, and `create_retriever_tool`.
-- [Tools, ToolRuntime, and tool errors](#s-tools-toolruntime-and-tool-errors): the model sees only the content of a `ToolMessage`, so the source path goes into that text.
-- [The system prompt](#s-the-system-prompt): the rule to cite each claim, and to say when the lessons do not cover a question.
+- [嵌入、切分器、向量存储与检索器](#s-embeddings-splitters-vector-stores-and-retrievers)：切分器、存储和 `create_retriever_tool`。
+- [工具、ToolRuntime 与工具错误](#s-tools-toolruntime-and-tool-errors)：模型只能看到 `ToolMessage` 的内容，所以来源路径要写进那段文本。
+- [系统提示词](#s-the-system-prompt)：每条论断都要引用来源，课程没有涉及某个问题时要说明。
 
-## The pipeline
+## 流水线 {#s-a-retrieval-agent-over-a-local-corpus-the-pipeline}
 
-`nomic-embed-text` expects a task prefix on each text: `search_document:` for a passage and `search_query:` for a question. `OllamaEmbeddings` sends each text as it gets it {{code langchain_ollama/embeddings.py}}, so the demo wraps it:
+`nomic-embed-text` 要求每段文本带一个任务前缀：段落用 `search_document:`，问题用 `search_query:`。`OllamaEmbeddings` 收到什么文本就发送什么 {{code langchain_ollama/embeddings.py}}，所以演示对它做了包装：
 
 ```listing
-title: the embedding wrapper
+title: 嵌入包装器
 source: capture/demos/retrieval-agent/retrieval_agent.py
 lang: python
 ---
@@ -36,12 +36,12 @@ class NomicEmbeddings(Embeddings):
         return self.inner.embed_query(f"search_query: {text}")
 ```
 
-The splitter cuts the files into chunks of at most 1,000 characters with 150 of overlap. `add_start_index=True` keeps the offset of each chunk, so a hit names a place in a file. The store is `InMemoryVectorStore`, rebuilt on every run.
+切分器把文件切成最多 1,000 个字符的块，重叠 150 个字符。`add_start_index=True` 保留每个块的偏移量，所以一个命中能指出文件里的位置。存储是 `InMemoryVectorStore`，每次运行都重建。
 
-The tool comes from `create_retriever_tool`. Its document prompt writes the path in square brackets in front of each passage. With `content_and_artifact`, the documents also stay on the message as its artifact, so the script can check each citation against what the search returned:
+工具来自 `create_retriever_tool`。它的文档 prompt 在每个段落前面用方括号写出路径。使用 `content_and_artifact` 时，文档还会作为 artifact 保留在消息上，脚本因此可以对照搜索返回的内容检查每条引用：
 
 ```listing
-title: the retriever as a tool
+title: 作为工具的检索器
 source: capture/demos/retrieval-agent/retrieval_agent.py
 lang: python
 ---
@@ -56,16 +56,16 @@ lang: python
     agent = create_agent(model(), tools=[search], system_prompt=SYSTEM_PROMPT)
 ```
 
-Before each agent run, the script searches the store itself and prints the top four hits. That line shows the retriever alone, whatever the model then does.
+每次 agent 运行之前，脚本都会自己搜索存储，并打印前四个命中。不管模型随后做什么，这一行单独显示了检索器的表现。
 
-## The recorded run
+## 录制的运行 {#s-a-retrieval-agent-over-a-local-corpus-the-recorded-run}
 
-The demo asks five questions. Four have an answer in one lesson file, and one, about which GPU to buy, has none. It runs once with Qwen3 4B and once with Qwen3 8B.
+演示问了五个问题。其中四个在某个课程文件里有答案，一个关于该买哪块 GPU 的问题没有答案。它分别用 Qwen3 4B 和 Qwen3 8B 各运行一次。
 
-The split gave 122 chunks, and embedding them took 2.2 s. For the question about Matryoshka embeddings, the first hit was the right file. Qwen3 8B searched, answered, and cited that file:
+切分得到 122 个块，嵌入它们用了 2.2 秒。对于关于 Matryoshka 嵌入的问题，第一个命中就是正确的文件。Qwen3 8B 做了搜索、给出回答，并引用了那个文件：
 
 ```listing
-title: one question, Qwen3 8B
+title: 一个问题，Qwen3 8B
 source: capture/lab/retrieval-agent/run-8b.log
 lang: text
 ---
@@ -82,13 +82,13 @@ lang: text
   model calls 2, prompt tokens 1802, 10.3 s
 ```
 
-Qwen3 4B got the same top four hits, because the retriever does not depend on the chat model. It never called the tool:
+Qwen3 4B 得到了同样的前四个命中，因为检索器不依赖聊天模型。但它从没调用过工具：
 
 ```listing
-title: the same question, Qwen3 4B
+title: 同一个问题，Qwen3 4B
 source: capture/lab/retrieval-agent/run-4b.log
 lang: text
-note: The top four hits are cut. They are the same as in the run of Qwen3 8B.
+note: 前四个命中已截掉，它们与 Qwen3 8B 那次运行相同。
 ---
 == matryoshka: How much storage does Matryoshka truncation from 1536 to 256 dimensions save, and what does it cost in accuracy?
 …
@@ -98,28 +98,28 @@ note: The top four hits are cut. They are the same as in the run of Qwen3 8B.
   model calls 1, prompt tokens 291, 0.9 s
 ```
 
-## What the run shows
+## 这次运行说明了什么 {#s-a-retrieval-agent-over-a-local-corpus-what-the-run-shows}
 
-**We measured** one run of each model on the Mac, Apple M1 Max, 10 cores, 64 GiB, with Ollama 0.31.1 and five questions per model.
+**我们测量了** Mac 上每个模型的一次运行，机器是 Apple M1 Max，10 核，64 GiB，使用 Ollama 0.31.1，每个模型五个问题。
 
-| Question | Top hit is the right file | Qwen3 4B | Qwen3 8B |
+| 问题 | 第一个命中是正确的文件 | Qwen3 4B | Qwen3 8B |
 |---|---|---|---|
-| a field with no reducer | yes | no search, said not covered | no search, said not covered |
-| Matryoshka truncation | yes | no search, said not covered | searched, cited the right file |
-| reliability decay | yes | no search, said not covered | searched, cited the right file |
-| the key of a checkpoint | yes | no search, said not covered | searched, cited the right file |
-| which GPU to buy | not in the corpus | said not covered | said not covered |
+| 没有 reducer 的字段 | 是 | 没有搜索，说没有涉及 | 没有搜索，说没有涉及 |
+| Matryoshka 截断 | 是 | 没有搜索，说没有涉及 | 搜索了，引用了正确的文件 |
+| 可靠性衰减 | 是 | 没有搜索，说没有涉及 | 搜索了，引用了正确的文件 |
+| 检查点的键 | 是 | 没有搜索，说没有涉及 | 搜索了，引用了正确的文件 |
+| 该买哪块 GPU | 语料里没有 | 说没有涉及 | 说没有涉及 |
 
-The retriever put the right file first for all four questions that the corpus answers. The failures are all model results. Qwen3 4B answered every question from its own reading of the prompt and never called `search_lessons`. Qwen3 8B skipped the search once, on the reducer question. Every citation that either model wrote was a file that a search had returned in that run.
+对语料能回答的四个问题，检索器都把正确的文件排在第一位。失败全是模型造成的。Qwen3 4B 对每个问题都凭自己对 prompt 的理解作答，从没调用 `search_lessons`。Qwen3 8B 有一次跳过了搜索，就是 reducer 那个问题。两个模型写出的每条引用，都是那次运行中某次搜索返回过的文件。
 
-So when an answer says the documents do not cover a question, check the trace for a tool call before you tune the retriever. A run with no search is a model problem. A run with a search and the wrong passages is a retriever problem.
+所以当回答说文档没有涉及某个问题时，先在追踪里查有没有工具调用，再去调检索器。没有搜索的运行是模型问题。有搜索但段落不对的运行是检索器问题。
 
 ```takeaways
-- Put the source path into the text of each passage, because the model sees only that text.
-- Keep the documents as the artifact, and check each citation against them.
-- Log the top hits of the retriever beside each answer, so you can test it alone.
-- Check for a tool call before you tune chunks or embeddings.
-- Add the task prefixes that your embedding model expects.
+- 把来源路径写进每个段落的文本，因为模型只能看到这段文本。
+- 把文档保留为 artifact，并对照它们检查每条引用。
+- 在每个回答旁边记录检索器的前几个命中，这样可以单独测试它。
+- 调整块或嵌入之前，先检查有没有工具调用。
+- 加上你的嵌入模型所要求的任务前缀。
 ```
 
-Sources: capture/demos/retrieval-agent/retrieval_agent.py, capture/demos/retrieval-agent/run.sh, capture/demos/retrieval-agent/README.md; capture/lab/retrieval-agent/run-4b.log, capture/lab/retrieval-agent/run-8b.log, capture/lab/retrieval-agent/run-4b.jsonl, capture/lab/retrieval-agent/run-8b.jsonl, capture/lab/retrieval-agent/corpus.txt, capture/lab/summary/demos-mac.json; libs/core/langchain_core/tools/retriever.py at langchain-core 1.8.0; langchain_ollama/embeddings.py at langchain-ollama 1.1.0.
+来源：capture/demos/retrieval-agent/retrieval_agent.py, capture/demos/retrieval-agent/run.sh, capture/demos/retrieval-agent/README.md; capture/lab/retrieval-agent/run-4b.log, capture/lab/retrieval-agent/run-8b.log, capture/lab/retrieval-agent/run-4b.jsonl, capture/lab/retrieval-agent/run-8b.jsonl, capture/lab/retrieval-agent/corpus.txt, capture/lab/summary/demos-mac.json; libs/core/langchain_core/tools/retriever.py at langchain-core 1.8.0; langchain_ollama/embeddings.py at langchain-ollama 1.1.0.
