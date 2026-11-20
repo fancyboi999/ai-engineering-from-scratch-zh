@@ -274,6 +274,7 @@ forms.flat.tower(f, 420, 16, 'blue', { mark: 'substrate' });
 
 - JSON、HTTP、SSE、JSONL 块必须用带 `source` 的 `listing`；普通 `json` 围栏会被审计拒绝。
 - 套件位于 `capture/`，应能离线运行，不需要网络和密钥，遵循仓库依赖白名单。
+- 例外：讲解某个库的手册，可以在套件自己的环境中安装该库及其固定版本的配套包，并在 `capture/requirements.txt` 中写明精确版本；实验脚本和演示也可使用这些包。其余内容仍受白名单约束。未安装这些包时，套件的 `check` 应打印 `skipped` 及原因。
 - 专有二进制或托管服务无法在 CI 离线运行时，由原作者在安装固定版本的机器上录制。`check` 比较脱敏后的已存输出；目标未安装时应打印 `skipped` 及原因并退出 0。前言说明哪些记录来自这种方式，以及录制机器。
 - `capture.run` 写入 `capture/out/`。`capture.check` 在临时目录生成数据，再对比经过掩码的已存输出；时间戳、随机 ID 等变化值需要掩码。
 - 默认审计只应在明确批准后运行 `capture.check`；中文同步可用 `--skip-capture` 做静态溯源校验，报告必须披露跳过的执行。不得把 `skipped` 当成目标系统运行成功。

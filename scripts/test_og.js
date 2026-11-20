@@ -92,6 +92,19 @@ assert.ok(chineseLines.length > 1);
 assert.ok(!chineseLines.join('').includes(' '));
 assert.ok(layout(spec).title.lines.join('').includes('反向传播'));
 
+// 蓝底页面卡与居中首页卡的文字必须全部落在四角标记框内，框外保持纯背景色。
+for (const [name, card] of [['home', cards['page/home']], ['lesson', { ...spec, title: '反向传播与注意力机制'.repeat(6), description: '亲手构建神经网络，理解梯度、损失和 agent 循环。'.repeat(4) }]]) {
+  const pixels = renderPixels(card);
+  const background = card.kind === 'home' ? [250, 250, 245] : [53, 83, 255];
+  let stray = null;
+  for (let at = 0; at < pixels.length && !stray; at += 3) {
+    const x = (at / 3) % 1200, y = Math.floor(at / 3600);
+    const inside = x >= 24 && x < 1176 && y >= 24 && y < 606;
+    if (!inside && (pixels[at] !== background[0] || pixels[at + 1] !== background[1] || pixels[at + 2] !== background[2])) stray = `${x},${y}`;
+  }
+  assert.equal(stray, null, `${name} card paints outside the frame`);
+}
+
 const html = `<head>\n  <meta property="og:image" content="${ORIGIN}/og/page/home.png">\n</head>`;
 const stamped = stampCards(html, cards);
 assert.match(stamped, /home\.png\?v=[a-f0-9]{12}/);
