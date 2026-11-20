@@ -3,19 +3,19 @@
 const { figure } = require('../../../_shared/figkit.js');
 
 const rows = [
-  ['a checkpoint row names a class', ['an edited SqliteSaver row,', 'read with get_state'], 'default: get_state built the lab class', 'LANGGRAPH_STRICT_MSGPACK=true: raw fields'],
-  ['a user id of *', ['a store prefix built', 'from that id'], 'list_namespaces listed every user', 'search on the same prefix: one user only'],
-  ['an edit switches the tool', ['send_email edited into', 'a call of delete_file'], 'batched: delete_file ran in 3 of 3 runs', 'per_call: ValidationError, nothing ran'],
-  ['an agent inside a local trace', ['tracing_context with', 'enabled="local"'], 'requests to api.smith.langchain.com', 'enabled=False: no run sent'],
+  ['检查点行指名了一个类', ['被编辑过的 SqliteSaver 行，', '用 get_state 读取'], '默认：get_state 构建了实验用的类', 'LANGGRAPH_STRICT_MSGPACK=true：原始字段'],
+  ['用户 id 为 *', ['由该 id 构造的', 'store 前缀'], 'list_namespaces 列出了每个用户', '对同一前缀的 search：只有一个用户'],
+  ['编辑切换了工具', ['send_email 被编辑成', 'delete_file 的调用'], 'batched：delete_file 在 3 次运行中全部运行', 'per_call：ValidationError，没有运行'],
+  ['本地追踪中的智能体', ['tracing_context，', 'enabled="local"'], '向 api.smith.langchain.com 发出请求', 'enabled=False：没有发送运行'],
 ];
 
 module.exports = figure('fig-8-4', {
   height: 452,
-  title: 'Where input crosses into code, by default and with the setting',
-  desc: 'Four rows, each from an input on the left to two results on the right: the default result in rose and the result with a setting in violet. An edited SqliteSaver checkpoint row that names a class makes get_state build the class, and LANGGRAPH_STRICT_MSGPACK=true gives back the raw fields. A user id of star makes list_namespaces list every user, while search on the same prefix returns one user. A batched review lets an edit of send_email into delete_file run delete_file, and per-call review raises ValidationError. An agent inside tracing_context with enabled local sends requests to api.smith.langchain.com, and enabled False sends no run, only one GET /info.',
+  title: '输入跨入代码之处：默认情况与设置之后',
+  desc: '四行，每行从左侧的输入指向右侧的两个结果：玫红色是默认结果，紫罗兰色是使用某项设置后的结果。指名了一个类的、被编辑过的 SqliteSaver 检查点行，会让 get_state 构建该类，而 LANGGRAPH_STRICT_MSGPACK=true 返回原始字段。用户 id 为星号时，list_namespaces 列出所有用户，而对同一前缀的 search 只返回一个用户。批量审批下，把 send_email 编辑成 delete_file 会让 delete_file 运行，逐个调用审批则抛出 ValidationError。在 enabled 为 local 的 tracing_context 内，智能体会向 api.smith.langchain.com 发出请求，而 enabled 为 False 时不发送任何运行，只有一次 GET /info。',
 }, f => {
-  f.kicker(20, 22, 'the input');
-  f.kicker(300, 22, 'the default, then the change');
+  f.kicker(20, 22, '输入');
+  f.kicker(300, 22, '默认结果，然后是改动后的结果');
   rows.forEach(([title, sub, bad, good], i) => {
     const y = 34 + i * 96;
     const input = f.box({ x: 20, y, w: 252, h: 76, hue: 'grey', title, sub, align: 'left' });
@@ -24,6 +24,6 @@ module.exports = figure('fig-8-4', {
     f.path(`M${input.x + input.w} ${worse.cy} H${worse.x - 1}`, { style: 'fail' });
     f.path(`M${input.x + input.w} ${better.cy} H${better.x - 1}`, { style: 'call' });
   });
-  f.text(20, 428, 'Rose: the result with the default. Violet: the result after the change.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 444, 'Each result is a recorded run on the Mac or the x86 server guest, or a capture of the kit.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 428, '玫红：默认设置下的结果。紫罗兰：改动之后的结果。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 444, '每个结果都是 Mac 或 x86 服务器虚拟机上的一次录制运行，或录制工具包的一份录制。', { size: 11, serif: true, hue: 'ink-soft' });
 });

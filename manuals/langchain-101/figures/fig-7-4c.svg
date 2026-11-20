@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 382" role="img" aria-labelledby="fig-7-4c-title fig-7-4c-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-7-4c-title">The 20 file tasks: plain loop, deep agent, and deep agent on the disk</title>
-  <desc id="fig-7-4c-desc">A grid of the 20 file tasks for three models and three harnesses. A filled square is a pass, a rose square a fail. A green dot under a square marks a run where the model wrote with a Deep Agents file tool, and a grey dot a run where it only read with one. With the default backend those tools write to the agent state, and the checker reads the disk. Qwen3 4B passed 16 plain, 2 as a default deep agent, and 16 with FilesystemBackend. Qwen3 8B passed 17, 5 and 9. Claude Haiku 5.5 passed 20, 20 and 19.</desc>
-  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">MODEL, HARNESS</text>
-  <text x="204" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">FILES01 TO FILES20</text>
-  <text x="620" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">PASS</text>
-  <text x="566" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">BUILT-IN</text>
+  <title id="fig-7-4c-title">20 个文件任务：plain 循环、deep agent 与落盘的 deep agent</title>
+  <desc id="fig-7-4c-desc">三个模型、三种框架在 20 个文件任务上的网格。实心方块表示通过，玫红方块表示失败。方块下方的绿点表示该次运行中模型用 Deep Agents 的文件工具写入过，灰点表示只用它读取过。默认后端下，这些工具写入智能体状态，而检查器读取磁盘。Qwen3 4B 在 plain 下通过 16 个，作为默认 deep agent 通过 2 个，使用 FilesystemBackend 时通过 16 个。Qwen3 8B 通过 17、5 和 9 个。Claude Haiku 5.5 通过 20、20 和 19 个。</desc>
+  <text x="20" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">模型，框架</text>
+  <text x="204" y="22" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">FILES01 至 FILES20</text>
+  <text x="620" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">通过</text>
+  <text x="566" y="22" font-size="11" text-anchor="end" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">内置工具</text>
   <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
   <text x="20" y="65" font-size="11" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">Haiku 5.5</text>
-  <text x="100" y="65" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">plain loop</text>
+  <text x="100" y="65" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">plain 循环</text>
   <rect x="204" y="54" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="219" y="54" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="234" y="54" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
@@ -30,28 +30,28 @@
   <rect x="489" y="54" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="560" y="65" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)"></text>
   <text x="620" y="65" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">20/20</text>
-  <text x="100" y="91" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep, default</text>
+  <text x="100" y="91" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep，默认</text>
   <rect x="204" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="219" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="234" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="240" cy="99" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="240" cy="99" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="249" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="255" cy="99" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="255" cy="99" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="264" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="279" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="285" cy="99" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="285" cy="99" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="294" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="309" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="324" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="339" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="345" cy="99" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="345" cy="99" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="354" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="360" cy="99" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="360" cy="99" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="369" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="384" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="399" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="414" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="420" cy="99" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="420" cy="99" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="429" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="444" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="459" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -59,16 +59,16 @@
   <rect x="489" y="80" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <text x="560" y="91" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)">6/20</text>
   <text x="620" y="91" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">20/20</text>
-  <text x="100" y="117" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep, on disk</text>
+  <text x="100" y="117" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep，落盘</text>
   <rect x="204" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="219" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="234" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="240" cy="125" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="249" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="255" cy="125" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="255" cy="125" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="264" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="279" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="285" cy="125" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="285" cy="125" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="294" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="300" cy="125" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="309" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -77,12 +77,12 @@
   <rect x="339" y="106" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="345" cy="125" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="354" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="360" cy="125" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="360" cy="125" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="369" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="384" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="399" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="414" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="420" cy="125" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="420" cy="125" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="429" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="444" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="459" y="106" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -93,7 +93,7 @@
   </g>
   <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
   <text x="20" y="155" font-size="11" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">Qwen3 8B</text>
-  <text x="100" y="155" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">plain loop</text>
+  <text x="100" y="155" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">plain 循环</text>
   <rect x="204" y="144" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="219" y="144" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="234" y="144" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
@@ -116,23 +116,23 @@
   <rect x="489" y="144" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="560" y="155" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)"></text>
   <text x="620" y="155" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">17/20</text>
-  <text x="100" y="181" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep, default</text>
+  <text x="100" y="181" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep，默认</text>
   <rect x="204" y="170" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="219" y="170" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="234" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="240" cy="189" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="249" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="255" cy="189" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="255" cy="189" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="264" y="170" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="279" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="285" cy="189" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="285" cy="189" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="294" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="309" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="315" cy="189" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="324" y="170" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="339" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="354" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="360" cy="189" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="360" cy="189" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="369" y="170" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="384" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="399" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
@@ -141,20 +141,20 @@
   <rect x="429" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="435" cy="189" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="444" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="450" cy="189" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="450" cy="189" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="459" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="474" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="480" cy="189" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="480" cy="189" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="489" y="170" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <text x="560" y="181" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)">9/20</text>
   <text x="620" y="181" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">5/20</text>
-  <text x="100" y="207" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep, on disk</text>
+  <text x="100" y="207" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep，落盘</text>
   <rect x="204" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="219" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="234" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="240" cy="215" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="249" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="255" cy="215" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="255" cy="215" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="264" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="279" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="285" cy="215" r="2.6" fill="var(--m-green-ink, #336b40)"/>
@@ -164,7 +164,7 @@
   <rect x="324" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="339" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="354" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="360" cy="215" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="360" cy="215" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="369" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="384" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="399" y="196" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -173,17 +173,17 @@
   <rect x="429" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="435" cy="215" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="444" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="450" cy="215" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="450" cy="215" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="459" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="474" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="480" cy="215" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="480" cy="215" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="489" y="196" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <text x="560" y="207" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)">9/20</text>
   <text x="620" y="207" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">9/20</text>
   </g>
   <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
   <text x="20" y="245" font-size="11" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">Qwen3 4B</text>
-  <text x="100" y="245" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">plain loop</text>
+  <text x="100" y="245" font-size="11" fill="var(--m-violet-ink, #5b4fa3)">plain 循环</text>
   <rect x="204" y="234" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="219" y="234" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <rect x="234" y="234" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
@@ -206,55 +206,55 @@
   <rect x="489" y="234" width="12" height="13" fill="var(--m-violet-ink, #5b4fa3)"/>
   <text x="560" y="245" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)"></text>
   <text x="620" y="245" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">16/20</text>
-  <text x="100" y="271" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep, default</text>
+  <text x="100" y="271" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep，默认</text>
   <rect x="204" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="210" cy="279" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="219" y="260" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="234" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="240" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="240" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="249" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="255" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="255" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="264" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="279" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="285" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="285" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="294" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="300" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="300" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="309" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="315" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="315" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="324" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="330" cy="279" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="339" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="345" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="345" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="354" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="360" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="360" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="369" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="375" cy="279" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="384" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="390" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="390" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="399" y="260" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="405" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="405" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="414" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="420" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="420" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="429" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="435" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="435" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="444" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="450" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="450" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="459" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <circle cx="465" cy="279" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="474" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="480" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="480" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="489" y="260" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
-  <circle cx="495" cy="279" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="495" cy="279" r="2" fill="var(--m-ink-mute, #666660)"/>
   <text x="560" y="271" font-size="11" text-anchor="end" fill="var(--m-green-ink, #336b40)">18/20</text>
   <text x="620" y="271" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">2/20</text>
-  <text x="100" y="297" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep, on disk</text>
+  <text x="100" y="297" font-size="11" fill="var(--m-blue-ink, #2f5d9a)">deep，落盘</text>
   <rect x="204" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="210" cy="305" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="219" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <rect x="234" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="240" cy="305" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="249" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="255" cy="305" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="255" cy="305" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="264" y="286" width="12" height="13" fill="var(--m-rose-ink, #b0344d)"/>
   <rect x="279" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="285" cy="305" r="2.6" fill="var(--m-green-ink, #336b40)"/>
@@ -267,11 +267,11 @@
   <rect x="339" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="345" cy="305" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="354" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="360" cy="305" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="360" cy="305" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="369" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="375" cy="305" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="384" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
-  <circle cx="390" cy="305" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
+  <circle cx="390" cy="305" r="2" fill="var(--m-ink-mute, #666660)"/>
   <rect x="399" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
   <circle cx="405" cy="305" r="2.6" fill="var(--m-green-ink, #336b40)"/>
   <rect x="414" y="286" width="12" height="13" fill="var(--m-blue-ink, #2f5d9a)"/>
@@ -290,9 +290,9 @@
   <text x="620" y="297" font-size="11" text-anchor="end" font-weight="700" fill="var(--m-ink, #1a1a1a)">16/20</text>
   </g>
   <circle cx="24" cy="326" r="2.6" fill="var(--m-green-ink, #336b40)"/>
-  <text x="34" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">wrote with write_file, edit_file, or delete</text>
-  <circle cx="344" cy="326" r="2" fill="var(--m-ink-mute, #6f6f6a)"/>
-  <text x="354" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">read only: ls, glob, read_file</text>
-  <text x="20" y="352" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">default: StateBackend, files live in the agent state. on disk: FilesystemBackend on the task folder.</text>
-  <text x="20" y="370" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Every row also had the five task tools that write the folder. The checker reads the folder.</text>
+  <text x="34" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">用 write_file、edit_file 或 delete 写入过</text>
+  <circle cx="344" cy="326" r="2" fill="var(--m-ink-mute, #666660)"/>
+  <text x="354" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">只读过：ls、glob、read_file</text>
+  <text x="20" y="352" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">默认：StateBackend，文件存放在智能体状态里。落盘：任务文件夹上的 FilesystemBackend。</text>
+  <text x="20" y="370" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每一行还都有五个写入该文件夹的任务工具。检查器读取这个文件夹。</text>
 </svg>

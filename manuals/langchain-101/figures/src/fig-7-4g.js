@@ -6,14 +6,14 @@ const { load } = require('../../../_shared/chart.js');
 
 const S = load(path.join(__dirname, '../../capture/lab/bench2/summary-bench2.json'));
 const H = S.ptc['claude-haiku-5-5'];
-const ARMS = [['ptc', 'eval tool, plain prompt', 'green'], ['nudge', 'eval tool, prompt asks for it', 'indigo']];
+const ARMS = [['ptc', 'eval 工具，普通提示词', 'green'], ['nudge', 'eval 工具，提示词要求使用', 'indigo']];
 const METRICS = [
-  ['model calls', c => c.calls_sum, v => String(v)],
-  ['prompt tokens', c => c.in_sum, v => `${(v / 1e6).toFixed(2)}M`],
-  ['output tokens', c => c.out_sum, v => `${(v / 1000).toFixed(1)}k`],
-  ['dollars', c => c.cost, v => `$${v.toFixed(3)}`],
-  ['eval calls', c => c.eval_calls, v => String(v)],
-  ['eval errors', c => c.eval_errors, v => String(v)],
+  ['模型调用', c => c.calls_sum, v => String(v)],
+  ['提示词 token', c => c.in_sum, v => `${(v / 1e6).toFixed(2)}M`],
+  ['输出 token', c => c.out_sum, v => `${(v / 1000).toFixed(1)}k`],
+  ['美元', c => c.cost, v => `$${v.toFixed(3)}`],
+  ['eval 调用', c => c.eval_calls, v => String(v)],
+  ['eval 错误', c => c.eval_errors, v => String(v)],
 ];
 const ids = Object.keys(H.ptc.tasks);
 const SQ = 11;
@@ -30,24 +30,24 @@ const ev = a => ids.filter(t => H[a].tasks[t].ev > 0).length;
 
 module.exports = figure('fig-7-4g', {
   height: BARS_Y + METRICS.length * (2 * RH + GAP) + 50,
-  title: 'Claude Haiku 5.5 with the eval tool, with and without a prompt that asks for it',
-  desc: `Two strips of the 39 chain and sql tasks, one square per task, show which runs called the eval tool: ${ev('ptc')} runs without the prompt and ${ev('nudge')} runs with it. Every task passed in both arms. Below, paired bars compare model calls, prompt tokens, output tokens, dollars, eval calls and eval errors of the two arms: ${H.ptc.calls_sum} and ${H.nudge.calls_sum} calls, and $${H.ptc.cost.toFixed(3)} and $${H.nudge.cost.toFixed(3)}.`,
+  title: 'Claude Haiku 5.5 带 eval 工具，提示词有无要求使用',
+  desc: `两条带，对应 39 个 chain 与 sql 任务，每个任务一个方块，显示哪些运行调用了 eval 工具：提示词没有要求时 ${ev('ptc')} 次，提示词要求时 ${ev('nudge')} 次。两组中每个任务都通过。下方的成对条形比较两组的模型调用数、提示词 token、输出 token、美元、eval 调用数和 eval 错误数：调用数分别为 ${H.ptc.calls_sum} 和 ${H.nudge.calls_sum}，成本分别为 $${H.ptc.cost.toFixed(3)} 和 $${H.nudge.cost.toFixed(3)}。`,
 }, f => {
-  f.kicker(20, 22, 'each square is one task');
-  f.kicker(620, 22, `${ids.length} tasks, all passed`, { anchor: 'end' });
+  f.kicker(20, 22, '每个方块是一个任务');
+  f.kicker(620, 22, `${ids.length} 个任务，全部通过`, { anchor: 'end' });
   f.rule(20, 32, 620, 32, { hue: 'ink-mute' });
   ARMS.forEach(([a, label, hue], i) => {
     f.beat(i + 1);
     const y = stripY(i);
-    f.text(X0, y - 6, `${label}: ${ev(a)} of ${ids.length} runs called eval`, { size: 11, weight: 700, hue });
+    f.text(X0, y - 6, `${label}：${ids.length} 次运行中有 ${ev(a)} 次调用了 eval`, { size: 11, weight: 700, hue });
     ids.forEach((t, j) => {
       const used = H[a].tasks[t].ev > 0;
       f.rect(X0 + j * STEP, y, SQ, SQ, used ? { fill: color(`${hue}-ink`), stroke: 'none' } : { fill: color(`${hue}-fill`), stroke: color(`${hue}-ink`), strokeWidth: 0.8 });
     });
   });
   f.beat(0);
-  f.text(X0, stripY(1) + 32, 'Dark square: the run called eval. Pale square: it used the task tools directly.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.kicker(20, BARS_Y - 8, 'two arms, same 39 tasks');
+  f.text(X0, stripY(1) + 32, '深色方块：该次运行调用了 eval。浅色方块：直接使用任务工具。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.kicker(20, BARS_Y - 8, '两组，同样的 39 个任务');
   let y = BARS_Y;
   METRICS.forEach(([name, get, show], g) => {
     f.beat(g % 2 + 1);
@@ -64,5 +64,5 @@ module.exports = figure('fig-7-4g', {
     y += 2 * RH + GAP;
   });
   f.beat(0);
-  f.text(20, y + 2, 'Green is the plain prompt and indigo is the prompt that asks for eval.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 2, '绿色是普通提示词，靛蓝是要求使用 eval 的提示词。', { size: 11, serif: true, hue: 'ink-soft' });
 });

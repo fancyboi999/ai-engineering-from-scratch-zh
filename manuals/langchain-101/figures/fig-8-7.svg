@@ -1,56 +1,56 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" role="img" aria-labelledby="fig-8-7-title fig-8-7-desc" font-family="JetBrains Mono, ui-monospace, monospace">
-  <title id="fig-8-7-title">Seven failures of the drill, before and after each fix</title>
-  <desc id="fig-8-7-desc">A table of seven rows, one per case of the failure drill with Qwen3 4B on the x86 server guest, with the symptom on the left and the result after the fix on the right. Retry layers: 9 requests against 3. A crash after a charge: 4 charges against 2 with the key, because the model asked for two charges. A middleware that jumps past review: the tool ran before any decision, and per-call mode stopped it. No structured output: None with no exception in 3 of 5 prompts, and a check that raises. A tracing endpoint that is down: exit 16.9 s after the run against 0.3 s. The same tool name twice: one tool bound with no error. Endless tool calls: GraphRecursionError at limit 10, and a model call limit of 3 that ends the run after 3 calls, with the recursion limit raised to 25.</desc>
-  <text x="176" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">THE SYMPTOM</text>
-  <text x="408" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #6f6f6a)">AFTER THE FIX</text>
-  <text x="20" y="59" font-size="11.5" font-weight="700">retry layers</text>
+  <title id="fig-8-7-title">演练中的七个故障，修复前后</title>
+  <desc id="fig-8-7-desc">一张七行的表，每行是 x86 服务器虚拟机上 Qwen3 4B 故障演练的一个案例，左侧是症状，右侧是修复后的结果。重试层：9 个请求，对比 3 个。扣款后崩溃：4 次扣款，对比带键时的 2 次，因为模型要求了两次扣款。跳过审批的中间件：工具在任何决定之前就运行了，逐个调用模式拦住了它。没有结构化输出：5 条提示词中有 3 条得到 None 且没有异常，而检查会抛出异常。追踪端点宕机：运行后 16.9 s 退出，对比 0.3 s。同一工具名出现两次：绑定了一个工具，没有报错。无休止的工具调用：在上限 10 处出现 GraphRecursionError，而 3 次模型调用上限在 3 次调用后结束运行，同时递归上限提高到 25。</desc>
+  <text x="176" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">症状</text>
+  <text x="408" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">修复之后</text>
+  <text x="20" y="59" font-size="11.5" font-weight="700">重试层</text>
   <rect x="176" y="32" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="50.1" font-size="12" font-weight="700">9 requests, 6.83 s</text>
-  <text x="188" y="67.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">every connection dropped</text>
+  <text x="188" y="50.1" font-size="12" font-weight="700">9 个请求，6.83 s</text>
+  <text x="188" y="67.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个连接都被断开</text>
   <rect x="408" y="32" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="50.1" font-size="12" font-weight="700">3 requests, 2.32 s</text>
-  <text x="420" y="67.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">max_retries=0 on the model</text>
-  <text x="20" y="117" font-size="11.5" font-weight="700">crash after a charge</text>
+  <text x="420" y="50.1" font-size="12" font-weight="700">3 个请求，2.32 s</text>
+  <text x="420" y="67.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型上设 max_retries=0</text>
+  <text x="20" y="117" font-size="11.5" font-weight="700">扣款后崩溃</text>
   <rect x="176" y="90" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="108.1" font-size="12" font-weight="700">4 charges</text>
-  <text x="188" y="125.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">SIGKILL, then a resume</text>
+  <text x="188" y="108.1" font-size="12" font-weight="700">4 次扣款</text>
+  <text x="188" y="125.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">SIGKILL，然后恢复</text>
   <rect x="408" y="90" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="108.1" font-size="12" font-weight="700">2 with the key</text>
-  <text x="420" y="125.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one per call id of the model</text>
-  <text x="20" y="175" font-size="11.5" font-weight="700">jump past review</text>
+  <text x="420" y="108.1" font-size="12" font-weight="700">带键时 2 次</text>
+  <text x="420" y="125.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个模型调用 id 一次</text>
+  <text x="20" y="175" font-size="11.5" font-weight="700">跳过审批</text>
   <rect x="176" y="148" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="166.1" font-size="12" font-weight="700">ran 1 time, no decision</text>
-  <text x="188" y="183.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">batched mode</text>
+  <text x="188" y="166.1" font-size="12" font-weight="700">运行了 1 次，没有决定</text>
+  <text x="188" y="183.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">批量模式</text>
   <rect x="408" y="148" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="166.1" font-size="12" font-weight="700">ran 0 times, 1 interrupt</text>
+  <text x="420" y="166.1" font-size="12" font-weight="700">运行了 0 次，1 次中断</text>
   <text x="420" y="183.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">interrupt_mode per_call</text>
-  <text x="20" y="233" font-size="11.5" font-weight="700">no structured output</text>
+  <text x="20" y="233" font-size="11.5" font-weight="700">没有结构化输出</text>
   <rect x="176" y="206" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="224.1" font-size="12" font-weight="700">None in 3 of 5 prompts</text>
-  <text x="188" y="241.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ToolStrategy and a tool</text>
+  <text x="188" y="224.1" font-size="12" font-weight="700">5 条提示词中 3 条为 None</text>
+  <text x="188" y="241.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ToolStrategy 加一个工具</text>
   <rect x="408" y="206" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="224.1" font-size="12" font-weight="700">your check raises</text>
-  <text x="420" y="241.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">test for None</text>
-  <text x="20" y="291" font-size="11.5" font-weight="700">tracing endpoint down</text>
+  <text x="420" y="224.1" font-size="12" font-weight="700">你的检查会抛出异常</text>
+  <text x="420" y="241.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">检查是否为 None</text>
+  <text x="20" y="291" font-size="11.5" font-weight="700">追踪端点宕机</text>
   <rect x="176" y="264" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="282.1" font-size="12" font-weight="700">exit 16.9 s after the run</text>
-  <text x="188" y="299.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">one run, nothing listens</text>
+  <text x="188" y="282.1" font-size="12" font-weight="700">运行后 16.9 s 退出</text>
+  <text x="188" y="299.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一次运行，无人监听</text>
   <rect x="408" y="264" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="282.1" font-size="12" font-weight="700">exit 0.3 s after the run</text>
-  <text x="420" y="299.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">probe, then tracing off</text>
-  <text x="20" y="349" font-size="11.5" font-weight="700">same tool name twice</text>
+  <text x="420" y="282.1" font-size="12" font-weight="700">运行后 0.3 s 退出</text>
+  <text x="420" y="299.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先探测，再关闭追踪</text>
+  <text x="20" y="349" font-size="11.5" font-weight="700">同一工具名出现两次</text>
   <rect x="176" y="322" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="340.1" font-size="12" font-weight="700">1 tool bound, no error</text>
-  <text x="188" y="357.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">the refunds function ran</text>
+  <text x="188" y="340.1" font-size="12" font-weight="700">绑定了 1 个工具，没有报错</text>
+  <text x="188" y="357.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">refunds 函数运行了</text>
   <rect x="408" y="322" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="340.1" font-size="12" font-weight="700">duplicate found</text>
-  <text x="420" y="357.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">check names first</text>
-  <text x="20" y="407" font-size="11.5" font-weight="700">endless tool calls</text>
+  <text x="420" y="340.1" font-size="12" font-weight="700">发现重复</text>
+  <text x="420" y="357.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">先检查名称</text>
+  <text x="20" y="407" font-size="11.5" font-weight="700">无休止的工具调用</text>
   <rect x="176" y="380" width="220" height="46" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
-  <text x="188" y="398.1" font-size="12" font-weight="700">raised at 5 model calls</text>
+  <text x="188" y="398.1" font-size="12" font-weight="700">5 次模型调用时抛出</text>
   <text x="188" y="415.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">recursion_limit 10</text>
   <rect x="408" y="380" width="212" height="46" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
-  <text x="420" y="398.1" font-size="12" font-weight="700">ended at 3 calls</text>
-  <text x="420" y="415.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">call limit 3, recursion 25</text>
-  <text x="20" y="452" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">The first of three runs of drill.py with Qwen3 4B on Ollama, on the x86 server guest.</text>
+  <text x="420" y="398.1" font-size="12" font-weight="700">3 次调用时结束</text>
+  <text x="420" y="415.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">调用上限 3，递归上限 25</text>
+  <text x="20" y="452" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">x86 服务器虚拟机上，用 Ollama 里的 Qwen3 4B 运行 drill.py 三次中的第一次。</text>
 </svg>

@@ -9,9 +9,9 @@ const M = S.main;
 const Q4 = 'qwen3:4b-instruct-2507-q4_K_M';
 const MODELS = [['claude-haiku-5-5', 'Haiku 5.5'], ['qwen3:8b', 'Qwen3 8B'], [Q4, 'Qwen3 4B']];
 const HARN = [
-  ['plain', 'plain loop', 'violet'],
-  ['deep_agent', 'deep, default', 'blue'],
-  ['deep_agent_fs', 'deep, on disk', 'blue'],
+  ['plain', 'plain 循环', 'violet'],
+  ['deep_agent', 'deep，默认', 'blue'],
+  ['deep_agent_fs', 'deep，落盘', 'blue'],
 ];
 const WRITERS = new Set(['write_file', 'edit_file', 'delete']);
 const files = M.order.filter(t => M.family[t] === 'files');
@@ -32,13 +32,13 @@ const SEP = 12;
 
 module.exports = figure('fig-7-4c', {
   height: Y0 + 9 * RH + 2 * SEP + 70,
-  title: 'The 20 file tasks: plain loop, deep agent, and deep agent on the disk',
-  desc: `A grid of the 20 file tasks for three models and three harnesses. A filled square is a pass, a rose square a fail. A green dot under a square marks a run where the model wrote with a Deep Agents file tool, and a grey dot a run where it only read with one. With the default backend those tools write to the agent state, and the checker reads the disk. Qwen3 4B passed ${pass(Q4, 'plain')} plain, ${pass(Q4, 'deep_agent')} as a default deep agent, and ${pass(Q4, 'deep_agent_fs')} with FilesystemBackend. Qwen3 8B passed ${pass('qwen3:8b', 'plain')}, ${pass('qwen3:8b', 'deep_agent')} and ${pass('qwen3:8b', 'deep_agent_fs')}. Claude Haiku 5.5 passed ${pass('claude-haiku-5-5', 'plain')}, ${pass('claude-haiku-5-5', 'deep_agent')} and ${pass('claude-haiku-5-5', 'deep_agent_fs')}.`,
+  title: '20 个文件任务：plain 循环、deep agent 与落盘的 deep agent',
+  desc: `三个模型、三种框架在 20 个文件任务上的网格。实心方块表示通过，玫红方块表示失败。方块下方的绿点表示该次运行中模型用 Deep Agents 的文件工具写入过，灰点表示只用它读取过。默认后端下，这些工具写入智能体状态，而检查器读取磁盘。Qwen3 4B 在 plain 下通过 ${pass(Q4, 'plain')} 个，作为默认 deep agent 通过 ${pass(Q4, 'deep_agent')} 个，使用 FilesystemBackend 时通过 ${pass(Q4, 'deep_agent_fs')} 个。Qwen3 8B 通过 ${pass('qwen3:8b', 'plain')}、${pass('qwen3:8b', 'deep_agent')} 和 ${pass('qwen3:8b', 'deep_agent_fs')} 个。Claude Haiku 5.5 通过 ${pass('claude-haiku-5-5', 'plain')}、${pass('claude-haiku-5-5', 'deep_agent')} 和 ${pass('claude-haiku-5-5', 'deep_agent_fs')} 个。`,
 }, f => {
-  f.kicker(20, 22, 'model, harness');
-  f.kicker(X0, 22, 'files01 to files20');
-  f.kicker(620, 22, 'pass', { anchor: 'end' });
-  f.kicker(566, 22, 'built-in', { anchor: 'end' });
+  f.kicker(20, 22, '模型，框架');
+  f.kicker(X0, 22, 'files01 至 files20');
+  f.kicker(620, 22, '通过', { anchor: 'end' });
+  f.kicker(566, 22, '内置工具', { anchor: 'end' });
   let y = Y0;
   MODELS.forEach(([m, name], g) => {
     if (g) y += SEP;
@@ -62,9 +62,9 @@ module.exports = figure('fig-7-4c', {
   f.beat(0);
   const ly = y + 18;
   f.dot(24, ly - 4, { hue: 'green', r: 2.6 });
-  f.text(34, ly, 'wrote with write_file, edit_file, or delete', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(34, ly, '用 write_file、edit_file 或 delete 写入过', { size: 11, serif: true, hue: 'ink-soft' });
   f.dot(344, ly - 4, { hue: 'ink-mute', r: 2 });
-  f.text(354, ly, 'read only: ls, glob, read_file', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ly + 22, 'default: StateBackend, files live in the agent state. on disk: FilesystemBackend on the task folder.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, ly + 40, 'Every row also had the five task tools that write the folder. The checker reads the folder.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(354, ly, '只读过：ls、glob、read_file', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ly + 22, '默认：StateBackend，文件存放在智能体状态里。落盘：任务文件夹上的 FilesystemBackend。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, ly + 40, '每一行还都有五个写入该文件夹的任务工具。检查器读取这个文件夹。', { size: 11, serif: true, hue: 'ink-soft' });
 });

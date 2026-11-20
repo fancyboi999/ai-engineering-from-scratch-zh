@@ -31,21 +31,21 @@ const KEYS = ['subjects', 'jokes', 'best', 'log'];
 
 module.exports = figure('fig-6-2', {
   height: 480,
-  title: 'The joke graph and one run',
-  desc: `The top is the graph from the capture: __start__ to plan, then three Send arrows from plan to three write_joke tasks for ${subjects.join(', ')} in one step, then plain edges to pick. pick returns a Command with best set to "${pick.write.best}" and goto ${goto}, so ${goto} runs and then __end__. The ${skipped.join(' and ')} node, the other target of pick, did not run. The bottom is a table of what each node wrote to the state in each of the ${step} steps, read from the updates stream: plan wrote subjects, each write_joke wrote one joke, operator.add joined the three into a list of ${final.jokes.length}, and pick wrote best. The log key ends with ${final.log.length} entries.`,
+  title: '笑话图与一次运行',
+  desc: `上方是录制中的图：__start__ 到 plan，再由 plan 发出三条 Send 箭头，在同一超步内指向 ${subjects.join(', ')} 三个 write_joke 任务，随后用普通边汇入 pick。pick 返回一个 Command，best 设为 "${pick.write.best}"，goto 为 ${goto}，所以 ${goto} 先运行，再到 __end__。pick 的另一个目标 ${skipped.join(' 和 ')} 节点没有运行。下方的表按 updates 流读取，列出 ${step} 个超步中每个节点写入状态的内容：plan 写入 subjects，每个 write_joke 写入一个笑话，operator.add 把三者合并为含 ${final.jokes.length} 项的列表，pick 写入 best。log 键最终有 ${final.log.length} 条记录。`,
 }, f => {
   const start = f.box({ x: 12, y: 76, w: 74, h: 40, hue: 'grey', title: '__start__', titleSize: 11.5, pad: 4 });
-  const plan = f.box({ x: 104, y: 76, w: 66, h: 40, hue: 'indigo', title: 'plan', sub: 'step 1', pad: 4 });
+  const plan = f.box({ x: 104, y: 76, w: 66, h: 40, hue: 'indigo', title: 'plan', sub: '超步 1', pad: 4 });
   f.arrow(start.right(), [plan.x - 1, plan.cy], { style: 'call' });
   subjects.forEach((subject, i) => {
     const task = f.box({ x: 206, y: 24 + i * 52, w: 102, h: 40, hue: 'indigo', title: 'write_joke', sub: subject, titleSize: 11.5, pad: 4 });
     f.path(`M170 96 H186 V${task.cy} H205`, { style: 'state' });
     f.path(`M308 ${task.cy} H324 V96 H343`, { style: 'call', head: i === 1 });
   });
-  f.text(178, 16, `Send x ${subjects.length}`, { size: 11, hue: 'amber' });
+  f.text(178, 16, `Send × ${subjects.length}`, { size: 11, hue: 'amber' });
   f.box({ x: 344, y: 76, w: 66, h: 40, hue: 'indigo', title: 'pick', sub: 'Command', pad: 4 });
-  f.box({ x: 452, y: 36, w: 82, h: 40, hue: 'indigo', title: goto, sub: 'ran', pad: 4 });
-  skipped.forEach(name => f.box({ x: 452, y: 124, w: 82, h: 40, hue: 'grey', title: name, sub: 'did not run', dash: 'dashed', pad: 4 }));
+  f.box({ x: 452, y: 36, w: 82, h: 40, hue: 'indigo', title: goto, sub: '已运行', pad: 4 });
+  skipped.forEach(name => f.box({ x: 452, y: 124, w: 82, h: 40, hue: 'grey', title: name, sub: '未运行', dash: 'dashed', pad: 4 }));
   f.path('M410 90 H428 V56 H451', { style: 'state' });
   f.path('M410 102 H428 V144 H451', { style: 'state', hue: 'grey' });
   f.text(431, 28, `goto ${goto}`, { size: 11, hue: 'amber' });
@@ -53,9 +53,9 @@ module.exports = figure('fig-6-2', {
   f.path('M534 56 H546 V90 H559', { style: 'call' });
   f.path('M534 144 H546 V102 H559', { style: 'call', hue: 'grey' });
 
-  f.kicker(20, 186, 'what each step wrote to the state');
+  f.kicker(20, 186, '每个超步写入状态的内容');
   Object.entries(COL).forEach(([n, x]) => {
-    f.text(x, 210, `step ${n}`, { size: 11, anchor: 'middle', weight: 700, hue: 'amber' });
+    f.text(x, 210, `超步 ${n}`, { size: 11, anchor: 'middle', weight: 700, hue: 'amber' });
     f.rule(x - 60, 216, x - 60, 418, { hue: 'ink-mute', opacity: 0.3 });
   });
   let y = 236;
@@ -73,11 +73,11 @@ module.exports = figure('fig-6-2', {
     });
     if (key === 'jokes') {
       f.arrow([COL[2] + 60, y + 20], [COL[3] - 30, y + 20], { style: 'write' });
-      f.text(COL[3] - 24, y + 16, `operator.add: ${final.jokes.length} items`, { size: 11, hue: 'teal', weight: 700, knock: true });
-      f.text(COL[3] - 24, y + 30, 'one list in the state', { size: 11, serif: true, hue: 'ink-soft', knock: true });
+      f.text(COL[3] - 24, y + 16, `operator.add：${final.jokes.length} 项`, { size: 11, hue: 'teal', weight: 700, knock: true });
+      f.text(COL[3] - 24, y + 30, '状态中的一个列表', { size: 11, serif: true, hue: 'ink-soft', knock: true });
     }
     y += lines * 20 + 14;
   }
-  f.text(20, 450, `Three writes to jokes in one step joined into one list. The log key ends with ${final.log.length} entries.`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, 468, 'Each teal cell is one value a node returned, read from the updates stream.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 450, `同一超步内对 jokes 的三次写入合并成了一个列表。log 键最终有 ${final.log.length} 条记录。`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 468, '每个青绿色单元格是节点返回的一个值，读自 updates 流。', { size: 11, serif: true, hue: 'ink-soft' });
 });

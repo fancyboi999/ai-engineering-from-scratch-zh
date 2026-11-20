@@ -21,7 +21,7 @@ const fresh = runsAfterResume.length - runsAfterFirst.length;
 const inputs = runsAfterFirst.map(call => /\((\d+)\)/.exec(call)[1]);
 
 const lanes = [
-  { title: 'your code', sub: 'invoke', hue: 'violet' },
+  { title: '你的代码', sub: 'invoke', hue: 'violet' },
   { title: 'workflow', sub: '@entrypoint', hue: 'indigo' },
   { title: 'double', sub: '@task', hue: 'indigo' },
   { title: 'ask_human', sub: '@task', hue: 'indigo' },
@@ -33,14 +33,14 @@ const LOG = 446;
 const rows = [
   [0, 1, 'call', `invoke([${inputs.join(', ')}])`],
   [1, 2, 'call', `double(${inputs.join('), (')})`, 'runs'],
-  [2, 4, 'write', `results ${results.join(', ')}`],
+  [2, 4, 'write', `结果 ${results.join(', ')}`],
   [1, 3, 'call', `ask_human(${pause.total})`],
-  [3, 0, 'state', `interrupt: ${pause.question}`],
+  [3, 0, 'state', `中断：${pause.question}`],
   null,
   [0, 1, 'call', `Command(resume='${final.answer}')`],
   [1, 2, 'call', `double(${inputs.join('), (')})`, 'none'],
-  [4, 2, 'reply', `saved ${results.join(', ')}`],
-  [2, 1, 'reply', `${results.join(', ')}, no body runs`],
+  [4, 2, 'reply', `已保存 ${results.join(', ')}`],
+  [2, 1, 'reply', `${results.join(', ')}，任务体不运行`],
   [1, 3, 'call', `ask_human(${pause.total})`],
   [3, 1, 'reply', `'${final.answer}'`],
   [1, 0, 'reply', `total ${final.total}, answer ${final.answer}`],
@@ -48,23 +48,23 @@ const rows = [
 
 module.exports = figure('fig-6-3', {
   height: 650,
-  title: 'Two runs of one entrypoint',
-  desc: `Five lifelines: your code, the workflow entrypoint, the double task, the ask_human task, and the checkpointer. A sixth column is the log of task bodies that ran, read from the capture. Run 1: invoke with ${inputs.join(', ')} runs the bodies ${runsAfterFirst.join(', ')}, saves the results ${results.join(', ')}, calls ask_human with ${pause.total}, and stops with the interrupt "${pause.question}". Run 2: Command resume ${final.answer} runs workflow again from its top. The double calls return the saved results and the log gets ${fresh} new entries. ask_human gets ${final.answer}, and workflow returns total ${final.total} and answer ${final.answer}.`,
+  title: '同一入口点的两次运行',
+  desc: `五条生命线：你的代码、workflow 入口点、double 任务、ask_human 任务和 checkpointer。第六列是录制中已运行任务体的日志。第 1 次运行：用 ${inputs.join(', ')} 调用 invoke，运行任务体 ${runsAfterFirst.join(', ')}，保存结果 ${results.join(', ')}，以 ${pause.total} 调用 ask_human，并带着中断 "${pause.question}" 停下。第 2 次运行：Command resume ${final.answer} 让 workflow 从头再运行一遍。double 的各次调用直接返回已保存的结果，日志新增 ${fresh} 条。ask_human 得到 ${final.answer}，workflow 返回 total ${final.total} 和 answer ${final.answer}。`,
 }, f => {
   lanes.forEach((lane, index) => {
     f.box({ x: cx(index), y: 8, w: 84, h: 40, hue: lane.hue, title: lane.title, sub: lane.sub, titleSize: 11, anchor: 'middle', pad: 2 });
     f.lifeline(cx(index), 48, 640);
   });
-  f.kicker(LOG, 22, 'task bodies run');
-  f.text(LOG, 38, 'the log, in order', { size: 11, serif: true, hue: 'ink-soft' });
+  f.kicker(LOG, 22, '已运行的任务体');
+  f.text(LOG, 38, '日志，按顺序', { size: 11, serif: true, hue: 'ink-soft' });
   f.rule(LOG - 12, 8, LOG - 12, 640, { hue: 'ink-mute', opacity: 0.4 });
-  f.text(20, 70, 'RUN 1', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
+  f.text(20, 70, '第 1 次运行', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
   let n = 0;
   rows.forEach((row, index) => {
     const y = 92 + index * 42;
     if (!row) {
       f.rule(20, y - 4, LOG - 20, y - 4, { hue: 'ink-mute', dash: 'dashed' });
-      f.text(20, y + 12, 'RUN 2, THE RESUME', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
+      f.text(20, y + 12, '第 2 次运行：恢复', { size: 11, spacing: 1.2, hue: 'ink-mute', knock: true });
       return;
     }
     const [from, to, style, label, log] = row;
@@ -80,10 +80,10 @@ module.exports = figure('fig-6-3', {
     });
     if (log === 'none') {
       f.rect(LOG, y - 10, 182, 20, { fill: color('paper'), stroke: color('teal-ink'), dash: 'dashed' });
-      f.text(LOG + 8, y + 4, `${fresh} new entries`, { size: 11, hue: 'teal', weight: 700 });
+      f.text(LOG + 8, y + 4, `新增 ${fresh} 条`, { size: 11, hue: 'teal', weight: 700 });
     }
   });
   f.beat(0);
-  f.text(LOG, 610, `${runsAfterResume.length} entries after both runs:`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(LOG, 626, 'each double body ran once', { size: 11, serif: true, hue: 'teal', weight: 700 });
+  f.text(LOG, 610, `两次运行后共 ${runsAfterResume.length} 条：`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(LOG, 626, '每个 double 任务体只运行一次', { size: 11, serif: true, hue: 'teal', weight: 700 });
 });

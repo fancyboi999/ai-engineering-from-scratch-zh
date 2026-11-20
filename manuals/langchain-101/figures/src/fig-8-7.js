@@ -14,27 +14,27 @@ const c5 = by(5);
 const c7 = by(7);
 
 const rows = [
-  ['retry layers', `${c1.requests} requests, ${c1.run_s} s`, 'every connection dropped', `${c1.requests_after_fix} requests, ${c1.run_s_after_fix} s`, 'max_retries=0 on the model'],
-  ['crash after a charge', `${c2.charges} charges`, 'SIGKILL, then a resume', `${c2.charges_after_fix} with the key`, 'one per call id of the model'],
-  ['jump past review', `ran ${c3.ran_before_decision} time, no decision`, 'batched mode', `ran ${c3.ran_after_fix} times, 1 interrupt`, 'interrupt_mode per_call'],
-  ['no structured output', `None in ${c4.none_count} of ${c4.runs.length} prompts`, 'ToolStrategy and a tool', 'your check raises', 'test for None'],
-  ['tracing endpoint down', `exit ${c5.exit_lag_s} s after the run`, 'one run, nothing listens', `exit ${c5.exit_lag_s_after_fix} s after the run`, 'probe, then tracing off'],
-  ['same tool name twice', '1 tool bound, no error', 'the refunds function ran', 'duplicate found', 'check names first'],
-  ['endless tool calls', `raised at ${c7.model_calls} model calls`, 'recursion_limit 10', `ended at ${c7.after_fix[1].model_calls} calls`, 'call limit 3, recursion 25'],
+  ['重试层', `${c1.requests} 个请求，${c1.run_s} s`, '每个连接都被断开', `${c1.requests_after_fix} 个请求，${c1.run_s_after_fix} s`, '模型上设 max_retries=0'],
+  ['扣款后崩溃', `${c2.charges} 次扣款`, 'SIGKILL，然后恢复', `带键时 ${c2.charges_after_fix} 次`, '每个模型调用 id 一次'],
+  ['跳过审批', `运行了 ${c3.ran_before_decision} 次，没有决定`, '批量模式', `运行了 ${c3.ran_after_fix} 次，1 次中断`, 'interrupt_mode per_call'],
+  ['没有结构化输出', `${c4.runs.length} 条提示词中 ${c4.none_count} 条为 None`, 'ToolStrategy 加一个工具', '你的检查会抛出异常', '检查是否为 None'],
+  ['追踪端点宕机', `运行后 ${c5.exit_lag_s} s 退出`, '一次运行，无人监听', `运行后 ${c5.exit_lag_s_after_fix} s 退出`, '先探测，再关闭追踪'],
+  ['同一工具名出现两次', '绑定了 1 个工具，没有报错', 'refunds 函数运行了', '发现重复', '先检查名称'],
+  ['无休止的工具调用', `${c7.model_calls} 次模型调用时抛出`, 'recursion_limit 10', `${c7.after_fix[1].model_calls} 次调用时结束`, '调用上限 3，递归上限 25'],
 ];
 
 module.exports = figure('fig-8-7', {
   height: 470,
-  title: 'Seven failures of the drill, before and after each fix',
-  desc: `A table of seven rows, one per case of the failure drill with Qwen3 4B on the x86 server guest, with the symptom on the left and the result after the fix on the right. Retry layers: ${c1.requests} requests against ${c1.requests_after_fix}. A crash after a charge: ${c2.charges} charges against ${c2.charges_after_fix} with the key, because the model asked for two charges. A middleware that jumps past review: the tool ran before any decision, and per-call mode stopped it. No structured output: None with no exception in ${c4.none_count} of ${c4.runs.length} prompts, and a check that raises. A tracing endpoint that is down: exit ${c5.exit_lag_s} s after the run against ${c5.exit_lag_s_after_fix} s. The same tool name twice: one tool bound with no error. Endless tool calls: GraphRecursionError at limit 10, and a model call limit of 3 that ends the run after 3 calls, with the recursion limit raised to 25.`,
+  title: '演练中的七个故障，修复前后',
+  desc: `一张七行的表，每行是 x86 服务器虚拟机上 Qwen3 4B 故障演练的一个案例，左侧是症状，右侧是修复后的结果。重试层：${c1.requests} 个请求，对比 ${c1.requests_after_fix} 个。扣款后崩溃：${c2.charges} 次扣款，对比带键时的 ${c2.charges_after_fix} 次，因为模型要求了两次扣款。跳过审批的中间件：工具在任何决定之前就运行了，逐个调用模式拦住了它。没有结构化输出：${c4.runs.length} 条提示词中有 ${c4.none_count} 条得到 None 且没有异常，而检查会抛出异常。追踪端点宕机：运行后 ${c5.exit_lag_s} s 退出，对比 ${c5.exit_lag_s_after_fix} s。同一工具名出现两次：绑定了一个工具，没有报错。无休止的工具调用：在上限 10 处出现 GraphRecursionError，而 3 次模型调用上限在 3 次调用后结束运行，同时递归上限提高到 25。`,
 }, f => {
-  f.kicker(176, 20, 'the symptom');
-  f.kicker(408, 20, 'after the fix');
+  f.kicker(176, 20, '症状');
+  f.kicker(408, 20, '修复之后');
   rows.forEach(([label, left, leftSub, right, rightSub], i) => {
     const y = 32 + i * 58;
     f.text(20, y + 27, label, { size: 11.5, weight: 700, max: 150 });
     f.box({ x: 176, y, w: 220, h: 46, hue: 'rose', title: left, sub: leftSub, align: 'left', titleSize: 12 });
     f.box({ x: 408, y, w: 212, h: 46, hue: 'teal', title: right, sub: rightSub, align: 'left', titleSize: 12 });
   });
-  f.text(20, 452, 'The first of three runs of drill.py with Qwen3 4B on Ollama, on the x86 server guest.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 452, 'x86 服务器虚拟机上，用 Ollama 里的 Qwen3 4B 运行 drill.py 三次中的第一次。', { size: 11, serif: true, hue: 'ink-soft' });
 });

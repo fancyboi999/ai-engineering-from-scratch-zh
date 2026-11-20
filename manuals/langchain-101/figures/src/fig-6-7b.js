@@ -16,15 +16,15 @@ const bottom = Math.max(left.bottom, right.bottom);
 
 module.exports = figure('fig-6-7b', {
   height: bottom + 44,
-  title: 'One parent graph, drawn with and without xray',
-  desc: `The parent graph of the subgraph example, drawn twice from draw_mermaid output. get_graph() has ${a.nodes} nodes and shows the subgraph as one node named inner. get_graph(xray=True) has ${b.nodes} nodes. It draws the subgraph as a box named inner around its nodes ${[...xray.clusters.get('inner')].join(' and ')}, and the parent edges go to inner:shout and leave from inner:ask_ok.`,
+  title: '同一个父图，分别用 xray 和不用 xray 绘制',
+  desc: `子图示例的父图，由 draw_mermaid 输出绘制两次。get_graph() 有 ${a.nodes} 个节点，把子图显示为一个名为 inner 的节点。get_graph(xray=True) 有 ${b.nodes} 个节点，把子图画成包住节点 ${[...xray.clusters.get('inner')].join(' 和 ')} 的方框 inner，父图的边指向 inner:shout，并从 inner:ask_ok 引出。`,
 }, f => {
   f.kicker(20, 20, 'get_graph()');
   f.kicker(300, 20, 'get_graph(xray=True)');
-  f.text(20, 40, `${a.nodes} nodes, inner is one node`, { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(300, 40, `${b.nodes} nodes, the subgraph opened`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, 40, `${a.nodes} 个节点，inner 是一个节点`, { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(300, 40, `${b.nodes} 个节点，子图已展开`, { size: 11, serif: true, hue: 'ink-soft' });
   f.rule(280, 12, 280, bottom + 4, { dash: 'dotted' });
   gl.draw(f, left);
   gl.draw(f, right);
-  gl.legend(f, bottom + 30);
+  gl.legend(f, bottom + 30, { plain: '普通边', conditional: '条件边，运行时选择' });
 });

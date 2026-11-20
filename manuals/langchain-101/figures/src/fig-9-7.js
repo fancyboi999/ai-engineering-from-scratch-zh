@@ -22,22 +22,22 @@ const median = list => list.slice().sort((a, b) => a - b)[Math.floor(list.length
 
 module.exports = figure('fig-9-7', {
   height: 340,
-  title: 'Workers against the model server, Qwen3 4B on the Mac',
-  desc: `Three panels. Left: completed runs each second for ${cells.map(c => `${c.workers} worker${c.workers > 1 ? 's' : ''} and ${c.users} users ${c.runs_per_s_exact}`).join(', ')}. Middle: median and 95th percentile seconds per run in each cell, against a median of ${baseMedian.toFixed(2)} s for one user alone, who finished ${baseRate.toFixed(3)} runs each second. Right: output tokens each second from Ollama with 1 to ${Math.max(...levels)} requests at one time, ${levels.map(l => median(probe.filter(p => p.concurrent === l).map(p => p.tokens_per_s)).toFixed(0)).join(', ')}.`,
+  title: 'worker 数与模型服务器：Mac 上的 Qwen3 4B',
+  desc: `三个面板。左：每秒完成的运行数，${cells.map(c => `${c.workers} 个 worker、${c.users} 个用户为 ${c.runs_per_s_exact}`).join('，')}。中：各格中每次运行的中位秒数与第 95 百分位秒数，对照单个用户独自运行时的中位数 ${baseMedian.toFixed(2)} s，该用户每秒完成 ${baseRate.toFixed(3)} 次运行。右：Ollama 在同时处理 1 到 ${Math.max(...levels)} 个请求时每秒输出的 token 数，依次为 ${levels.map(l => median(probe.filter(p => p.concurrent === l).map(p => p.tokens_per_s)).toFixed(0)).join('、')}。`,
 }, f => {
   users.forEach((u, i) => {
     f.path(`M${16 + i * 160} 18 H${40 + i * 160}`, { hue: hues[u], dash: dashes[u], head: false, width: 2, packet: false });
-    f.text(46 + i * 160, 22, `${u} users at once`, { size: 11, hue: hues[u] });
+    f.text(46 + i * 160, 22, `${u} 个用户同时`, { size: 11, hue: hues[u] });
   });
   f.rule(350, 18, 374, 18, { hue: 'ink-soft', dash: 'dotted', width: 1.5 });
-  f.text(380, 22, 'one user alone', { size: 11, hue: 'ink-soft' });
+  f.text(380, 22, '单个用户', { size: 11, hue: 'ink-soft' });
 
-  const a = chart(f, { x: 44, y: 70, w: 150, h: 210, xDomain: [0.5, 4.5], yDomain: [0, rateMax], xTicks: [1, 2, 4], yTicks: Array.from({ length: Math.round(rateMax * 10) + 1 }, (_, i) => i / 10), yLabel: 'runs finished each second' });
+  const a = chart(f, { x: 44, y: 70, w: 150, h: 210, xDomain: [0.5, 4.5], yDomain: [0, rateMax], xTicks: [1, 2, 4], yTicks: Array.from({ length: Math.round(rateMax * 10) + 1 }, (_, i) => i / 10), yLabel: '每秒完成的运行数' });
   f.rule(a.px(0.5), a.py(baseRate), a.px(4.5), a.py(baseRate), { hue: 'ink-soft', dash: 'dotted', width: 1.5 });
   users.forEach(u => a.series(cells.filter(c => c.users === u).map(c => [c.workers, c.runs_per_s_exact]), { hue: hues[u], dash: dashes[u] }));
-  f.text(44 + 75, 318, 'uvicorn workers', { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
+  f.text(44 + 75, 318, 'uvicorn worker 数', { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
 
-  const b = chart(f, { x: 250, y: 70, w: 160, h: 210, xDomain: [0.5, 4.5], yDomain: [0, secMax], xTicks: [1, 2, 4], yTicks: Array.from({ length: secMax / 50 + 1 }, (_, i) => i * 50), yLabel: 'seconds per run' });
+  const b = chart(f, { x: 250, y: 70, w: 160, h: 210, xDomain: [0.5, 4.5], yDomain: [0, secMax], xTicks: [1, 2, 4], yTicks: Array.from({ length: secMax / 50 + 1 }, (_, i) => i * 50), yLabel: '每次运行的秒数' });
   f.rule(b.px(0.5), b.py(baseMedian), b.px(4.5), b.py(baseMedian), { hue: 'ink-soft', dash: 'dotted', width: 1.5 });
   users.forEach((u, side) => {
     for (const c of cells.filter(c => c.users === u)) {
@@ -46,10 +46,10 @@ module.exports = figure('fig-9-7', {
       f.dot(x, b.py(c.p50_s), { hue: hues[u], r: 3 });
     }
   });
-  f.text(250 + 80, 318, 'dot median, bar to p95', { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
+  f.text(250 + 80, 318, '点为中位数，条到 p95', { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
 
-  const c = chart(f, { x: 462, y: 70, w: 150, h: 210, xScale: 'log2', xDomain: [0.8, Math.max(...levels) * 1.25], yDomain: [0, tokMax], xTicks: levels, yTicks: Array.from({ length: tokMax / 20 + 1 }, (_, i) => i * 20), yLabel: 'Ollama tokens each second' });
+  const c = chart(f, { x: 462, y: 70, w: 150, h: 210, xScale: 'log2', xDomain: [0.8, Math.max(...levels) * 1.25], yDomain: [0, tokMax], xTicks: levels, yTicks: Array.from({ length: tokMax / 20 + 1 }, (_, i) => i * 20), yLabel: 'Ollama 每秒 token 数' });
   for (const p of probe) f.dot(c.px(p.concurrent), c.py(p.tokens_per_s), { hue: 'olive', r: 2.4 });
   c.series(levels.map(l => [l, median(probe.filter(p => p.concurrent === l).map(p => p.tokens_per_s))]), { hue: 'olive', dots: false });
-  f.text(466 + 75, 318, 'requests at one time', { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
+  f.text(466 + 75, 318, '同时请求数', { size: 11, anchor: 'middle', serif: true, hue: 'ink-soft' });
 });

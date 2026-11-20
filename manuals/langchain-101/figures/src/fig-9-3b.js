@@ -15,27 +15,27 @@ const desc = sample.description.split('. ');
 
 module.exports = figure('fig-9-3b', {
   height: 330,
-  title: 'The zero-cent refund before and after the tool checks the amount',
-  desc: `The eval asks to refund ORD-e19-3 and approves what the model proposes. Before the fix, ${MODELS.map(([k, l]) => `${l} wrote ${data.before[k].filter(r => rowsOf(r).length).length} zero-cent rows in ${data.before[k].length} runs`).join(', ')}. After the fix, ${MODELS.map(([k, l]) => `${l} wrote ${data.after[k].filter(r => rowsOf(r).length).length} rows in ${data.after[k].length} runs`).join(', ')}. The approval text after the fix: ${sample.description}`,
+  title: '工具检查金额前后的 0 cent 退款',
+  desc: `评估要求退款 ORD-e19-3，并批准模型提出的内容。修复前，${MODELS.map(([k, l]) => `${l} 在 ${data.before[k].length} 次运行中写入了 ${data.before[k].filter(r => rowsOf(r).length).length} 行 0 cent 记录`).join('，')}。修复后，${MODELS.map(([k, l]) => `${l} 在 ${data.after[k].length} 次运行中写入了 ${data.after[k].filter(r => rowsOf(r).length).length} 行`).join('，')}。修复后的审批文本：${sample.description}`,
 }, f => {
-  f.kicker(150, 22, 'before the fix');
-  f.kicker(400, 22, 'after the fix');
+  f.kicker(150, 22, '修复前');
+  f.kicker(400, 22, '修复后');
   MODELS.forEach(([key, label], m) => {
     const y = 44 + m * 80;
     f.text(16, y + 22, label, { size: 11.5, weight: 700 });
-    f.text(16, y + 38, 'refund ORD-e19-3', { size: 11, serif: true, hue: 'ink-soft' });
+    f.text(16, y + 38, '退款 ORD-e19-3', { size: 11, serif: true, hue: 'ink-soft' });
     data.before[key].forEach((rep, i) => {
       const rows = rowsOf(rep);
       const bad = rows.some(r => r.amount_cents === 0);
-      f.box({ x: 150 + i * 78, y, w: 74, h: 52, pad: 4, hue: bad ? 'rose' : 'teal', title: `run ${i + 1}`, sub: [bad ? '0-cent row' : `${rows.length} rows`] });
+      f.box({ x: 150 + i * 78, y, w: 74, h: 52, pad: 4, hue: bad ? 'rose' : 'teal', title: `运行 ${i + 1}`, sub: [bad ? '0 cent 行' : `${rows.length} 行`] });
     });
     data.after[key].forEach((rep, i) => {
       const rows = rowsOf(rep);
       const p = proposed(rep);
       const refused = result(rep) && /must be positive/.test(result(rep).result);
-      f.box({ x: 400 + i * 78, y, w: 74, h: 52, pad: 4, hue: rows.length ? 'rose' : 'teal', title: `run ${i + 1}`, sub: [p ? `${p.amount_cents} asked` : 'none asked', refused ? 'refused' : `${rows.length} rows`] });
+      f.box({ x: 400 + i * 78, y, w: 74, h: 52, pad: 4, hue: rows.length ? 'rose' : 'teal', title: `运行 ${i + 1}`, sub: [p ? `请求 ${p.amount_cents}` : '未请求', refused ? '被拒绝' : `${rows.length} 行`] });
     });
   });
-  f.kicker(16, 222, 'what the approver read after the fix');
+  f.kicker(16, 222, '修复后审批人读到的内容');
   desc.forEach((line, i) => f.text(16, 244 + i * 16, line.endsWith('.') ? line : `${line}.`, { size: 11, serif: true, max: 608 }));
 });

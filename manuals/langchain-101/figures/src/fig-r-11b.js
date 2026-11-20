@@ -18,14 +18,14 @@ const row = (label, c, hue) => ({ label, k: c.pass, n: c.n, hue });
 const profile = (m, name) => {
   const d = S.profiles[m];
   return [
-    { head: `${name}, 99 tasks`, rows: [row('plain loop', d.plain, 'violet'), row('deep agent', d.deep, 'blue'), row('deep, profile B', d.profB, 'plum')] },
-    { head: `${name}, 30-task subset`, rows: [row('plain loop', d.plain_sub, 'violet'), row('deep agent', d.deep_sub, 'blue'), row('deep, profile A', d.profA, 'plum'), row('deep, profile B', d.profB_sub, 'plum')] },
+    { head: `${name}，99 个任务`, rows: [row('plain 循环', d.plain, 'violet'), row('deep agent', d.deep, 'blue'), row('deep，档案 B', d.profB, 'plum')] },
+    { head: `${name}，30 任务子集`, rows: [row('plain 循环', d.plain_sub, 'violet'), row('deep agent', d.deep_sub, 'blue'), row('deep，档案 A', d.profA, 'plum'), row('deep，档案 B', d.profB_sub, 'plum')] },
   ];
 };
 const ptc = (m, name) => {
   const d = S.ptc[m];
-  const arms = [['plain', 'plain loop', 'violet'], ['deep', 'deep agent', 'blue'], ['ptc', 'deep + eval tool', 'green'], ['nudge', 'deep + eval, asked', 'indigo']];
-  return { head: `${name}, chain and sql`, rows: arms.filter(([a]) => d[a]).map(([a, l, h]) => row(l, d[a], h)) };
+  const arms = [['plain', 'plain 循环', 'violet'], ['deep', 'deep agent', 'blue'], ['ptc', 'deep + eval 工具', 'green'], ['nudge', 'deep + eval，已要求', 'indigo']];
+  return { head: `${name}，chain 与 sql`, rows: arms.filter(([a]) => d[a]).map(([a, l, h]) => row(l, d[a], h)) };
 };
 const GROUPS = [
   ...profile(Q4, 'Qwen3 4B'),
@@ -34,7 +34,7 @@ const GROUPS = [
   ptc('qwen3:14b', 'Qwen3 14B'),
   ptc('gpt-oss:20b', 'gpt-oss 20B'),
   ptc('claude-haiku-5-5', 'Claude Haiku 5.5'),
-  { head: 'Qwen3 8B with a Qwen3 14B grader', rows: [{ label: 'rubric, tasks failed before', k: S.rubric.recovered.length, n: S.rubric.n, hue: 'olive' }] },
+  { head: 'Qwen3 8B，Qwen3 14B 评分', rows: [{ label: '评分细则，此前失败的任务', k: S.rubric.recovered.length, n: S.rubric.n, hue: 'olive' }] },
 ];
 const AX = 250;
 const AW = 260;
@@ -51,11 +51,11 @@ const narrowest = Math.min(...widths);
 
 module.exports = figure('fig-r-11b', {
   height: Y0 + nRows * RH + GROUPS.length * (HEAD + 6) + 50,
-  title: 'The pass rate and its interval for every cell of the second bench',
-  desc: `Dots with 95 percent Wilson intervals for ${nRows} cells of the second bench, in ${GROUPS.length} groups: two profile experiments on Qwen3 4B and Qwen3 8B, the eval tool on four models, and one rubric run. ${small} of the cells have fewer than 30 tasks. The widest interval is ${Math.round(100 * widest)} points and the narrowest is ${Math.round(100 * narrowest)} points.`,
+  title: '第二轮基准中每个单元的通过率与区间',
+  desc: `${nRows} 个单元的点与 95% Wilson 区间，来自第二轮基准，分为 ${GROUPS.length} 组：Qwen3 4B 与 Qwen3 8B 上的两项档案实验、四个模型上的 eval 工具，以及一次评分细则运行。其中 ${small} 个单元的任务数少于 30。最宽的区间是 ${Math.round(100 * widest)} 个百分点，最窄的是 ${Math.round(100 * narrowest)} 个百分点。`,
 }, f => {
-  f.kicker(20, 22, 'cell');
-  f.kicker(620, 22, 'pass of n', { anchor: 'end' });
+  f.kicker(20, 22, '单元');
+  f.kicker(620, 22, '通过数/n', { anchor: 'end' });
   [0, 0.5, 1].forEach(v => {
     f.text(px(v), 44, `${v * 100}%`, { size: 11, anchor: 'middle', hue: 'ink-soft' });
   });
@@ -77,6 +77,6 @@ module.exports = figure('fig-r-11b', {
     y += 6;
   });
   f.beat(0);
-  f.text(20, y + 8, 'Whiskers are 95% Wilson intervals. Rose counts are cells of fewer than 30 tasks.', { size: 11, serif: true, hue: 'ink-soft' });
-  f.text(20, y + 24, 'The rubric cell holds only tasks that the plain loop failed, so its baseline is 0 of 25.', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 8, '须线是 95% Wilson 区间。玫红计数表示任务数少于 30 的单元。', { size: 11, serif: true, hue: 'ink-soft' });
+  f.text(20, y + 24, '评分细则单元只含 plain 循环失败过的任务，所以它的基线是 25 个中的 0 个。', { size: 11, serif: true, hue: 'ink-soft' });
 });
