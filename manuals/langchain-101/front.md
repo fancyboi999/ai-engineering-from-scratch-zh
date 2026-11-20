@@ -1,86 +1,86 @@
-# How to read this manual
+# 如何阅读本手册
 
-> This manual explains the LangChain Python stack at one pin, and every listing in it comes from a capture of a real run that you can check yourself.
+> 本手册讲解锁定在某一版本上的 LangChain Python 技术栈，其中每份代码清单都来自一次真实运行的录制，你可以自己核对。
 
-## Who this manual is for
+## 本手册写给谁 {#s-front-who-this-manual-is-for}
 
-You write Python and you have called a chat model API. You have seen LangChain code, maybe from the 0.x years, with chains, `AgentExecutor`, and `langchain_community` imports. Today `pip install langchain` on Python 3.11 gives you version 1.5.0, and most of that code no longer imports.
+你会写 Python，调用过聊天模型 API。你见过 LangChain 代码，也许是 0.x 年代那种带 chain、`AgentExecutor` 和 `langchain_community` 导入的写法。如今在 Python 3.11 上执行 `pip install langchain`，装到的是 1.5.0 版，那些代码大多已经导入不了。
 
-This manual is for the engineer who must decide if the 1.x stack fits, and then build on it. It starts with that decision, measured on a task suite with local and Claude models. Each part then opens with a position that our runs support, and most parts end with a small program that applies it.
+本手册面向需要判断 1.x 技术栈是否适合自己，然后在它上面构建东西的工程师。手册从这个判断讲起，用本地模型和 Claude 模型在一套任务集上做测量。之后每个部分都以一个有我们的运行支撑的立场开篇，多数部分以一个应用该立场的小程序收尾。
 
-Four projects share the LangChain name: LangChain, LangGraph, LangSmith, and Deep Agents. Their packages have their own version numbers. So this manual names the package with each version, such as `langchain` 1.5.0 and `langchain-core` 1.8.0. [Section 1.1](#s-langchain-langgraph-langsmith-and-deep-agents) says what each project does.
+LangChain 这个名字下有四个项目：LangChain、LangGraph、LangSmith 和 Deep Agents。它们的包各有各的版本号。所以本手册提到包时都带上版本，例如 `langchain` 1.5.0 和 `langchain-core` 1.8.0。[第 1.1 节](#s-langchain-langgraph-langsmith-and-deep-agents)说明每个项目做什么。
 
-## What you can do after this manual
+## 读完本手册你能做什么 {#s-front-what-you-can-do-after-this-manual}
 
-- Install the stack from a lockfile on Python 3.11 or later, and say which package each import comes from.
-- Build an agent with `create_agent`, and predict each model call, tool call, and checkpoint of a run.
-- Choose a structured output strategy and a set of middleware, and predict the order in which their hooks run.
-- Stream a run in the mode you need, and keep a conversation across turns and restarts with a checkpointer.
-- Pause a run for human approval, resume it, and say which code runs again on the resume.
-- Count the attempts of each retry layer, and make a side effect safe when a crash replays it.
-- Connect MCP tools, a retriever, Deep Agents, and LangSmith tracing, and find the cause of a failure from its message.
-- Serve an agent from FastAPI with Postgres, approvals, spans, and evals, and size it from the model server.
+- 在 Python 3.11 或更高版本上依据锁文件安装整套技术栈，并说出每条 import 来自哪个包。
+- 用 `create_agent` 构建 agent，并预测一次运行中的每次模型调用、工具调用和检查点。
+- 选择结构化输出策略和一组中间件，并预测它们的钩子按什么顺序运行。
+- 按需要的模式流式输出一次运行，并用 checkpointer 让对话跨轮次、跨重启延续。
+- 暂停运行等待人工审批，恢复它，并说清恢复时哪些代码会再次运行。
+- 数清每一层重试的尝试次数，并在崩溃重放时让副作用保持安全。
+- 接入 MCP 工具、检索器、Deep Agents 和 LangSmith 追踪，并从报错信息找到故障原因。
+- 用 FastAPI 加 Postgres 提供 agent 服务，带审批、span 和评估，并依据模型服务器估算容量。
 
-## How this manual was made
+## 本手册是怎么做出来的 {#s-front-how-this-manual-was-made}
 
-We pinned the stack at the `langchain` 1.5.0 release of 2026-11-11 and checked every fact again on 2026-11-14. We read the source code of each package at its tag. We read the documentation at one commit of its repository, and we ran what both of them say.
+我们把技术栈锁定在 2026-11-11 发布的 `langchain` 1.5.0，并在 2026-11-14 把每个事实重新核对了一遍。我们读了每个包在其标签处的源码。我们读了文档仓库某一个提交处的文档，并把两者所述的内容都实际运行了一遍。
 
-| Package | Version | Commit |
+| 包 | 版本 | 提交 |
 |---|---|---|
 | `langchain` | 1.5.0 | `c2f4036e` |
-| `langchain-core` | 1.8.0 | `a4b4a7b9`, the same `libs/core` tree as `c2f4036e` |
+| `langchain-core` | 1.8.0 | `a4b4a7b9`，与 `c2f4036e` 的 `libs/core` 目录树相同 |
 | `langgraph` | 1.2.22 | `08a20169` |
-| `langgraph-checkpoint`, `langgraph-prebuilt` | 4.3.2, 1.1.2 | `08a20169` |
+| `langgraph-checkpoint`、`langgraph-prebuilt` | 4.3.2、1.1.2 | `08a20169` |
 | `langgraph-checkpoint-sqlite` | 3.1.3 | `5bd231cb` |
 | `deepagents` | 0.7.38 | `c858b364` |
 | `langsmith` | 0.14.17 | `15dd2a78` |
-| `langchain-openai`, `langchain-anthropic`, `langchain-ollama` | 1.8.0, 1.7.10, 1.1.0 | their own tags |
+| `langchain-openai`、`langchain-anthropic`、`langchain-ollama` | 1.8.0、1.7.10、1.1.0 | 各自的标签 |
 
-The sources have a rank. When two of them disagree, the higher one wins, and the section says so.
+各来源有优先级。两个来源不一致时，以较高的为准，并在对应小节里写明。
 
-| Rank | Source | What the manual takes from it | Cited as |
+| 优先级 | 来源 | 手册从中取什么 | 引用方式 |
 |---|---|---|---|
-| 1 | The source code at the tags above | every class, parameter, default, and error text | `code` |
-| 2 | The documentation at docs.langchain.com, built from commit `04d4d4a` of its repository, MIT license | the documented behaviour, in our own words | `docs` |
-| 3 | The changelog and the release notes of each package | when a change came, and in which package | `docs` for the changelog page, `code` for a release |
-| 4 | The capture kit in `capture/` | every listing | the file name |
-| 5 | The lab recordings in `capture/lab/` | every measured number | the file name |
+| 1 | 上述标签处的源码 | 每个类、参数、默认值和错误文本 | `code` |
+| 2 | docs.langchain.com 的文档，由其仓库提交 `04d4d4a` 构建，MIT 许可证 | 文档描述的行为，用我们自己的话写出 | `docs` |
+| 3 | 每个包的变更日志和发布说明 | 某项变更何时出现、出现在哪个包 | 变更日志页用 `docs`，某次发布用 `code` |
+| 4 | `capture/` 里的录制工具包 | 每份代码清单 | 文件名 |
+| 5 | `capture/lab/` 里的实验记录 | 每个实测数字 | 文件名 |
 
-GitHub issues and pull requests are evidence for a behaviour at the pin, and the text names each one by its number. The product pages at www.langchain.com have no open license. Section 1.1 states their claims in our words and sets each one beside our result.
+GitHub 的 issue 和拉取请求，是锁定版本上某个行为的证据，正文按编号逐一点名。www.langchain.com 的产品页没有开放许可证。第 1.1 节用我们自己的话转述其中的宣称，并把每一条与我们的结果并排放置。
 
-The documentation site serves its main branch, and no docs tag matches a package release. A page can describe a newer or an older behaviour than the pin. Where a page and the code disagree, the code wins, and the section shows both.
+文档站点提供的是主分支，没有哪个文档标签对应某次包发布。一个页面描述的行为可能比锁定版本更新，也可能更旧。页面与代码不一致时，以代码为准，小节会把两者都列出来。
 
-## The capture kit and the lab
+## 录制工具包与实验记录 {#s-front-the-capture-kit-and-the-lab}
 
-**Capture kit:** the program in `capture/` that drives the stack in one Python process and writes what it sees to `capture/out/`. It covers LangChain, LangGraph, Deep Agents, `langchain.mcp`, and the LangSmith SDK.
+**录制工具包：** `capture/` 里的程序。它在一个 Python 进程中驱动整套技术栈，并把看到的内容写入 `capture/out/`。它覆盖 LangChain、LangGraph、Deep Agents、`langchain.mcp` 和 LangSmith SDK。
 
-The kit uses no fake chat model. Where a scenario needs a model, it calls Qwen3 4B Instruct, `qwen3:4b-instruct-2507-q4_K_M`, through `ChatOllama`. The settings are temperature 0, seed 42, `num_ctx` 16384, and `num_predict` 512. We recorded those captures on the x86 server guest, on CPU, on 2026-11-14. Each file names its model, its settings, the machine, and the date.
+工具包不使用假聊天模型。场景需要模型时，它通过 `ChatOllama` 调用 Qwen3 4B Instruct，即 `qwen3:4b-instruct-2507-q4_K_M`。设置是 temperature 0、seed 42、`num_ctx` 16384、`num_predict` 512。这些录制于 2026-11-14，在 x86 服务器客户机的 CPU 上进行。每个文件都写明它的模型、设置、机器和日期。
 
-The other captures call no model, such as the versions, the messages, the graph structure, and the store. They run offline with no keys, and they give the same bytes on every run. The kit masks values that change on every run, such as message ids and the timings in each reply. A real model answers in its own words. So a listing shows what the model did on our run, even where the prompt asked for more.
+另一些录制不调用模型，例如版本、消息、图结构和 store。它们离线运行，不需要密钥，每次运行得到的字节都相同。工具包会遮蔽每次运行都会变的值，例如消息 id 和每次回复里的耗时。真实模型用它自己的话回答。所以代码清单展示的是模型在我们这次运行里做了什么，即使提示词要求得更多。
 
-**Lab recording:** a run against a real model or a real database on one of our machines, kept as raw files in `capture/lab/`. `capture/run.py` computes a summary of each data set into `capture/lab/summary/`, and each chart reads one summary.
+**实验记录：** 在我们某台机器上，对真实模型或真实数据库做的一次运行，以原始文件保存在 `capture/lab/`。`capture/run.py` 为每组数据计算一份摘要，写入 `capture/lab/summary/`，每张图表读取其中一份摘要。
 
-We recorded on two machines. The Mac is an Apple M1 Max with 10 cores and 64 GiB, with Ollama and PostgreSQL 14. The x86 server guest has 32 vCPU and 48 GiB, with PostgreSQL 16, Redis 7, and Ollama 0.31.1 on CPU. The two machines differ, so this manual never sets a number from one beside a number from the other.
+我们在两台机器上录制。Mac 是 Apple M1 Max，10 核、64 GiB，装有 Ollama 和 PostgreSQL 14。x86 服务器客户机有 32 vCPU 和 48 GiB，装有 PostgreSQL 16、Redis 7 和 CPU 上的 Ollama 0.31.1。两台机器不同，所以本手册从不把其中一台的数字与另一台的数字并排比较。
 
-The Mac is a shared laptop, and other work ran on it during every timed run. Read each time from the Mac as an upper bound for that machine. The local models of the lab were Qwen3 0.6B, 1.7B, 4B, 8B, 14B, and 30B-A3B, and gpt-oss 20B, on Ollama, with `nomic-embed-text` for embeddings. The capture kit used Qwen3 4B Instruct on the x86 server guest. So did the failure drill of [section 8.7](#s-a-failure-drill) and the crash matrix of [section 5.3](#s-durability-modes-and-a-crash-between-two-steps). So did the lab runs T05, T07, T08, T11, T17, T18, and T19.
+Mac 是一台共用的笔记本，每次计时运行期间上面都有其他工作在跑。读 Mac 上的每个时间时，把它当作该机器的上界。实验用的本地模型有 Qwen3 0.6B、1.7B、4B、8B、14B 和 30B-A3B，以及 gpt-oss 20B，都在 Ollama 上运行，嵌入用 `nomic-embed-text`。录制工具包在 x86 服务器客户机上使用 Qwen3 4B Instruct。[第 8.7 节](#s-a-failure-drill)的故障演练和[第 5.3 节](#s-durability-modes-and-a-crash-between-two-steps)的崩溃矩阵也是如此。实验运行 T05、T07、T08、T11、T17、T18 和 T19 同样如此。
 
-**Task-suite bench:** the 99 tasks of [section 1.2](#s-do-you-need-langchain), each checked by the state that its tools leave. Claude Haiku 5.5 (`claude-haiku-5-5`) and Claude Sonnet 5.5 (`claude-sonnet-5-5`) ran through the Anthropic API from the Mac. The budget had a cap, and every call is in a cost ledger. [The bench method](#s-ref-the-bench-method) gives the tasks, the settings, and the rows not to use.
+**任务集基准：** [第 1.2 节](#s-do-you-need-langchain)的 99 个任务，每个都按工具留下的状态来检查。Claude Haiku 5.5（`claude-haiku-5-5`）和 Claude Sonnet 5.5（`claude-sonnet-5-5`）从 Mac 经 Anthropic API 运行。预算设有上限，每次调用都记在成本账本里。[基准方法](#s-ref-the-bench-method)给出任务、设置，以及不应使用的行。
 
-Claude Haiku 5.5 also ran the 20 evals of the production service in [section 9.6](#s-evals-that-check-state), with every call in the same kind of ledger. It also ran 60 attacks on the file rules of [section 8.4](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses), for $0.021. The rule matrix of that section has no model. A scripted caller drives the permission layer, and the section says so. Every other model time in this manual is the time of a local model.
+Claude Haiku 5.5 还运行了[第 9.6 节](#s-evals-that-check-state)里生产服务的 20 项评估，每次调用同样记在这类账本里。它还对[第 8.4 节](#s-security-deserialization-store-isolation-approvals-and-mcp-subprocesses)的文件规则发起了 60 次攻击，花费 $0.021。该节的规则矩阵没有用模型，是由脚本化的调用方驱动权限层，小节里也写明了这一点。本手册里其余的模型耗时，都是本地模型的耗时。
 
-## Conventions
+## 约定 {#s-front-conventions}
 
-- A citation such as `{{docs oss/python/langchain/models}}` stays in the source of a section and renders nothing. The reader view shows no file paths.
-- Every source is stated in our own words. Quote marks hold only literal strings, such as output and error text.
-- A citation with the key `docs` names the page path at docs.langchain.com, read at docs commit `04d4d4a`.
-- A listing is cut from one capture file. `…` on its own line marks lines we cut, and the note under the title says what.
-- `<uuid-1>`, `<hex-1>`, and `<time>` in a listing are masks. The same token means the same value inside one file.
-- A paragraph that starts with **We measured** names the machine and the number of runs. Its numbers come from one summary file.
-- A run is one call of `invoke` or `stream`. A step is one superstep of the LangGraph loop. A turn is one human message and everything up to the reply.
+- 像 `{{docs oss/python/langchain/models}}` 这样的引用留在小节源文件里，不渲染任何内容。阅读视图不显示文件路径。
+- 每个来源都用我们自己的话陈述。引号里只放字面字符串，例如输出和错误文本。
+- 键为 `docs` 的引用，指向 docs.langchain.com 上的页面路径，读取于文档提交 `04d4d4a`。
+- 一份代码清单截取自一个录制文件。单独一行的 `…` 标出我们截掉的行，标题下方的说明写明截掉了什么。
+- 代码清单里的 `<uuid-1>`、`<hex-1>` 和 `<time>` 是遮蔽标记。同一个文件里，相同的标记代表相同的值。
+- 以 **我们测得** 开头的段落会写明机器和运行次数。它的数字来自一个摘要文件。
+- 一次运行是一次 `invoke` 或 `stream` 调用。一个步骤是 LangGraph 循环的一个超步。一轮是一条人类消息，加上直到回复为止的所有内容。
 
-## A first run, offline
+## 第一次运行，离线 {#s-front-a-first-run-offline}
 
-You need Python 3.13 for the kit, because the captures were made with it. The stack itself needs Python 3.11 or later. From the manual directory, create the virtual environment and run the check:
+录制工具包需要 Python 3.13，因为这些录制是用它做的。技术栈本身需要 Python 3.11 或更高版本。在手册目录里创建虚拟环境并运行检查：
 
 ```bash
 python3.13 -m venv capture/.venv
@@ -88,15 +88,15 @@ capture/.venv/bin/pip install -r capture/requirements.txt
 python3 capture/run.py --check
 ```
 
-The check runs the 19 model-free scenarios again into a temporary folder and compares each file with `capture/out/`. It checks that each of the 36 recorded files names its model. It also checks the structure that the manual relies on, such as the message types and the tool names. It then rebuilds the lab summaries from the raw recordings and compares them too. It does not call a model, so it prints one `skipped:` line for the recorded scenarios. `python3 capture/run.py --check --live` records them again when Ollama runs on your machine.
+这条检查把 19 个不需要模型的场景重新跑进一个临时文件夹，并把每个文件与 `capture/out/` 比较。它检查 36 个录制文件是否都写明了所用模型。它还检查手册依赖的结构，例如消息类型和工具名。然后它从原始录制重建实验摘要，也做比较。它不调用模型，所以对需要模型的录制场景，只打印一行 `skipped:`。当你的机器上运行着 Ollama 时，`python3 capture/run.py --check --live` 会把它们重新录制。
 
-This is the scenario behind [section 1.3](#s-one-create-agent-run). It builds an agent with one tool and a system prompt, and it asks one question:
+下面是[第 1.3 节](#s-one-create-agent-run)背后的场景。它用一个工具和一条系统提示词构建 agent，并问一个问题：
 
 ```listing
-title: the agent of the first run
+title: 第一次运行的 agent
 source: capture/s_start.py
 lang: python
-note: The scenario function from the kit. llm(), the add tool, and ASK come from capture/common.py.
+note: 工具包里的场景函数。llm()、add 工具和 ASK 来自 capture/common.py。
 ---
 def agent_run(cap):
     m = llm()
@@ -104,13 +104,13 @@ def agent_run(cap):
     out = agent.invoke(ASK)
 ```
 
-`llm()` builds `ChatOllama` on Qwen3 4B with the settings above. The model called `add` with 2 and 3 and then said the sum. The run ended with four messages:
+`llm()` 按上述设置在 Qwen3 4B 上构建 `ChatOllama`。模型用 2 和 3 调用了 `add`，然后说出了和。这次运行以四条消息结束：
 
 ```listing
-title: the messages at the end of the first run
+title: 第一次运行结束时的消息
 source: capture/out/06-agent-run.txt
 lang: json
-note: Each message is cut to its type and content. The ids and the tool call are cut.
+note: 每条消息只保留类型和内容。id 和工具调用被截掉了。
 ---
     "type": "HumanMessage",
     "content": "What is 2 + 3?",
@@ -125,38 +125,38 @@ note: Each message is cut to its type and content. The ids and the tool call are
     "content": "2 + 3 = 5.",
 ```
 
-To use another model, pass a model string such as `"openai:gpt-4.1"` in place of `m`, and install the provider package. [Section 3.2](#s-init-chat-model-and-model-profiles) shows how the string resolves.
+要用别的模型，就传入 `"openai:gpt-4.1"` 这样的模型字符串来代替 `m`，并安装对应的提供方包。[第 3.2 节](#s-init-chat-model-and-model-profiles)展示这个字符串如何解析。
 
-## How the parts are ordered
+## 各部分的编排 {#s-front-how-the-parts-are-ordered}
 
-Part 1 is the decision. It sets each project and its claims beside our results, compares harnesses on the task suite, and follows one agent run to the last checkpoint. Part 2 goes inside the runtime: supersteps, channels, the checkpoint write path, interrupts, streams, and checkpoint growth, from traces of real runs. Part 3 installs the stack and explains the model, the messages, the tools, and the prompt.
+第 1 部分是决策。它把每个项目的宣称与我们的结果并排放置，在任务集上比较各种 harness，并跟随一次 agent 运行直到最后一个检查点。第 2 部分深入运行时：超步、通道、检查点写入路径、中断、流和检查点增长，都来自真实运行的追踪。第 3 部分安装技术栈，并讲解模型、消息、工具和提示词。
 
-Part 4 is the agent that `create_agent` builds: its graph, structured output on each provider, many tools, and middleware. Part 5 is state, memory, and durability: streams, checkpointers, crashes, stores, long threads, and serialization. Part 6 is LangGraph control flow: state and reducers, `Send` and `Command`, the functional API, interrupts, approvals, time travel, subgraphs, and error handlers.
+第 4 部分是 `create_agent` 构建的 agent：它的图、各提供方上的结构化输出、多工具和中间件。第 5 部分是状态、记忆与持久性：流、checkpointer、崩溃、store、长线程和序列化。第 6 部分是 LangGraph 控制流：状态与 reducer、`Send` 与 `Command`、函数式 API、中断、审批、时间旅行、子图和错误处理器。
 
-Part 7 connects retrieval, MCP, Deep Agents, and LangSmith. Part 8 operates and debugs: Agent Server, Agent Chat UI, cost, security, migration from 0.x, symptoms, a failure drill, and the limits at the pin. Part 9 builds one production service end to end, with FastAPI, Postgres, approvals, OpenTelemetry spans, faults, evals, and several workers. It runs that service on Qwen3 4B, Qwen3 14B, and Claude Haiku 5.5. The table below lists every part:
+第 7 部分接入检索、MCP、Deep Agents 和 LangSmith。第 8 部分讲运维与调试：Agent Server、Agent Chat UI、成本、安全、从 0.x 迁移、症状、故障演练，以及锁定版本上的限制。第 9 部分端到端构建一个生产服务，用到 FastAPI、Postgres、审批、OpenTelemetry span、故障、评估和多个 worker。它在 Qwen3 4B、Qwen3 14B 和 Claude Haiku 5.5 上运行这个服务。下表列出每一部分：
 
 ```parts
 ```
 
-Each section ends with a short list of actions. Read those first when you need an answer today. Read the rest when you want the reason.
+每一节都以一个简短的行动清单结束。今天就需要答案时先读它，想知道原因再读其余部分。
 
-Four lessons go deeper into the ideas that this manual applies. [The LangGraph state machines lesson](phases/11-llm-engineering/16-langgraph-state-machines) and [the stateful graphs lesson](phases/14-agent-engineering/13-langgraph-stateful-graphs) build graphs from first principles. [The agent framework tradeoffs lesson](phases/11-llm-engineering/17-agent-framework-tradeoffs) compares frameworks. [The durable execution lesson](phases/15-autonomous-systems/12-durable-execution) explains checkpoints and replay. This manual stays with LangChain.
+有四课更深入地讲解本手册所应用的思想。[LangGraph 状态机一课](phases/11-llm-engineering/16-langgraph-state-machines)和[有状态图一课](phases/14-agent-engineering/13-langgraph-stateful-graphs)从第一性原理构建图。[agent 框架取舍一课](phases/11-llm-engineering/17-agent-framework-tradeoffs)比较各种框架。[持久执行一课](phases/15-autonomous-systems/12-durable-execution)讲解检查点和重放。本手册只专注于 LangChain。
 
-## Colour in figures
+## 图中的颜色 {#s-front-colour-in-figures}
 
-Each hue keeps one meaning in every figure:
+每种色相在所有图中保持同一个含义：
 
 ```palette
 ```
 
-[Figure](#fig-0-1) teaches the arrow styles with exchanges from our captures. A solid arrow is a call, and a dashed arrow in the same ink is its reply. The other six styles each mark one kind of event, and the colour of the arrow matches the table above.
+[图](#fig-0-1)用我们录制中的几次交互来讲解各种箭头样式。实线箭头是调用，同色的虚线箭头是它的回复。其余六种样式各标记一类事件，箭头颜色与上表一致。
 
 ```figure
 id: fig-0-1
 kind: sequence
-title: reading a sequence figure in this manual
-claim: Each arrow style marks one kind of exchange, and every label is a real name, message, or count from the capture kit.
-caption: Read each numbered row from the tail of the arrow to its head. The note under each label names the style. From capture/out/06-agent-run.txt, capture/out/03-tools.txt, capture/out/04-tool-errors.txt, capture/out/30-state-history-forks.txt, and capture/out/42-langsmith.txt.
+title: 如何阅读本手册里的时序图
+claim: 每种箭头样式标记一类交互，每个标签都是录制工具包里真实的名称、消息或计数。
+caption: 每个带编号的行，从箭头尾读到箭头头。每个标签下方的注释写明它的样式。来源：capture/out/06-agent-run.txt、capture/out/03-tools.txt、capture/out/04-tool-errors.txt、capture/out/30-state-history-forks.txt 和 capture/out/42-langsmith.txt。
 ```
 
-Sources: manual.json; capture/README.md, capture/run.py, capture/s_start.py, capture/common.py, capture/out/06-agent-run.txt, capture/out/03-tools.txt, capture/out/04-tool-errors.txt, capture/out/30-state-history-forks.txt, capture/out/42-langsmith.txt; capture/lab/, capture/lab/bench/summary-mac.json, capture/lab/bench/runs/cost-ledger.jsonl, capture/lab/prodapp-mac/runs/cost-ledger.jsonl; docs.langchain.com at docs commit 04d4d4a.
+来源：manual.json；capture/README.md, capture/run.py, capture/s_start.py, capture/common.py, capture/out/06-agent-run.txt, capture/out/03-tools.txt, capture/out/04-tool-errors.txt, capture/out/30-state-history-forks.txt, capture/out/42-langsmith.txt; capture/lab/, capture/lab/bench/summary-mac.json, capture/lab/bench/runs/cost-ledger.jsonl, capture/lab/prodapp-mac/runs/cost-ledger.jsonl; docs.langchain.com at docs commit 04d4d4a.
