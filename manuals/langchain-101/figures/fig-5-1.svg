@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 404" role="img" aria-labelledby="fig-5-1-title fig-5-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-1-title">一次 agent 运行在各个流模式下的块</title>
+  <desc id="fig-5-1-desc">八行，对应同一次 agent 运行的八种流，分四列：输入、第 1 步的 model 节点、第 2 步的 tools 节点、第 3 步的 model 节点。每个标记是从录制中读出的一个块，颜色表示它携带的内容：靛蓝是整个状态，梅紫是模型输出，绿色是工具输出，琥珀色是开始或结束的任务。updates 有 3 个，values 4 个，messages 13 个，tasks 6 个，debug 6 个，custom 0 个，slow_sum agent 上的 tools 模式 4 个，stream_events v3 有 23 个事件。v3 流在每一步结束时发出一个 values 事件。</desc>
+  <text x="138" y="24" font-size="11" text-anchor="middle" fill="var(--m-violet-ink, #5b4fa3)">输入</text>
+  <line x1="106" y1="34" x2="106" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="242" y="24" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">model，第 1 步</text>
+  <line x1="170" y1="34" x2="170" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="368" y="24" font-size="11" text-anchor="middle" fill="var(--m-green-ink, #336b40)">tools，第 2 步</text>
+  <line x1="314" y1="34" x2="314" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="503" y="24" font-size="11" text-anchor="middle" fill="var(--m-indigo-ink, #4b4f9e)">model，第 3 步</text>
+  <line x1="422" y1="34" x2="422" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <line x1="584" y1="34" x2="584" y2="300" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="20" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">流</text>
+  <text x="606" y="24" font-size="11" text-anchor="middle" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">N</text>
+  <g data-beat="1"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="0.45s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="56" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">updates</text>
+  <rect x="239" y="45" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="365" y="45" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <rect x="500" y="45" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <text x="606" y="56" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">3</text>
+  </g>
+  <g data-beat="2"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.571;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.05s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="88" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">values</text>
+  <rect x="135" y="77" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <rect x="239" y="77" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <rect x="365" y="77" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <rect x="500" y="77" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <text x="606" y="88" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">4</text>
+  </g>
+  <g data-beat="3"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.727;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="1.65s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="120" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">messages</text>
+  <rect x="233" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="245" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="365" y="109" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <rect x="446" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="458" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="470" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="482" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="494" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="506" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="518" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="530" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="542" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="554" y="109" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <text x="606" y="120" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">13</text>
+  </g>
+  <g data-beat="4"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.25s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="152" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">tasks</text>
+  <rect x="233" y="141" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="245" y="141" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="359" y="141" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="371" y="141" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="494" y="141" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="506" y="141" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <text x="606" y="152" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">6</text>
+  </g>
+  <g data-beat="5"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.842;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="2.85s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="184" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">debug</text>
+  <rect x="233" y="173" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="245" y="173" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="359" y="173" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="371" y="173" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="494" y="173" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="506" y="173" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <text x="606" y="184" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">6</text>
+  </g>
+  <g data-beat="6"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.87;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="3.45s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="216" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">custom</text>
+  <text x="606" y="216" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-ink-mute, #666660)">0</text>
+  </g>
+  <g data-beat="7"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.889;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.05s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="248" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">tools</text>
+  <rect x="347" y="237" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <rect x="359" y="237" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <rect x="371" y="237" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <rect x="383" y="237" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <text x="606" y="248" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">4</text>
+  </g>
+  <g data-beat="8"><animate attributeName="opacity" values="0;0;1" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/><animateTransform attributeName="transform" type="translate" values="0 4;0 4;0 0" keyTimes="0;0.903;1" calcMode="spline" keySplines="0 0 1 1;0.23 1 0.32 1" dur="4.65s" begin="indefinite" fill="freeze"/>
+  <text x="20" y="280" font-size="11.5" fill="var(--m-indigo-ink, #4b4f9e)">v3 events</text>
+  <rect x="135" y="269" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <rect x="209" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="221" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="233" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="245" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="257" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="269" y="269" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <rect x="353" y="269" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <rect x="365" y="269" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <rect x="377" y="269" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <rect x="434.46" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="445.38" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="456.31" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="467.23" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="478.15" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="489.08" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="500" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="510.92" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="521.85" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="532.77" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="543.69" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="554.62" y="269" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <rect x="565.54" y="269" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <text x="606" y="280" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">23</text>
+  </g>
+  <rect x="20" y="318" width="6" height="14" fill="var(--m-indigo-ink, #4b4f9e)" stroke="var(--m-indigo-ink, #4b4f9e)" stroke-width="1.2"/>
+  <text x="32" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">整个状态</text>
+  <rect x="142" y="318" width="6" height="14" fill="var(--m-plum-ink, #8a3d72)" stroke="var(--m-plum-ink, #8a3d72)" stroke-width="1.2"/>
+  <text x="154" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型输出</text>
+  <rect x="264" y="318" width="6" height="14" fill="var(--m-green-ink, #336b40)" stroke="var(--m-green-ink, #336b40)" stroke-width="1.2"/>
+  <text x="276" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">工具输出</text>
+  <rect x="386" y="318" width="6" height="14" fill="var(--m-paper, #fafaf5)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <text x="398" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务开始</text>
+  <rect x="508" y="318" width="6" height="14" fill="var(--m-amber-ink, #85590c)" stroke="var(--m-amber-ink, #85590c)" stroke-width="1.2"/>
+  <text x="520" y="330" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">任务结束</text>
+  <text x="20" y="362" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每个标记是一个块。tasks 和 debug 运行时没有 checkpointer。</text>
+  <text x="20" y="380" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">tools 行来自 slow_sum agent：开始、两个增量、完成。</text>
+  <text x="20" y="398" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每一列都以一个 v3 values 事件收尾。</text>
+</svg>

@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-9-5-title fig-9-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-9-5-title">五个故障、span 中的尝试，以及各模型对客户说了什么</title>
+  <desc id="fig-9-5-desc">对每个注入的故障，展示 Mac 上第一次套件运行的工具与模型 span，以及 Qwen3 4B、Qwen3 14B、Claude Haiku 5.5 的回复。search_faq 失败 一次：Qwen3 4B no tool call, said no data bad，Qwen3 14B answered after the retry ok，Claude Haiku 5.5 answered after the retry ok。read_order 挂起 每次尝试：Qwen3 4B said order not found bad，Qwen3 14B said it cannot look it up now ok，Claude Haiku 5.5 said lookup timed out ok。create_ticket 失败一次：Qwen3 4B said it could not open one ok，Qwen3 14B said it could not open one ok，Claude Haiku 5.5 said it could not open one ok。主模型 抛出异常：Qwen3 4B answered from backup ok，Qwen3 14B answered from backup ok，Claude Haiku 5.5 answered from backup ok。模型一直请求 search_faq：Qwen3 4B answered after 8 calls ok，Qwen3 14B answered after 8 calls ok，Claude Haiku 5.5 answered after 8 calls ok。</desc>
+  <text x="16" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">故障</text>
+  <text x="176" y="24" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">运行的 SPAN</text>
+  <text x="344" y="24" font-size="11" font-weight="700">Qwen3 4B</text>
+  <text x="444" y="24" font-size="11" font-weight="700">Qwen3 14B</text>
+  <text x="544" y="24" font-size="11" font-weight="700">Haiku 5.5</text>
+  <rect x="176" y="36" width="10" height="10" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="190" y="45" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">工具成功</text>
+  <rect x="250" y="36" width="10" height="10" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="264" y="45" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">错误</text>
+  <rect x="176" y="52" width="10" height="10" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="190" y="61" font-size="11" fill="var(--m-ink-soft, #4a4a4a)">模型调用成功</text>
+  <line x1="16" y1="74" x2="630" y2="74" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="16" y="92" font-size="11.5" font-weight="700">search_faq 失败</text>
+  <text x="16" y="107" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">一次</text>
+  <rect x="176" y="82" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <rect x="190" y="82" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="176" y="110" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2 个工具 span，Qwen3 14B</text>
+  <rect x="340" y="80" width="92" height="38" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="346" y="95" font-size="11" class="m-serif">没调用工具，</text>
+  <text x="346" y="110" font-size="11" class="m-serif">称无数据</text>
+  <rect x="440" y="80" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="446" y="95" font-size="11" class="m-serif">重试后</text>
+  <text x="446" y="110" font-size="11" class="m-serif">给出回答</text>
+  <rect x="540" y="80" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="546" y="95" font-size="11" class="m-serif">重试后</text>
+  <text x="546" y="110" font-size="11" class="m-serif">给出回答</text>
+  <line x1="16" y1="132" x2="630" y2="132" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="16" y="150" font-size="11.5" font-weight="700">read_order 挂起</text>
+  <text x="16" y="165" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每次尝试</text>
+  <rect x="176" y="140" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <rect x="190" y="140" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <rect x="204" y="140" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="176" y="168" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">3 个工具 span，Qwen3 4B</text>
+  <rect x="340" y="138" width="92" height="38" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="346" y="153" font-size="11" class="m-serif">称订单</text>
+  <text x="346" y="168" font-size="11" class="m-serif">未找到</text>
+  <rect x="440" y="138" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="446" y="153" font-size="11" class="m-serif">称现在</text>
+  <text x="446" y="168" font-size="11" class="m-serif">无法查询</text>
+  <rect x="540" y="138" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="546" y="153" font-size="11" class="m-serif">称查询</text>
+  <text x="546" y="168" font-size="11" class="m-serif">已超时</text>
+  <line x1="16" y1="190" x2="630" y2="190" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="16" y="208" font-size="11.5" font-weight="700">create_ticket</text>
+  <text x="16" y="223" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">失败一次</text>
+  <rect x="176" y="198" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="176" y="226" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1 个工具 span，Qwen3 4B</text>
+  <rect x="340" y="196" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="346" y="211" font-size="11" class="m-serif">称无法</text>
+  <text x="346" y="226" font-size="11" class="m-serif">开立工单</text>
+  <rect x="440" y="196" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="446" y="211" font-size="11" class="m-serif">称无法</text>
+  <text x="446" y="226" font-size="11" class="m-serif">开立工单</text>
+  <rect x="540" y="196" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="546" y="211" font-size="11" class="m-serif">称无法</text>
+  <text x="546" y="226" font-size="11" class="m-serif">开立工单</text>
+  <line x1="16" y1="248" x2="630" y2="248" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="16" y="266" font-size="11.5" font-weight="700">主模型</text>
+  <text x="16" y="281" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">抛出异常</text>
+  <rect x="176" y="256" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <rect x="190" y="256" width="10" height="12" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="204" y="256" width="10" height="12" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <rect x="218" y="256" width="10" height="12" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="176" y="284" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">model.call：主模型、备用</text>
+  <rect x="340" y="254" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="346" y="269" font-size="11" class="m-serif">回答了，</text>
+  <text x="346" y="284" font-size="11" class="m-serif">来自备用</text>
+  <rect x="440" y="254" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="446" y="269" font-size="11" class="m-serif">回答了，</text>
+  <text x="446" y="284" font-size="11" class="m-serif">来自备用</text>
+  <rect x="540" y="254" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="546" y="269" font-size="11" class="m-serif">回答了，</text>
+  <text x="546" y="284" font-size="11" class="m-serif">来自备用</text>
+  <line x1="16" y1="306" x2="630" y2="306" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="16" y="324" font-size="11.5" font-weight="700">模型一直请求</text>
+  <text x="16" y="339" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">search_faq</text>
+  <rect x="176" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="190" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="204" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="218" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="232" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="246" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="260" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <rect x="274" y="314" width="10" height="12" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="176" y="342" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">8 个工具 span，Qwen3 4B</text>
+  <rect x="340" y="312" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="346" y="327" font-size="11" class="m-serif">8 次调用后</text>
+  <text x="346" y="342" font-size="11" class="m-serif">给出回答</text>
+  <rect x="440" y="312" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="446" y="327" font-size="11" class="m-serif">8 次调用后</text>
+  <text x="446" y="342" font-size="11" class="m-serif">给出回答</text>
+  <rect x="540" y="312" width="92" height="38" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="546" y="327" font-size="11" class="m-serif">8 次调用后</text>
+  <text x="546" y="342" font-size="11" class="m-serif">给出回答</text>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="fig-3-4-title fig-3-4-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-3-4-title">各类工具失败对一次运行的影响</title>
+  <desc id="fig-3-4-desc">四行，每行从左侧的失败指向右侧的结果。参数错误，例如把 shell 命令当作对象而不是字符串传入，会变成 status 为 error 的 ToolMessage，模型再试一次。未知的工具名，即来自较早部署的 subtract，会变成 status 为 error 的 ToolMessage，模型用文字回答。有 ToolErrorMiddleware 时的异常，会变成 status 为 error 的 ToolMessage，内容是 on_error 返回的文字。没有中间件时的异常 RuntimeError disk on fire，会从 invoke 抛出，运行结束。</desc>
+  <defs><marker id="fig-3-4-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-3-4-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">失败情形</text>
+  <text x="380" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">运行得到的结果</text>
+  <rect x="20" y="34" width="250" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="55.25" font-size="12.5" font-weight="700">参数错误</text>
+  <text x="32" y="72.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">{&#39;command&#39;: {&#39;command&#39;: &#39;ls&#39;}}</text>
+  <rect x="380" y="34" width="240" height="52" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="392" y="55.25" font-size="12.5" font-weight="700">ToolMessage，status 为 error</text>
+  <text x="392" y="72.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型再试一次</text>
+  <line x1="270" y1="60" x2="379" y2="60" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-4-head-ink)"/>
+  <rect x="20" y="104" width="250" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="125.25" font-size="12.5" font-weight="700">未知的工具名</text>
+  <text x="32" y="142.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">subtract，来自较早的部署</text>
+  <rect x="380" y="104" width="240" height="52" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="392" y="125.25" font-size="12.5" font-weight="700">ToolMessage，status 为 error</text>
+  <text x="392" y="142.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型用文字回答</text>
+  <line x1="270" y1="130" x2="379" y2="130" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-4-head-ink)"/>
+  <rect x="20" y="174" width="250" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="195.25" font-size="12.5" font-weight="700">异常，有中间件</text>
+  <text x="32" y="212.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">ToolErrorMiddleware</text>
+  <rect x="380" y="174" width="240" height="52" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="392" y="195.25" font-size="12.5" font-weight="700">ToolMessage，status 为 error</text>
+  <text x="392" y="212.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">内容来自 on_error</text>
+  <line x1="270" y1="200" x2="379" y2="200" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-4-head-ink)"/>
+  <rect x="20" y="244" width="250" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="265.25" font-size="12.5" font-weight="700">异常，无中间件</text>
+  <text x="32" y="282.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">RuntimeError</text>
+  <rect x="380" y="244" width="240" height="52" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="392" y="265.25" font-size="12.5" font-weight="700">invoke 抛出异常</text>
+  <text x="392" y="282.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">disk on fire</text>
+  <line x1="270" y1="270" x2="379" y2="270" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-3-4-head-rose)"/>
+  <text x="20" y="322" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">前三种会继续进入下一次模型调用。最后一种会结束运行。</text>
+</svg>

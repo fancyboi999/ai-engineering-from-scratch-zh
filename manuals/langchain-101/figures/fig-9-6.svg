@@ -1,0 +1,312 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 692" role="img" aria-labelledby="fig-9-6-title fig-9-6-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-9-6-title">三个真实模型上的同样 27 个测试</title>
+  <desc id="fig-9-6-desc">每行是参考服务的一个测试，每列是整个套件的一次运行。Qwen3 4B：27 个中通过 16 个，27 个中通过 16 个，27 个中通过 16 个。Qwen3 14B：27 个中通过 22 个，27 个中通过 21 个，27 个中通过 21 个。Claude Haiku 5.5：20 个中通过 20 个。失败格中的字母标明原因，对照表在网格下方。</desc>
+  <text x="293" y="22" font-size="11" text-anchor="middle" font-weight="700">Qwen3 4B</text>
+  <text x="271" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1</text>
+  <text x="271" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">16</text>
+  <text x="293" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">2</text>
+  <text x="293" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">16</text>
+  <text x="315" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">3</text>
+  <text x="315" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">16</text>
+  <text x="399" y="22" font-size="11" text-anchor="middle" font-weight="700">Qwen3 14B</text>
+  <text x="377" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1</text>
+  <text x="377" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">22</text>
+  <text x="399" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">2</text>
+  <text x="399" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">21</text>
+  <text x="421" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">3</text>
+  <text x="421" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">21</text>
+  <text x="483" y="22" font-size="11" text-anchor="middle" font-weight="700">Haiku 5.5</text>
+  <text x="483" y="40" font-size="11" text-anchor="middle" fill="var(--m-ink-soft, #4a4a4a)">1</text>
+  <text x="483" y="54" font-size="11" text-anchor="middle" fill="var(--m-plum-ink, #8a3d72)">20</text>
+  <text x="16" y="40" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">套件的第几次运行</text>
+  <text x="16" y="54" font-size="11" class="m-serif" fill="var(--m-plum-ink, #8a3d72)">该次运行通过的测试数</text>
+  <text x="16" y="73" font-size="11">faq：退货期限</text>
+  <rect x="262" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="63" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="89" font-size="11">faq：送达时间</text>
+  <rect x="262" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="79" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="105" font-size="11">订单状态</text>
+  <rect x="262" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="95" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="121" font-size="11">未知订单</text>
+  <rect x="262" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="111" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="137" font-size="11">其他客户的订单被隐藏</text>
+  <rect x="262" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="127" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="153" font-size="11">退款已批准一次</text>
+  <rect x="262" y="143" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="153.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="284" y="143" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="153.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="306" y="143" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="153.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="368" y="143" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="377" y="153.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="390" y="143" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="399" y="153.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="412" y="143" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="421" y="153.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="474" y="143" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="169" font-size="11">退款被拒绝，没有行</text>
+  <rect x="262" y="159" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="169.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="284" y="159" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="169.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="306" y="159" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="169.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="368" y="159" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="159" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="159" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="159" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="185" font-size="11">退款被询问两次</text>
+  <rect x="262" y="175" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="185.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="284" y="175" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="185.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="306" y="175" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="185.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <rect x="368" y="175" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="377" y="185.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="390" y="175" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="399" y="185.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="412" y="175" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="421" y="185.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="474" y="175" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="201" font-size="11">退款工具重放</text>
+  <rect x="262" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="191" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="217" font-size="11">转人工工单</text>
+  <rect x="262" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="207" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="233" font-size="11">记忆已保存并召回</text>
+  <rect x="262" y="223" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="233.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <rect x="284" y="223" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="233.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <rect x="306" y="223" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="233.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <rect x="368" y="223" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="223" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="223" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="223" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="249" font-size="11">其他用户的记忆</text>
+  <rect x="262" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="239" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="265" font-size="11">flaky faq 被重试</text>
+  <rect x="262" y="255" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="265.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">f</text>
+  <rect x="284" y="255" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="265.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">f</text>
+  <rect x="306" y="255" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="265.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">f</text>
+  <rect x="368" y="255" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="255" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="255" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="255" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="281" font-size="11">挂起的工具超时</text>
+  <rect x="262" y="271" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="271" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="271" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="271" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="377" y="281.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">s</text>
+  <rect x="390" y="271" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="399" y="281.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">s</text>
+  <rect x="412" y="271" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="421" y="281.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">s</text>
+  <rect x="474" y="271" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="297" font-size="11">失败的工单不重试</text>
+  <rect x="262" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="287" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="313" font-size="11">主模型宕机，使用备用</text>
+  <rect x="262" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="303" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="329" font-size="11">失控循环，调用上限</text>
+  <rect x="262" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="319" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="345" font-size="11">长线程被摘要</text>
+  <rect x="262" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="335" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="361" font-size="11">审批期间的消息</text>
+  <rect x="262" y="351" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="361.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <rect x="284" y="351" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="361.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <rect x="306" y="351" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="361.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <rect x="368" y="351" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="377" y="361.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <rect x="390" y="351" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="399" y="361.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <rect x="412" y="351" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="421" y="361.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <rect x="474" y="351" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="16" y="377" font-size="11">先查状态，再退款</text>
+  <rect x="262" y="367" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="377.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">t</text>
+  <rect x="284" y="367" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="377.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">t</text>
+  <rect x="306" y="367" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="377.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">t</text>
+  <rect x="368" y="367" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="367" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="367" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="367" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <line x1="16" y1="380" x2="630" y2="380" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="16" y="393" font-size="11">隔离：线程、记忆</text>
+  <rect x="262" y="383" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="393.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <rect x="284" y="383" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="393.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <rect x="306" y="383" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="393.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <rect x="368" y="383" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="383" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="383" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="383" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="16" y="409" font-size="11">隔离：错误 token 401</text>
+  <rect x="262" y="399" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="399" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="399" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="399" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="399" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="399" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="399" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="16" y="425" font-size="11">退款中途崩溃，恢复</text>
+  <rect x="262" y="415" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="425.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <rect x="284" y="415" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="425.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <rect x="306" y="415" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="425.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <rect x="368" y="415" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="377" y="425.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="390" y="415" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="399" y="425.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="412" y="415" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="421" y="425.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <rect x="474" y="415" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="16" y="441" font-size="11">SIGTERM，运行完成</text>
+  <rect x="262" y="431" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="431" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="431" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="431" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="431" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="399" y="441.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">c</text>
+  <rect x="412" y="431" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="421" y="441.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">c</text>
+  <rect x="474" y="431" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="16" y="457" font-size="11">SIGTERM 超过期限</text>
+  <rect x="262" y="447" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="457.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">w</text>
+  <rect x="284" y="447" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="457.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">w</text>
+  <rect x="306" y="447" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="457.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">w</text>
+  <rect x="368" y="447" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="447" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="447" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="447" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="16" y="473" font-size="11">两个 worker，一个线程</text>
+  <rect x="262" y="463" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="284" y="463" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="306" y="463" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="368" y="463" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="463" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="463" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="463" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="16" y="489" font-size="11">LangSmith 关闭</text>
+  <rect x="262" y="479" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="271" y="489.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <rect x="284" y="479" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="293" y="489.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <rect x="306" y="479" width="18" height="14" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="315" y="489.5" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <rect x="368" y="479" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="390" y="479" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="412" y="479" width="18" height="14" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <rect x="474" y="479" width="18" height="14" fill="none" stroke="var(--m-ink-mute, #666660)" stroke-dasharray="1.5 3.5"/>
+  <text x="506" y="410" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务测试，</text>
+  <text x="506" y="426" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">未在 Claude 上运行</text>
+  <text x="16" y="524" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">a</text>
+  <text x="32" y="524" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型询问了金额和原因，没有提出 refund_order 调用</text>
+  <text x="16" y="539" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">z</text>
+  <text x="32" y="539" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型提出 amount_cents 0，审批人批准了它，于是写入了一行 0 cent 退款</text>
+  <text x="16" y="554" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">t</text>
+  <text x="32" y="554" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型用 create_ticket 开了工单，没有调用 refund_order</text>
+  <text x="16" y="569" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">n</text>
+  <text x="32" y="569" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型没有调用 save_note，所以没有可召回的记忆</text>
+  <text x="16" y="584" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">f</text>
+  <text x="32" y="584" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型没有调用 search_faq 就作答</text>
+  <text x="16" y="599" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">h</text>
+  <text x="32" y="599" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">测试在没有提出退款后发出 approve，得到 409，并把 409 响应体当作 SSE 解析</text>
+  <text x="16" y="614" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">w</text>
+  <text x="32" y="614" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">测试假定运行超过 3.5 s，而真实运行在 SIGTERM 之前就结束了</text>
+  <text x="16" y="629" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">g</text>
+  <text x="32" y="629" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">模型没有读取订单就编造了 amount_cents 10000</text>
+  <text x="16" y="644" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">s</text>
+  <text x="32" y="644" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">测试把整个运行限制在 5 s，而真实的模型调用花得更久</text>
+  <text x="16" y="659" font-size="11" font-weight="700" fill="var(--m-rose-ink, #b0344d)">c</text>
+  <text x="32" y="659" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">uvicorn 在 10 s 上限处关闭了流，11.6 到 12.1 s 的运行在排空阶段完成</text>
+</svg>

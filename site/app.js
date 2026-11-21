@@ -13,14 +13,11 @@
   document.addEventListener('DOMContentLoaded', function () {
     initThemeToggle();
     populateCurriculumSummary();
-    populateStats();
     renderPhases();
     initStaggerIndex();
     initModal();
     initCopyButton();
-    initMastheadFigure();
     initFadeObserver();
-    bindProgressActions('statExport', 'statImport', 'statImportFile');
   });
 
   function populateCurriculumSummary() {
@@ -60,72 +57,6 @@
     updateThemeIcon();
   }
 
-  function computeStats() {
-    var totalLessons = 0;
-    var completeLessons = 0;
-    var hasProgress = !!window.AIFSProgress;
-    for (var i = 0; i < PHASES.length; i++) {
-      var lessons = PHASES[i].lessons;
-      totalLessons += lessons.length;
-      for (var j = 0; j < lessons.length; j++) {
-        var staticDone = lessons[j].status === 'complete';
-        var userDone = false;
-        if (hasProgress && lessons[j].url) {
-          var lp = window.AIFSProgress.extractPath(lessons[j].url);
-          if (lp) userDone = window.AIFSProgress.isLessonComplete(lp);
-        }
-        if (staticDone || userDone) completeLessons++;
-      }
-    }
-    var completePhases = 0;
-    for (var p = 0; p < PHASES.length; p++) {
-      if (PHASES[p].status === 'complete') completePhases++;
-    }
-    return {
-      lessons: totalLessons,
-      phases: PHASES.length,
-      complete: completeLessons,
-      completePhases: completePhases
-    };
-  }
-
-  function setBar(selector, pct) {
-    var el = document.querySelector(selector);
-    if (!el) return;
-    var clamped = Math.max(0, Math.min(100, pct));
-    el.setAttribute('data-target-pct', clamped.toFixed(1));
-    if (el.classList.contains('in-view') || !window.IntersectionObserver) {
-      setBarScale(el, clamped);
-    } else {
-      setBarScale(el, 0);
-    }
-  }
-
-  function setBarScale(el, pct) {
-    var clamped = Math.max(0, Math.min(100, Number(pct) || 0));
-    el.style.setProperty('--bar-scale', (clamped / 100).toFixed(3));
-  }
-
-  function populateStats() {
-    var stats = computeStats();
-    var pct = stats.lessons > 0 ? (stats.complete / stats.lessons) * 100 : 0;
-    var phasePct = stats.phases > 0 ? (stats.completePhases / stats.phases) * 100 : 0;
-    var glossaryCount = (typeof GLOSSARY !== 'undefined') ? GLOSSARY.length : 0;
-
-    setText('[data-stat="complete-frac"]', stats.complete + ' / ' + stats.lessons);
-    setText('[data-stat="phases-frac"]', stats.completePhases + ' / ' + stats.phases);
-    setText('[data-stat="glossary-count"]', String(glossaryCount));
-    setBar('[data-bar="complete"]', pct);
-    setBar('[data-bar="phases"]', phasePct);
-    setBar('[data-bar="languages"]', 100);
-    setBar('[data-bar="glossary"]', glossaryCount > 0 ? 100 : 0);
-  }
-
-  function setText(selector, value) {
-    var el = document.querySelector(selector);
-    if (el) el.textContent = value;
-  }
-
   function renderPhases() {
     var grid = document.getElementById('phasesGrid');
     if (!grid) return;
@@ -149,7 +80,7 @@
       var finished = total > 0 && done >= total;
       var isNext = !finished && !nextMarked && total > 0;
       if (isNext) nextMarked = true;
-      var action = '未开始';
+      var action = '';
       if (finished) action = '已完成';
       else if (done > 0) action = '继续';
       else if (isNext) action = '由此开始';
@@ -162,8 +93,8 @@
       html += '<div class="phase-card-top"><span class="phase-card-num">阶段 ' + num + '</span><span class="toc-status ' + statusClass + '"></span></div>';
       html += '<h3 class="phase-card-name">' + escapeHtml(p.name) + '</h3>';
       html += '<p class="phase-card-desc">' + escapeHtml(p.desc || '') + '</p>';
-      html += '<div class="phase-card-bar" aria-hidden="true"><span style="width:' + percent + '%"></span></div>';
-      html += '<div class="phase-card-foot"><span class="phase-card-count">' + count + '</span><span class="phase-card-action">' + action + '</span></div>';
+      if (done > 0) html += '<div class="phase-card-bar" aria-hidden="true"><span style="width:' + percent + '%"></span></div>';
+      html += '<div class="phase-card-foot"><span class="phase-card-count">' + count + '</span>' + (action ? '<span class="phase-card-action">' + action + '</span>' : '') + '</div>';
       html += '</div>';
     }
     grid.innerHTML = html;
@@ -270,8 +201,7 @@
     if (exportBtn) {
       exportBtn.addEventListener('click', function () {
         if (!window.AIFSProgress) return;
-        var forcePicker = (exportId === 'statExport');
-        Promise.resolve(window.AIFSProgress.exportJSON(false, forcePicker)).catch(function () {
+        Promise.resolve(window.AIFSProgress.exportJSON(false, true)).catch(function () {
           window.alert('导出失败，请稍后重试。');
         });
       });
@@ -458,8 +388,7 @@
         var again = focusedPath ? document.querySelector('#modalLessons .modal-lesson-toggle[data-path="' + focusedPath + '"]') : null;
         if (again) again.focus();
       }
-      populateStats();
-      renderPhases();
+        renderPhases();
     });
   }
 
@@ -563,224 +492,10 @@
     }
   }
 
-  function initMastheadFigure() {
-    var figure = document.querySelector('[data-masthead-figure]');
-    if (!figure) return;
-    var panels = Array.prototype.slice.call(figure.querySelectorAll('.fig-panel'));
-    var dots = Array.prototype.slice.call(figure.querySelectorAll('.fig-dot'));
-    var previous = figure.querySelector('.fig-previous');
-    var next = figure.querySelector('.fig-next');
-    var controls = figure.querySelector('.fig-controls');
-    var caption = figure.querySelector('.fig-caption');
-    if (panels.length < 2 || dots.length !== panels.length || !previous || !next || !controls || !caption) return;
-
-    var autoplayDelay = 6500;
-    var current = Math.max(0, panels.findIndex(function (panel) { return panel.classList.contains('is-active'); }));
-    var reducedQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-    var desktopQuery = window.matchMedia ? window.matchMedia('(min-width: 1280px) and (hover: hover) and (pointer: fine)') : null;
-    var inViewport = !window.IntersectionObserver;
-    var timer = 0;
-    var timerStartedAt = 0;
-    var timerRemaining = autoplayDelay;
-    var autoplayCancelled = !!(reducedQuery && reducedQuery.matches);
-    var autoplayComplete = false;
-    var disposed = false;
-    var cleanups = [];
-
-    function now() {
-      return window.performance && typeof window.performance.now === 'function' ? window.performance.now() : Date.now();
-    }
-
-    function listen(target, type, handler, options) {
-      target.addEventListener(type, handler, options);
-      cleanups.push(function () { target.removeEventListener(type, handler, options); });
-    }
-
-    function listenToQuery(query, handler) {
-      if (!query) return;
-      if (typeof query.addEventListener === 'function') {
-        query.addEventListener('change', handler);
-        cleanups.push(function () { query.removeEventListener('change', handler); });
-      } else if (typeof query.addListener === 'function') {
-        query.addListener(handler);
-        cleanups.push(function () { query.removeListener(handler); });
-      }
-    }
-
-    function isDesktopView() {
-      return desktopQuery ? desktopQuery.matches : figure.getClientRects().length > 0;
-    }
-
-    function isReduced() {
-      return !!(reducedQuery && reducedQuery.matches);
-    }
-
-    function isOnScreen() {
-      var rect = figure.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth;
-    }
-
-    function showPlate(index, announce) {
-      current = Math.max(0, Math.min(panels.length - 1, index));
-      panels.forEach(function (panel, panelIndex) {
-        var active = panelIndex === current;
-        panel.classList.toggle('is-active', active);
-        panel.setAttribute('aria-hidden', active ? 'false' : 'true');
-      });
-      dots.forEach(function (dot, dotIndex) {
-        var active = dotIndex === current;
-        dot.classList.toggle('is-active', active);
-        dot.setAttribute('aria-pressed', active ? 'true' : 'false');
-      });
-      caption.setAttribute('aria-live', announce ? 'polite' : 'off');
-      caption.textContent = '第 ' + (current + 1) + ' 幅，共 ' + panels.length + ' 幅。' + panels[current].getAttribute('data-caption');
-      previous.disabled = current === 0;
-      next.disabled = current === panels.length - 1;
-    }
-
-    function clearTimer(preserveRemaining) {
-      if (!timer) return;
-      if (preserveRemaining) {
-        timerRemaining = Math.max(0, timerRemaining - (now() - timerStartedAt));
-      }
-      window.clearTimeout(timer);
-      timer = 0;
-      timerStartedAt = 0;
-    }
-
-    function canAutoplay() {
-      return !autoplayCancelled && !autoplayComplete && !isReduced() && isDesktopView() && inViewport && !document.hidden && figure.getClientRects().length > 0;
-    }
-
-    function scheduleAutoplay() {
-      if (timer || !canAutoplay()) return;
-      if (current >= panels.length - 1) {
-        autoplayComplete = true;
-        figure.removeAttribute('data-autoplay');
-        return;
-      }
-      figure.setAttribute('data-autoplay', 'true');
-      timerStartedAt = now();
-      timer = window.setTimeout(function () {
-        timer = 0;
-        timerStartedAt = 0;
-        showPlate(current + 1, false);
-        timerRemaining = autoplayDelay;
-        if (current >= panels.length - 1) {
-          autoplayComplete = true;
-          figure.removeAttribute('data-autoplay');
-          return;
-        }
-        scheduleAutoplay();
-      }, Math.max(16, timerRemaining));
-    }
-
-    function cancelAutoplay() {
-      clearTimer(false);
-      autoplayCancelled = true;
-      figure.removeAttribute('data-autoplay');
-    }
-
-    function syncRuntime() {
-      if (disposed) return;
-      var paused = isReduced() || !isDesktopView() || !inViewport || document.hidden || figure.getClientRects().length === 0;
-      figure.setAttribute('data-motion-paused', paused ? 'true' : 'false');
-      if (paused) clearTimer(true);
-      else scheduleAutoplay();
-    }
-
-    function choosePlate(index) {
-      cancelAutoplay();
-      showPlate(index, true);
-      syncRuntime();
-    }
-
-    dots.forEach(function (dot, index) {
-      listen(dot, 'click', function () { choosePlate(index); });
-    });
-    listen(previous, 'click', function () { choosePlate(current - 1); });
-    listen(next, 'click', function () { choosePlate(current + 1); });
-    listen(controls, 'pointerdown', cancelAutoplay);
-    listen(controls, 'keydown', cancelAutoplay);
-    listen(controls, 'focusin', cancelAutoplay);
-    listen(document, 'visibilitychange', syncRuntime);
-
-    listenToQuery(reducedQuery, function () {
-      if (isReduced()) cancelAutoplay();
-      syncRuntime();
-    });
-    listenToQuery(desktopQuery, function () {
-      inViewport = isOnScreen();
-      syncRuntime();
-    });
-
-    if (window.IntersectionObserver) {
-      var observer = new IntersectionObserver(function (entries) {
-        if (!entries.length) return;
-        inViewport = entries[0].isIntersecting && entries[0].intersectionRatio > 0;
-        syncRuntime();
-      }, { threshold: 0.12 });
-      observer.observe(figure);
-      cleanups.push(function () { observer.disconnect(); });
-    } else {
-      var checkViewport = function () {
-        inViewport = isOnScreen();
-        syncRuntime();
-      };
-      listen(window, 'scroll', checkViewport, { passive: true });
-      listen(window, 'resize', checkViewport);
-      checkViewport();
-    }
-
-    function cleanup() {
-      if (disposed) return;
-      disposed = true;
-      clearTimer(false);
-      while (cleanups.length) cleanups.pop()();
-      figure.removeAttribute('data-autoplay');
-      figure.setAttribute('data-motion-paused', 'true');
-    }
-
-    listen(window, 'pagehide', function (event) {
-      if (!event.persisted) cleanup();
-    });
-    showPlate(current, false);
-    syncRuntime();
-  }
-
   function initFadeObserver() {
-    var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var visibleEls = document.querySelectorAll('.reveal, .fade-in, .ascii-rule, .toc-row, .phase-card');
     for (var v = 0; v < visibleEls.length; v++) {
       visibleEls[v].classList.add('in-view', 'visible');
-    }
-
-    if (!window.IntersectionObserver || prefersReduced) {
-      document.querySelectorAll('.stat-row-bar').forEach(function (el) {
-        el.classList.add('in-view', 'visible');
-        var target = el.getAttribute('data-target-pct');
-        if (target !== null) setBarScale(el, target);
-      });
-      return;
-    }
-
-    var els = document.querySelectorAll('.stat-row-bar');
-    if (!els.length) return;
-    var observer = new IntersectionObserver(function (entries) {
-      for (var i = 0; i < entries.length; i++) {
-        if (entries[i].isIntersecting) {
-          var el = entries[i].target;
-          el.classList.add('in-view', 'visible');
-          var target = el.getAttribute('data-target-pct');
-          if (target !== null) {
-            setBarScale(el, target);
-          }
-          observer.unobserve(el);
-        }
-      }
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    for (var i = 0; i < els.length; i++) {
-      observer.observe(els[i]);
     }
   }
 

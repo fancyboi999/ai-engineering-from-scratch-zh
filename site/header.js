@@ -481,7 +481,7 @@
     function loadScript(name) {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = HEADER_BASE + name + '?v=20261115a';
+        script.src = HEADER_BASE + name + '?v=20261121a';
         script.onload = resolve;
         script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
         document.head.appendChild(script);
@@ -514,11 +514,11 @@
   }
 
   var BANNER_KEY = 'aifs:banner:dismissed';
-  var BANNER_ID = 'manuals-zh-20261113';
+  var BANNER_ID = 'manuals-zh-20261121';
   var BANNER_HTML = '<div class="site-banner-inner">'
     + '<span class="site-banner-tag">新增</span>'
     + '<p class="site-banner-text">'
-    + '<span class="site-banner-long">Agent Substrate、vLLM、Miles、SGLang、A2A、Docker Sandboxes 与逆向工程中文手册。</span>'
+    + '<span class="site-banner-long">LangChain、Agent Substrate、vLLM、Miles、SGLang、A2A、Docker Sandboxes 与逆向工程中文手册。</span>'
     + '<span class="site-banner-short">深入理解一个主题。</span>'
     + '<a class="site-banner-link" href="' + (HEADER_BASE || '/') + 'manuals.html">阅读手册<span aria-hidden="true"> →</span></a>'
     + '</p>'

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 418" role="img" aria-labelledby="fig-5-7-title fig-5-7-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-7-title">assistant 的七个进程，以及每个进程留下的内容</title>
+  <desc id="fig-5-7-desc">一张表，assistant 在 Mac 上运行的七个进程各占一行，每一列是进程结束时读到的一个计数。进程 3 批准了邮件、发出了邮件，随后以退出码 137 被杀。进程 4 恢复后发现同一个审批又在等待。进程 5 再次批准，send_email 第二次运行，幂等键检查跳过了发送。最后 send_email 一共运行了 2 次，发件箱里有 1 封邮件。新线程上的进程 7 在 store 里仍然找到 2 条记忆。</desc>
+  <text x="252.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">下一个</text>
+  <text x="252.5" y="37" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">节点</text>
+  <text x="333.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">检查点</text>
+  <text x="333.5" y="37" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">数量</text>
+  <text x="414.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">待审批</text>
+  <text x="414.5" y="37" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">数量</text>
+  <text x="495.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">send_email</text>
+  <text x="495.5" y="37" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">运行次数</text>
+  <text x="576.5" y="22" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">已发送</text>
+  <text x="576.5" y="37" font-size="11" text-anchor="middle" font-weight="700" fill="var(--m-ink-soft, #4a4a4a)">邮件数</text>
+  <text x="20" y="83" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">1</text>
+  <text x="40" y="83" font-size="11.5" fill="var(--m-ink, #1a1a1a)">记住</text>
+  <rect x="216" y="62" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="252.5" y="83" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">无</text>
+  <rect x="297" y="62" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="333.5" y="83" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">9</text>
+  <rect x="378" y="62" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="414.5" y="83" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">0</text>
+  <rect x="459" y="62" width="73" height="32" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="495.5" y="83" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">0</text>
+  <rect x="540" y="62" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="576.5" y="83" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">0</text>
+  <text x="20" y="123" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">2</text>
+  <text x="40" y="123" font-size="11.5" fill="var(--m-ink, #1a1a1a)">请求发送</text>
+  <rect x="216" y="102" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="252.5" y="123" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">tools</text>
+  <rect x="297" y="102" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="333.5" y="123" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">18</text>
+  <rect x="378" y="102" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="414.5" y="123" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">1</text>
+  <rect x="459" y="102" width="73" height="32" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="495.5" y="123" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">0</text>
+  <rect x="540" y="102" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="576.5" y="123" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">0</text>
+  <text x="20" y="163" font-size="12" font-weight="700" fill="var(--m-rose-ink, #b0344d)">3</text>
+  <text x="40" y="163" font-size="11.5" fill="var(--m-rose-ink, #b0344d)">批准</text>
+  <rect x="216" y="142" width="397" height="32" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)" stroke-dasharray="5 4"/>
+  <text x="226" y="163" font-size="11.5" font-weight="700" fill="var(--m-rose-ink, #b0344d)">SIGKILL，退出码 137：邮件已发出，该步未保存</text>
+  <text x="20" y="203" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">4</text>
+  <text x="40" y="203" font-size="11.5" fill="var(--m-ink, #1a1a1a)">恢复</text>
+  <rect x="216" y="182" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="252.5" y="203" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">tools</text>
+  <rect x="297" y="182" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="333.5" y="203" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">18</text>
+  <rect x="378" y="182" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="414.5" y="203" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">1</text>
+  <rect x="459" y="182" width="73" height="32" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="495.5" y="203" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">1</text>
+  <rect x="540" y="182" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="576.5" y="203" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">1</text>
+  <text x="20" y="243" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">5</text>
+  <text x="40" y="243" font-size="11.5" fill="var(--m-ink, #1a1a1a)">再次批准</text>
+  <rect x="216" y="222" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="252.5" y="243" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">无</text>
+  <rect x="297" y="222" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="333.5" y="243" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">22</text>
+  <rect x="378" y="222" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="414.5" y="243" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">0</text>
+  <rect x="459" y="222" width="73" height="32" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="495.5" y="243" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">2</text>
+  <rect x="540" y="222" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="576.5" y="243" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">1</text>
+  <text x="20" y="283" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">6</text>
+  <text x="40" y="283" font-size="11.5" fill="var(--m-ink, #1a1a1a)">第三轮</text>
+  <rect x="216" y="262" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="252.5" y="283" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">无</text>
+  <rect x="297" y="262" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="333.5" y="283" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">27</text>
+  <rect x="378" y="262" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="414.5" y="283" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">0</text>
+  <rect x="459" y="262" width="73" height="32" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="495.5" y="283" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">2</text>
+  <rect x="540" y="262" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="576.5" y="283" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">1</text>
+  <text x="20" y="323" font-size="12" font-weight="700" fill="var(--m-ink, #1a1a1a)">7</text>
+  <text x="40" y="323" font-size="11.5" fill="var(--m-ink, #1a1a1a)">新线程 t2</text>
+  <rect x="216" y="302" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="252.5" y="323" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">无</text>
+  <rect x="297" y="302" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="333.5" y="323" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">9</text>
+  <rect x="378" y="302" width="73" height="32" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="414.5" y="323" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-amber-ink, #85590c)">0</text>
+  <rect x="459" y="302" width="73" height="32" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="495.5" y="323" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-green-ink, #336b40)">2</text>
+  <rect x="540" y="302" width="73" height="32" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="576.5" y="323" font-size="12" text-anchor="middle" font-weight="700" fill="var(--m-teal-ink, #18696a)">1</text>
+  <text x="20" y="358" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">每行是一个新的 Python 进程，除非注明，都在线程 t1 上。</text>
+  <text x="20" y="376" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">计数是在进程结束时读取的。send_email 运行了两次，</text>
+  <text x="20" y="394" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">但只发出一封邮件，因为第二次运行在发件箱里</text>
+  <text x="20" y="412" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">找到了它的 tool_call_id。检查点数量是该行对应线程的行数。</text>
+</svg>

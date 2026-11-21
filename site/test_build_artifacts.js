@@ -462,7 +462,7 @@ function writeMarkdown(file, { name, description, version }) {
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20261106a';
-  const scriptRelease = '20261115a';
+  const scriptRelease = '20261121a';
   const appRelease = scriptRelease;
   const styleRelease = HEADER_ASSET_VERSION;
   const navigationRelease = HEADER_ASSET_VERSION;
@@ -1413,8 +1413,6 @@ test('repository exposes the four core AI engineering learning paths', () => {
     assert.equal(learningPath.title, title);
     assert.equal(learningPath.lessons.length, lessonCount);
     assert.match(homepage, new RegExp(`>${title}<`, 'i'));
-    assert.match(homepage, new RegExp(`learningPath=${id}`));
-    assert.match(homepage, new RegExp(`learning-paths/${id}\\.json`));
   }
 
   const shaping = learningPaths.find(entry => entry.id === 'shaping-the-build');
@@ -1489,8 +1487,7 @@ test('reverse engineering is a focused route with all fourteen canonical lessons
 test('homepage preserves live GitHub CTAs and the motion-aware learner marquee', () => {
   const homepage = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
   const headerSource = fs.readFileSync(path.join(__dirname, 'header.js'), 'utf8');
-  const mastheadCta = homepage.match(/<div class="masthead-cta[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<div class="masthead-install/);
-  const mastheadFigure = homepage.match(/\.masthead-figure\s*\{([\s\S]*?)\n    \}/);
+  const mastheadCta = homepage.match(/<div class="masthead-cta[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<nav class="masthead-start[\s\S]*?<\/nav>\s*<div class="masthead-install/);
   const wideMasthead = homepage.match(/@media \(min-width: 1280px\) \{([\s\S]*?)\n    \}\n\n    @media \(min-width: 1440px\)/);
 
   assert.ok(mastheadCta, 'prominent masthead CTA row is missing');
@@ -1516,19 +1513,103 @@ test('homepage preserves live GitHub CTAs and the motion-aware learner marquee',
   assert.match(headerSource, /fetch\('https:\/\/api\.github\.com\/repos\/' \+ REPO/);
   assert.match(headerSource, /var n = data\.stargazers_count;[\s\S]*?paint\(n\)/);
 
-  assert.ok(mastheadFigure, 'contained masthead figure rule is missing');
-  assert.match(mastheadFigure[0], /width: 100%/);
-  assert.match(mastheadFigure[0], /max-width: 430px/);
-  assert.doesNotMatch(mastheadFigure[0], /position:\s*absolute|right:\s*-/);
+  assert.doesNotMatch(homepage, /data-masthead-figure/);
+  assert.doesNotMatch(homepage, /data-intelligence-check/);
   assert.match(homepage, /@media \(min-width: 601px\) and \(max-width: 1279px\) \{[\s\S]*?\.manual-masthead\.container\s*\{[\s\S]*?padding-left: clamp\(24px, 2\.5vw, 32px\);[\s\S]*?padding-right: clamp\(24px, 2\.5vw, 32px\);/);
   assert.ok(wideMasthead, 'wide-screen masthead layout is missing');
   assert.match(wideMasthead[0], /grid-template-columns: minmax\(0, 1fr\) minmax\(360px, 400px\)/);
   assert.match(wideMasthead[0], /"title curiosity"/);
-  assert.match(wideMasthead[0], /"install figure"/);
-  assert.match(wideMasthead[0], /\.masthead-figure\s*\{[\s\S]*?position: static;[\s\S]*?grid-area: figure/);
+  assert.match(wideMasthead[0], /"install curiosity"/);
+  assert.match(wideMasthead[0], /\.masthead-start\s*\{[^}]*align-self: center/);
   assert.match(homepage, /\.masthead-cta\s*\{\s*display: grid;\s*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1fr\) minmax\(0, 1\.28fr\) minmax\(0, 1\.12fr\)/);
 
   assert.doesNotMatch(mastheadCta[0], /github\.com\/rohitg00/);
+});
+
+test('homepage hero starts the learner on one of four real lessons through static /lessons/ routes', () => {
+  const homepage = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const card = homepage.match(/<nav class="masthead-start[\s\S]*?<\/nav>/);
+  assert.ok(card, 'the "start where you are" card is missing');
+  const rows = [...card[0].matchAll(/<a class="masthead-start-row" href="([^"]+)">/g)].map(match => match[1]);
+  assert.deepEqual(rows, [
+    '/lessons/00-setup-and-tooling/01-dev-environment/',
+    '/lessons/01-math-foundations/01-linear-algebra-intuition/',
+    '/lessons/10-llms-from-scratch/01-tokenizers/',
+    '/lessons/14-agent-engineering/31-agent-workbench-why-models-fail/',
+  ]);
+  for (const href of rows) {
+    const lesson = path.join(__dirname, '..', 'phases', href.replace(/^\/lessons\//, '').replace(/\/$/, ''), 'docs', 'zh.md');
+    assert.ok(fs.existsSync(lesson), `${href} has no Chinese lesson`);
+  }
+  assert.match(card[0], /href="#contents"/);
+  assert.doesNotMatch(card[0], /lesson\.html\?path=/);
+});
+
+test('homepage explains the agent tutor with commands the Chinese repository really ships', () => {
+  const homepage = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const section = homepage.match(/<section class="agent-tutor container"[\s\S]*?<\/section>/);
+  assert.ok(section, 'the agent tutor section is missing');
+  const commands = [...section[0].matchAll(/<code class="tutor-step-cmd">([^<]+)<\/code>/g)].map(match => match[1]);
+  assert.deepEqual(commands, ['npx skills add fancyboi999/ai-engineering-from-scratch-zh', '/find-your-level', '/start-learning', '/learn']);
+  for (const skill of ['find-your-level', 'start-learning', 'course-guide']) {
+    assert.ok(fs.existsSync(path.join(__dirname, '..', 'skills', skill, 'SKILL.md')), `${skill} skill is missing`);
+  }
+  assert.ok(fs.existsSync(path.join(__dirname, '..', 'skills', 'learn', 'SKILL.md')), 'learn skill is missing');
+  assert.doesNotMatch(section[0], /rohitg00/);
+  assert.match(section[0], /href="skills\.html"/);
+  assert.ok(homepage.indexOf('class="agent-tutor ') < homepage.indexOf('id="contents"'), 'the tutor comes before the curriculum');
+});
+
+test('homepage drops the carousel, thought experiment, duplicate preface, route rows and progress bars', () => {
+  const homepage = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+  const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  for (const gone of ['masthead-figure', 'fig-plate', 'intelligence-check', 'course-route', 'class="preface container"', 'stat-row', 'manual-meta-row']) {
+    assert.ok(!homepage.includes(gone), `${gone} must be gone from the homepage`);
+  }
+  assert.doesNotMatch(app, /initMastheadFigure|populateStats|setBarScale/);
+  assert.match(homepage, /<section class="stat-block lesson-loop container"/);
+  assert.match(homepage, /333 节中文配音动画/);
+  assert.doesNotMatch(homepage, /whats-new|What.s New/i);
+  assert.ok(!fs.existsSync(path.join(__dirname, 'whats-new.html')));
+});
+
+test('lesson pages hide the desktop sidebar on demand and remember the choice', () => {
+  const lesson = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  assert.match(lesson, /<button class="lesson-sidebar-toggle" id="sidebarToggle"[^>]*>[\s\S]*?sidebar-toggle-hide[\s\S]*?<\/button>/);
+  assert.match(lesson, /@media \(min-width: 901px\) \{[\s\S]*?\.sidebar-collapsed \.lesson-sidebar \{ transform: translateX\(-100%\); \}[\s\S]*?\.sidebar-collapsed \.lesson-main \{ margin-left: 0; \}/);
+  assert.match(lesson, /@media \(min-width: 901px\) \{[\s\S]*?\.lesson-sidebar-toggle \.sidebar-toggle-menu \{ display: none; \}[\s\S]*?\.sidebar-collapsed \.lesson-sidebar-toggle \.sidebar-toggle-menu,\s*\.sidebar-collapsed \.lesson-sidebar-toggle \.sidebar-toggle-label \{ display: inline; \}/, 'desktop shows only the hide arrow while open, and the menu icon with its label once collapsed');
+  assert.match(lesson, /<script>try\{if\(localStorage\.getItem\('aifs:lesson-sidebar-collapsed'\)==='1'&&matchMedia\('\(min-width: 901px\)'\)\.matches\)document\.documentElement\.classList\.add\('sidebar-collapsed'\);\}catch\(e\)\{\}<\/script>/, 'the saved choice applies before first paint');
+  const script = lesson.match(/      function initSidebarToggle\(\) \{[\s\S]*?\n      \}/)[0];
+  const stored = new Map();
+  const classes = new Set();
+  const attrs = {};
+  const listeners = {};
+  const sidebar = { inert: false, classList: { toggle(name, on) { on ? classes.add('sidebar:' + name) : classes.delete('sidebar:' + name); }, contains: name => classes.has('sidebar:' + name), remove: name => classes.delete('sidebar:' + name) }, contains: () => false };
+  const toggle = { setAttribute: (key, value) => { attrs[key] = value; }, addEventListener: (type, fn) => { listeners[type] = fn; }, contains: () => false };
+  const media = { matches: true, addEventListener: (type, fn) => { listeners['media:' + type] = fn; } };
+  const root = { classList: { toggle(name, on) { on ? classes.add(name) : classes.delete(name); } } };
+  const make = () => vm.runInNewContext(script + '\ninitSidebarToggle;', {
+    document: { getElementById: id => (id === 'sidebarToggle' ? toggle : sidebar), documentElement: root, addEventListener() {} },
+    window: { matchMedia: () => media, innerWidth: 1440 },
+    localStorage: { getItem: key => (stored.has(key) ? stored.get(key) : null), setItem: (key, value) => stored.set(key, value) },
+  });
+  make()();
+  assert.equal(classes.has('sidebar-collapsed'), false);
+  assert.equal(attrs['aria-expanded'], 'true');
+  listeners.click();
+  assert.equal(classes.has('sidebar-collapsed'), true);
+  assert.equal(sidebar.inert, true);
+  assert.equal(attrs['aria-expanded'], 'false');
+  assert.equal(stored.get('aifs:lesson-sidebar-collapsed'), '1');
+  classes.clear();
+  make()();
+  assert.equal(classes.has('sidebar-collapsed'), true, 'a reload restores the hidden sidebar');
+  media.matches = false;
+  listeners['media:change']();
+  assert.equal(classes.has('sidebar-collapsed'), false, 'narrow screens keep the drawer behaviour');
+  listeners.click();
+  assert.equal(classes.has('sidebar:open'), true);
+  assert.equal(stored.get('aifs:lesson-sidebar-collapsed'), '1', 'the drawer does not change the desktop choice');
 });
 
 test('homepage uses consistent responsive grids for controls, routes, and curriculum rows', () => {
@@ -1543,14 +1624,6 @@ test('homepage uses consistent responsive grids for controls, routes, and curric
   assert.match(
     homepage,
     /@media \(min-width: 601px\) and \(max-width: 1279px\) \{[\s\S]*?\.masthead-install,[\s\S]*?\.masthead-install-caption\s*\{[\s\S]*?max-width: none;/
-  );
-  assert.match(
-    homepage,
-    /\.course-route-actions\s*\{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?width: 248px;[\s\S]*?justify-self: end;/
-  );
-  assert.match(
-    homepage,
-    /@media \(max-width: 600px\) \{[\s\S]*?\.course-route-actions\s*\{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;/
   );
   assert.match(
     homepage,
@@ -1621,11 +1694,7 @@ test('website motion contracts keep interaction state stable and compositor-frie
   const ttsSource = fs.readFileSync(path.join(__dirname, 'tts.js'), 'utf8');
   const roadmapSource = fs.readFileSync(path.join(__dirname, 'roadmap.js'), 'utf8');
 
-  const homepageStatBar = homepage.match(/\.stat-row-bar::before\s*\{[\s\S]*?\n\s*\}/);
-  assert.ok(homepageStatBar, 'homepage stat bar rule is missing');
-  assert.match(homepageStatBar[0], /transform: scaleX\(var\(--bar-scale, 0\)\)/);
-  assert.match(homepageStatBar[0], /transition: transform/);
-  assert.doesNotMatch(homepageStatBar[0], /transition:\s*width/);
+  assert.doesNotMatch(homepage, /stat-row|statRows|statExport/, 'the homepage keeps no progress-bar block');
   assert.match(appSource, /barFill\.style\.transform = 'scaleX\('/);
   assert.doesNotMatch(appSource, /barFill\.style\.width\s*=/);
   assert.doesNotMatch(appSource, /initScrollExplode\s*\(/);
@@ -1830,7 +1899,7 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   const localeLoaderVersion = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'figures-manifest.js'))).digest('hex').slice(0, 12);
   assert.ok(lessonHtml.includes('<script src="figures-manifest.js?v=' + localeLoaderVersion + '"'),
     'the lesson must load the current content-addressed locale loader');
-  assert.match(lessonHtml, /<script src="progress\.js\?v=20261115a/);
+  assert.match(lessonHtml, /<script src="progress\.js\?v=20261121a/);
   assert.match(fs.readFileSync(path.join(__dirname, 'lesson-figures.js'), 'utf8'), /providerBaseUrl \+ provider/);
   assert.match(lessonHtml, /import\('https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@11/);
 });
@@ -2630,11 +2699,11 @@ test('lesson page includes completion panel and button contract', () => {
 
 test('all shared headers render one complete menu before JavaScript runs', () => {
   const expected = [
-    ['index.html#contents', '课程目录'], ['catalog.html', '课程表'], ['prereqs.html', '路线图'],
-    ['learning-paths.html', '学习路径'], ['certifications.html', '认证'], ['projects.html', '实战项目'],
-    ['manuals.html', '技术手册'], ['glossary.html', '术语表'], ['cheatsheets', '速查表'], ['practice', '编程练习'], ['interviews', '面试题库'],
-    ['how-to-learn.html', '学习方法'], ['skills.html', 'Agent 技能'],
-    ['inside-an-ai-agent.html', 'Agent 内部机制'], ['highlights.html', '我的高亮'], ['about.html', '关于'],
+    ['how-to-learn.html', '学习方法'], ['skills.html', 'Agent 技能'], ['catalog.html', '课程表'], ['learning-paths.html', '学习路径'],
+    ['index.html#contents', '课程目录'], ['prereqs.html', '路线图'],
+    ['projects.html', '实战项目'], ['practice', '编程练习'], ['interviews', '面试题库'], ['manuals.html', '技术手册'],
+    ['cheatsheets', '速查表'], ['inside-an-ai-agent.html', 'Agent 内部机制'], ['highlights.html', '我的高亮'], ['glossary.html', '术语表'],
+    ['certifications.html', '认证'], ['about.html', '关于'],
   ];
   const files = fs.readdirSync(__dirname).filter(name => name.endsWith('.html') && !name.endsWith('-print.html')).concat([
     'hubs/phase/tools-and-protocols.html', 'hubs/glossary/activation-checkpointing.html',
@@ -2663,4 +2732,12 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
     checked++;
   }
   assert.ok(checked >= 25, `only ${checked} shared headers checked`);
+});
+
+test('manual progress export always lets the reader choose where to save', () => {
+  const app = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+  // 首页进度区块随上游删除后，弹窗导出是唯一手动入口；自动备份（reminder.js）仍静默复用已记住的文件。
+  assert.match(app, /exportJSON\(false, true\)/);
+  const reminder = fs.readFileSync(path.join(__dirname, 'reminder.js'), 'utf8');
+  assert.match(reminder, /exportJSON\(true\)/);
 });

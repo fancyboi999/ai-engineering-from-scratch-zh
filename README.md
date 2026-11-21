@@ -13,6 +13,12 @@
 
 > 542 节课，20 个阶段。Python、TypeScript、Rust、Julia、Go。
 
+一条命令，把你的 coding agent 变成导师：
+
+```bash
+npx skills add fancyboi999/ai-engineering-from-scratch-zh
+```
+
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-1a1a1a?style=flat-square&labelColor=fafaf5" alt="MIT License"></a>
   <a href="ROADMAP.md"><img src="https://img.shields.io/badge/lessons-542-3553ff?style=flat-square&labelColor=fafaf5" alt="542 lessons"></a>
@@ -38,6 +44,29 @@
   我们订阅使用 Claude / Claude Code 时采用住宅 IP，长期使用稳定。<br>
   支持<a href="https://www.ipwo.net/?ref=githubgoofishcli"><ins>免费测试</ins></a>，<strong>9 折优惠码：</strong><code>0203</code>
 </p>
+
+## 为什么要从零构建
+
+调用框架会把最容易出错的部分藏起来。损失变成 NaN，或者 agent 反复调用同一个工具时，亲手写过小版本的人知道该去哪里找原因。大多数课程先让你写出并运行这个小版本，再展示生产级工具在哪里完成同样的工作。
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/readme/lesson-loop-mobile-dark.svg">
+    <source media="(max-width: 600px)" srcset="assets/readme/lesson-loop-mobile-light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/readme/lesson-loop-dark.svg">
+    <img src="assets/readme/lesson-loop-light.svg" alt="一节课的四个步骤：问题背景、从零动手构建、看生产级工具在哪里完成同样的工作、交付一份你留下的产物。示例是阶段 14 的 Agent 循环一课。" width="840">
+  </picture>
+</p>
+
+<details>
+<summary>文字版</summary>
+
+- **01 · 问题背景**：LLM 只会返回文本，不能采取行动。
+- **02 · 动手构建**：用标准库 Python 写出 ReAct 循环。
+- **03 · 实际使用**：看 agent SDK 在哪里运行同一个循环。
+- **04 · 拿去用**：`skill-agent-loop.md`，可直接交给你的 agent。
+
+</details>
 
 <a id="see-what-you-will-build-and-keep"></a>
 <a id="learning-routes"></a>
@@ -299,6 +328,18 @@ python3 phases/01-math-foundations/01-linear-algebra-intuition/code/vectors.py
 二十个阶段层层叠起来。数学是地基，agent 和生产部署是屋顶。下层的东西你已经会了，就尽管
 往前跳；但别跳过去之后，又回头纳闷上层为什么塌了。
 
+<p align="center">
+  <picture>
+    <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/readme/curriculum-map-mobile-dark.svg">
+    <source media="(max-width: 600px)" srcset="assets/readme/curriculum-map-mobile-light.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/readme/curriculum-map-dark.svg">
+    <img src="assets/readme/curriculum-map-light.svg" alt="二十个阶段分为六卷，自下而上从基础到生产。第 1 卷 基础，阶段 0 至 2：向量、梯度与经典模型。第 2 卷 深度学习，阶段 3、4 和 6：从感知机到视觉与语音。第 3 卷 语言，阶段 5 和 7：亲手实现注意力与 transformer。第 4 卷 大语言模型，阶段 8 至 11：预训练迷你 GPT，对齐，并交付 RAG。第 5 卷 Agent，阶段 12 至 16：Agent 循环、工具、MCP 服务器与集群。第 6 卷 生产，阶段 17 至 19：部署服务、可观测性、安全与综合项目。" width="840">
+  </picture>
+</p>
+
+<details>
+<summary>阶段依赖图</summary>
+
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#fafaf5','primaryTextColor':'#1a1a1a','primaryBorderColor':'#3553ff','lineColor':'#3553ff'}}}%%
 flowchart TB
@@ -326,6 +367,8 @@ flowchart TB
   classDef phase fill:#fafaf5,stroke:#3553ff,color:#1a1a1a
   class P0,P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19 phase
 ```
+
+</details>
 
 <a id="contents"></a>
 

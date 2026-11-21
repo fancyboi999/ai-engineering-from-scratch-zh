@@ -1,0 +1,63 @@
+'use strict';
+
+const path = require('path');
+const { figure } = require('../../../_shared/figkit.js');
+const { load } = require('../../../_shared/chart.js');
+
+const S = load(path.join(__dirname, '../../capture/lab/bench/summary-mac.json'));
+const M = S.main;
+const cell = (m, h) => {
+  const c = M.cells[`${m}|${h}|0`];
+  if (!c) throw new Error(`fig-7-4d: no cell ${m} ${h}`);
+  return c;
+};
+const sq = (x, y, s) => `M${(x - s / 2).toFixed(1)} ${(y - s / 2).toFixed(1)}h${s}v${s}h-${s}z`;
+const median = xs => {
+  const s = xs.slice().sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const MODELS = [['claude-haiku-5-5', 'Claude Haiku 5.5'], ['claude-sonnet-5-5', 'Claude Sonnet 5.5']];
+const ROWS = [['plain', 'cost_u', '朴素循环，标价', 'violet'], ['plain', 'cost', '朴素循环，计费', 'violet'], ['deep_agent', 'cost_u', 'deep，标价', 'blue'], ['deep_agent', 'cost', 'deep，计费', 'blue']];
+const LO = 5e-5;
+const HI = 0.2;
+const X0 = 200;
+const W = 340;
+const px = v => X0 + ((Math.log10(v) - Math.log10(LO)) / (Math.log10(HI) - Math.log10(LO))) * W;
+const total = (m, h, k) => Object.values(cell(m, h).tasks).reduce((a, r) => a + r[k], 0);
+const ratio = (m, k) => total(m, 'deep_agent', k) / total(m, 'plain', k);
+const RH = 24;
+const Y0 = 70;
+const BLOCK = 4 * RH + 56;
+
+module.exports = figure('fig-7-4d', {
+  height: Y0 + 2 * BLOCK + 40,
+  title: '每个任务的美元成本：朴素循环与 deep agent，有无 prompt 缓存',
+  desc: `在对数刻度上用点带展示每个任务的美元成本：Claude Haiku 5.5 的 99 个任务，Claude Sonnet 5.5 的 30 个任务。标价是按基础价格计算的输入与输出 token。计费是计入 API 报告的 prompt 缓存读取之后的成本。对所有任务，deep agent 在 Haiku 上按标价是 朴素循环的 ${ratio('claude-haiku-5-5', 'cost_u').toFixed(2)} 倍，按计费是 ${ratio('claude-haiku-5-5', 'cost').toFixed(2)} 倍，在 Sonnet 上分别是 ${ratio('claude-sonnet-5-5', 'cost_u').toFixed(2)} 倍和 ${ratio('claude-sonnet-5-5', 'cost').toFixed(2)} 倍。`,
+}, f => {
+  f.kicker(20, 22, '每个任务的美元成本，对数刻度');
+  f.kicker(620, 22, '全部任务', { anchor: 'end' });
+  [['$0.0001', 1e-4], ['$0.001', 1e-3], ['$0.01', 1e-2], ['$0.1', 1e-1]].forEach(([label, v]) => {
+    f.rule(px(v), 52, px(v), Y0 + 2 * BLOCK - 30, { hue: 'ink-mute', opacity: 0.25 });
+    f.text(px(v), 46, label, { size: 11, anchor: 'middle', hue: 'ink-soft' });
+  });
+  let y = Y0;
+  MODELS.forEach(([m, name], g) => {
+    f.beat(g + 1);
+    f.text(20, y + 10, `${name}，${cell(m, 'plain').n} 个任务`, { size: 11, weight: 700, hue: 'plum' });
+    y += 26;
+    ROWS.forEach(([h, k, label, hue]) => {
+      const vals = Object.values(cell(m, h).tasks).map(r => r[k]);
+      f.text(20, y + 4, label, { size: 11, hue });
+      f.mark(vals.slice().sort((a, b) => a - b).map((v, i) => sq(px(v), y + ((i % 3) - 1) * 3, 3)).join(''), { hue });
+      const md = median(vals);
+      f.rule(px(md), y - 8, px(md), y + 8, { hue: 'ink', width: 2 });
+      f.text(620, y + 4, `$${total(m, h, k).toFixed(3)}`, { size: 11, hue: 'ink', anchor: 'end', weight: k === 'cost' ? 700 : 400 });
+      y += RH;
+    });
+    f.text(20, y + 6, `deep 相对朴素循环：标价 ${ratio(m, 'cost_u').toFixed(2)}x，计费 ${ratio(m, 'cost').toFixed(2)}x`, { size: 11, serif: true, hue: 'ink', knock: true });
+    y += 38;
+  });
+  f.beat(0);
+  f.text(20, y + 4, '黑色刻线：中位数任务。八行中的每个任务都通过。', { size: 11, serif: true, hue: 'ink-soft' });
+});

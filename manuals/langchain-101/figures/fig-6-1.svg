@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" role="img" aria-labelledby="fig-6-1-title fig-6-1-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-6-1-title">同一超步中对同一个键的两次写入</title>
+  <desc id="fig-6-1-desc">两栏。左栏：同一超步中的三个 write_joke 任务各向键 jokes 写入一个笑话，该键的 reducer 是 operator.add，状态最终包含关于 cats、dogs 和 owls 的三个笑话。右栏：节点 a 和 b 都写入没有 reducer 的键 value，运行在键 value 处抛出 InvalidUpdateError，因为该键每个超步只能接收一个值。</desc>
+  <defs><marker id="fig-6-1-head-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-teal-ink, #18696a)"/></marker><marker id="fig-6-1-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">JOKES，REDUCER 为 OPERATOR.ADD</text>
+  <text x="352" y="18" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">VALUE，无 REDUCER</text>
+  <line x1="336" y1="8" x2="336" y2="262" stroke="var(--m-ink-mute, #666660)" stroke-width="1" stroke-dasharray="5 4"/>
+  <rect x="20" y="32" width="96" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="68" y="49.95" font-size="11.5" text-anchor="middle" font-weight="700">write_joke</text>
+  <text x="68" y="67.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">jokes: [cats]</text>
+  <path d="M68 78 V96 H156 V112" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <rect x="124" y="32" width="96" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="172" y="49.95" font-size="11.5" text-anchor="middle" font-weight="700">write_joke</text>
+  <text x="172" y="67.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">jokes: [dogs]</text>
+  <path d="M172 78 V96 H156 V112" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round" marker-end="url(#fig-6-1-head-teal)"/>
+  <rect x="228" y="32" width="96" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="276" y="49.95" font-size="11.5" text-anchor="middle" font-weight="700">write_joke</text>
+  <text x="276" y="67.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">jokes: [owls]</text>
+  <path d="M276 78 V96 H156 V112" fill="none" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" stroke-linejoin="round"/>
+  <rect x="20" y="114" width="296" height="44" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="168" y="131.25" font-size="12.5" text-anchor="middle" font-weight="700">operator.add</text>
+  <text x="168" y="148.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">合并同一超步的三个更新</text>
+  <line x1="168" y1="158" x2="168" y2="189" stroke="var(--m-teal-ink, #18696a)" stroke-width="1.2" marker-end="url(#fig-6-1-head-teal)"/>
+  <rect x="20" y="190" width="296" height="60" fill="var(--m-teal-fill, #e1efee)" stroke="var(--m-teal-ink, #18696a)"/>
+  <text x="168" y="207.75" font-size="12.5" text-anchor="middle" font-weight="700">状态：jokes，共 3 项</text>
+  <text x="168" y="225.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">关于 cats 的笑话</text>
+  <text x="168" y="240.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">关于 dogs、owls 的笑话</text>
+  <rect x="352" y="32" width="128" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="416" y="49.95" font-size="11.5" text-anchor="middle" font-weight="700">节点 a</text>
+  <text x="416" y="67.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">value: &quot;a&quot;</text>
+  <path d="M416 78 V96 H486 V112" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-6-1-head-rose)"/>
+  <rect x="492" y="32" width="128" height="46" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="556" y="49.95" font-size="11.5" text-anchor="middle" font-weight="700">节点 b</text>
+  <text x="556" y="67.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">value: &quot;b&quot;</text>
+  <path d="M556 78 V96 H486 V112" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"/>
+  <rect x="352" y="114" width="268" height="44" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="486" y="131.25" font-size="12.5" text-anchor="middle" font-weight="700">无 reducer</text>
+  <text x="486" y="148.55" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">LastValue 每超步只收一次写入</text>
+  <line x1="486" y1="158" x2="486" y2="189" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-6-1-head-rose)"/>
+  <rect x="352" y="190" width="268" height="60" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="486" y="207.75" font-size="12.5" text-anchor="middle" font-weight="700">InvalidUpdateError</text>
+  <text x="486" y="225.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">At key &#39;value&#39;: Can receive</text>
+  <text x="486" y="240.05" font-size="11" text-anchor="middle" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">only one value per step.</text>
+  <text x="20" y="282" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两张图，都在同一超步内向同一个键并行写入。只有一个键有 reducer。</text>
+</svg>

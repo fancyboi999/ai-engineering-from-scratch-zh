@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" role="img" aria-labelledby="fig-5-6-title fig-5-6-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-5-6-title">九种值经过检查点后取回的样子</title>
+  <desc id="fig-5-6-desc">九行，每行从左侧放入状态的值，指向右侧 SqliteSaver 上 get_state 取回的结果。tuple 取回后变成 list。由元组组成的 set 和 frozenset 取回后变成 list 的 list。defaultdict、Counter 和 OrderedDict 取回后都变成普通 dict。带 ZoneInfo 时区的 datetime 取回后变成固定偏移，fold 为 1 的丢失了 fold。普通类的实例抛出 TypeError，没有被保存。</desc>
+  <defs><marker id="fig-5-6-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-5-6-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">放入状态的值</text>
+  <text x="372" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">GET_STATE 取回的结果</text>
+  <rect x="20" y="32" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="46.1" font-size="12" font-weight="700">tuple</text>
+  <text x="30" y="63.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">(1, 2)</text>
+  <rect x="372" y="32" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="46.1" font-size="12" font-weight="700">list</text>
+  <text x="382" y="63.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">[1, 2]</text>
+  <line x1="270" y1="51" x2="371" y2="51" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="78" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="92.1" font-size="12" font-weight="700">元组的 set</text>
+  <text x="30" y="109.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">{(1, 2), (3, 4)}</text>
+  <rect x="372" y="78" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="92.1" font-size="12" font-weight="700">list 的 list</text>
+  <text x="382" y="109.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">[[1, 2], [3, 4]]</text>
+  <line x1="270" y1="97" x2="371" y2="97" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="124" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="138.1" font-size="12" font-weight="700">元组的 frozenset</text>
+  <text x="30" y="155.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">frozenset({(1, 2)})</text>
+  <rect x="372" y="124" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="138.1" font-size="12" font-weight="700">list 的 list</text>
+  <text x="382" y="155.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">[[1, 2]]</text>
+  <line x1="270" y1="143" x2="371" y2="143" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="170" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="184.1" font-size="12" font-weight="700">defaultdict</text>
+  <text x="30" y="201.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">{&#39;k&#39;: [1]}</text>
+  <rect x="372" y="170" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="184.1" font-size="12" font-weight="700">dict</text>
+  <text x="382" y="201.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">没有 default factory</text>
+  <line x1="270" y1="189" x2="371" y2="189" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="216" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="230.1" font-size="12" font-weight="700">Counter</text>
+  <text x="30" y="247.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Counter(&#39;abca&#39;)</text>
+  <rect x="372" y="216" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="230.1" font-size="12" font-weight="700">dict</text>
+  <text x="382" y="247.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">没有 Counter 的方法</text>
+  <line x1="270" y1="235" x2="371" y2="235" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="262" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="276.1" font-size="12" font-weight="700">OrderedDict</text>
+  <text x="30" y="293.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">两个键</text>
+  <rect x="372" y="262" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="276.1" font-size="12" font-weight="700">dict</text>
+  <text x="382" y="293.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">键和顺序不变</text>
+  <line x1="270" y1="281" x2="371" y2="281" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="308" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="322.1" font-size="12" font-weight="700">datetime, ZoneInfo</text>
+  <text x="30" y="339.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Asia/Kolkata</text>
+  <rect x="372" y="308" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="322.1" font-size="12" font-weight="700">datetime，固定偏移</text>
+  <text x="382" y="339.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">+05:30，没有时区规则</text>
+  <line x1="270" y1="327" x2="371" y2="327" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="354" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="368.1" font-size="12" font-weight="700">datetime, fold=1</text>
+  <text x="30" y="385.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">America/New_York</text>
+  <rect x="372" y="354" width="248" height="38" fill="var(--m-amber-fill, #f5ecd9)" stroke="var(--m-amber-ink, #85590c)"/>
+  <text x="382" y="368.1" font-size="12" font-weight="700">datetime，固定偏移</text>
+  <text x="382" y="385.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">fold 为 0，不相等</text>
+  <line x1="270" y1="373" x2="371" y2="373" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-ink)"/>
+  <rect x="20" y="400" width="250" height="38" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="30" y="414.1" font-size="12" font-weight="700">普通类</text>
+  <text x="30" y="431.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Plain(3)</text>
+  <rect x="372" y="400" width="248" height="38" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="382" y="414.1" font-size="12" font-weight="700">TypeError</text>
+  <text x="382" y="431.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">not msgpack serializable</text>
+  <line x1="270" y1="419" x2="371" y2="419" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-5-6-head-rose)"/>
+  <text x="20" y="460" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">另外二十种值取回后类型和值都不变。在 Mac 上，各运行一次。</text>
+</svg>

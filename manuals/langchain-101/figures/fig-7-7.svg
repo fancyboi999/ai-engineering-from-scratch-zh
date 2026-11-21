@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" role="img" aria-labelledby="fig-7-7-title fig-7-7-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-7-7-title">evaluate 在两种目标上使用 upload_results=False</title>
+  <desc id="fig-7-7-desc">两栏，各是一次 evaluate 调用，都把 upload_results 设为 False，并使用记录请求的客户端。左栏的目标是一个把两数相加的普通函数，共三个示例，评估器为 exact，汇总评估器为 accuracy。三行得分为 true、false、true，accuracy 为 0.667，客户端没有收到请求。右栏的目标是 Qwen3 4B 上的 create_agent 运行，一个示例，评估器为 same_answer。答案 2 + 3 = 5. 与参考答案 The sum is 5. 不一致，所以该行得分为 false，客户端收到 7 次 POST /runs 和 7 次 PATCH，因为 evaluate 在 enabled 为 local 的 tracing_context 内运行目标。</desc>
+  <defs><marker id="fig-7-7-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker><marker id="fig-7-7-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker></defs>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">普通函数目标</text>
+  <text x="330" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">CREATE_AGENT 目标</text>
+  <rect x="20" y="32" width="290" height="46" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="32" y="50.25" font-size="12.5" font-weight="700">3 个示例：a + b</text>
+  <text x="32" y="67.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">adder()，故意错一个答案</text>
+  <rect x="20" y="108" width="290" height="46" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="126.25" font-size="12.5" font-weight="700">tracing_context 中的目标</text>
+  <text x="32" y="143.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">enabled=&quot;local&quot;，由 evaluate 设置</text>
+  <rect x="20" y="178" width="200" height="58" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="32" y="194.75" font-size="12.5" font-weight="700">exact，然后 accuracy</text>
+  <text x="32" y="212.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">true, false, true</text>
+  <text x="32" y="227.05" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">accuracy 0.667</text>
+  <rect x="20" y="278" width="290" height="52" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="299.25" font-size="12.5" font-weight="700">客户端收到 0 个请求</text>
+  <text x="32" y="316.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">没有任何内容离开进程</text>
+  <line x1="60" y1="78" x2="60" y2="107" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-7-head-ink)"/>
+  <line x1="60" y1="154" x2="60" y2="177" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-7-head-ink)"/>
+  <path d="M270 154 V277" fill="none" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-7-7-head-ink)"/>
+  <text x="264" y="262" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求</text>
+  <rect x="330" y="32" width="290" height="46" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="342" y="50.25" font-size="12.5" font-weight="700">1 个示例：What is 2 + 3?</text>
+  <text x="342" y="67.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">Qwen3 4B 上的 create_agent</text>
+  <rect x="330" y="108" width="290" height="46" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="342" y="126.25" font-size="12.5" font-weight="700">tracing_context 中的目标</text>
+  <text x="342" y="143.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">enabled=&quot;local&quot;，由 evaluate 设置</text>
+  <rect x="330" y="178" width="200" height="58" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="342" y="202.25" font-size="12.5" font-weight="700">same_answer</text>
+  <text x="342" y="219.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">false: 2 + 3 = 5.</text>
+  <rect x="330" y="278" width="290" height="52" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="342" y="299.25" font-size="12.5" font-weight="700">POST /runs 7, PATCH 7</text>
+  <text x="342" y="316.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">agent 的 LangChain 运行</text>
+  <line x1="370" y1="78" x2="370" y2="107" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" marker-end="url(#fig-7-7-head-ink)"/>
+  <line x1="370" y1="154" x2="370" y2="177" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-7-head-ink)"/>
+  <path d="M580 154 V277" fill="none" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#fig-7-7-head-rose)"/>
+  <text x="574" y="262" font-size="11" text-anchor="end" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">请求</text>
+  <text x="20" y="362" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">来自录制工具包，langsmith 0.14.17，客户端会记录每个请求。</text>
+</svg>

@@ -242,6 +242,8 @@ jobs:
           node manuals/_shared/figkit.js check manuals/docker-sandboxes-101
           node manuals/_shared/figkit.js check manuals/agent-substrate-101
           (cd manuals/agent-substrate-101 && python3 capture/run.py --check)
+          node manuals/_shared/figkit.js check manuals/langchain-101
+          (cd manuals/langchain-101 && python3 capture/run.py --check)
           python3 manuals/a2a-101/tests/test_static_contract.py
           node scripts/test_og.js
           node scripts/check_og_cards.js --require-manifests

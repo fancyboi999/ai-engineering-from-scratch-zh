@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 318" role="img" aria-labelledby="fig-6-5-title fig-6-5-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-6-5-title">批量模式与逐个调用模式</title>
+  <desc id="fig-6-5-desc">一张四行两列的表，左列是批量模式，右列是逐个调用模式。暂停：一次中断带有全部调用的 action_requests，对比每个调用一次中断，类型为 tool_approval 并带 schema。恢复：按调用顺序排列的决定列表，对比由 response_schema 校验的、从中断 id 到决定的映射。编辑成另一个工具：批量情形 B3 中 delete_file 在 3 次运行中全部运行，逐个调用情形 P3 中出现 ValidationError，没有任何工具运行。跳到工具的中间件：批量情形 J1 至 J3 中工具照常运行，逐个调用情形 J4 和 J5 中审批生效。</desc>
+  <text x="188" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">批量</text>
+  <text x="408" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">逐个调用</text>
+  <text x="20" y="56" font-size="11.5" font-weight="700">暂停</text>
+  <rect x="188" y="34" width="208" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="200" y="54.1" font-size="12" font-weight="700">一次中断</text>
+  <text x="200" y="71.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">含全部调用的 action_requests</text>
+  <rect x="408" y="34" width="212" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="420" y="54.1" font-size="12" font-weight="700">每个调用一次中断</text>
+  <text x="420" y="71.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">type tool_approval，带 schema</text>
+  <text x="20" y="126" font-size="11.5" font-weight="700">恢复</text>
+  <rect x="188" y="104" width="208" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="200" y="124.1" font-size="12" font-weight="700">一个决定列表</text>
+  <text x="200" y="141.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">按调用顺序排列</text>
+  <rect x="408" y="104" width="212" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="420" y="124.1" font-size="12" font-weight="700">id 到决定的映射</text>
+  <text x="420" y="141.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">由 response_schema 校验</text>
+  <text x="20" y="189" font-size="11.5" font-weight="700">编辑成</text>
+  <text x="20" y="204" font-size="11.5" font-weight="700">另一个工具</text>
+  <rect x="188" y="174" width="208" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="200" y="194.1" font-size="12" font-weight="700">delete_file 已运行</text>
+  <text x="200" y="211.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">B3，3 次运行全部如此</text>
+  <rect x="408" y="174" width="212" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="420" y="194.1" font-size="12" font-weight="700">ValidationError</text>
+  <text x="420" y="211.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">P3，没有工具运行，3 次全部</text>
+  <text x="20" y="259" font-size="11.5" font-weight="700">中间件</text>
+  <text x="20" y="274" font-size="11.5" font-weight="700">跳到工具</text>
+  <rect x="188" y="244" width="208" height="50" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="200" y="264.1" font-size="12" font-weight="700">工具仍然运行</text>
+  <text x="200" y="281.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">J1、J2、J3，3 次运行全部如此</text>
+  <rect x="408" y="244" width="212" height="50" fill="var(--m-blue-fill, #e6edf6)" stroke="var(--m-blue-ink, #2f5d9a)"/>
+  <text x="420" y="264.1" font-size="12" font-weight="700">审批生效</text>
+  <text x="420" y="281.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">J4、J5，没有工具运行</text>
+  <text x="20" y="312" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">第 1、2 行来自录制工具包。第 3、4 行是 x86 服务器虚拟机上的实验记录运行。</text>
+</svg>

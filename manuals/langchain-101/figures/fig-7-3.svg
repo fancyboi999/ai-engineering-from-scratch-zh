@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 470" role="img" aria-labelledby="fig-7-3-title fig-7-3-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-7-3-title">各种 MCP 故障对一次运行的影响</title>
+  <desc id="fig-7-3-desc">七行，每行从左侧的情形指向右侧的结果。目标字符串不是 http 或 https URL 时抛出 ValueError，不启动任何东西。工具报告 isError 与工具抛出 Python 异常，都会变成 status 为 error 的 ToolMessage，运行继续。默认客户端下的慢工具在 2.0 秒后返回，因为适配器没有超时。timeout 为 1 的 FastMCP Client 在 1.0 秒后抛出 MCPError timed out。stdio 下服务器崩溃抛出 MCPError Connection closed 并中止运行，下一次调用会重新启动服务器。HTTP 下服务器崩溃在该调用上抛出 RemoteProtocolError，随后的 agent 运行与后续调用都连接失败，因为没有东西重新启动服务器。</desc>
+  <defs><marker id="fig-7-3-head-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-rose-ink, #b0344d)"/></marker><marker id="fig-7-3-head-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1 L10 5 L0 9 z" fill="var(--m-ink, #1a1a1a)"/></marker></defs>
+  <text x="20" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">情形</text>
+  <text x="360" y="20" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">运行得到的结果</text>
+  <rect x="20" y="32" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="51.25" font-size="12.5" font-weight="700">MCPAdapter(&#39;server.py&#39;)</text>
+  <text x="32" y="68.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">不是 URL 的字符串</text>
+  <rect x="360" y="32" width="260" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="372" y="51.25" font-size="12.5" font-weight="700">ValueError，不启动</text>
+  <text x="372" y="68.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">构造时即被拒绝</text>
+  <line x1="290" y1="56" x2="359" y2="56" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-rose)"/>
+  <rect x="20" y="92" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="111.25" font-size="12.5" font-weight="700">工具报告 isError</text>
+  <text x="32" y="128.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器内的 ToolError</text>
+  <rect x="360" y="92" width="260" height="48" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="372" y="111.25" font-size="12.5" font-weight="700">ToolMessage，status error</text>
+  <text x="372" y="128.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行继续</text>
+  <line x1="290" y1="116" x2="359" y2="116" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-ink)"/>
+  <rect x="20" y="152" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="171.25" font-size="12.5" font-weight="700">工具内抛出异常</text>
+  <text x="32" y="188.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">服务器内的 RuntimeError</text>
+  <rect x="360" y="152" width="260" height="48" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="372" y="171.25" font-size="12.5" font-weight="700">ToolMessage，status error</text>
+  <text x="372" y="188.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行继续</text>
+  <line x1="290" y1="176" x2="359" y2="176" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-ink)"/>
+  <rect x="20" y="212" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="231.25" font-size="12.5" font-weight="700">慢工具，默认客户端</text>
+  <text x="32" y="248.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">slow(2) 等待 2.0 s</text>
+  <rect x="360" y="212" width="260" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="372" y="231.25" font-size="12.5" font-weight="700">ToolMessage，status success</text>
+  <text x="372" y="248.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">适配器没有超时</text>
+  <line x1="290" y1="236" x2="359" y2="236" stroke="var(--m-ink, #1a1a1a)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-ink)"/>
+  <rect x="20" y="272" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="291.25" font-size="12.5" font-weight="700">慢工具，Client(timeout=1)</text>
+  <text x="32" y="308.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">经 stdio 或 HTTP 的 slow(5)</text>
+  <rect x="360" y="272" width="260" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="372" y="291.25" font-size="12.5" font-weight="700">MCPError: timed out</text>
+  <text x="372" y="308.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">1.0 s 后抛出</text>
+  <line x1="290" y1="296" x2="359" y2="296" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-rose)"/>
+  <rect x="20" y="332" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="351.25" font-size="12.5" font-weight="700">服务器崩溃，stdio</text>
+  <text x="32" y="368.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">调用中途 os._exit(3)</text>
+  <rect x="360" y="332" width="260" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="372" y="351.25" font-size="12.5" font-weight="700">MCPError: Connection closed</text>
+  <text x="372" y="368.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">运行中止，下次调用会重新启动</text>
+  <line x1="290" y1="356" x2="359" y2="356" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-rose)"/>
+  <rect x="20" y="392" width="270" height="48" fill="var(--m-grey-fill, #ecebe3)" stroke="var(--m-grey-ink, #5e5e59)"/>
+  <text x="32" y="411.25" font-size="12.5" font-weight="700">服务器崩溃，HTTP</text>
+  <text x="32" y="428.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">调用中途 os._exit(3)</text>
+  <rect x="360" y="392" width="260" height="48" fill="var(--m-rose-fill, #f7e4e7)" stroke="var(--m-rose-ink, #b0344d)"/>
+  <text x="372" y="411.25" font-size="12.5" font-weight="700">RemoteProtocolError</text>
+  <text x="372" y="428.55" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">之后的运行连接失败</text>
+  <line x1="290" y1="416" x2="359" y2="416" stroke="var(--m-rose-ink, #b0344d)" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#fig-7-3-head-rose)"/>
+  <text x="20" y="462" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">来自 Mac，每种情形运行一次，langchain 1.5.0 配 fastmcp 4.2.0。</text>
+</svg>

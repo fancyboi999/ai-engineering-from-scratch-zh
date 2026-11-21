@@ -1,7 +1,16 @@
 {
-  "base": "a509402c0b5455d11ddc2b5fa83cc8c0d2e0692b",
-  "target": "8afa245ebc2e8861480edf8c4911a2b6d9769688",
-  "pending": [],
+  "base": "8afa245ebc2e8861480edf8c4911a2b6d9769688",
+  "target": "9712e323fde8cb2ec933310ac619e920e8e31017",
+  "pending": [
+    {
+      "batch": "manual-langchain-101",
+      "summary": "LangChain 101 中文技术手册、103 幅图表本地化与配套设施（#802）线上部署验收"
+    },
+    {
+      "batch": "site-home-tutor-806-816",
+      "summary": "首页一键开课与 Agent 导师区块、课程页侧栏收起、菜单排序、README 改版、蓝底分享卡片与 MCPA 17 题修正（#806 #816 #811）线上部署验收"
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -290,6 +299,36 @@
         "cheatsheets/production-agent-runtimes.md",
         ".github/workflows/build.yml",
         ".gitignore"
+      ]
+    },
+    {
+      "scope": "上游 8afa245..9712e32 LangChain 101 手册、首页导师入口与分享卡片（2026-11-21）",
+      "decision": "#802：引入 LangChain 101 手册全部 60 节正文、11 节参考、front.md、README.md、capture/README.md 与 manual.json 人读字段并完成中文翻译与全书术语统一；标题保留英文显式 {#s-...} 锚点，listing 与代码块与上游逐字节一致，图表链接文字写「图」由构建自动编号；103 幅图表源码本地化并按中文字宽重建 SVG；移植 manuals/_shared/graphviz-lite.js、marks.js、AUTHORING.md 库手册依赖例外条款、.gitignore 的 capture/demos/*.db、header.js 新手册横幅与 agent-harness 速查表来源登记（source_hash 按 2026-11-11 决策不刷新）；check_manual_outputs 登记 60/11/102，CI 加入 figkit check 与 capture/run.py --check（未装锁定包时按上游契约跳过录制、仍校验 47 份实验摘要）。#806：语义移植首页「从你所在的位置开始」四门入门课（与上游相同四课，链接用 /lessons/ 路由）、Agent 导师区块（命令对应中文仓技能与仓库）、首页删减、课程页桌面侧栏收起并记忆（预渲染与运行时路径）、菜单学习优先级排序、README 改版与 8 幅中文化 SVG；跳过 What's New 页（与 D2=A 一致）、Prefer us on Google 标签（上游站推广）、ui-strings 与 i18n README；导师技能课数随上游改为 542。#816：OG 卡片改为蓝底大标题、角标与品牌页脚，首页卡居中且无侧图，域名与文案中文化，首页描述按句分行。#811：MCPA 17 课缺参题正确答案对调至执行阶段 isError 选项。#815：中文站无 newsletter，跳过。#810：中文站未移植 NLLB 翻译脚本，跳过。已检视基准前移至 9712e32，两个批次在完成 CI、合并与线上生产验证前保留 pending。",
+      "paths": [
+        "manuals/langchain-101/",
+        "manuals/_shared/graphviz-lite.js",
+        "manuals/_shared/marks.js",
+        "manuals/AUTHORING.md",
+        ".gitignore",
+        "site/header.js",
+        "site/index.html",
+        "site/app.js",
+        "site/lesson.html",
+        "lib/site-navigation.js",
+        "lib/og-render.js",
+        "lib/og-cards.js",
+        "README.md",
+        "assets/readme/",
+        "certifications/mcpa/lessons/17-tool-invocation-lifecycle/quiz.json",
+        "cheatsheets/topics.yaml",
+        "cheatsheets/agent-harness.md",
+        "scripts/check_manual_outputs.js",
+        ".github/workflows/build.yml",
+        "skills/start-learning/SKILL.md",
+        "skills/find-your-level/SKILL.md",
+        "site/whats-new.html",
+        "site/newsletter.js",
+        "scripts/translate_lessons.py"
       ]
     }
   ]

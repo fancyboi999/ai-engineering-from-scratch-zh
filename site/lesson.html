@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>document.documentElement.classList.add('js');</script>
+  <script>try{if(localStorage.getItem('aifs:lesson-sidebar-collapsed')==='1'&&matchMedia('(min-width: 901px)').matches)document.documentElement.classList.add('sidebar-collapsed');}catch(e){}</script>
   <link rel="icon" href="/favicon.ico?v=20260831a" sizes="32x32">
   <link rel="icon" href="/favicon.svg?v=20260831a" type="image/svg+xml">
   <!-- AIFS:LESSON-SEO:START -->
@@ -23,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261115a">
+  <link rel="stylesheet" href="style.css?v=20261121a">
   <link rel="stylesheet" href="certifications.css?v=20261106a">
   <link rel="stylesheet" href="highlights.css?v=20261026a">
   <link rel="stylesheet" href="lesson-walkthrough.css?v=20261026a">
@@ -81,6 +82,51 @@
     .lesson-sidebar-toggle:hover {
       border-color: var(--blueprint);
       color: var(--blueprint);
+    }
+
+    .sidebar-toggle-hide,
+    .sidebar-toggle-label { display: none; }
+
+    @media (min-width: 901px) {
+      :root { --lesson-sidebar-w: 240px; }
+      .lesson-main { transition: margin-left var(--motion-drawer) var(--ease-drawer); }
+      .lesson-sidebar-toggle {
+        display: flex;
+        top: calc(84px + var(--site-banner-offset, 0px));
+        left: calc(var(--lesson-sidebar-w) - 14px);
+        width: 28px;
+        height: 28px;
+        background: var(--bg);
+        transition:
+          left var(--motion-drawer) var(--ease-drawer),
+          transform var(--motion-press) var(--ease-out),
+          border-color var(--motion-feedback) var(--ease-out),
+          color var(--motion-feedback) var(--ease-out);
+      }
+      .lesson-sidebar-toggle .sidebar-toggle-menu { display: none; }
+      .lesson-sidebar-toggle .sidebar-toggle-hide { display: inline; line-height: 1; }
+      .sidebar-collapsed .lesson-sidebar { transform: translateX(-100%); }
+      .sidebar-collapsed .lesson-main { margin-left: 0; }
+      .sidebar-collapsed .lesson-sidebar-toggle {
+        left: 16px;
+        width: auto;
+        padding: 0 12px;
+        gap: 8px;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+      }
+      .sidebar-collapsed .lesson-sidebar-toggle .sidebar-toggle-hide { display: none; }
+      .sidebar-collapsed .lesson-sidebar-toggle .sidebar-toggle-menu,
+      .sidebar-collapsed .lesson-sidebar-toggle .sidebar-toggle-label { display: inline; }
+    }
+
+    @media (min-width: 1440px) {
+      :root { --lesson-sidebar-w: 280px; }
+    }
+
+    @media (min-width: 901px) and (prefers-reduced-motion: reduce) {
+      .lesson-main,
+      .lesson-sidebar-toggle { transition: none; }
     }
 
     .lesson-sidebar::-webkit-scrollbar { width: 4px; }
@@ -2696,21 +2742,21 @@
   <div class="header-inner">
     <a href="index.html" class="logo"><span class="logo-icon" aria-hidden="true"></span><span class="logo-label">AI / FROM SCRATCH</span></a>
     <nav class="header-nav" aria-label="主导航"><!-- Shared navigation: lib/site-navigation.js -->
-<a href="index.html#contents" data-header-page="index">课程目录</a>
-<a href="catalog.html" data-header-page="catalog" data-header-priority>课程表</a>
-<a href="prereqs.html" data-header-page="prereqs">路线图</a>
-<a href="learning-paths.html" data-header-page="learning-paths" data-header-priority>学习路径</a>
-<a href="certifications.html" data-header-page="certifications">认证</a>
-<a href="projects.html" data-header-page="projects" data-header-priority>实战项目</a>
-<a href="manuals.html" data-header-page="manuals">技术手册</a>
-<a href="glossary.html" data-header-page="glossary">术语表</a>
-<a href="cheatsheets" data-header-page="cheatsheets">速查表</a>
-<a href="practice" data-header-page="practice" data-header-priority>编程练习</a>
-<a href="interviews" data-header-page="interviews" data-header-priority>面试题库</a>
 <a href="how-to-learn.html" data-header-page="how-to-learn">学习方法</a>
 <a href="skills.html" data-header-page="skills">Agent 技能</a>
+<a href="catalog.html" data-header-page="catalog" data-header-priority>课程表</a>
+<a href="learning-paths.html" data-header-page="learning-paths" data-header-priority>学习路径</a>
+<a href="index.html#contents" data-header-page="index">课程目录</a>
+<a href="prereqs.html" data-header-page="prereqs">路线图</a>
+<a href="projects.html" data-header-page="projects" data-header-priority>实战项目</a>
+<a href="practice" data-header-page="practice" data-header-priority>编程练习</a>
+<a href="interviews" data-header-page="interviews" data-header-priority>面试题库</a>
+<a href="manuals.html" data-header-page="manuals">技术手册</a>
+<a href="cheatsheets" data-header-page="cheatsheets">速查表</a>
 <a href="inside-an-ai-agent.html" data-header-page="inside-an-ai-agent">Agent 内部机制</a>
 <a href="highlights.html" data-header-page="highlights">我的高亮</a>
+<a href="glossary.html" data-header-page="glossary">术语表</a>
+<a href="certifications.html" data-header-page="certifications">认证</a>
 <a href="about.html" data-header-page="about">关于</a>
 <a href="https://github.com/fancyboi999/ai-engineering-from-scratch-zh" target="_blank" rel="noopener" class="header-github" aria-label="在 GitHub 查看 AI Engineering from Scratch 中文版"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg><svg class="star-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.896l-7.416 3.517 1.48-8.279L0 9.306l8.332-1.151z"/></svg><span class="star-count" data-loading="true" aria-label="GitHub Star 数">…</span></a></nav>
     <button class="search-toggle" type="button" data-cmd-palette aria-label="搜索（⌘K）" title="搜索（⌘K）"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button><!--header-tools-->
@@ -2719,7 +2765,11 @@
   </div>
 </header>
 
-  <button class="lesson-sidebar-toggle" id="sidebarToggle" aria-label="切换课程目录" aria-controls="lessonSidebar" aria-expanded="false" type="button">&#9776;</button>
+  <button class="lesson-sidebar-toggle" id="sidebarToggle" aria-label="切换课程目录" aria-controls="lessonSidebar" aria-expanded="false" type="button">
+    <span class="sidebar-toggle-menu" aria-hidden="true">&#9776;</span>
+    <span class="sidebar-toggle-hide" aria-hidden="true">&#8249;</span>
+    <span class="sidebar-toggle-label">课程目录</span>
+  </button>
 
   <div class="mermaid-modal-overlay" id="mermaidModalOverlay" aria-hidden="true">
     <div class="mermaid-modal" role="dialog" aria-modal="true" aria-label="放大图示">
@@ -2750,9 +2800,9 @@
     <aside class="toc-sidebar" id="tocSidebar" aria-hidden="true"></aside>
   </div>
 
-  <script src="md-render.js?v=20261115a"></script>
+  <script src="md-render.js?v=20261121a"></script>
   <script src="build-meta.js?v=20261106a"></script>
-  <script src="data.js?v=20261115a"></script>
+  <script src="data.js?v=20261121a"></script>
   <script>
     (function () {
       var path = '';
@@ -2774,11 +2824,11 @@
     }());
   </script>
   <script src="content-source.js?v=20261012a"></script>
-  <script src="progress.js?v=20261115a"></script>
-  <script src="highlights-anchor.js?v=20261115a"></script>
-  <script src="highlights-store.js?v=20261115a"></script>
-  <script src="highlights.js?v=20261115a"></script>
-  <script src="lesson-walkthrough.js?v=20261115a"></script>
+  <script src="progress.js?v=20261121a"></script>
+  <script src="highlights-anchor.js?v=20261121a"></script>
+  <script src="highlights-store.js?v=20261121a"></script>
+  <script src="highlights.js?v=20261121a"></script>
+  <script src="lesson-walkthrough.js?v=20261121a"></script>
   <script id="learningPathProgressRuntime">
     (function (root) {
       'use strict';
@@ -2899,8 +2949,8 @@
     });
     window._mermaidReady = mermaid;
   </script>
-  <script src="header.js?v=20261115a" defer></script>
-  <script src="cmdpalette.js?v=20261115a" defer></script>
+  <script src="header.js?v=20261121a" defer></script>
+  <script src="cmdpalette.js?v=20261121a" defer></script>
   <script src="lesson-figures.js?v=9ed45625eaea"></script>
   <script src="code-copy.js?v=20261106a" defer></script>
   <script src="figure-manifest.js?v=e73e1e2c4fe2"></script>
@@ -3636,10 +3686,42 @@
         var sidebar = document.getElementById('lessonSidebar');
         if (!toggle || !sidebar) return;
 
+        // 桌面端可以收起侧栏并记住选择；窄屏仍是抽屉，两者互不影响。
+        var desktop = window.matchMedia('(min-width: 901px)');
+        var collapsedKey = 'aifs:lesson-sidebar-collapsed';
+        var collapsed = false;
+        try { collapsed = localStorage.getItem(collapsedKey) === '1'; } catch (e) {}
+
+        function setOpen(open) {
+          sidebar.classList.toggle('open', open);
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        function syncDesktop() {
+          var hidden = desktop.matches && collapsed;
+          document.documentElement.classList.toggle('sidebar-collapsed', hidden);
+          sidebar.inert = hidden;
+          if (desktop.matches) {
+            toggle.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+            toggle.setAttribute('aria-label', hidden ? '显示课程目录' : '隐藏课程目录');
+          } else {
+            toggle.setAttribute('aria-expanded', sidebar.classList.contains('open') ? 'true' : 'false');
+            toggle.setAttribute('aria-label', '切换课程目录');
+          }
+        }
+
         toggle.addEventListener('click', function () {
-          sidebar.classList.toggle('open');
-          toggle.setAttribute('aria-expanded', sidebar.classList.contains('open') ? 'true' : 'false');
+          if (desktop.matches) {
+            collapsed = !collapsed;
+            try { localStorage.setItem(collapsedKey, collapsed ? '1' : '0'); } catch (e) {}
+            syncDesktop();
+            return;
+          }
+          setOpen(!sidebar.classList.contains('open'));
         });
+
+        if (desktop.addEventListener) desktop.addEventListener('change', syncDesktop);
+        syncDesktop();
 
         document.addEventListener('click', function (e) {
           if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {

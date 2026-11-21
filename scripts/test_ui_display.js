@@ -131,7 +131,7 @@ async function main() {
       assert.equal(row.listStyle, 'none');
       console.log('header/glossary layout:', JSON.stringify({width,columns:row.columns,headingGap:row.headingGap,overlap:false}));
     }
-    const menu = ['课程目录', '课程表', '路线图', '学习路径', '认证', '实战项目', '技术手册', '术语表', '速查表', '编程练习', '面试题库', '学习方法', 'Agent 技能', 'Agent 内部机制', '我的高亮', '关于'];
+    const menu = ['学习方法', 'Agent 技能', '课程表', '学习路径', '课程目录', '路线图', '实战项目', '编程练习', '面试题库', '技术手册', '速查表', 'Agent 内部机制', '我的高亮', '术语表', '认证', '关于'];
     const priorities = ['课程表', '学习路径', '实战项目', '编程练习', '面试题库'];
     const contexts = [
       ['index.html#contents', null, false], ['prereqs.html', '路线图', true],

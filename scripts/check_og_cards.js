@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { lessonDocumentSeo } = require('../lib/lesson-document');
 const { lessonCard, socialCards } = require('../lib/og-cards');
-const { layout } = require('../lib/og-render');
+const { layout, titleOverflow } = require('../lib/og-render');
 const { validateOgCards } = require('../site/og-cards');
 
 const at = process.argv.indexOf('--root');
@@ -19,8 +19,11 @@ function walk(dir) {
       const lessonPath = path.relative(root, path.dirname(dir)).split(path.sep).join('/');
       if (!lessonPath.startsWith('phases/') && !lessonPath.startsWith('certifications/')) continue;
       const seo = lessonDocumentSeo(fs.readFileSync(file, 'utf8'));
-      try { layout(lessonCard({ ...seo, path: lessonPath, context: { kind: lessonPath.startsWith('certifications/') ? 'certification' : 'lesson' } })); }
+      const card = lessonCard({ ...seo, path: lessonPath, context: { kind: lessonPath.startsWith('certifications/') ? 'certification' : 'lesson' } });
+      let wide;
+      try { layout(card); wide = titleOverflow(card); }
       catch (error) { throw Error(`${lessonPath}: ${error.message}`); }
+      if (wide) throw Error(`${lessonPath}: OG title line is wider than the card: ${wide}`);
       checked++;
     }
   }

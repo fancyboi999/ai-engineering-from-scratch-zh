@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 372" role="img" aria-labelledby="fig-7-6d-title fig-7-6d-desc" font-family="JetBrains Mono, ui-monospace, monospace">
+  <title id="fig-7-6d-title">LangSmith 追踪视图中一次被追踪的 agent 运行</title>
+  <desc id="fig-7-6d-desc">对 LangSmith 追踪视图的重绘，内容是 Ollama 上 Qwen3 4B 的一次 create_agent 运行，位于托管免费计划的项目 aiefs-lc101-trace 中。左窗格是运行树：6.13 s 的 LangGraph 根运行有 6 个子运行，3.33 s 的 model 节点内含一次 282 token 的 ChatOllama 调用，tools 节点内含 0.00 s 的 add 工具，第二个 2.79 s 的 model 节点内含一次 302 token 的 ChatOllama 调用。每个运行旁的条形显示它在 6.13 s 内的运行时间段。右窗格是根运行：输入是用户问题 What is 305 + 18?，输出是用户消息、调用 add（a 为 305，b 为 18）的 AI 消息、工具结果 323，以及最终的 AI 回答 323。</desc>
+  <rect x="16" y="10" width="608" height="30" fill="var(--m-olive-fill, #eef0dc)" stroke="var(--m-olive-ink, #515f26)"/>
+  <text x="28" y="30" font-size="12.5" font-weight="700" fill="var(--m-olive-ink, #515f26)">LangSmith</text>
+  <text x="112" y="30" font-size="11.5" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">项目 aiefs-lc101-trace，开启追踪的一次运行</text>
+  <text x="28" y="66" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">运行树</text>
+  <text x="206" y="66" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">瀑布图</text>
+  <rect x="28" y="81" width="10" height="10" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="44" y="90" font-size="12" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">LangGraph</text>
+  <text x="44" y="104" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">6.13 s, 6 个子运行</text>
+  <rect x="206" y="84" width="96" height="8" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <line x1="36" y1="108" x2="36" y2="126" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <rect x="44" y="119" width="10" height="10" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="60" y="128" font-size="12" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">model</text>
+  <text x="60" y="142" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">3.33 s</text>
+  <rect x="206" y="122" width="52.15" height="8" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <line x1="52" y1="146" x2="52" y2="164" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <rect x="60" y="157" width="10" height="10" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="76" y="166" font-size="12" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">ChatOllama</text>
+  <text x="76" y="180" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">3.33 s, 282 token</text>
+  <rect x="206" y="160" width="52.15" height="8" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <line x1="36" y1="184" x2="36" y2="202" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <rect x="44" y="195" width="10" height="10" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="60" y="204" font-size="12" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">tools</text>
+  <text x="60" y="218" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.00 s</text>
+  <rect x="258.15" y="198" width="2" height="8" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <line x1="52" y1="222" x2="52" y2="240" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <rect x="60" y="233" width="10" height="10" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="76" y="242" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">add</text>
+  <text x="76" y="256" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">0.00 s</text>
+  <rect x="258.15" y="236" width="2" height="8" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <line x1="36" y1="260" x2="36" y2="278" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <rect x="44" y="271" width="10" height="10" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <text x="60" y="280" font-size="12" font-weight="700" fill="var(--m-indigo-ink, #4b4f9e)">model</text>
+  <text x="60" y="294" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2.79 s</text>
+  <rect x="258.31" y="274" width="43.69" height="8" fill="var(--m-indigo-fill, #e9e9f6)" stroke="var(--m-indigo-ink, #4b4f9e)"/>
+  <line x1="52" y1="298" x2="52" y2="316" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <rect x="60" y="309" width="10" height="10" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="76" y="318" font-size="12" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">ChatOllama</text>
+  <text x="76" y="332" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">2.79 s, 302 token</text>
+  <rect x="258.31" y="312" width="43.69" height="8" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <line x1="318" y1="54" x2="318" y2="360" stroke="var(--m-ink-mute, #666660)" stroke-width="1"/>
+  <text x="334" y="66" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">根运行，输入</text>
+  <rect x="334" y="76" width="290" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="346" y="91.1" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">用户</text>
+  <text x="346" y="108.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">What is 305 + 18?</text>
+  <text x="334" y="144" font-size="11" letter-spacing="1.2" fill="var(--m-ink-mute, #666660)">根运行，输出</text>
+  <rect x="334" y="154" width="290" height="40" fill="var(--m-violet-fill, #ebe8f5)" stroke="var(--m-violet-ink, #5b4fa3)"/>
+  <text x="346" y="169.1" font-size="12" font-weight="700" fill="var(--m-violet-ink, #5b4fa3)">用户</text>
+  <text x="346" y="186.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">What is 305 + 18?</text>
+  <rect x="334" y="204" width="290" height="40" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="346" y="219.1" font-size="12" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">AI</text>
+  <text x="346" y="236.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">工具调用 add(a=305, b=18)</text>
+  <rect x="334" y="254" width="290" height="40" fill="var(--m-green-fill, #e5f0e4)" stroke="var(--m-green-ink, #336b40)"/>
+  <text x="346" y="269.1" font-size="12" font-weight="700" fill="var(--m-green-ink, #336b40)">add</text>
+  <text x="346" y="286.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">工具结果 323</text>
+  <rect x="334" y="304" width="290" height="40" fill="var(--m-plum-fill, #f4e6ef)" stroke="var(--m-plum-ink, #8a3d72)"/>
+  <text x="346" y="319.1" font-size="12" font-weight="700" fill="var(--m-plum-ink, #8a3d72)">AI</text>
+  <text x="346" y="336.3" font-size="11" class="m-serif" fill="var(--m-ink-soft, #4a4a4a)">323</text>
+</svg>
