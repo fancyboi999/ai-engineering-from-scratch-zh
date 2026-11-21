@@ -150,7 +150,7 @@ deep agent 把记忆当作文件来读写。`CompositeBackend` 把 `/memories/` 
 
 - **文档里的工厂，`("memories",)`。** Bob 的 agent 调用了 `ls` 和 `read_file`，并告诉了他 Alice 的密码，每种 store 的 10 个会话里 10 次。
 - **每个用户一个工厂，`("users", rt.context.user_id)`。** Bob 的 agent 列出一个空文件夹，并告诉他没有密码，每种 store 的 10 个会话里 10 次。
-- **同一个工厂，加上一个搜索 `("users",)` 的 `recall` 工具。** 这是[命名空间隔离](#s-stores-and-long-term-memory)里那个幼稚的工具：前缀少了一个标签。问到 `/memories/` 时，模型只用了 `ls`，20 个会话里什么也没泄露。被要求使用它的 recall 工具时，它调用了 `recall`，并告诉 Bob Alice 的密码，每种 store 的 10 个会话里 10 次。
+- **同一个工厂，加上一个搜索 `("users",)` 的 `recall` 工具。** 这是[命名空间隔离](#s-stores-and-long-term-memory-namespace-isolation)里那个幼稚的工具：前缀少了一个标签。问到 `/memories/` 时，模型只用了 `ls`，20 个会话里什么也没泄露。被要求使用它的 recall 工具时，它调用了 `recall`，并告诉 Bob Alice 的密码，每种 store 的 10 个会话里 10 次。
 
 ```figure
 id: fig-5-4b
@@ -184,7 +184,7 @@ class Ctx:
 
 有两个校验器检查命名空间，而且它们不一致。`StoreBackend` 允许字母、数字和 `-_.@+:~`，并拒绝了 `*` {{code libs/deepagents/deepagents/backends/store.py:44-87}}。store 本身则拒绝任何标签里的 `.`。所以返回电子邮件地址（例如 `carol@acme.com`）的工厂，通过了第一道检查，却在写入时以 `InvalidNamespaceError` 失败，两种 store 都是如此。文档建议用 `rt.server_info.user.identity` 作标签。如果你的身份标识是电子邮件地址，先把每个地址映射成不含句点的标签。
 
-我们还对[命名空间隔离](#s-stores-and-long-term-memory)里的原始 store 调用又运行了一遍，在 `InMemoryStore` 和 `PostgresStore` 上各一次。Alice 和 Bob 位于 `("users", <user>, ...)` 之下时，这些调用返回了两个用户的条目或命名空间：`search(("users",))`、`search(())`、`list_namespaces()` 和 `list_namespaces(prefix=("users", "*"))`。`search(("users", "*", "memories"))` 什么也没返回，因为 `*` 只在 `list_namespaces` 里是通配符。
+我们还对[命名空间隔离](#s-stores-and-long-term-memory-namespace-isolation)里的原始 store 调用又运行了一遍，在 `InMemoryStore` 和 `PostgresStore` 上各一次。Alice 和 Bob 位于 `("users", <user>, ...)` 之下时，这些调用返回了两个用户的条目或命名空间：`search(("users",))`、`search(())`、`list_namespaces()` 和 `list_namespaces(prefix=("users", "*"))`。`search(("users", "*", "memories"))` 什么也没返回，因为 `*` 只在 `list_namespaces` 里是通配符。
 
 ## SqliteStore 的两处缺陷 {#s-stores-and-long-term-memory-two-defects-of-sqlitestore}
 
