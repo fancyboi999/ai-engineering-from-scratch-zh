@@ -462,7 +462,7 @@ function writeMarkdown(file, { name, description, version }) {
 
 test('shared site asset families use the expected cache keys on every page', () => {
   const release = '20261106a';
-  const scriptRelease = '20261121a';
+  const scriptRelease = '20261121b';
   const appRelease = scriptRelease;
   const styleRelease = HEADER_ASSET_VERSION;
   const navigationRelease = HEADER_ASSET_VERSION;
@@ -1899,7 +1899,7 @@ test('lesson reader keeps learning-path context and renders a copyable full-dept
   const localeLoaderVersion = crypto.createHash('sha256').update(fs.readFileSync(path.join(__dirname, 'figures-manifest.js'))).digest('hex').slice(0, 12);
   assert.ok(lessonHtml.includes('<script src="figures-manifest.js?v=' + localeLoaderVersion + '"'),
     'the lesson must load the current content-addressed locale loader');
-  assert.match(lessonHtml, /<script src="progress\.js\?v=20261121a/);
+  assert.match(lessonHtml, /<script src="progress\.js\?v=20261121b/);
   assert.match(fs.readFileSync(path.join(__dirname, 'lesson-figures.js'), 'utf8'), /providerBaseUrl \+ provider/);
   assert.match(lessonHtml, /import\('https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@11/);
 });
@@ -2740,4 +2740,10 @@ test('manual progress export always lets the reader choose where to save', () =>
   assert.match(app, /exportJSON\(false, true\)/);
   const reminder = fs.readFileSync(path.join(__dirname, 'reminder.js'), 'utf8');
   assert.match(reminder, /exportJSON\(true\)/);
+});
+
+test('lesson drop cap is driven only by the renderer-marked paragraph, never by the first paragraph', () => {
+  const css = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  assert.doesNotMatch(css, /p:first-of-type::first-letter/);
+  assert.match(css, /\.lesson-article \.drop-cap::first-letter \{/);
 });

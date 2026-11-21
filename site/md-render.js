@@ -357,7 +357,8 @@
 
           var paraClass = '';
           if (firstBlockquoteDone && !firstParaAfterMottoDone) {
-            var isMetaLine = line.match(/^\*\*[^*]+\*\*\s*:/);
+            // 课程头部的「**类型：** Build」冒号在加粗内且是全角，也要算元数据行，首字下沉留给第一段正文。
+            var isMetaLine = line.match(/^\*\*[^*]+?(?:[:：]\*\*|\*\*\s*[:：])/);
             if (!isMetaLine) {
               paraClass = ' class="drop-cap"';
               firstParaAfterMottoDone = true;

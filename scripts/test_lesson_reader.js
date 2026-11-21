@@ -299,3 +299,21 @@ test('Mermaid reader preserves natural label scale in a keyboard-scrollable regi
   assert.match(source, /\.lesson-figure \.lf-readable-viewport\s*\{[^}]*overflow-x:\s*auto;/);
   assert.match(source, /\.lesson-figure \.lf-readable-viewport svg\s*\{[^}]*max-width:\s*none;/);
 });
+
+test('lesson drop cap skips the Chinese metadata lines and lands on the first prose paragraph', () => {
+  const html = MDRender.parseMd([
+    '# 开发环境',
+    '',
+    '> 你的工具塑造你的思维。',
+    '',
+    '**类型：** Build',
+    '**语言：** Python',
+    '**预计时间：** ~45 分钟',
+    '',
+    '## 问题',
+    '',
+    '你的第一个模型训练了三个小时。',
+  ].join('\n'));
+  const dropCaps = html.match(/<p class="drop-cap">[^<]*/g) || [];
+  assert.deepEqual(dropCaps, ['<p class="drop-cap">你的第一个模型训练了三个小时。']);
+});
