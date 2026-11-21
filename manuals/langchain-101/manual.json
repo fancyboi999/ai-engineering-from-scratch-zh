@@ -94,7 +94,7 @@
       "usedFor": "所有标为实测的数字；按文件引用"
     },
     {
-      "name": "GitHub issue、拉取请求与安全公告",
+      "name": "GitHub issue、pull request 与安全公告",
       "path": "langchain-ai/langchain, langchain-ai/langgraph, and langchain-ai/deepagents, read 2026-11-14",
       "usedFor": "锁定版本上的已知缺陷和某个行为的来龙去脉；以 issue 引用并附编号"
     },
