@@ -6,6 +6,7 @@
   font-size: 17px;
   line-height: 1.62;
   font-kerning: normal;
+  font-synthesis-style: none; /* 汉字不做伪斜体，西文仍用真斜体 */
   hyphens: manual;
   overflow-wrap: break-word;
 }
@@ -195,3 +196,5 @@
   .m-fig-box { padding: 10px; }
   .manual .cb pre { font-size: 12px; }
 }
+
+.manual :is(pre, code) { font-synthesis-style: auto; }

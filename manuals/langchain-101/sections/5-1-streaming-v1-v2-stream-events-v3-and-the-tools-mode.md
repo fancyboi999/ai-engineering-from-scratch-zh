@@ -448,7 +448,7 @@ note: 另外两个循环的分支被截掉了。
 
 不要在同一条消息上一个接一个地读两个投影。后读的那个投影总要等到消息结束。这条规则对 `message.tool_calls` 同样成立，上面的工具阶段已经说明。为每个投影开一个任务也许可行，[第 8.8 节](#s-limits-at-the-pin-and-what-comes-in-the-next-edition)把它列为没有运行的项目。
 
-这个 issue 有一个已关闭的拉取请求 #38533，它让 `create_agent` 把运行配置传给 `model_.invoke` {{code libs/langchain_v1/langchain/agents/factory.py:1509}}。这个改动没有碰投影代码。在同一个 agent 里，只读文本的循环和原始事件循环本来就能实时拿到每个 delta。所以不要等 `create_agent` 的修复。
+这个 issue 有一个已关闭的 pull request #38533，它让 `create_agent` 把运行配置传给 `model_.invoke` {{code libs/langchain_v1/langchain/agents/factory.py:1509}}。这个改动没有碰投影代码。在同一个 agent 里，只读文本的循环和原始事件循环本来就能实时拿到每个 delta。所以不要等 `create_agent` 的修复。
 
 ## 真实模型如何流出工具调用 {#s-streaming-v1-v2-stream-events-v3-and-the-tools-mode-how-a-real-model-streams-a-tool-call}
 

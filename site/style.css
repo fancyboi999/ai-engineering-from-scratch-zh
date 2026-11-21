@@ -94,6 +94,10 @@ html {
   scroll-padding-top: 96px;
 }
 
+/* 中文字体没有斜体，浏览器会把汉字机械倾斜。关闭伪斜体：西文仍用真斜体字面，汉字保持正体。代码沿用原样式。 */
+html:lang(zh) { font-synthesis-style: none; }
+html:lang(zh) :is(pre, code) { font-synthesis-style: auto; }
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
