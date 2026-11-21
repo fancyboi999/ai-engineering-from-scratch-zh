@@ -6,7 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const zlib = require('node:zlib');
 const { spawnSync } = require('node:child_process');
-const { renderCard, renderPixels, layout } = require('../lib/og-render');
+const { renderCard, renderPixels, layout, descriptionDrift } = require('../lib/og-render');
 const { ORIGIN, cardPath, cardUrl, cardTags, cardVersion, lessonCard, socialCards, stampCards, trackCard } = require('../lib/og-cards');
 const { createHandler } = require('../api/og');
 const { buildOgCards, validateOgCards } = require('../site/og-cards');
@@ -91,6 +91,16 @@ const chineseLines = layout({ ...spec, title: '反向传播注意力机制神经
 assert.ok(chineseLines.length > 1);
 assert.ok(!chineseLines.join('').includes(' '));
 assert.ok(layout(spec).title.lines.join('').includes('反向传播'));
+// 副标题折成一行时只能截掉句尾：版本号里的点、.gitignore、中文句末加后引号都不能让开头丢失。
+for (const description of [
+  '用 LangChain 1.5、LangGraph 1.2 和 Deep Agents 0.7 构建、运行、持久化并调试 agent，每项决策都有一份录制的实测答案',
+  '版本控制不是可选项，你在这里做的每一次实验都要提交。配置 .gitignore，把模型 checkpoint 和大型二进制文件排除在仓库之外，再推送到远程。',
+  '实体链接与消歧：NER 找到了 "Paris"。实体链接来定夺：是法国巴黎，还是一个人名？',
+]) {
+  const card = { ...spec, description };
+  assert.equal(descriptionDrift(card), null, layout(card).description);
+}
+assert.equal(layout({ ...spec, description: '开发环境：你的工具塑造你的思维。一次配置到位，就配置对。从零搭建 Python、Node 与 GPU 驱动的完整环境，并在每一步验证结果是否可用。' }).description, '开发环境：你的工具塑造你的思维。一次配置到位，就配置对。');
 
 // 蓝底页面卡与居中首页卡的文字必须全部落在四角标记框内，框外保持纯背景色。
 for (const [name, card] of [['home', cards['page/home']], ['lesson', { ...spec, title: '反向传播与注意力机制'.repeat(6), description: '亲手构建神经网络，理解梯度、损失和 agent 循环。'.repeat(4) }]]) {
