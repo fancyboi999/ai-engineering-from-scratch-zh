@@ -1,46 +1,46 @@
 ---
 name: attention-variant-picker
-description: Pick a full / sliding-window / sparse / differential attention topology for a new model given context length, retrieval demands, and compute profile.
+description: 根据上下文长度、检索需求和算力画像，为新模型选择全注意力 / 滑动窗口 / 稀疏 / 差分注意力拓扑。
 version: 1.0.0
 phase: 7
 lesson: 15
 tags: [attention, transformer, long-context, inference, memory]
 ---
 
-# Attention Variant Picker
+# 注意力变体选择器
 
-Help a developer choose and justify an attention topology for a new transformer, or for an existing one they're extending to longer context.
+帮开发者为新的 transformer，或为正在扩展到更长上下文的现有模型，选定一种注意力拓扑并给出理由。
 
-## Inputs to gather
+## 需要收集的输入
 
-1. **Target context length** at training and at inference (often different — many models train at 16K and extend at inference).
-2. **Retrieval demand** on a 1–5 scale: 1 = pure chat, 5 = needle-in-haystack / RAG / code with long repository context.
-3. **Inference memory budget** per-request KV cache tolerance (bytes per token per layer is the right unit).
-4. **Training cost tolerance** — training SWA from scratch is cheap; retrofitting differential attention into a pretrained model is expensive.
-5. **Hardware target** — Hopper+ has full FlashAttention-3, Ada has FA2, older GPUs are mask-limited.
+1. 训练时和推理时的**目标上下文长度**（两者常常不同：很多模型在 16K 上训练，推理时再扩展）。
+2. **检索需求**，按 1–5 打分：1 = 纯聊天，5 = 大海捞针 / RAG / 需要长仓库上下文的代码任务。
+3. **推理内存预算**，即每个请求能承受的 KV cache（合适的单位是每层每 token 的字节数）。
+4. **训练成本容忍度**：从零训练 SWA 很便宜；给预训练模型改装差分注意力很贵。
+5. **目标硬件**：Hopper 及以上有完整的 FlashAttention-3，Ada 有 FA2，更老的 GPU 受掩码能力限制。
 
-## Decision rules
+## 决策规则
 
-- **Context ≤ 16K and retrieval ≤ 3**: full attention with FlashAttention. Don't optimize prematurely.
-- **Context 16–128K and retrieval ≤ 3**: mixed SWA + global at 5:1, window 1024 (Gemma 3 shape). Keeps retrieval workable while collapsing KV.
-- **Context > 128K**: full SWA with a global layer every 4–6 layers, plus position interpolation / YaRN scaling (Lesson 04).
-- **Retrieval = 5 and training budget allows**: consider differential attention in the top 4 layers only (half the KV doubling, most of the sink-cancellation win).
-- **You're shipping a public API**: prefer stable patterns (full, SWA, Gemma-3 mix). Skip native-sparse / DIFF unless you have kernel engineers.
-- **You can't change the base model**: SWA can be retrofitted at inference via masking; differential and sparse can't.
+- **上下文 ≤ 16K 且检索 ≤ 3**：全注意力 + FlashAttention。不要过早优化。
+- **上下文 16–128K 且检索 ≤ 3**：SWA 与全局层按 5:1 混合，窗口 1024（Gemma 3 的结构）。既保住检索能力，又大幅压缩 KV。
+- **上下文 > 128K**：全面使用 SWA，每 4–6 层插一个全局层，再加位置插值 / YaRN 缩放（第 04 课）。
+- **检索 = 5 且训练预算允许**：考虑只在最上面 4 层用差分注意力（KV 翻倍的代价只付一半，却能拿到大部分抵消注意力汇聚的收益）。
+- **要发布公开 API**：优先选稳定的模式（全注意力、SWA、Gemma-3 混合）。除非有 kernel 工程师，否则跳过原生稀疏 / DIFF。
+- **无法改动基座模型**：SWA 可以在推理时通过掩码改装上去；差分和稀疏注意力不行。
 
-## Always flag
+## 始终标出
 
-- Pure-SWA models below 7B often lose measurably on reasoning benchmarks. Recommend against.
-- Window size < 512 is almost never right. Go bigger or use a different topology.
-- Differential attention reports in the paper are on small models (3–7B). Scale-up evidence is thin as of early 2026.
-- Every variant interacts with RoPE / YaRN scaling (Lesson 04). State the position scheme explicitly.
+- 7B 以下的纯 SWA 模型在推理类基准上常有可测的退步。建议不要用。
+- 窗口 < 512 几乎从来都不对。要么调大，要么换一种拓扑。
+- 论文里的差分注意力结果都来自小模型（3–7B）。截至 2026 年初，放大规模后的证据仍然很少。
+- 每种变体都会和 RoPE / YaRN 缩放相互影响（第 04 课）。要明确写出位置编码方案。
 
-## Output format
+## 输出格式
 
-Return:
+返回：
 
-1. **Recommendation** — a single named topology (e.g. "Gemma-3 mix, W=1024, 5:1 SWA:global").
-2. **Justification** — map each input to the decision rule above.
-3. **KV cache estimate** — at target context, in bytes per token per layer and GB at batch 1.
-4. **Migration path** — if the base model is already trained, how to retrofit.
-5. **Known risks** — which benchmarks / workloads might regress.
+1. **推荐**：一个具名拓扑（例如 "Gemma-3 mix, W=1024, 5:1 SWA:global"）。
+2. **理由**：把每项输入对应到上面的决策规则。
+3. **KV cache 估算**：目标上下文下，每层每 token 的字节数，以及 batch 为 1 时的 GB 数。
+4. **迁移路径**：如果基座模型已经训练好，如何改装。
+5. **已知风险**：哪些基准 / 负载可能退步。

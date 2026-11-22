@@ -1,34 +1,34 @@
 ---
 name: swarm-fit
-description: Decide whether a task fits a swarm (decentralized) architecture or a supervisor (centralized) one.
+description: 判断一个任务适合群体（去中心化）架构还是 supervisor（中心化）架构。
 version: 1.0.0
 phase: 16
 lesson: 09
 tags: [multi-agent, swarm, decentralized, langgraph, matrix]
 ---
 
-Given a task and its throughput / determinism requirements, recommend swarm or supervisor and list the specific queue and guardrail choices.
+给定一个任务及其吞吐量 / 确定性要求，推荐群体（swarm）或 supervisor，并列出具体的队列和护栏选择。
 
-Produce:
+产出：
 
-1. **Task independence check.** Are subtasks independent or do they depend on each other? Swarm only fits when independence is high.
-2. **Duration distribution.** Uniform vs variable. Swarm wins mostly on variable-duration workloads.
-3. **Ordering requirement.** Strict, relaxed, or none. Swarm does not preserve order; supervisor does.
-4. **Debuggability need.** High (finance, medical) → supervisor. Medium → swarm with per-task trace IDs.
-5. **Queue choice.** In-memory (`queue.Queue`) for demos; Kafka / Redis Streams / NATS / durable DB-backed for production.
-6. **Worker design requirements.** Must be idempotent; must emit per-task trace; must handle back-pressure.
-7. **Anti-starvation plan.** Priority aging, worker specialization, bounded queue.
-8. **Observability plan.** Per-task IDs, start/end events, result pool schema.
+1. **任务独立性检查。** 子任务彼此独立，还是相互依赖？只有独立性高时，群体架构才适合。
+2. **耗时分布。** 均匀还是参差不齐。群体架构主要在耗时参差的负载上占优。
+3. **顺序要求。** 严格、宽松或没有。群体架构不保证顺序；supervisor 保证。
+4. **可调试性需求。** 高（金融、医疗）→ supervisor。中 → 群体架构，每个任务带 trace ID。
+5. **队列选择。** 演示用内存队列（`queue.Queue`）；生产用 Kafka / Redis Streams / NATS / 持久化的数据库队列。
+6. **Worker 设计要求。** 必须幂等；必须为每个任务输出 trace；必须能处理背压。
+7. **防饥饿方案。** 优先级老化、worker 专职化、有界队列。
+8. **可观测性方案。** 每个任务的 ID、开始/结束事件、结果池 schema。
 
-Hard rejects:
+直接否决：
 
-- Swarm recommendation for tasks with hard ordering requirements.
-- Swarm without idempotent workers.
-- Swarm without durable queue in production.
+- 对有硬性顺序要求的任务推荐群体架构。
+- worker 不幂等的群体架构。
+- 生产环境中没有持久化队列的群体架构。
 
-Refusal rules:
+拒绝规则：
 
-- If the task has fewer than 10 independent units per second, refuse swarm and recommend supervisor. Swarm overhead is not justified at low throughput.
-- If observability requirements need a single coherent trace (audit, compliance), refuse swarm and recommend LangGraph deterministic graph instead.
+- 任务每秒独立单元不到 10 个时，拒绝群体架构，推荐 supervisor。吞吐量低时群体架构的开销不划算。
+- 可观测性要求一条完整连贯的 trace（审计、合规）时，拒绝群体架构，改为推荐 LangGraph 确定性图。
 
-Output: a one-page architectural brief. Open with the fit verdict, close with the specific message broker recommendation for the target throughput.
+输出：一页架构简报。开头给出适配结论，结尾针对目标吞吐量给出具体的消息 broker 推荐。

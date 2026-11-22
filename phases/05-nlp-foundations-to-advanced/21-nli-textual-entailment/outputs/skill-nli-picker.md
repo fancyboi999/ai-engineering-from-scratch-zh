@@ -1,17 +1,17 @@
 ---
 name: nli-picker
-description: Pick an NLI model, label template, and evaluation setup for a classification / faithfulness / zero-shot task.
+description: 为分类、忠实度检查或零样本任务选择 NLI 模型、标签模板和评测设置。
 version: 1.0.0
 phase: 5
 lesson: 21
 tags: [nlp, nli, zero-shot]
 ---
 
-Given a use case (faithfulness check, zero-shot classification, document-level inference), output:
+拿到使用场景（忠实度检查、零样本分类、文档级推理）后，输出：
 
-1. Model. Named NLI checkpoint. Reason tied to domain, length, language.
-2. Template (if zero-shot). Verbalization pattern. Example.
-3. Threshold. Entailment cutoff for the decision rule. Reason based on calibration.
-4. Evaluation. Accuracy on held-out labeled set, hypothesis-only baseline, adversarial subset.
+1. 模型。指名的 NLI checkpoint。理由要和领域、长度、语言挂钩。
+2. 模板（零样本时）。标签的语言化模式，附一个例子。
+3. 阈值。决策规则使用的蕴含分数线。理由基于校准结果。
+4. 评测。留出标注集上的准确率、只看假设的基线、对抗子集。
 
-Refuse to ship zero-shot classification without a 100-example labeled sanity check. Refuse to use a sentence-level NLI model on document-length premises. Flag any claim that NLI solves hallucination — it reduces it; it does not eliminate it.
+零样本分类没有用 100 条标注样本做健全性检查，拒绝上线。拒绝把句子级 NLI 模型用在文档长度的前提上。任何声称 NLI 能解决幻觉的说法都要指出：它能减少幻觉，但消除不了。

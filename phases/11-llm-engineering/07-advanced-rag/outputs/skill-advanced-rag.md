@@ -1,16 +1,16 @@
 ---
 name: skill-advanced-rag
-description: Build production-grade RAG with hybrid search, reranking, and evaluation
+description: 用混合搜索、重排序和评估构建生产级 RAG
 version: 1.0.0
 phase: 11
 lesson: 7
 tags: [rag, hybrid-search, bm25, reranking, hyde, evaluation]
 ---
 
-# Advanced RAG Pattern
+# 进阶 RAG 模式
 
-Basic RAG: embed query -> vector search -> top-k -> generate.
-Advanced RAG: embed query + BM25 -> fuse ranks -> rerank -> top-k -> generate.
+基础 RAG：嵌入查询 -> 向量搜索 -> top-k -> 生成。
+进阶 RAG：嵌入查询 + BM25 -> 融合排名 -> 重排序 -> top-k -> 生成。
 
 ```
 query -> [vector search (top-50)] -+-> RRF fusion -> reranker (top-5) -> prompt -> LLM
@@ -18,44 +18,44 @@ query -> [vector search (top-50)] -+-> RRF fusion -> reranker (top-5) -> prompt 
 query -> [BM25 search (top-50)]  --+
 ```
 
-## When to upgrade from basic RAG
+## 什么时候从基础 RAG 升级
 
-- Retrieval quality drops below 70% Recall@5
-- Users report wrong or irrelevant answers
-- Corpus grows beyond 100K chunks
-- Queries use different vocabulary than documents
-- Multi-hop questions fail consistently
+- 检索质量跌破 70% Recall@5
+- 用户反馈答案错误或不相关
+- 语料超过 100K 个块
+- 查询用词与文档用词不同
+- 多跳问题持续失败
 
-## Implementation checklist
+## 实现清单
 
-1. Add BM25 index alongside vector index
-2. Run both searches in parallel (top-50 each)
-3. Merge with Reciprocal Rank Fusion (k=60)
-4. Rerank top candidates with a cross-encoder
-5. Take top-5 for the final prompt
-6. Add faithfulness evaluation on a test set
+1. 在向量索引旁边加一个 BM25 索引
+2. 两种搜索并行跑（各取 top-50）
+3. 用 Reciprocal Rank Fusion（k=60）合并
+4. 用 cross-encoder 对头部候选重排序
+5. 取 top-5 放进最终 prompt
+6. 在测试集上加入忠实度评估
 
-## Technique selection guide
+## 技术选型指南
 
-- **Hybrid search**: always use in production. Costs nothing extra at query time.
-- **Reranking**: use when Recall@50 is good but Recall@5 is bad. Adds 50-200ms latency.
-- **HyDE**: use when queries are vague or use different vocabulary than docs. Adds one LLM call.
-- **Parent-child chunks**: use when small chunks lack context but large chunks dilute relevance.
-- **Metadata filtering**: use when corpus has clear categories (date, source type, department).
-- **Query decomposition**: use for multi-hop questions that require information from multiple docs.
+- **混合搜索**：生产环境一律使用，查询时几乎没有额外成本。
+- **重排序**：Recall@50 好但 Recall@5 差时使用。增加 50-200ms 延迟。
+- **HyDE**：查询含糊或与文档用词不同时使用。多一次 LLM 调用。
+- **父子块**：小块缺上下文、大块又稀释相关性时使用。
+- **元数据过滤**：语料有清晰分类（日期、来源类型、部门）时使用。
+- **查询分解**：需要从多篇文档获取信息的多跳问题。
 
-## Common mistakes
+## 常见错误
 
-- Running BM25 and vector search with different chunk sets (they must search the same corpus)
-- Using too small a candidate pool for reranking (top-10 is too few; use top-50)
-- Adding HyDE for every query (only helps when vocabulary mismatch is the bottleneck)
-- Not evaluating changes (measure Recall@k before and after each technique)
-- Over-engineering the pipeline before measuring where it fails
+- BM25 和向量搜索用了不同的块集合（两者必须搜同一份语料）
+- 重排序的候选池太小（top-10 太少，用 top-50）
+- 每个查询都加 HyDE（只有用词不匹配是瓶颈时才有帮助）
+- 不评估改动效果（每加一项技术前后都要测 Recall@k）
+- 还没测出哪里失败就过度设计流水线
 
-## Evaluation workflow
+## 评估流程
 
-1. Create 50+ test questions with known answer chunks
-2. Measure Recall@5 and Recall@10 for each retrieval method
-3. For queries where retrieval succeeds, measure faithfulness of generated answers
-4. Track metrics weekly as the corpus grows
-5. Investigate individual failures before adding more techniques
+1. 准备 50+ 道已知答案块的测试题
+2. 对每种检索方式测量 Recall@5 和 Recall@10
+3. 对检索成功的查询，测量生成答案的忠实度
+4. 随语料增长每周跟踪指标
+5. 加新技术之前，先逐个排查具体失败案例

@@ -1,30 +1,30 @@
 ---
 name: token-gen-cost-analyzer
-description: Compute token counts, inference latency, and quality ceiling for Emu3-style next-token generation and pick between Emu3-family and diffusion.
+description: 计算 Emu3 式 next-token 生成的 token 数、推理延迟和质量上限，并在 Emu3 系列与扩散模型之间做选择。
 version: 1.0.0
 phase: 12
 lesson: 12
 tags: [emu3, next-token-prediction, video-gen, diffusion, cfg]
 ---
 
-Given a generation product spec (image or video, target resolution, quality tier, throughput requirement), compute token counts for Emu3-style next-token generation, estimate inference cost, and pick between Emu3-family and diffusion.
+用户会给出生成类产品的规格（图像还是视频、目标分辨率、质量档次、吞吐要求）。你负责计算 Emu3 式 next-token 生成的 token 数，估算推理成本，并在 Emu3 系列与扩散模型之间做选择。
 
-Produce:
+输出：
 
-1. Token count. Per-image tokens at chosen tokenizer reduction (typically 8x per dim for image). Per-video tokens with 3D VQ (typically 4 frames x 8x8 pixels per token).
-2. Inference latency. Tokens / throughput (tokens-per-second) for Emu3-family; denoise-steps * step-time for diffusion. Cite concrete A100 / H100 ranges.
-3. Quality ceiling. Tokenizer reconstruction PSNR (30-32 dB for IBQ-class), FID expectations on MJHQ-30K, FVD for video.
-4. CFG configuration. Recommended guidance weight (gamma) per task; typical 3.0 for standard gen, 5-7 for strong prompt adherence.
-5. Pick. Emu3-family if product needs unified understanding + generation or any-modality flexibility; diffusion (SDXL / SD3 / Flux) if product is image-gen-only with strict latency.
+1. Token 数。按所选分词器的压缩倍率（图像通常每个维度 8 倍）计算每张图的 token 数。视频用 3D VQ 计算每段视频的 token 数（通常每个 token 对应 4 帧 x 8x8 像素）。
+2. 推理延迟。Emu3 系列按 token 数 / 吞吐（每秒 token 数）计算；扩散模型按去噪步数 * 单步时间计算。给出具体的 A100 / H100 数值范围。
+3. 质量上限。分词器重建 PSNR（IBQ 级别为 30-32 dB）、MJHQ-30K 上的 FID 预期、视频的 FVD。
+4. CFG 配置。按任务推荐引导权重（gamma）；常规生成一般取 3.0，需要强 prompt 遵循时取 5-7。
+5. 选择。产品需要统一的理解 + 生成，或需要任意模态的灵活性时，选 Emu3 系列；只做图像生成且延迟要求严格时，选扩散模型（SDXL / SD3 / Flux）。
 
-Hard rejects:
-- Claiming Emu3 is faster than diffusion at inference. It is not; the autoregressive decode over thousands of image tokens is the standing cost.
-- Recommending Emu3-family without specifying CFG weight. Quality collapses without it.
-- Proposing Emu3 for strict 4K image generation. Token count at 2048+ resolution blows KV cache and takes minutes.
+直接否决：
+- 声称 Emu3 推理比扩散模型快。事实并非如此，对数千个图像 token 做自回归解码是绕不开的固定成本。
+- 推荐 Emu3 系列却不给 CFG 权重。没有它，质量会崩。
+- 用 Emu3 做严格的 4K 图像生成。2048+ 分辨率下的 token 数会撑爆 KV cache，生成要好几分钟。
 
-Refusal rules:
-- If latency budget is <5s per image, refuse Emu3 and recommend SDXL or SD3.
-- If product must emit images AND describe them AND reason about third-party images, recommend Emu3-family (the unified loss is the point); diffusion cannot do this without a separate VLM.
-- If user wants open weights with permissive license for commercial use, refuse Emu3 — check its license first; some versions are research-only.
+拒绝规则：
+- 如果延迟预算低于每张图 5s，拒绝 Emu3，推荐 SDXL 或 SD3。
+- 如果产品必须既能生成图像、又能描述图像、还要能推理第三方图像，推荐 Emu3 系列（统一损失正是它的意义所在）；扩散模型不配一个单独的 VLM 就做不到这些。
+- 如果用户要可商用的宽松许可开源权重，拒绝 Emu3，先查清它的许可证；有些版本仅限研究使用。
 
-Output: one-page analysis with token counts, latency estimates, quality ceiling, CFG config, and a pick with justification. End with arXiv 2409.18869 (Emu3) and 2408.11039 (Transfusion) for the alternative.
+输出：一页分析，包含 token 数、延迟估计、质量上限、CFG 配置，以及附理由的选择。结尾附上 arXiv 2409.18869（Emu3），并附 2408.11039（Transfusion）作为替代方案。

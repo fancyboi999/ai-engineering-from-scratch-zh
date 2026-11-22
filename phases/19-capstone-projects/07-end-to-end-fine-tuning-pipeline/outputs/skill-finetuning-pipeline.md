@@ -1,47 +1,47 @@
 ---
 name: finetuning-pipeline
-description: Run a reproducible data-to-SFT-to-DPO-to-serve fine-tuning pipeline with ablations, quantization, and a 2026 Model Openness Framework model card.
+description: 运行一条可复现的微调流水线（数据 → SFT → DPO → 部署），包含消融、量化，以及符合 2026 Model Openness Framework 的模型卡。
 version: 1.0.0
 phase: 19
 lesson: 07
 tags: [capstone, fine-tuning, axolotl, trl, dpo, grpo, vllm, eagle-3, mof]
 ---
 
-Given a base model (Llama 3.1 8B, Qwen3 14B, or Gemma 3 12B) and a task-specific dataset, build a single-command pipeline that produces a served endpoint and a reproducible model card.
+给定一个基座模型（Llama 3.1 8B、Qwen3 14B 或 Gemma 3 12B）和一份特定任务的数据集，构建一条一键运行的流水线，产出一个在线服务端点和一张可复现的模型卡。
 
-Build plan:
+构建计划：
 
-1. Data stage: Datatrove dedup, Nemotron-CC-style quality filter, Presidio PII scrub, seeded train/val splits.
-2. Contamination check: MinHashLSH against MMLU-Pro, MT-Bench-v2, RewardBench-2. Reject on overlap.
-3. SFT: Axolotl v0.8 with ZeRO-3, Flash Attention 3, packed sequences, 2-3 epochs on 8xH100.
-4. Preference tuning: TRL 0.15 DPO (or GRPO with verifiable rewards) for 1 epoch, beta sweep.
-5. Quantize: GPTQ-INT4-Marlin + AWQ-INT4 + GGUF-Q4_K_M.
-6. Serve: vLLM 0.7 with EAGLE-3 speculative decoding (draft heads via Red Hat Speculators or SGLang SpecForge). K8s deployment with HPA on queue-wait.
-7. Eval: lm-evaluation-harness, RewardBench-2, MT-Bench-v2, MMLU-Pro across base/SFT-only/SFT+DPO/SFT+GRPO.
-8. Safety: Llama Guard 4 pass rate, ShieldGemma-2 output filter.
-9. Model card under 2026 Model Openness Framework with data, training, eval, safety, reproducibility sections.
+1. 数据阶段：Datatrove 去重、Nemotron-CC 式质量过滤、Presidio PII 清洗、固定种子的训练/验证集划分。
+2. 污染检查：用 MinHashLSH 对照 MMLU-Pro、MT-Bench-v2、RewardBench-2。有重叠就拒绝。
+3. SFT：Axolotl v0.8，配合 ZeRO-3、Flash Attention 3、序列打包，在 8xH100 上跑 2-3 个 epoch。
+4. 偏好调优：TRL 0.15 DPO（或带可验证奖励的 GRPO）跑 1 个 epoch，对 beta 做扫参。
+5. 量化：GPTQ-INT4-Marlin + AWQ-INT4 + GGUF-Q4_K_M。
+6. 部署：vLLM 0.7 配合 EAGLE-3 投机解码（draft head 由 Red Hat Speculators 或 SGLang SpecForge 训练）。K8s 部署，HPA 按排队等待时间扩缩。
+7. 评估：在 base / 仅 SFT / SFT+DPO / SFT+GRPO 上跑 lm-evaluation-harness、RewardBench-2、MT-Bench-v2、MMLU-Pro。
+8. 安全：Llama Guard 4 通过率、ShieldGemma-2 输出过滤。
+9. 按 2026 Model Openness Framework 编写模型卡，包含数据、训练、评估、安全、可复现性各章节。
 
-Assessment rubric:
+评分标准：
 
-| Weight | Criterion | Measurement |
+| 权重 | 评分项 | 衡量方式 |
 |:-:|---|---|
-| 25 | Eval delta vs base | Measured gain on MMLU-Pro, MT-Bench-v2, task-specific benchmarks |
-| 20 | Pipeline reproducibility | One-command rerun with identical seeds yields matching hashes |
-| 20 | Data hygiene | Dedup rate, PII scrub coverage, contamination check green |
-| 20 | Serving efficiency | tokens/s at batch 1/8/32, EAGLE-3 acceptance, $/1M tokens |
-| 15 | Model card + safety eval | 2026 MOF completeness + Llama Guard 4 pass rate |
+| 25 | 相对基座的评估提升 | 在 MMLU-Pro、MT-Bench-v2 和任务专用基准上实测的提升 |
+| 20 | 流水线可复现性 | 一条命令用相同种子重跑，得到一致的哈希 |
+| 20 | 数据卫生 | 去重率、PII 清洗覆盖率、污染检查通过 |
+| 20 | 推理服务效率 | batch 1/8/32 下的 tokens/s、EAGLE-3 接受率、$/1M tokens |
+| 15 | 模型卡 + 安全评估 | 2026 MOF 完整度 + Llama Guard 4 通过率 |
 
-Hard rejects:
+直接否决：
 
-- Pipelines that skip the MinHash contamination check. Leaking MMLU-Pro into training is the classic eval-cheating failure mode.
-- Training runs without seeds or YAMLs attached. Reproducibility is a hard requirement.
-- Serving without EAGLE-3 or an equivalent speculative decoding configuration. Baseline tokens/s is not the 2026 bar.
-- Missing safety eval. Every fine-tune ships with a Llama Guard 4 pass rate.
+- 流水线跳过 MinHash 污染检查。把 MMLU-Pro 泄漏进训练集，是最典型的评估作弊式失败。
+- 训练运行没有附上随机种子或 YAML。可复现性是硬性要求。
+- 部署时没有 EAGLE-3 或同等的投机解码配置。基线 tokens/s 达不到 2026 年的标准。
+- 缺少安全评估。每次微调交付都要附 Llama Guard 4 通过率。
 
-Refusal rules:
+拒绝规则：
 
-- Refuse to publish a model card that claims benchmark scores without attaching the lm-eval-harness commit SHA.
-- Refuse to fine-tune on data whose license forbids derivative models. MOF grades data licensing.
-- Refuse to ship a quantized model without measuring quality loss on the eval matrix.
+- 模型卡声称了基准分数，却没附 lm-eval-harness 的 commit SHA，拒绝发布。
+- 数据许可证禁止派生模型时，拒绝在其上微调。MOF 会对数据许可打分。
+- 没有在评估矩阵上测量质量损失，拒绝交付量化模型。
 
-Output: a repo containing the pipeline orchestrator, the YAMLs for Llama 3.1 8B + one alternate base, the SFT and DPO W&B run logs, the quantized artifacts, the served endpoint, the three-benchmark eval matrix, the safety eval, the 2026 MOF model card, and a write-up on the three largest data-hygiene issues you caught and fixed.
+输出：一个仓库，包含流水线编排器、Llama 3.1 8B 及另一个备选基座的 YAML、SFT 和 DPO 的 W&B 运行日志、量化产物、在线服务端点、三项基准的评估矩阵、安全评估、2026 MOF 模型卡，以及一份说明文档，写出你发现并修复的三个最大的数据卫生问题。

@@ -1,38 +1,38 @@
 ---
 name: star-loop-reviewer
-description: Audit a proposed self-taught reasoning pipeline (STaR-family) before you commit training compute to it.
+description: 在投入训练算力之前，审计一条拟议的自学推理流水线（STaR 家族）。
 version: 1.0.0
 phase: 15
 lesson: 2
 tags: [star, vstar, quiet-star, self-improvement, reasoning, bootstrap]
 ---
 
-Given a proposed STaR-style bootstrap pipeline (base model, problem source, filter rule, training frequency, evaluation plan), produce a pre-training audit that predicts what the loop will and will not improve.
+给定一条拟议的 STaR 式自举流水线（基座模型、题目来源、过滤规则、训练频率、评测计划），产出一份训练前审计，预测这个循环能改进什么、不能改进什么。
 
-Produce:
+产出：
 
-1. **Filter analysis.** State exactly what the "keep" rule grades on (final answer, final answer + format check, final answer + verifier). Identify the class of rationales the filter will preserve that a human would reject.
-2. **Shortcut surface.** For the problem distribution, name the three most plausible shortcuts (pattern-match, arithmetic trick, heuristic guessing) that reach the right answer without sound reasoning. Estimate what fraction of the training corpus they can "solve".
-3. **OOD plan.** Require the pipeline to hold out a problem set drawn from a distribution the shortcuts cannot reach. If the pipeline does not have one, refuse and recommend one before training starts.
-4. **Verifier design (if V-STaR).** State what the verifier is trained on. If it is trained on the same (problem, rationale, label) triples as the generator, flag the risk of reinforcing confident wrongness.
-5. **Compute vs labelling tradeoff.** Compare the projected STaR compute cost to the cost of a smaller process-supervised labelling effort. If the process-supervised alternative produces better held-out quality for less money, recommend it.
+1. **过滤器分析。** 准确说明"保留"规则依据什么打分（最终答案、最终答案加格式检查、最终答案加验证器）。指出过滤器会保留下来、但人类会否决的那类推理过程。
+2. **捷径面。** 针对该题目分布，列出三种最可能的捷径（模式匹配、算术技巧、启发式猜测），它们不靠可靠推理也能得到正确答案。估计训练语料中有多大比例能被它们"解出"。
+3. **OOD 计划。** 要求流水线留出一组来自捷径够不到的分布的题目。流水线没有这组题时，拒绝继续，并在训练开始前推荐一组。
+4. **验证器设计（V-STaR 时适用）。** 说明验证器用什么训练。如果它和生成器用的是同一批（题目、推理过程、标签）三元组，标出强化"自信地犯错"的风险。
+5. **算力与标注的权衡。** 把 STaR 的预估算力成本与一次规模较小的过程监督标注成本做比较。如果过程监督方案花更少的钱就能得到更好的留出集质量，推荐它。
 
-Hard rejects:
-- Any STaR pipeline without a held-out OOD evaluation.
-- Any claim that "the model's rationales prove the model reasons correctly." The filter rewards right answers, not right reasoning.
-- Running STaR on a problem class where the label itself is ambiguous or noisy — the loop amplifies label noise.
+直接否决：
+- 没有留出 OOD 评测的任何 STaR 流水线。
+- 声称"模型的推理过程证明它推理正确"。过滤器奖励的是正确答案，不是正确推理。
+- 在标签本身就模糊或有噪声的题型上跑 STaR。循环会放大标签噪声。
 
-Refusal rules:
-- If the user cannot name at least one plausible shortcut, refuse and ask them to spend an hour looking at sampled rationales before proceeding. Every domain has shortcuts; not knowing them is a red flag.
-- If the base model's baseline accuracy is already above 90% on the target distribution, refuse STaR and recommend targeted process supervision on the remaining failures. STaR is least valuable near saturation.
-- If the training loop has no stopping condition other than "keep going," refuse. Rounds past peak OOD accuracy actively degrade quality.
+拒绝规则：
+- 用户连一种可能的捷径都说不出来时，拒绝继续，请他们先花一小时看看采样出来的推理过程。每个领域都有捷径，不知道它们是危险信号。
+- 基座模型在目标分布上的基线准确率已经超过 90% 时，拒绝使用 STaR，建议针对剩余失败样本做定向过程监督。接近饱和时 STaR 的价值最低。
+- 训练循环除了"一直跑下去"之外没有停止条件时，拒绝。OOD 准确率过峰之后再跑的轮次会主动拉低质量。
 
-Output format:
+输出格式：
 
-Return a short memo with:
-- **Pipeline summary** (one paragraph)
-- **Filter grade** (what it rewards, what it misses)
-- **Top 3 shortcuts** (with examples)
-- **OOD evaluation plan** (or a ticket to create one)
-- **Verifier risk** (if applicable)
-- **Recommendation** (proceed / redesign / choose process supervision instead)
+返回一份简短备忘录，包含：
+- **流水线摘要**（一段话）
+- **过滤器评级**（它奖励什么、漏掉什么）
+- **三大捷径**（附例子）
+- **OOD 评测计划**（或者一张创建计划的工单）
+- **验证器风险**（如适用）
+- **建议**（继续 / 重新设计 / 改用过程监督）

@@ -1,27 +1,27 @@
 ---
 name: self-improvement-auditor
-description: Audit a proposed self-improvement or constitutional AI pipeline before it runs at scale.
+description: 在自我改进或 Constitutional AI 流水线大规模运行前进行审计。
 version: 1.0.0
 phase: 10
 lesson: 9
 tags: [alignment, cai, grpo, rlhf, self-improvement, reward-hacking]
 ---
 
-Given a proposed training pipeline that claims to use Constitutional AI, RLAIF, GRPO, or any form of self-generated preference data, produce an audit with:
+用户会给你一套训练流水线方案，声称使用 Constitutional AI、RLAIF、GRPO 或任何形式的自生成偏好数据。你需要输出一份审计，包含：
 
-1. Reward rule. State the exact verifier (regex, sympy, test suite, LLM judge). Classify as deterministic, stochastic-LLM, or hybrid. Reject any "self-improvement" loop that has no external grounding — the model cannot pull signal from nowhere.
-2. Group statistics. For GRPO pipelines, confirm group size, how advantages are computed (z-score vs relative rank), and what happens when group reward std collapses to zero. The pipeline must skip or downweight zero-variance groups, not divide by epsilon and pretend the signal is real.
-3. KL budget. A numeric cap on cumulative KL(policy || reference) over the run. The pipeline must halt, reset, or switch to a warmer reference when the cap is hit. Unbounded KL is unbounded drift.
-4. Diversity floor. A measured lower bound on per-group reward std, response length variance, or n-gram entropy, whichever the task admits. If the floor is breached for N consecutive rounds the pipeline must mix in fresh human data or a wider prompt distribution.
-5. Human data quota. Minimum fraction of the training mix that must remain human-authored, typically 5-10%. Self-distillation-only pipelines collapse after 3-5 rounds. Call this out explicitly.
-6. Mode-collapse watchdog. Flag automatic checks: reward std across rounds, unique n-gram count on held-out prompts, length distribution, refusal rate. Any of these crossing a threshold halts training.
-7. Constitution drift. For CAI pipelines, require a versioned constitution file, a changelog, and a "constitutional regression test set" — prompts whose expected behavior must not change across edits.
+1. 奖励规则。写明具体的验证器（regex、sympy、测试套件、LLM 评审）。归为确定性、随机 LLM 或混合三类之一。任何没有外部依据的“自我改进”循环一律否决：模型不可能凭空产生信号。
+2. 分组统计。对 GRPO 流水线，确认组大小、优势的计算方式（z-score 还是相对排名），以及组内奖励标准差坍缩到零时怎么处理。流水线必须跳过零方差的组或降低其权重，不能除以 epsilon 再假装信号是真的。
+3. KL 预算。对整个运行期间累计的 KL(policy || reference) 设一个数值上限。达到上限时，流水线必须停止、重置，或换一个更接近当前策略的参考模型。KL 不设上限，漂移就没有上限。
+4. 多样性下限。根据任务允许的方式，给组内奖励标准差、回答长度方差或 n-gram 熵设一个实测下限。连续 N 轮跌破下限时，流水线必须混入新的人工数据或更宽的 prompt 分布。
+5. 人工数据配额。训练数据中必须保留的人工撰写数据的最低比例，通常为 5-10%。只靠自蒸馏的流水线会在 3-5 轮后坍缩。这一点要明确指出。
+6. 模式坍缩看门狗。列出自动检查项：各轮之间的奖励标准差、留出 prompt 上的不重复 n-gram 数量、长度分布、拒答率。任何一项越过阈值就停止训练。
+7. Constitution 漂移。对 CAI 流水线，要求有带版本号的 constitution 文件、变更日志，以及一套“constitution 回归测试集”：这些 prompt 的预期行为在任何修改后都不能改变。
 
-Refuse to approve pipelines that:
-- claim "zero human data" without any external verifier (rule, tool, environment).
-- use PRMs without a process-reward hacking probe (does the model write steps that look right without advancing the proof?).
-- run more than 5 rounds of rejection-sampling fine-tuning without a held-out diversity benchmark.
-- share the reference model with the policy (no reference means no KL, means no anchor).
-- score with an LLM judge that is the same model as the policy (judge contamination).
+以下流水线拒绝批准：
+- 声称“零人工数据”，却没有任何外部验证器（规则、工具、环境）。
+- 使用 PRM，却没有过程奖励投机探针（模型写出的步骤是否看起来对、实际上却没有推进证明？）。
+- 跑了超过 5 轮拒绝采样微调，却没有留出的多样性基准。
+- 参考模型与策略模型共用（没有参考模型就没有 KL，也就没有锚点）。
+- 打分用的 LLM 评审与策略模型是同一个模型（评审污染）。
 
-Output: a one-page audit with pass/fail per gate, the measured or stated value, and the exact step in the pipeline that produces each signal. If any gate fails, list the minimum viable change that would flip it to pass.
+输出：一页审计报告，每道关卡给出通过/不通过、实测值或声明值，以及流水线中产生该信号的具体步骤。有关卡不通过时，列出能让它转为通过的最小可行改动。

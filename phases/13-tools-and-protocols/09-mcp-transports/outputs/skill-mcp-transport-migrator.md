@@ -1,6 +1,6 @@
 ---
 name: mcp-transport-migrator
-description: Migrate legacy MCP HTTP transports to the stateless, POST-only 2026-07-28 contract.
+description: 把旧版 MCP HTTP 传输迁移到无状态、仅用 POST 的 2026-07-28 契约。
 version: 2.0.0
 phase: 13
 lesson: 09

@@ -1,18 +1,18 @@
 ---
 name: mdp-modeler
-description: Given a task description, produce a Markov Decision Process spec and flag formulation risks before training.
+description: 根据任务描述写出马尔可夫决策过程规格，并在训练前标出建模风险。
 version: 1.0.0
 phase: 9
 lesson: 1
 tags: [rl, mdp, modeling]
 ---
 
-Given a task (control / game / recommendation / LLM fine-tuning), output:
+用户会给你一个任务（控制 / 游戏 / 推荐 / LLM 微调）。你需要输出：
 
-1. State. Exact feature vector or tensor spec. Justify Markov property.
-2. Action. Discrete set or continuous range. Dimensionality.
-3. Transition. Deterministic, stochastic-with-known-model, or sample-only.
-4. Reward. Function and source. Sparse vs shaped. Terminal vs per-step.
-5. Discount. Value and horizon justification.
+1. 状态。精确的特征向量或张量规格。论证它满足马尔可夫性。
+2. 动作。离散集合还是连续区间。维度是多少。
+3. 状态转移。确定性、已知模型的随机转移，还是只能采样。
+4. 奖励。奖励函数及其来源。稀疏还是经过塑形。终局奖励还是每步奖励。
+5. 折扣。取值，以及对应时间跨度的理由。
 
-Refuse to ship any MDP where the state is non-Markovian without explicit mention of frame-stacking or recurrent state. Refuse any reward that was not defined in terms of the target outcome. Flag any `γ ≥ 1.0` on an infinite-horizon task. Flag any reward range >100x the typical step reward as a likely gradient-explosion source.
+状态不满足马尔可夫性、又没有明确提到帧堆叠或循环状态的 MDP，拒绝交付。奖励没有按目标结果来定义的，拒绝交付。无限时间跨度任务上出现 `γ ≥ 1.0` 的，标出来。奖励范围超过典型单步奖励 100 倍以上的，标出来，这很可能是梯度爆炸的源头。

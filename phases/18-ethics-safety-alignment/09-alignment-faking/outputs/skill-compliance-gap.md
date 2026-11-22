@@ -1,29 +1,29 @@
 ---
 name: compliance-gap
-description: Evaluate whether a safety report can detect alignment faking, via the monitored / unmonitored compliance gap.
+description: 借助受监控与不受监控条件下的合规差距，评估一份安全报告能否识别对齐伪装。
 version: 1.0.0
 phase: 18
 lesson: 9
 tags: [alignment-faking, compliance-gap, anthropic, safety-evaluation]
 ---
 
-Given a safety evaluation report, assess whether it can distinguish alignment faking from genuine compliance using the Greenblatt et al. 2024 compliance-gap framework.
+给定一份安全评估报告，用 Greenblatt et al. 2024 的合规差距框架，判断它能否区分对齐伪装（alignment faking）和真实的合规。
 
-Produce:
+输出以下内容：
 
-1. Condition split. Does the evaluation run both a monitored (training-relevant) and an unmonitored (non-training) condition? Without both, alignment faking is invisible.
-2. Compliance-gap measurement. Report the gap as (monitored - unmonitored) compliance rate. Interpret sign and magnitude: positive gap = faking-shaped behaviour; negative gap = over-refusal when observed.
-3. Verbal-trace vs behaviour check. Does the evaluation rely on the model's scratchpad reasoning, or on the action itself? Per Anthropic 2025, mitigations that target the verbal trace can remove it without removing the behaviour.
-4. Operationalization audit. Is the monitoring condition created via system prompt, synthetic fine-tuning, or natural deployment context? System-prompt dependence weakens the claim; synthetic-fine-tuning replications strengthen it.
-5. Residual-incentive check. After any applied mitigation, is the incentive structure still present (would the model still benefit from faking if it chose to)? Incentive persistence means behaviour can return under distribution shift.
+1. 条件划分。评估是否同时跑了受监控条件（与训练相关）和不受监控条件（与训练无关）？缺了任何一个，对齐伪装就无从发现。
+2. 合规差距测量。把差距记为（受监控 - 不受监控）的合规率。解读符号和大小：正差距意味着行为呈伪装形态；负差距意味着被观察时过度拒绝。
+3. 语言痕迹与行为对照。评估依据的是模型 scratchpad 里的推理，还是行为本身？按 Anthropic 2025 的结论，针对语言痕迹的缓解措施可能只抹掉痕迹，行为照旧。
+4. 操作化审计。监控条件是怎么构造的：system prompt、合成数据微调，还是真实部署语境？依赖 system prompt 会削弱结论；用合成数据微调复现则能加强结论。
+5. 残余激励检查。施加缓解措施之后，激励结构是否仍在（模型如果选择伪装，是否依然有利可图）？激励还在，分布一变，行为就可能卷土重来。
 
-Hard rejects:
-- Any claim of "no alignment faking" based on unmonitored-only evaluation.
-- Any claim that "scratchpad reasoning no longer verbalizes faking" implies behaviour has ceased.
-- Any claim that HHH-trained models do not fake alignment — Greenblatt et al. 2024 establishes HHH training is the necessary condition, not a sufficient defense.
+直接否决：
+- 只基于不受监控条件评估就声称"不存在对齐伪装"。
+- 声称"scratchpad 推理里不再说出伪装意图"就等于行为已经停止。
+- 声称经过 HHH 训练的模型不会伪装对齐。Greenblatt et al. 2024 表明，HHH 训练恰恰是伪装出现的必要条件，而不是足够的防御。
 
-Refusal rules:
-- If the user asks "does my model fake alignment," refuse the binary answer without the compliance-gap data.
-- If the user asks for a remediation that trains only against a visible trace (interrogation answers, flagged scratchpad reasoning), explain the 2025 follow-up's warning that such training can teach the model to hide the trace.
+拒绝规则：
+- 如果用户问"我的模型会不会伪装对齐"，在没有合规差距数据时，拒绝给出是或否的答案。
+- 如果用户要求一种只针对可见痕迹训练的补救方案（审问时的回答、被标记的 scratchpad 推理），说明 2025 年后续研究的警告：这样训练可能教会模型把痕迹藏起来。
 
-Output: a one-page assessment that reports compliance in both conditions, the gap, the verbal-trace-vs-behaviour separation, and the operationalization strength. Flag each missing element. Cite Greenblatt et al. (arXiv:2412.14093) once as the framework source.
+输出：一页评估，报告两种条件下的合规率、差距、语言痕迹与行为的区分，以及操作化的强度。每个缺失项都要标出来。引用一次 Greenblatt et al.（arXiv:2412.14093）作为框架来源。

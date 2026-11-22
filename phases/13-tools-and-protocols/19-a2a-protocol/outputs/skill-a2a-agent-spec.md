@@ -1,30 +1,30 @@
 ---
 name: a2a-agent-spec
-description: Produce the Agent Card and skills schema for an agent that should be callable over A2A.
+description: 为需要通过 A2A 被调用的 agent 产出 Agent Card 和 skills schema。
 version: 1.0.0
 phase: 13
 lesson: 19
 tags: [a2a, agent-card, task-lifecycle, delegation]
 ---
 
-Given an agent's capabilities and intended collaborators, produce its A2A Agent Card and skill definitions.
+用户会给出一个 agent 的能力和预期的协作方。你负责产出它的 A2A Agent Card 和 skill 定义。
 
-Produce:
+输出：
 
-1. Agent Card. `name`, `description`, `version`, `supportedInterfaces[]` (each with `url`, `protocolBinding`, `protocolVersion`), `capabilities` (streaming, pushNotifications), `defaultInputModes`, `defaultOutputModes`, `securitySchemes` and `securityRequirements`, `skills[]`. Serve it at `/.well-known/agent-card.json`.
-2. Skills list. Each with `id`, `name`, `description`, `tags`, and optional `inputModes` / `outputModes` media types. Use the "Use when X. Do not use for Y." pattern in descriptions.
-3. Task-state plan. For each skill, expected state transitions and the `TASK_STATE_INPUT_REQUIRED` paths.
-4. Signing plan. Whether to sign the card with JWS entries in `signatures` (recommended for externally-callable agents).
-5. Protocol binding. `JSONRPC`, `GRPC`, or `HTTP+JSON`, each declared as a `supportedInterfaces` entry with `protocolVersion` `1.0`. Clients send `A2A-Version: 1.0`. Note backward-compat with v1.0.
+1. Agent Card。`name`、`description`、`version`、`supportedInterfaces[]`（每项含 `url`、`protocolBinding`、`protocolVersion`）、`capabilities`（streaming、pushNotifications）、`defaultInputModes`、`defaultOutputModes`、`securitySchemes` 和 `securityRequirements`、`skills[]`。在 `/.well-known/agent-card.json` 提供。
+2. Skills 列表。每项含 `id`、`name`、`description`、`tags`，以及可选的 `inputModes` / `outputModes` 媒体类型。描述使用 "Use when X. Do not use for Y." 句式。
+3. 任务状态规划。对每个 skill，给出预期的状态转换和 `TASK_STATE_INPUT_REQUIRED` 路径。
+4. 签名方案。是否用 `signatures` 中的 JWS 条目为 card 签名（对外部可调用的 agent 建议签名）。
+5. 协议绑定。`JSONRPC`、`GRPC` 或 `HTTP+JSON`，每种都作为一个 `supportedInterfaces` 条目声明，`protocolVersion` 为 `1.0`。客户端发送 `A2A-Version: 1.0`。注明与 v1.0 的向后兼容性。
 
-Hard rejects:
-- Any Agent Card without a stable `supportedInterfaces` URL. Breaks discovery.
-- Any skill without `tags` or without input and output modes (its own or the card defaults). Callers cannot reason about compatibility.
-- Any externally-callable agent without a card-signing plan. Impersonation vector.
+直接否决：
+- 没有稳定 `supportedInterfaces` URL 的 Agent Card。会破坏服务发现。
+- 没有 `tags`、或没有输入输出模式（自身的或 card 默认的）的 skill。调用方无法判断兼容性。
+- 外部可调用、却没有 card 签名方案的 agent。这是冒充攻击的入口。
 
-Refusal rules:
-- If the agent's use case is a single tool call, refuse to scaffold A2A; recommend MCP.
-- If the agent exposes internals it should not (tool call traces, chain-of-thought), refuse and mandate opacity.
-- If the agent needs A2A for payments (AP2 use case), confirm the AP2 extension version and flag that AP2 is separate from core A2A.
+拒绝规则：
+- 如果 agent 的用例只是单次工具调用，拒绝搭建 A2A；推荐 MCP。
+- 如果 agent 暴露了不该暴露的内部信息（工具调用轨迹、思维链），拒绝，并要求保持不透明。
+- 如果 agent 需要用 A2A 处理支付（AP2 用例），确认 AP2 扩展版本，并指出 AP2 独立于核心 A2A。
 
-Output: a one-page Agent Card JSON, a skills schema for each operation, state-transition plan, signing and transport choices. End with the minimum v1.0 backward-compat guarantee the agent promises.
+输出：一页 Agent Card JSON、每个操作的 skills schema、状态转换规划、签名和传输方式选择。最后写明该 agent 承诺的最低 v1.0 向后兼容保证。

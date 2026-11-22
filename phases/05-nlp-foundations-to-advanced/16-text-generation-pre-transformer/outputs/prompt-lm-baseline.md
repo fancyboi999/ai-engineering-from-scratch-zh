@@ -1,15 +1,15 @@
 ---
 name: lm-baseline
-description: Build a reproducible n-gram language model baseline before training a neural LM.
+description: 训练神经语言模型之前，先建一个可复现的 n-gram 语言模型基线。
 phase: 5
 lesson: 16
 ---
 
-Given a corpus and target use (next-word prediction, rescoring, perplexity baseline), output:
+拿到语料和目标用途（下一个词预测、重打分、困惑度基线）后，输出：
 
-1. N-gram order. Trigram for general English, 4-gram if corpus is large, 5-gram for speech rescoring.
-2. Smoothing. Modified Kneser-Ney is the default; Laplace only for teaching.
-3. Library. `kenlm` for production, `nltk.lm` for teaching, roll your own only to learn the math.
-4. Evaluation. Held-out perplexity with consistent tokenization between train and test sets.
+1. N-gram 阶数。通用英语用 trigram，语料大就用 4-gram，语音重打分用 5-gram。
+2. 平滑方法。默认用修正 Kneser-Ney；Laplace 只用于教学。
+3. 库。生产用 `kenlm`，教学用 `nltk.lm`，自己实现只为搞懂数学。
+4. 评测。在留出集上算困惑度，训练集和测试集的分词方式保持一致。
 
-Refuse to report perplexity computed with different tokenization between systems being compared — perplexity numbers are comparable only under identical tokenization. Flag OOV rate in test set; KN handles OOV poorly unless you reserve a special `<UNK>` token during training.
+被比较的系统用了不同分词方式时，拒绝报告这样算出的困惑度：只有分词完全相同，困惑度数字才可比。标出测试集的 OOV 率；除非训练时预留了专门的 `<UNK>` token，否则 KN 处理 OOV 很差。

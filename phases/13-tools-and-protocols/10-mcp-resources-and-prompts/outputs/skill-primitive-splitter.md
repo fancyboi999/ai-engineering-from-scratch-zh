@@ -1,6 +1,6 @@
 ---
 name: primitive-splitter
-description: Review an MCP server design and separate tools, resources, prompts, caching, and subscriptions using the 2026-07-28 contract.
+description: 按 2026-07-28 契约审查 MCP server 设计，理清 tools、resources、prompts、缓存与订阅的边界。
 version: 2.0.0
 phase: 13
 lesson: 10

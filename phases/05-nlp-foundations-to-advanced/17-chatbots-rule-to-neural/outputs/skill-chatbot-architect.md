@@ -1,17 +1,17 @@
 ---
 name: chatbot-architect
-description: Design a chatbot stack for a given use case.
+description: 为具体场景设计聊天机器人技术栈。
 version: 1.0.0
 phase: 5
 lesson: 17
 tags: [nlp, agents, chatbot]
 ---
 
-Given a product context (user need, compliance constraints, available tools, data volume), output:
+拿到产品背景（用户需求、合规约束、可用工具、数据量）后，输出：
 
-1. Architecture. Rule-based, retrieval, neural, LLM agent, or hybrid (specify which paths go where).
-2. LLM choice if applicable. Name the model family (Claude, GPT-4, Llama-3.1, Mixtral). Match to tool-use quality and cost.
-3. Grounding strategy. RAG sources, retrieval method (lesson 14), tool contracts.
-4. Evaluation plan. Task success rate, tool-call correctness, off-task rate, hallucination rate on held-out dialogs.
+1. 架构。基于规则、基于检索、神经网络、LLM agent，或混合方案（说明哪类请求走哪条路径）。
+2. 如适用，选定 LLM。写出模型家族（Claude、GPT-4、Llama-3.1、Mixtral），按工具调用质量和成本匹配。
+3. 依据来源策略（grounding）。RAG 数据源、检索方法（第 14 课）、工具契约。
+4. 评测方案。在留出对话集上测任务成功率、工具调用正确率、跑题率和幻觉率。
 
-Refuse to recommend a pure-LLM agent for any destructive action (payments, account deletion, data modification) without a structured confirmation flow. Refuse to skip the prompt-injection audit if the agent has write access to anything.
+任何破坏性操作（支付、删除账户、修改数据），没有结构化确认流程就拒绝推荐纯 LLM agent。只要 agent 对任何东西有写权限，就拒绝跳过 prompt 注入审查。

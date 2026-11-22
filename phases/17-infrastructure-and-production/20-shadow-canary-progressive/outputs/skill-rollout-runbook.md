@@ -1,31 +1,31 @@
 ---
 name: rollout-runbook
-description: Design a shadow → canary → A/B → 100% rollout plan for a new LLM model or prompt template, with five canary gates, noise-floor-aware thresholds, and a seconds-fast rollback path.
+description: 为新 LLM 模型或 prompt 模板设计影子 → 金丝雀 → A/B → 100% 的上线计划，包含五道金丝雀门禁、考虑噪声底线的阈值，以及秒级回滚路径。
 version: 1.0.0
 phase: 17
 lesson: 20
 tags: [rollout, canary, shadow, progressive-delivery, feature-flags, argo-rollouts, flagger, kserve]
 ---
 
-Given a candidate change (new model, new prompt template, new router policy), baseline production metrics, and risk tolerance, produce a rollout runbook.
+给定候选变更（新模型、新 prompt 模板、新路由策略）、生产基线指标和风险容忍度，写一份上线运行手册。
 
-Produce:
+输出以下内容：
 
-1. Shadow plan. Duration (24-72 hours). Metrics logged: outputs, token counts, latency, refusal, error. Alert on: >20% cost shift, >30% output length shift, any schema violation.
-2. Canary progression. Stages (1% → 10% → 25% → 50% → 75% → 100%). Duration per stage (30m-24h based on traffic volume; ensure each stage has enough data for statistical confidence).
-3. Five gates. Specify the exact thresholds for latency P99, cost/request, error/refusal, output-length P99, thumbs-down rate. Set above noise floor (expect 15% irreducible variance).
-4. Tooling. Name the rollout controller (Argo Rollouts, Flagger, KServe) and the feature flag system for instant rollback.
-5. Rollback path. Document the three actions: flip flag → revert pinned digest → verify. Target time: under 60 seconds end to end.
-6. Skip A/B? Justify. Improved-variant changes skip A/B; distinctly different changes (new behavior, new cost curve) require A/B.
+1. 影子方案。时长（24-72 小时）。记录的指标：输出、token 数、延迟、拒答、错误。告警条件：成本变化 >20%、输出长度变化 >30%、任何 schema 违规。
+2. 金丝雀推进。阶段（1% → 10% → 25% → 50% → 75% → 100%）。每阶段时长（根据流量从 30 分钟到 24 小时；确保每个阶段的数据足以支撑统计置信度）。
+3. 五道门禁。写明延迟 P99、单请求成本、错误/拒答、输出长度 P99、差评率的具体阈值。阈值要高于噪声底线（预计有 15% 无法消除的波动）。
+4. 工具。写出上线控制器（Argo Rollouts、Flagger、KServe）和用于即时回滚的 feature flag 系统。
+5. 回滚路径。记录三个动作：翻转 flag → 回退到固定的镜像 digest → 验证。目标时间：端到端 60 秒以内。
+6. 跳过 A/B？说明理由。改进型变更可以跳过 A/B；明显不同的变更（新行为、新的成本曲线）必须做 A/B。
 
-Hard rejects:
-- Skipping shadow mode. Refuse — cost spikes and length regressions slip past offline eval.
-- Gates tighter than 15% variance. Refuse — false alarms will halt legitimate rollouts.
-- Rollback that requires redeploy. Refuse — it is not a rollback, it is a damage report.
+直接否决：
+- 跳过影子模式。拒绝。成本飙升和输出长度回归会绕过离线评估。
+- 门禁比 15% 的波动还严。拒绝。误报会叫停正常的上线。
+- 需要重新部署才能回滚。拒绝。那不叫回滚，那叫事故报告。
 
-Refusal rules:
-- If the change is safety-critical (e.g., PII handling change), require explicit additional gate: zero PII leakage in shadow sample before starting canary.
-- If traffic volume is <100 req/hour, require extended canary stages — otherwise gate noise overwhelms signal.
-- If the team cannot provide baseline metrics for the five canary gates, refuse the rollout — baseline is prerequisite.
+拒绝规则：
+- 如果变更涉及安全关键环节（例如 PII 处理变更），要求额外加一道明确的门禁：开始金丝雀之前，影子样本中 PII 泄露为零。
+- 如果流量 <100 请求/小时，要求延长金丝雀各阶段。否则门禁噪声会盖过信号。
+- 如果团队拿不出五道金丝雀门禁的基线指标，拒绝上线。基线是前提。
 
-Output: a one-page runbook with shadow, canary, gates, tooling, rollback, A/B posture. End with a rollback drill requirement: rehearse rollback once before first real deploy.
+输出：一页运行手册，写明影子方案、金丝雀、门禁、工具、回滚和 A/B 策略。最后给出回滚演练要求：第一次真实部署之前，先演练一次回滚。

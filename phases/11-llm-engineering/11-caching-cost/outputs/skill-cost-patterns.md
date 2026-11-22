@@ -1,79 +1,79 @@
 ---
 name: skill-cost-patterns
-description: Decision framework for LLM cost optimization -- caching strategies, rate limiting, model routing, and budget controls
+description: LLM 成本优化的决策框架：缓存策略、限流、模型路由与预算控制
 version: 1.0.0
 phase: 11
 lesson: 11
 tags: [caching, cost-optimization, rate-limiting, model-routing, budget, llm-ops]
 ---
 
-# LLM Cost Optimization Patterns
+# LLM 成本优化模式
 
-When building an LLM application that needs to control costs, apply this decision framework.
+构建需要控制成本的 LLM 应用时，套用下面这套决策框架。
 
-## When to optimize
+## 什么时候优化
 
-**Optimize immediately when:**
-- Monthly LLM spend exceeds $500 or 10% of infrastructure budget
-- Cost per query is above $0.01 for a consumer product
-- Your system prompt is over 1,000 tokens and sent with every request
-- More than 30% of queries are duplicates or near-duplicates
-- You are scaling from 100 to 10,000+ daily users
+**以下情况立即优化：**
+- 每月 LLM 花费超过 $500，或超过基础设施预算的 10%
+- 面向消费者的产品单次查询成本高于 $0.01
+- 系统 prompt 超过 1,000 token，且每次请求都会发送
+- 超过 30% 的查询是重复或近似重复的
+- 日活正在从 100 扩张到 10,000+
 
-**Do not optimize yet when:**
-- You have fewer than 100 DAU and are still validating product-market fit
-- Monthly spend is under $100 and growing slowly
-- You are still iterating on prompt design (caching locks you into a prompt)
+**以下情况先别优化：**
+- 日活不到 100，还在验证产品市场匹配
+- 每月花费低于 $100 且增长缓慢
+- 还在迭代 prompt 设计（缓存会把你锁死在某个 prompt 上）
 
-## Caching strategy selection
+## 缓存策略选择
 
-### Exact caching
+### 精确缓存
 
-**Use when:** temperature=0, identical prompts repeat, deterministic outputs needed.
+**适用于：** temperature=0、相同 prompt 会重复出现、需要确定性输出。
 
 ```python
 key = sha256(json.dumps({"model": m, "messages": msgs, "temp": 0}))
 ```
 
-- Implementation: 30 minutes
-- Hit rate: 10-25% for most apps, 40-60% for FAQ bots
-- Latency: <1ms (dict lookup)
-- Risk: stale responses if underlying data changes
+- 实现：30 分钟
+- 命中率：大多数应用 10-25%，FAQ 机器人 40-60%
+- 延迟：<1ms（字典查找）
+- 风险：底层数据变化后返回过时响应
 
-**Skip when:** temperature > 0, every query is unique, real-time data needed.
+**不适用于：** temperature > 0、每个查询都独一无二、需要实时数据。
 
-### Semantic caching
+### 语义缓存
 
-**Use when:** users ask the same question in different words, FAQ-heavy products, customer support.
+**适用于：** 用户用不同措辞问同一个问题、以 FAQ 为主的产品、客服。
 
-- Implementation: 2-4 hours (embedding + similarity + storage)
-- Hit rate: 15-35% on top of exact cache
-- Latency: 10-50ms (embedding + ANN search)
-- Risk: false positives (returning wrong cached answer for a similar but different question)
+- 实现：2-4 小时（embedding + 相似度 + 存储）
+- 命中率：在精确缓存之上再多 15-35%
+- 延迟：10-50ms（embedding + ANN 搜索）
+- 风险：误命中（对相似但不同的问题返回错误的缓存答案）
 
-**Threshold guidelines:**
-- 0.98+: very conservative, almost no false positives, lower hit rate
-- 0.95: good balance for factual Q&A
-- 0.90: aggressive, higher hit rate but risk of wrong answers
-- 0.85: only for low-stakes applications (suggestions, autocomplete)
+**阈值参考：**
+- 0.98+：非常保守，几乎没有误命中，命中率较低
+- 0.95：事实问答的良好平衡点
+- 0.90：激进，命中率更高，但有答错风险
+- 0.85：只用于低风险应用（建议、自动补全）
 
-**Skip when:** every query has unique context (code generation), responses must reflect latest data, query space is unbounded.
+**不适用于：** 每个查询都有独特上下文（代码生成）、响应必须反映最新数据、查询空间无边界。
 
-### Provider prompt caching
+### 供应商 prompt 缓存
 
-**Use when:** system prompt > 1,024 tokens (OpenAI) or model-specific minimum, same prefix sent repeatedly.
+**适用于：** 系统 prompt > 1,024 token（OpenAI）或达到各模型的最小长度要求，且同一前缀会反复发送。
 
-| Provider | Action | Savings |
+| 供应商 | 操作 | 节省 |
 |----------|--------|---------|
-| Anthropic | Add `cache_control: {"type": "ephemeral"}` to system message | 90% on cached prefix (after 25% write premium) |
-| OpenAI | Nothing (automatic) | 50% on cached prefix |
-| Google | Use Context Caching API with explicit TTL | ~75% on cached context |
+| Anthropic | 在系统消息上加 `cache_control: {"type": "ephemeral"}` | 缓存前缀省 90%（需先付 25% 的写入溢价） |
+| OpenAI | 什么都不用做（自动） | 缓存前缀省 50% |
+| Google | 使用 Context Caching API 并显式设置 TTL | 缓存上下文省约 75% |
 
-**Skip when:** system prompt changes per request, prompt is under minimum length.
+**不适用于：** 系统 prompt 每次请求都变、prompt 短于最小长度。
 
-## Model routing rules
+## 模型路由规则
 
-### Keyword-based (simple, fast)
+### 基于关键词（简单、快）
 
 ```
 simple:  <= 5 words OR matches FAQ keywords -> gpt-4o-mini ($0.15/$0.60)
@@ -81,66 +81,66 @@ medium:  general queries, summaries        -> claude-sonnet ($3/$15)
 complex: "analyze", "compare", "debug"     -> gpt-4o ($2.50/$10)
 ```
 
-- Implementation: 1 hour
-- Accuracy: 70-80%
-- Savings: 40-60% of model costs
+- 实现：1 小时
+- 准确率：70-80%
+- 节省：模型成本的 40-60%
 
-### Embedding-based (more accurate)
+### 基于 embedding（更准）
 
-Embed 50-100 labeled queries per category. Classify new queries by nearest neighbor.
+每个类别嵌入 50-100 条已标注查询。新查询按最近邻分类。
 
-- Implementation: 4-8 hours
-- Accuracy: 85-92%
-- Savings: 50-70% of model costs
-- Additional cost: ~$0.02/1M tokens for classification embeddings (negligible)
+- 实现：4-8 小时
+- 准确率：85-92%
+- 节省：模型成本的 50-70%
+- 额外成本：分类用的 embedding 约 $0.02/1M tokens（可忽略）
 
-### ML-based (production grade)
+### 基于机器学习（生产级）
 
-Train a small classifier (logistic regression or small BERT) on historical query/model pairs.
+用历史的查询/模型配对数据训练一个小分类器（逻辑回归或小型 BERT）。
 
-- Implementation: 1-2 weeks
-- Accuracy: 90-95%
-- Savings: 60-75% of model costs
-- Requires: labeled training data from production traffic
+- 实现：1-2 周
+- 准确率：90-95%
+- 节省：模型成本的 60-75%
+- 前提：来自生产流量的标注训练数据
 
-## Rate limiting configuration
+## 限流配置
 
-### Token bucket parameters by tier
+### 各等级的令牌桶参数
 
-| Tier | Bucket Size | Refill Rate | Max RPM | Daily Cap |
+| 等级 | 桶容量 | 补充速率 | 最大 RPM | 每日上限 |
 |------|-------------|-------------|---------|-----------|
 | Free | 50K tokens | 500/sec | 10 | 50K |
 | Pro | 500K tokens | 5K/sec | 60 | 500K |
 | Enterprise | 5M tokens | 50K/sec | 300 | 5M |
 
-### Implementation checklist
+### 实现清单
 
-1. Store buckets in Redis (not in-memory) for multi-instance apps
-2. Use atomic operations (MULTI/EXEC) to prevent race conditions
-3. Return `Retry-After` header with rejection responses
-4. Track rejected requests as a metric (>5% rejection = tier limits too tight)
-5. Implement graceful degradation: reject expensive model requests first, keep cheap model access
+1. 多实例应用把桶存在 Redis 里（不要放内存）
+2. 用原子操作（MULTI/EXEC）防止竞态
+3. 拒绝响应要带 `Retry-After` 头
+4. 把被拒请求作为指标跟踪（拒绝率 >5% 说明等级限额太紧）
+5. 实现优雅降级：先拒绝昂贵模型的请求，保留便宜模型的访问
 
-## Budget controls
+## 预算控制
 
-### Three-threshold circuit breaker
+### 三阈值熔断
 
-| Threshold | Action | Reversible |
+| 阈值 | 动作 | 可恢复 |
 |-----------|--------|------------|
-| 70% of monthly budget | Log warning, alert team via Slack/PagerDuty | Yes (auto) |
-| 85% of monthly budget | Route all traffic to cheapest model | Yes (auto, next billing cycle) |
-| 95% of monthly budget | Serve cached responses only, reject new LLM calls | Yes (manual reset or next cycle) |
+| 月预算的 70% | 记录警告，通过 Slack/PagerDuty 通知团队 | 是（自动） |
+| 月预算的 85% | 所有流量路由到最便宜的模型 | 是（自动，下个计费周期） |
+| 月预算的 95% | 只返回缓存响应，拒绝新的 LLM 调用 | 是（手动重置或下个周期） |
 
-### Per-user cost tracking
+### 按用户跟踪成本
 
-Track cumulative cost per user. Flag users exceeding 10x the median. Common causes:
-- Legitimate power user (upgrade their tier)
-- Prompt injection loop (bot sending automated requests)
-- Inefficient integration (client retrying on every error)
+跟踪每个用户的累计成本。标记超过中位数 10 倍的用户。常见原因：
+- 正当的重度用户（给他升级等级）
+- prompt 注入循环（机器人在自动发请求）
+- 低效的集成（客户端每次出错都重试）
 
-## Cost tracking fields
+## 成本跟踪字段
 
-Log every API call with these fields:
+每次 API 调用都记录这些字段：
 
 ```json
 {
@@ -159,36 +159,36 @@ Log every API call with these fields:
 }
 ```
 
-### Key metrics to dashboard
+### 看板上的关键指标
 
-- **Cost per query** (P50, P95, P99) -- by model, by feature, by user tier
-- **Cache hit rate** -- exact vs semantic, trend over time
-- **Model distribution** -- % of traffic per model, cost per model
-- **Budget burn rate** -- current spend vs projected monthly at current rate
-- **Rejection rate** -- % of requests rate-limited, by tier
+- **单次查询成本**（P50、P95、P99）：按模型、按功能、按用户等级
+- **缓存命中率**：精确 vs 语义，随时间的趋势
+- **模型分布**：各模型的流量占比和成本
+- **预算消耗速度**：当前花费 vs 按当前速度预计的月花费
+- **拒绝率**：被限流的请求占比，按等级
 
-## Common mistakes
+## 常见错误
 
-| Mistake | Why it hurts | Fix |
+| 错误 | 危害 | 修复 |
 |---------|-------------|-----|
-| Caching with temperature > 0 | Non-deterministic outputs, stale cache gives wrong variety | Only cache temp=0 calls, or accept that cached responses lose randomness |
-| Semantic cache threshold too low | Returns wrong answers for superficially similar queries | Start at 0.95, lower only after measuring false positive rate |
-| No cache invalidation | Responses go stale when underlying data changes | Set TTL (1 hour for dynamic data, 24 hours for static), invalidate on data updates |
-| Routing all traffic to cheapest model | Quality drops, users notice | Route by complexity, measure quality per tier, set minimum quality thresholds |
-| No per-user limits | One abusive user burns entire budget | Always implement per-user quotas, even if generous |
-| Ignoring output tokens | Output costs 2-5x more than input per token | Set max_tokens appropriately, use stop sequences, compress outputs |
-| Caching before prompt is stable | Cache fills with responses from old prompts | Only enable caching after prompt is finalized, flush cache on prompt changes |
+| temperature > 0 时做缓存 | 输出不确定，过时缓存给出的多样性是错的 | 只缓存 temp=0 的调用，或接受缓存响应失去随机性 |
+| 语义缓存阈值太低 | 对表面相似的查询返回错误答案 | 从 0.95 开始，测过误命中率再往下调 |
+| 没有缓存失效机制 | 底层数据变化后响应过时 | 设置 TTL（动态数据 1 小时，静态数据 24 小时），数据更新时失效 |
+| 所有流量都路由到最便宜的模型 | 质量下降，用户能察觉 | 按复杂度路由，按等级衡量质量，设置最低质量阈值 |
+| 没有按用户限额 | 一个滥用用户就能烧光全部预算 | 始终实现按用户配额，哪怕给得很宽松 |
+| 忽略输出 token | 每 token 输出成本是输入的 2-5 倍 | 合理设置 max_tokens，使用停止序列，压缩输出 |
+| prompt 未稳定就开缓存 | 缓存里塞满旧 prompt 的响应 | prompt 定稿后再开缓存，prompt 改动时清空缓存 |
 
-## Pricing reference (as of April 2026)
+## 定价参考（截至 2026 年 4 月）
 
-| Model | Input ($/1M) | Output ($/1M) | Cached Input ($/1M) | Best For |
+| 模型 | 输入（$/1M） | 输出（$/1M） | 缓存输入（$/1M） | 最适合 |
 |-------|-------------|--------------|--------------------|---------| 
-| gpt-4.1-nano | $0.10 | $0.40 | $0.025 | High-volume simple tasks |
-| gpt-4o-mini | $0.15 | $0.60 | $0.075 | Simple routing, classification |
-| gemini-2.5-flash | $0.15 | $0.60 | $0.0375 | Budget multimodal |
-| claude-haiku-3.5 | $0.80 | $4.00 | $0.08 | Fast mid-tier tasks |
-| o4-mini | $1.10 | $4.40 | $0.275 | Reasoning on a budget |
-| gemini-2.5-pro | $1.25 | $10.00 | $0.3125 | Long context, multimodal |
-| gpt-4o | $2.50 | $10.00 | $1.25 | General purpose, function calling |
-| claude-sonnet-4 | $3.00 | $15.00 | $0.30 | Balanced quality/cost |
-| claude-opus-4 | $15.00 | $75.00 | $1.50 | Maximum quality, complex reasoning |
+| gpt-4.1-nano | $0.10 | $0.40 | $0.025 | 高并发的简单任务 |
+| gpt-4o-mini | $0.15 | $0.60 | $0.075 | 简单路由、分类 |
+| gemini-2.5-flash | $0.15 | $0.60 | $0.0375 | 低预算多模态 |
+| claude-haiku-3.5 | $0.80 | $4.00 | $0.08 | 快速的中档任务 |
+| o4-mini | $1.10 | $4.40 | $0.275 | 低预算推理 |
+| gemini-2.5-pro | $1.25 | $10.00 | $0.3125 | 长上下文、多模态 |
+| gpt-4o | $2.50 | $10.00 | $1.25 | 通用、function calling |
+| claude-sonnet-4 | $3.00 | $15.00 | $0.30 | 质量与成本平衡 |
+| claude-opus-4 | $15.00 | $75.00 | $1.50 | 最高质量、复杂推理 |

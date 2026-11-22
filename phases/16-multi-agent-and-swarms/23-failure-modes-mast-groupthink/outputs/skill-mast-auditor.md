@@ -1,35 +1,35 @@
 ---
 name: mast-auditor
-description: Run a MAST-style failure-mode audit on a multi-agent system. Categorize execution-trace failures into Specification / Coordination / Verification and the Groupthink families; rank mitigations by expected failure reduction.
+description: 对多 agent 系统做 MAST 风格的失效模式审计。把执行 trace 中的失败归入规约 / 协调 / 验证三类以及群体思维（Groupthink）各家族，并按预期失败降幅给缓解措施排序。
 version: 1.0.0
 phase: 16
 lesson: 23
 tags: [multi-agent, failure-modes, MAST, groupthink, circuit-breaker, audit]
 ---
 
-Given a multi-agent system and sampled execution traces, run a failure-mode audit.
+给定一个多 agent 系统和抽样得到的执行 trace，做一次失效模式审计。
 
-Produce:
+输出以下内容：
 
-1. **Sample construction.** At least 200 traces from production, sampled uniformly across task types and time windows. Document sampling method and bias risks.
-2. **Classification pass.** For each trace, mark `success | failure`. For failures, assign one MAST category (spec / coord / verify) and, when applicable, one or more Groupthink family tags (monoculture / conformity / tom / mixed-motive / cascade).
-3. **Distribution table.** Counts and percentages by MAST category and Groupthink tag. Compare to Cemri 2025's reference distribution (41.77 / 36.94 / 21.30). Systems that skew heavily from the reference often have a specific weak layer.
-4. **Top failure patterns.** Identify the 3 most-frequent specific patterns (e.g., "two agents both review"). Document reproduction steps.
-5. **Mitigation ranking.** For each top pattern, propose a mitigation from the standard library: explicit role contracts, versioned shared state, independent verifier, circuit breaker, detection-diagnosis-validation (STRATUS) trio. Rank by expected failure reduction given the pattern's frequency.
-6. **Risk of silent failures.** How many failures produce plausible-but-wrong outputs vs loud errors? Silent rate drives the verification-layer investment.
-7. **Slow-failure proxies.** Recommend 2-3 live metrics that would surface drift before it becomes a loud error: agreement rate, retry-rate, output-length distribution, inter-agent edit distance.
+1. **构建样本。** 从生产环境取至少 200 条 trace，按任务类型和时间窗口均匀抽样。记录抽样方法和偏差风险。
+2. **分类。** 每条 trace 标记 `success | failure`。对失败的 trace，分配一个 MAST 类别（规约 / 协调 / 验证），适用时再加一个或多个群体思维家族标签（monoculture / conformity / tom / mixed-motive / cascade）。
+3. **分布表。** 按 MAST 类别和群体思维标签统计数量和百分比。与 Cemri 2025 的参考分布（41.77 / 36.94 / 21.30）比较。严重偏离参考分布的系统，往往有某一层特别薄弱。
+4. **主要失败模式。** 找出最常见的 3 种具体模式（例如"两个 agent 都在做审查"）。记录复现步骤。
+5. **缓解措施排序。** 针对每种主要模式，从标准措施库里选一个缓解方案：明确的角色契约、带版本的共享状态、独立验证者、熔断器、检测-诊断-验证（STRATUS）三件套。结合模式出现频率，按预期失败降幅排序。
+6. **静默失败风险。** 有多少失败产出的是看似合理但错误的结果，又有多少是明显报错？静默失败率决定了验证层的投入。
+7. **慢性失败代理指标。** 推荐 2-3 个线上指标，在漂移变成明显报错之前把它暴露出来：一致率、重试率、输出长度分布、agent 之间的编辑距离。
 
-Hard rejects:
+直接否决：
 
-- Audits without a random or stratified sample. Hand-picked failures over-represent dramatic cases and miss slow-failure drift.
-- Mitigation recommendations without a baseline measurement. "Add a verifier" means nothing unless the current failure rate is known.
-- Ignoring MAST-unknown incidents. If a trace does not fit a category, the taxonomy is incomplete; propose an extension rather than forcing a category.
-- Claiming a quarterly audit is sufficient without operational slow-failure monitoring. Quarterly misses drift between audits.
+- 没有随机或分层抽样的审计。手挑的失败案例会过度代表戏剧性情况，漏掉慢性失败带来的漂移。
+- 没有基线测量就给出缓解建议。不知道当前失败率，"加一个验证者"毫无意义。
+- 忽略 MAST 无法归类的事件。如果某条 trace 不属于任何类别，说明分类体系不完整；提出扩展，而不是硬塞进某个类别。
+- 声称季度审计就够了，却没有线上的慢性失败监控。季度审计会漏掉两次审计之间的漂移。
 
-Refusal rules:
+拒绝规则：
 
-- If traces lack per-agent attribution (who wrote what, who read what), the audit cannot distinguish coordination failures from role conflicts. Recommend adding structured per-agent logging before re-auditing.
-- If the system has fewer than 50 failed traces total, the sample is too small to produce distribution estimates. Recommend longer observation window.
-- If traces contain PII, mask before analysis.
+- 如果 trace 缺少按 agent 的归属信息（谁写了什么、谁读了什么），审计就无法区分协调失败和角色冲突。建议先加上结构化的逐 agent 日志再重新审计。
+- 如果系统失败 trace 总数少于 50 条，样本太小，无法估计分布。建议延长观察窗口。
+- 如果 trace 含有 PII，分析前先脱敏。
 
-Output: a three-page report. Start with a one-sentence summary ("41% spec failures, 12% coordination, 39% verification gaps, 8% unknown; top pattern is dual-reviewer conflict; highest-ROI mitigation is explicit role contracts."), then the seven sections above. End with a prioritized action list: three mitigations with estimated implementation cost and expected failure-rate reduction.
+输出：三页报告。开头用一句话总结（"41% 规约失败，12% 协调失败，39% 验证缺口，8% 无法归类；最常见的模式是双审查者冲突；ROI 最高的缓解措施是明确的角色契约。"），然后是上面七个部分。最后给出按优先级排序的行动清单：三项缓解措施，附预估实施成本和预期失败率降幅。

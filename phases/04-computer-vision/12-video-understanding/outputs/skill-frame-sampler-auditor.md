@@ -1,49 +1,49 @@
 ---
 name: skill-frame-sampler-auditor
-description: Audit a video pipeline's frame sampler for off-by-one, short-clip handling, and crop consistency
+description: 审计视频管线的帧采样器，检查差一错误、短片段处理和裁剪一致性
 version: 1.0.0
 phase: 4
 lesson: 12
 tags: [computer-vision, video, sampling, debugging]
 ---
 
-# Frame Sampler Auditor
+# 帧采样器审计
 
-Frame sampling is where video pipelines break. Bugs here propagate into every downstream metric.
+视频管线最容易坏在帧采样上。这里的 bug 会传导到下游的每一个指标。
 
-## When to use
+## 何时使用
 
-- Writing a new video data loader.
-- Reproducing numbers from a paper and training accuracy is lower than reported.
-- Debugging a video model whose eval accuracy is unstable across runs.
+- 编写新的视频数据加载器。
+- 复现论文数字时，训练准确率比论文报告的低。
+- 排查视频模型：评估准确率在多次运行之间不稳定。
 
-## Inputs
+## 输入
 
-- `sampler_code`: Python function that takes (num_frames_total, T) and returns T indices.
-- `T`: target clip length.
-- Optional test cases: `num_frames_total` values to exercise (e.g. `[3, T-1, T, T+1, 30, 300, 3000]`).
+- `sampler_code`：接收 (num_frames_total, T)、返回 T 个索引的 Python 函数。
+- `T`：目标片段长度。
+- 可选测试用例：要测试的 `num_frames_total` 取值（例如 `[3, T-1, T, T+1, 30, 300, 3000]`）。
 
-## Checks
+## 检查项
 
-### 1. Short clip handling
-Feed `num_frames_total < T`. Every returned index must be in `[0, num_frames_total - 1]`. The standard padding policy is to repeat the last frame for the remaining positions.
+### 1. 短片段处理
+传入 `num_frames_total < T`。返回的每个索引都必须在 `[0, num_frames_total - 1]` 内。标准的填充策略是用最后一帧重复填满剩余位置。
 
-### 2. Boundary indices
-Feed `num_frames_total == T`. Returned indices should be `[0, 1, ..., T-1]` exactly.
+### 2. 边界索引
+传入 `num_frames_total == T`。返回的索引应该恰好是 `[0, 1, ..., T-1]`。
 
-### 3. Uniform distribution
-Feed `num_frames_total == 10 * T`. Returned indices should be monotonically increasing and roughly evenly spaced.
+### 3. 均匀分布
+传入 `num_frames_total == 10 * T`。返回的索引应该单调递增，间隔大致均匀。
 
-### 4. Dense window bounds
-For dense sampling, feed `num_frames_total == 3 * T`. Returned indices should form a contiguous window, never crossing the end of the clip.
+### 4. 密集窗口边界
+对密集采样，传入 `num_frames_total == 3 * T`。返回的索引应该构成一个连续窗口，且绝不越过片段末尾。
 
-### 5. Determinism
-Call the sampler twice with the same inputs and (for deterministic samplers) the same RNG. Indices should match.
+### 5. 确定性
+用相同的输入和（对确定性采样器而言）相同的 RNG 调用采样器两次，索引应当一致。
 
-### 6. Crop consistency
-If the pipeline also returns a spatial crop per frame, run the sampler twice for the same clip with the same seed and confirm every frame uses the same crop box (same `(x, y, w, h)`). Different crops per frame inside one clip destroys temporal coherence and is a classic silent bug. Acceptable variation: augmentation applied *per clip*, consistent within a clip.
+### 6. 裁剪一致性
+如果管线还会为每帧返回一个空间裁剪框，就用同一个片段和同一个种子跑两次采样器，确认每一帧用的是同一个裁剪框（相同的 `(x, y, w, h)`）。同一片段内各帧裁剪不同，会破坏时间连贯性，这是经典的静默 bug。可以接受的变化是：数据增强*按片段*施加，片段内保持一致。
 
-## Report
+## 报告
 
 ```
 [sampler audit]
@@ -72,9 +72,9 @@ If the pipeline also returns a spatial crop per frame, run the sampler twice for
   ok | fix required
 ```
 
-## Rules
+## 规则
 
-- Never mark a sampler "ok" if short-clip handling returns out-of-range indices.
-- Dense samplers should never return a window that crosses `num_frames_total - 1`.
-- If the sampler is stochastic (dense), test determinism only with an explicit seeded RNG.
-- Suggest, but do not silently fix, the canonical policies: pad with last frame, clamp window to end, round half-open intervals.
+- 如果短片段处理会返回越界索引，绝不能把采样器标为 "ok"。
+- 密集采样器返回的窗口绝不能越过 `num_frames_total - 1`。
+- 如果采样器是随机的（密集采样），只能在显式设置种子的 RNG 下测试确定性。
+- 可以建议标准策略，但不要悄悄替用户修复：用最后一帧填充、把窗口截断到末尾、对半开区间取整。

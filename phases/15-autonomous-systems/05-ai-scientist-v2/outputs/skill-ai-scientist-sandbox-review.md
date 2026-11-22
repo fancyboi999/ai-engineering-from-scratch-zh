@@ -1,54 +1,54 @@
 ---
 name: ai-scientist-sandbox-review
-description: Two-gate review checklist for research-loop agent outputs before anything leaves the sandbox.
+description: 研究循环 agent 的产出离开沙箱之前，用这份双关卡审查清单把关。
 version: 1.0.0
 phase: 15
 lesson: 5
 tags: [ai-scientist, research-agent, sandbox, peer-review, disclosure]
 ---
 
-Given an autonomous research output (hypothesis, code, experiments, figures, paper draft) produced by an AI-Scientist-v2-style loop, produce a two-gate review: sandbox audit (does anything leave?) plus research audit (is the work sound?).
+给定一个由 AI-Scientist-v2 式循环产出的自主研究成果（假设、代码、实验、图表、论文草稿），产出一份双关卡审查：沙箱审计（有没有东西漏出去？）加研究审计（工作是否站得住？）。
 
-The two gates map directly onto the audits below: **Sandbox gate = item 1**; **Research gate = items 2 (Experiment audit) + 3 (Polish audit)**. Items 4–5 govern what happens after both gates pass.
+两道关卡直接对应下面的审计项：**沙箱关卡 = 第 1 项**；**研究关卡 = 第 2 项（实验审计）+ 第 3 项（润色审计）**。第 4–5 项规定两道关卡都通过之后怎么做。
 
-Produce:
+产出：
 
-1. **Sandbox gate.** Before any artifact leaves the sandbox:
-   - List every network call the loop made and its target. Flag any that were not pre-approved.
-   - Inventory every file the loop wrote outside its working directory.
-   - Confirm Docker / seccomp / gVisor containment held for the full run.
-   - Confirm no subprocesses escaped the sandbox's supervision.
-   If any check fails, block export; raise to a human.
-2. **Experiment audit.** Read the experiment code, not the paper:
-   - Verify every claimed experiment actually ran and its reported numbers are reproducible.
-   - Check that failed experiments were reported as failures, not re-framed as negative results after-the-fact.
-   - Check that the "novelty" label on the idea holds up against a literature search by a human domain expert.
-3. **Polish audit.** Read the figures:
-   - Ensure every figure's data came from a logged experiment run, not from polish-stage rewriting.
-   - Confirm axes, scales, and annotations match the underlying data.
-   - Flag any figure whose caption claims more than the data supports.
-4. **Disclosure plan.** If the artifact is intended for external distribution:
-   - Disclose that the artifact is agent-authored.
-   - Disclose the tools used (model family, loop version).
-   - Disclose the human reviewer who checked it and what they checked.
-5. **Negative-release decision.** If the artifact fails any audit step, the default is do not release. Overriding this default requires a named human owner.
+1. **沙箱关卡。** 任何产物离开沙箱之前：
+   - 列出循环发起的每次网络调用及其目标。标出所有未经预先批准的调用。
+   - 清点循环在工作目录之外写入的每个文件。
+   - 确认 Docker / seccomp / gVisor 隔离在整个运行期间都没有失守。
+   - 确认没有子进程逃出沙箱的监管。
+   任何一项检查失败，就阻止导出，上报给人类。
+2. **实验审计。** 读实验代码，不读论文：
+   - 核实每个声称做过的实验确实跑过，报告的数字可以复现。
+   - 检查失败的实验是作为失败报告的，而不是事后被包装成负面结果。
+   - 检查想法上的"新颖性"标签，经得起人类领域专家的文献检索。
+3. **润色审计。** 读图表：
+   - 确保每张图的数据都来自有日志记录的实验运行，而不是润色阶段改写出来的。
+   - 确认坐标轴、刻度和标注与底层数据一致。
+   - 标出图注说法超出数据支撑范围的任何图。
+4. **披露计划。** 如果产物打算对外发布：
+   - 披露产物由 agent 撰写。
+   - 披露所用工具（模型家族、循环版本）。
+   - 披露检查它的人类审查者是谁，以及检查了什么。
+5. **默认不发布。** 产物在任何一个审计步骤失败时，默认不发布。推翻这个默认需要一位具名的人类负责人。
 
-Hard rejects:
-- Any submission that skips either gate.
-- Any artifact where the loop's execution logs are missing or incomplete.
-- Any figure that cannot be traced to a specific experiment run.
-- Any novelty claim that a domain expert has not verified.
+直接否决：
+- 跳过任一关卡的任何提交。
+- 循环执行日志缺失或不完整的任何产物。
+- 无法追溯到具体某次实验运行的任何图表。
+- 未经领域专家核实的任何新颖性声明。
 
-Refusal rules:
-- If the run lacks Docker or equivalent isolation, refuse and require re-run in an isolated sandbox.
-- If the user cannot produce execution logs for the experiment stage, refuse — the paper is unreviewable.
-- If the proposed distribution channel is a peer-reviewed venue and the user proposes not to disclose agent authorship, refuse and require disclosure.
+拒绝规则：
+- 运行时没有 Docker 或同等隔离时，拒绝，要求在隔离沙箱中重跑。
+- 用户拿不出实验阶段的执行日志时，拒绝，这篇论文无法审查。
+- 拟议的发布渠道是同行评审场合、而用户打算不披露 agent 作者身份时，拒绝，要求披露。
 
-Output format:
+输出格式：
 
-Return a two-gate report:
-- **Sandbox gate verdict** (PASS / BLOCK, with rationale)
-- **Research gate verdict** (covers Experiment audit (2) and Polish audit (3)) (PASS / BLOCK / REQUIRES_EXPERT, with per-check notes)
-- **Disclosure plan** (venue, text, human reviewer name)
-- **Release decision** (release / hold / reject)
-- **Next action** (who does what by when)
+返回一份双关卡报告：
+- **沙箱关卡结论**（PASS / BLOCK，附理由）
+- **研究关卡结论**（涵盖实验审计（2）和润色审计（3））（PASS / BLOCK / REQUIRES_EXPERT，附逐项检查说明）
+- **披露计划**（发布场合、披露文字、人类审查者姓名）
+- **发布决定**（发布 / 暂缓 / 拒绝）
+- **下一步动作**（谁在什么时候之前做什么）

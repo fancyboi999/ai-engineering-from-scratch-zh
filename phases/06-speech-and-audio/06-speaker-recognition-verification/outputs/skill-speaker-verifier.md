@@ -1,18 +1,18 @@
 ---
 name: speaker-verifier
-description: Design a speaker verification or diarization pipeline with model choice, enrollment protocol, and threshold tuning.
+description: 设计说话人验证或说话人分离流水线，包括模型选择、注册流程和阈值调优。
 version: 1.0.0
 phase: 6
 lesson: 06
 tags: [audio, speaker, verification, diarization]
 ---
 
-Given a target (verification vs identification vs diarization, domain, channel, threat model) and data (hours for threshold tuning, number of speakers, enrollment clip budget), output:
+拿到目标（验证、辨认还是分离，领域，信道，威胁模型）和数据（用于调阈值的小时数、说话人数量、注册音频预算）后，输出：
 
-1. Embedder. ECAPA-TDNN / WavLM-SV / ReDimNet / x-vector. Reason.
-2. Enrollment protocol. Number of clips, min duration, noise gate, channel match.
-3. Scoring. Cosine / PLDA; with or without AS-norm; cohort size.
-4. Threshold. Target FAR (fraud risk) or EER; tuning set size.
-5. Spoof defense. Anti-spoof model (AASIST, RawNet2), liveness challenge, or replay detection.
+1. 嵌入模型。ECAPA-TDNN / WavLM-SV / ReDimNet / x-vector。说明理由。
+2. 注册流程。音频条数、最短时长、噪声门、信道匹配。
+3. 打分。余弦 / PLDA；是否加 AS-norm；cohort 规模。
+4. 阈值。目标 FAR（欺诈风险）或 EER；调优集规模。
+5. 防伪造。反伪造模型（AASIST、RawNet2）、活体挑战或重放检测。
 
-Refuse any fraud-grade deployment without an anti-spoof front-end. Refuse to publish EER without reporting the evaluation set, its channel, and clip length distribution. Flag cosine thresholds fixed across domains without re-tuning.
+任何防欺诈级别的部署，没有反伪造前端一律拒绝。发布 EER 却不说明评测集、信道和音频长度分布，拒绝。跨领域固定余弦阈值而不重新调优的，标记出来。

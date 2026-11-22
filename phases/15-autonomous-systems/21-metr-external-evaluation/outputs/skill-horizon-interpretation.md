@@ -1,40 +1,40 @@
 ---
 name: horizon-interpretation
-description: Review a vendor's time-horizon claim and produce a gap analysis between benchmark claim and deployment reality.
+description: 审查厂商的时间跨度声明，产出基准测试声明与部署现实之间的差距分析。
 version: 1.0.0
 phase: 15
 lesson: 21
 tags: [metr, time-horizon, hcast, re-bench, eval-vs-deploy, external-evaluation]
 ---
 
-Given a vendor's published time-horizon claim (e.g., "our model completes 14-hour tasks at 50% reliability"), produce a gap analysis that quantifies the deployment-reality delta and flags any methodological weaknesses.
+给定厂商公布的时间跨度声明（例如"我们的模型能以 50% 可靠性完成 14 小时的任务"），产出一份差距分析，量化部署现实与声明之间的差值，并指出方法论上的薄弱之处。
 
-Produce:
+产出：
 
-1. **Methodology audit.** Identify the task suite (HCAST, RE-Bench, SWAA, or proprietary). Confirm the logistic fit is disclosed (slope, sample size, confidence interval). A horizon without methodology disclosure is a marketing claim.
-2. **Task distribution fit.** Map the vendor's benchmark task distribution onto the user's production task distribution. If they diverge materially (vendor measures SWE tasks, production is customer-support flows), the number does not transfer.
-3. **Eval-context gap.** Apply a 10–40% gap between benchmark horizon and deployment reality. Cite the Anthropic 2024 alignment-faking study and the 2026 International AI Safety Report on eval-context gaming. The actual gap depends on the eval protocol; gaming is higher on unstructured tasks.
-4. **Tooling gap.** Benchmark tooling is clean and well-instrumented. Production tooling is messier. Estimate an additional 5–30% reliability discount.
-5. **Human-in-the-loop assumption.** Benchmarks assume no HITL. Production agents with HITL run at higher reliability but lower autonomy. Adjust the horizon interpretation accordingly.
+1. **方法论审计。** 识别所用任务集（HCAST、RE-Bench、SWAA 或私有任务集）。确认 logistic 拟合的细节已披露（斜率、样本量、置信区间）。没有方法论披露的时间跨度只是营销说法。
+2. **任务分布匹配度。** 把厂商基准测试的任务分布映射到用户生产环境的任务分布上。两者差异很大时（厂商测的是 SWE 任务，生产环境是客服流程），这个数字无法迁移。
+3. **评测情境差距。** 在基准测试时间跨度与部署现实之间计入 10–40% 的差距。引用 Anthropic 2024 年的 alignment-faking 研究和 2026 年《国际 AI 安全报告》中关于评测情境博弈的内容。实际差距取决于评测协议；在非结构化任务上博弈更严重。
+4. **工具差距。** 基准测试的工具干净、埋点完善，生产环境的工具更杂乱。估计额外 5–30% 的可靠性折扣。
+5. **人类介入假设。** 基准测试假设没有 HITL。带 HITL 的生产 agent 可靠性更高，但自主性更低。据此调整对时间跨度的解读。
 
-Hard rejects:
-- Horizon claims with no source methodology or sample size.
-- Claims that a benchmark horizon predicts deployment reliability.
-- Vendors citing a 2025-or-earlier horizon number as current (the doubling time is ~7 months; 2025 numbers are stale within a year).
-- Treating a 50% horizon as "will work most of the time" — 50% reliability is a coin flip.
+直接否决：
+- 没有源方法论或样本量的时间跨度声明。
+- 声称基准测试时间跨度能预测部署可靠性。
+- 厂商把 2025 年或更早的时间跨度数字当作现行数字引用（翻倍周期约 7 个月，2025 年的数字不到一年就过时了）。
+- 把 50% 时间跨度当作"大多数时候能行"。50% 可靠性就是抛硬币。
 
-Refusal rules:
-- If the vendor does not disclose methodology, refuse and require the source paper or blog post.
-- If the benchmark distribution does not overlap the production distribution, refuse and require internal evaluation.
-- If the vendor cites horizons without a gaming audit on their specific eval pipeline, refuse to quote the number as a reliability prediction.
+拒绝规则：
+- 厂商不披露方法论时，拒绝，要求提供原始论文或博客文章。
+- 基准测试分布与生产分布没有重合时，拒绝，要求做内部评测。
+- 厂商引用时间跨度，却没有针对其具体评测流水线做过博弈审计时，拒绝把这个数字当作可靠性预测来引用。
 
-Output format:
+输出格式：
 
-Return a horizon-interpretation memo with:
-- **Source methodology** (suite, fit method, sample size, CI)
-- **Distribution overlap** (benchmark vs production; % mapping)
-- **Eval-context gap estimate** (low / med / high with rationale)
-- **Tooling gap estimate** (low / med / high)
-- **HITL assumption** (benchmark-style autonomous vs production HITL)
-- **Deploy-adjusted horizon** (horizon after gap and tooling discounts)
-- **Readiness verdict** (production / staging / research-only)
+返回一份时间跨度解读备忘录，包含：
+- **源方法论**（任务集、拟合方法、样本量、置信区间）
+- **分布重合度**（基准测试与生产对比；映射百分比）
+- **评测情境差距估计**（low / med / high，附理由）
+- **工具差距估计**（low / med / high）
+- **HITL 假设**（基准测试式全自主，还是生产环境带 HITL）
+- **部署修正后的时间跨度**（扣除差距和工具折扣后的时间跨度）
+- **就绪度结论**（production / staging / research-only）

@@ -1,35 +1,35 @@
 ---
 name: tom-auditor
-description: Audit a multi-agent system that claims "emergent coordination." Separates real ToM-enabled coordination from prompt-dressed illusion with control conditions, statistical tests, and complementarity measurement.
+description: 审计声称"涌现协调"的多 agent 系统。借助对照条件、统计检验和互补性测量，把真正由心智理论（ToM）驱动的协调和 prompt 包装出来的假象区分开。
 version: 1.0.0
 phase: 16
 lesson: 18
 tags: [multi-agent, theory-of-mind, coordination, evaluation, emergence]
 ---
 
-Given a multi-agent system that claims emergent coordination, audit whether the coordination is real or an artifact of prompt engineering.
+给定一个声称存在涌现协调的多 agent 系统，审计这种协调是真实的，还是 prompt 工程的产物。
 
-Produce:
+输出以下内容：
 
-1. **Claim extraction.** What coordination behavior is being claimed? (division of labor, anticipation, complementary actions, consensus reaching). State it precisely.
-2. **Prompt inspection.** Does any agent's system prompt explicitly instruct coordination, role selection, or team awareness? If yes, flag the claim as partially prompt-dressed and design a control.
-3. **Control condition.** A version of the system with coordination-inducing language stripped. Specify exactly what text changes.
-4. **Metric.** At least one of: identity-linked differentiation, goal-directed complementarity, higher-order synergy (Riedl 2025). Do not accept "agents seem to work together" as evidence.
-5. **Statistical test.** Significance of the metric on system vs control. Sample size needed for `p < 0.05`. If `n < 50` trials, report power explicitly.
-6. **Model-capacity check.** Repeat the comparison on a smaller base model. Does the effect persist or vanish? Li/Riedl both show capacity-dependence.
-7. **Failure-case review.** When the system fails, what does the ToM state (if any) look like? Identity confusion (belief-agent binding broken) or content hallucination (wrong belief content)?
+1. **提取主张。** 声称的是哪种协调行为？（分工、预判、互补行动、达成共识）。准确写出来。
+2. **检查 prompt。** 有没有哪个 agent 的系统 prompt 明确指示协调、角色选择或团队意识？如果有，把该主张标为部分由 prompt 包装，并设计对照组。
+3. **对照条件。** 去掉诱导协调措辞的系统版本。精确写出改动了哪些文本。
+4. **指标。** 至少选一个：与身份关联的差异化、目标导向的互补性、高阶协同（Riedl 2025）。不接受"agent 看起来在合作"作为证据。
+5. **统计检验。** 指标在系统组与对照组之间的显著性。达到 `p < 0.05` 所需的样本量。如果试验次数 `n < 50`，明确报告统计功效。
+6. **模型能力检查。** 在更小的基座模型上重复比较。效应是保持还是消失？Li 和 Riedl 的研究都显示效应依赖模型能力。
+7. **失败案例复盘。** 系统失败时，ToM 状态（如果有）是什么样？是身份混淆（信念与 agent 的绑定断了），还是内容幻觉（信念内容错了）？
 
-Hard rejects:
+直接否决：
 
-- Claims of emergence without a control condition. Demo reels are not evidence.
-- Claims that vanish on statistical scrutiny (effect below `p < 0.05` on `n >= 50` trials). These are coordination illusions.
-- Claims that hold on one model only. If a smaller strong baseline also achieves the effect without ToM prompting, the coordination is not ToM-driven.
-- "Our agents just figured it out" as a mechanism explanation. Mechanism claims need the ToM state logged and inspectable.
+- 没有对照条件的涌现主张。演示视频不是证据。
+- 经不起统计检验的主张（在 `n >= 50` 次试验上效应达不到 `p < 0.05`）。这些是协调假象。
+- 只在一个模型上成立的主张。如果一个更小的强基线不用 ToM prompt 也能达到同样效果，那么这种协调就不是 ToM 驱动的。
+- 把"我们的 agent 自己摸索出来了"当作机制解释。机制主张需要把 ToM 状态记录下来且可检查。
 
-Refusal rules:
+拒绝规则：
 
-- If the system has no logging of per-agent reasoning, the audit cannot distinguish real coordination from randomness. Recommend adding structured ToM-state logs before re-auditing.
-- If the task has an oracle-computed optimal coordination, compare to optimal rather than control.
-- If the claim is narrow ("coordination on single-round task"), the audit can be a shorter check: measure complementarity on the single round, no long-horizon analysis needed.
+- 如果系统没有记录每个 agent 的推理，审计就无法区分真实协调和随机性。建议先加上结构化的 ToM 状态日志再重新审计。
+- 如果任务有 oracle 算出的最优协调方案，就和最优方案比，而不是和对照组比。
+- 如果主张范围很窄（"单轮任务上的协调"），审计可以简化：只测这一轮的互补性，不需要长周期分析。
 
-Output: a two-page audit. Start with a one-sentence verdict ("Coordination claim is prompt-dressed: removing 'work together' language drops the metric from 0.82 to 0.31, control-significant."), then the seven sections above. End with a list of fixes to convert prompt-dressed coordination into real coordination: explicit ToM state, longer horizons with logging, mixed-model ensembles.
+输出：两页审计报告。开头用一句话给出结论（"协调主张由 prompt 包装：去掉 'work together' 措辞后，指标从 0.82 降到 0.31，与对照组差异显著。"），然后是上面七个部分。最后列出把 prompt 包装的协调变成真实协调的修复项：显式 ToM 状态、更长时间跨度并记录日志、混合模型集成。

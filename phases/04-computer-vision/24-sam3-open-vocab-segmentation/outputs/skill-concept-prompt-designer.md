@@ -1,48 +1,48 @@
 ---
 name: skill-concept-prompt-designer
-description: Turn user utterances into well-formed SAM 3 concept prompts with splitting, disambiguation, and fallbacks
+description: 把用户的自然语言表述转成规范的 SAM 3 概念 prompt，包括拆分、消歧和兜底
 version: 1.0.0
 phase: 4
 lesson: 24
 tags: [sam3, open-vocab, prompt-engineering, segmentation]
 ---
 
-# Concept Prompt Designer
+# 概念 Prompt 设计器
 
-SAM 3's accuracy depends heavily on how the concept prompt is phrased. This skill normalises free-form user utterances into prompts that SAM 3 handles well.
+SAM 3 的准确率很大程度上取决于概念 prompt 怎么写。这个 skill 把用户随意写的表述规范化，变成 SAM 3 能处理好的 prompt。
 
-## When to use
+## 何时使用
 
-- Building a UI that accepts natural-language object queries.
-- Exposing SAM 3 through an API where upstream callers send sentences.
-- Debugging poor SAM 3 matches — often the prompt is malformed, not the model.
+- 搭建一个接受自然语言物体查询的 UI。
+- 通过 API 对外提供 SAM 3，上游调用方发来的是整句话。
+- 排查 SAM 3 匹配效果差的问题：往往是 prompt 写得不对，不是模型的问题。
 
-## Inputs
+## 输入
 
-- `utterance`: raw user string.
-- `context`: optional domain hint (e.g. "surveillance", "medical", "retail").
-- `max_concepts`: maximum concepts to extract per utterance; default 5.
+- `utterance`：用户原始字符串。
+- `context`：可选的领域提示（例如 "surveillance"、"medical"、"retail"）。
+- `max_concepts`：每条表述最多提取的概念数；默认 5。
 
-## Rules SAM 3 prefers
+## SAM 3 偏好的写法
 
-- **Short noun phrases, not sentences.** `"cat"` wins over `"there is a cat"`.
-- **Concrete nouns.** `"skateboard"` wins over `"thing to ride on"`.
-- **Modifiers immediately before the noun.** `"red car"` wins over `"car that is red"`.
-- **Lowercase.** SAM 3 is robust but empirically slightly better on lowercase inputs.
-- **Singular or plural.** Both work; plural helps when multiple instances are expected.
+- **短名词短语，不要整句。** `"cat"` 好过 `"there is a cat"`。
+- **具体名词。** `"skateboard"` 好过 `"thing to ride on"`。
+- **修饰语紧贴在名词前面。** `"red car"` 好过 `"car that is red"`。
+- **小写。** SAM 3 很稳健，但实测小写输入略好一些。
+- **单数或复数。** 都可以；预期有多个实例时，复数有帮助。
 
-## Steps
+## 步骤
 
-1. **Tokenise by common separators** — comma, semicolon, "and", "or", "&".
-2. **Drop filler prefixes** — "find", "show me", "segment", "detect", "locate", "a", "an", "the".
-3. **Keep prepositional modifiers** only if they are visual — `"striped red umbrella"` yes, `"umbrella from yesterday"` no (the `"from yesterday"` is not in-image).
-4. **Disambiguate collisions** using the optional `context`:
-   - `"window"` in surveillance context -> `"building window"`.
-   - `"window"` in medical context -> often error; suggest user clarify.
-5. **Fallback** to the exact string if splitting yields zero concepts *and* the utterance contains at least one concrete noun. If no concrete noun can be extracted, do not emit a concept — return only warnings and ask the user to clarify (see Rules).
-6. **Cap at `max_concepts`.** If more concepts were extracted than the caller asked for, keep the first `max_concepts` in utterance order and emit the rest under `dropped` with reason `"exceeded max_concepts"`. This keeps latency bounded when a user pastes a long enumeration.
+1. **按常见分隔符切分**：逗号、分号、"and"、"or"、"&"。
+2. **去掉填充前缀**："find"、"show me"、"segment"、"detect"、"locate"、"a"、"an"、"the"。
+3. **只保留视觉上的介词修饰语**：`"striped red umbrella"` 保留，`"umbrella from yesterday"` 不保留（`"from yesterday"` 不在图像里）。
+4. **借助可选的 `context` 消除歧义**：
+   - 监控场景中的 `"window"` -> `"building window"`。
+   - 医学场景中的 `"window"` -> 通常是错误；建议用户澄清。
+5. **兜底**：如果拆分后没有得到任何概念，*并且*表述中至少有一个具体名词，就直接使用原字符串。如果提取不出任何具体名词，就不要输出概念，只返回警告并请用户澄清（见规则）。
+6. **上限为 `max_concepts`。** 如果提取出的概念多于调用方要求的数量，按表述中的顺序保留前 `max_concepts` 个，其余放进 `dropped`，原因写 `"exceeded max_concepts"`。这样即使用户粘贴了一长串列举，延迟也有上限。
 
-## Output format
+## 输出格式
 
 ```
 [designed prompts]
@@ -56,7 +56,7 @@ SAM 3's accuracy depends heavily on how the concept prompt is phrased. This skil
   Merge outputs with distinct concept tags per detection.
 ```
 
-## Examples
+## 示例
 
 ```
 in:  "can you find me a cat or two dogs?"
@@ -76,9 +76,9 @@ in:  "striped red umbrella, green hat, pink balloon"
 out: ["striped red umbrella", "green hat", "pink balloon"]
 ```
 
-## Rules
+## 规则
 
-- Never pass sentences longer than 8 words to SAM 3 — accuracy drops above that.
-- When an utterance contains no extractable concrete nouns, do not run SAM 3; return the warnings and ask for clarification.
-- Do not split on punctuation inside quoted strings; preserve `"black and white cat"` as one concept if it is quoted.
-- Always log the original utterance and the derived concepts for production debugging.
+- 绝不把超过 8 个词的句子传给 SAM 3；超过这个长度准确率会下降。
+- 如果表述里提取不出具体名词，就不要运行 SAM 3；返回警告并请求澄清。
+- 不要在引号内的字符串里按标点切分；如果 `"black and white cat"` 带了引号，就把它作为一个概念保留。
+- 一律记录原始表述和推导出的概念，便于生产环境排查。

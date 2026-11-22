@@ -1,17 +1,17 @@
 ---
 name: checkpoint-save-resume
-description: Atomic, sharded checkpoints with full RNG capture so a killed run resumes mid-epoch with the same loss trajectory.
+description: 原子化、分片的 checkpoint，完整保存 RNG 状态，被杀掉的训练能在 epoch 中途恢复，并保持相同的损失曲线。
 version: 1.0.0
 phase: 19
 lesson: 47
 tags: [training, durability, resume, sharded-state]
 ---
 
-## When to use
+## 适用场景
 
-Any training run longer than the wallclock cap of the cluster, any run that must survive a node reboot, any model too large for a single payload.
+训练时长超过集群墙钟上限的任何运行、必须扛过节点重启的任何运行，以及大到无法装进单个文件的任何模型。
 
-## Payload shape
+## 载荷结构
 
 ```python
 {
@@ -25,30 +25,30 @@ Any training run longer than the wallclock cap of the cluster, any run that must
 }
 ```
 
-## Atomic save
+## 原子保存
 
-1. Write the payload to a unique temp file in the same directory as the target.
-2. `os.replace(tmp, target)` to swap atomically.
-3. Never write directly to the target name.
+1. 把载荷写到目标文件所在目录下一个唯一的临时文件里。
+2. 用 `os.replace(tmp, target)` 原子替换。
+3. 永远不要直接写目标文件名。
 
-## Sharded layout
+## 分片布局
 
-- `model.shard-NNN.pt` per shard, round robin on keys or split by parameter group.
-- `meta.pt` carries optimizer, scheduler, train state, RNG, and the shard manifest.
-- `index.json` carries `sha256` for every shard and for `meta.pt`.
-- Loader verifies every hash before merging and rejects shard paths outside the checkpoint directory.
-- Load every file with `torch.load(path, map_location="cpu", weights_only=True)`. Keep RNG state as plain lists so it survives the weights-only loader.
+- 每个分片一个 `model.shard-NNN.pt`，按 key 轮询分配，或按参数组切分。
+- `meta.pt` 存放优化器、调度器、训练状态、RNG 和分片清单。
+- `index.json` 记录每个分片以及 `meta.pt` 的 `sha256`。
+- 加载器在合并前校验每个哈希，并拒绝 checkpoint 目录之外的分片路径。
+- 每个文件都用 `torch.load(path, map_location="cpu", weights_only=True)` 加载。RNG 状态存成普通 list，这样 weights-only 加载器也能读。
 
-## Mid-epoch resume
+## epoch 中途恢复
 
-- Save `(epoch, batch_in_epoch)` next to `step`.
-- Restore RNG state before the first batch of the resumed epoch.
-- Fast-forward the generator past consumed batches.
+- 在 `step` 旁边同时保存 `(epoch, batch_in_epoch)`。
+- 在恢复后的 epoch 的第一个 batch 之前还原 RNG 状态。
+- 让数据生成器快进，跳过已经消费掉的 batch。
 
-## Failure modes
+## 失败模式
 
-- Cross-device rename: not atomic, lose the previous file. Put temp in same directory.
-- Forgetting RNG: resumed loss diverges from baseline. Run the demo's assertion.
-- Forgetting optimizer state: next step lurches. Same diff blows up.
-- Pruning the wrong checkpoint: keep last K plus best.
-- Loading with `weights_only=False`: a `.pt` file is a pickle, so an untrusted checkpoint runs code on load.
+- 跨设备重命名：不是原子操作，会丢掉上一个文件。临时文件要放在同一目录。
+- 忘了保存 RNG：恢复后的损失偏离基线。运行 demo 里的断言来检查。
+- 忘了保存优化器状态：下一步会猛地一跳。同样的 diff 会直接炸掉。
+- 删错 checkpoint：保留最近 K 个外加最好的那个。
+- 用 `weights_only=False` 加载：`.pt` 文件本质是 pickle，不可信的 checkpoint 在加载时就会执行代码。

@@ -1,50 +1,50 @@
 ---
 name: prompt-tool-designer
-description: Design complete tool definitions (JSON Schema) for function calling from a natural language description
+description: 根据自然语言描述，为 function calling 设计完整的工具定义（JSON Schema）
 phase: 11
 lesson: 09
 ---
 
-You are a tool definition designer for LLM function calling. I will describe what a tool should do. You will produce a complete, production-ready JSON Schema tool definition.
+你负责为 LLM function calling 设计工具定义。我会描述一个工具要做什么，你要产出一份完整、可直接上生产的 JSON Schema 工具定义。
 
-## Design Protocol
+## 设计流程
 
-### 1. Analyze the Tool Purpose
+### 1. 分析工具用途
 
-Before writing the schema:
+写 schema 之前：
 
-- Identify the core action (read, write, search, compute, transform)
-- Determine required vs optional parameters
-- Identify parameter types and constraints (enums, min/max, patterns)
-- Consider error cases and what the tool should return on failure
-- Determine if the tool has side effects (read-only vs mutating)
+- 确定核心动作（读、写、搜索、计算、转换）
+- 区分必填参数和可选参数
+- 确定参数类型和约束（enum、min/max、pattern）
+- 考虑出错情况，以及失败时工具应返回什么
+- 判断工具是否有副作用（只读还是会修改状态）
 
-### 2. Writing the Description
+### 2. 编写 description
 
-The description is the most important field. The model reads it to decide when to use the tool.
+description 是最重要的字段。模型靠读它来决定何时使用这个工具。
 
-Rules:
-- Start with an action verb: "Get", "Search", "Create", "Calculate", "Read"
-- State what the tool returns: "Returns temperature in Celsius and weather conditions"
-- Mention limitations: "Only supports cities with population > 100,000"
-- Keep it under 200 characters
-- Do not include parameter details in the description -- those go in parameter descriptions
+规则：
+- 以动词开头："Get"、"Search"、"Create"、"Calculate"、"Read"
+- 说明工具返回什么："Returns temperature in Celsius and weather conditions"
+- 写明限制："Only supports cities with population > 100,000"
+- 控制在 200 个字符以内
+- 不要把参数细节写进 description，那些放在参数的 description 里
 
-Bad: "A weather tool"
-Good: "Get current weather for a city. Returns temperature, condition, humidity, and wind speed in metric units."
+差："A weather tool"
+好："Get current weather for a city. Returns temperature, condition, humidity, and wind speed in metric units."
 
-### 3. Parameter Design
+### 3. 参数设计
 
-For each parameter:
-- Use `description` to explain what it accepts and give examples
-- Use `enum` for categorical values -- never rely on the model inventing the right string
-- Use `minimum`/`maximum` for numbers to prevent hallucinated extreme values
-- Set `default` for optional parameters so the model knows the behavior when omitted
-- Mark only truly necessary parameters as `required`
+对每个参数：
+- 用 `description` 说明它接受什么，并给出示例
+- 分类值用 `enum`，绝不指望模型自己编出正确的字符串
+- 数字用 `minimum`/`maximum`，防止幻觉出来的极端值
+- 给可选参数设置 `default`，让模型知道省略时的行为
+- 只有真正不可缺少的参数才标为 `required`
 
-### 4. Output Format
+### 4. 输出格式
 
-Return the tool definition in the OpenAI `tools` format:
+按 OpenAI `tools` 格式返回工具定义：
 
 ```json
 {
@@ -66,23 +66,23 @@ Return the tool definition in the OpenAI `tools` format:
 }
 ```
 
-Also include:
-- An Anthropic-format version (using `input_schema` instead of `parameters`)
-- 3 example tool calls with expected arguments
-- 2 error scenarios the implementation should handle
+另外还要提供：
+- 一份 Anthropic 格式的版本（用 `input_schema` 代替 `parameters`）
+- 3 个工具调用示例及预期参数
+- 2 个实现时需要处理的出错场景
 
-## Input Format
+## 输入格式
 
-**Tool description:**
+**工具描述：**
 ```
 {description}
 ```
 
-**Context (optional):**
+**上下文（可选）：**
 ```
 {context}
 ```
 
-## Output
+## 输出
 
-A complete tool definition with both OpenAI and Anthropic formats, examples, and error scenarios.
+一份完整的工具定义，包含 OpenAI 和 Anthropic 两种格式、示例以及出错场景。

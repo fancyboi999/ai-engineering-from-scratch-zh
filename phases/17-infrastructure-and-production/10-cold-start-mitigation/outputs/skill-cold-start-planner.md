@@ -1,31 +1,31 @@
 ---
 name: cold-start-planner
-description: Pick and stack cold-start mitigations for serverless LLM deployments. Budget phases (node, image, weights, engine, first forward) and match mitigations to SLA.
+description: 为 serverless LLM 部署挑选并叠加冷启动缓解措施，拆分各阶段耗时预算（节点、镜像、权重、引擎、首次前向），并让缓解措施匹配 SLA。
 version: 1.0.0
 phase: 17
 lesson: 10
 tags: [cold-start, serverless, bottlerocket, model-streamer, gpu-snapshot, warm-pool, serverlessllm]
 ---
 
-Given model size, SLA (TTFT P99), traffic shape (steady vs bursty), and budget posture, produce a cold-start mitigation plan.
+给定模型规模、SLA（TTFT P99）、流量形态（平稳还是突发）和预算立场，制定冷启动缓解方案。
 
-Produce:
+输出以下内容：
 
-1. Cold-start budget. Break down the raw cold-start path (node provision, image pull, weights to HBM, engine init, first forward). Use 2026 nominal seconds for the stated model size.
-2. Layer selection. Pick the minimum number of layers that brings total below the SLA: pre-seeded image (L1), model streamer (L2), GPU snapshot (L3), warm pool (L4), tiered loading (L5). Justify each layer against the specific phase it attacks.
-3. Warm-pool sizing. State `min_workers` for the primary path. If SLA is TTFT P99 < 60s on a 70B+ model, make warm pool mandatory regardless of cost.
-4. Cost estimate. Monthly GPU cost for the chosen warm-pool and the expected number of cold starts per day.
-5. Tail policy. What happens to the first user on a fresh replica — do they get queued to a warm replica, or do they pay the cold-start tax? Name a specific policy (e.g., "route first request to any warm replica within 10s; fall through to cold").
-6. Failure mode. What happens if a warm replica dies mid-session. Is recovery automatic (live migration), or is it a cold start on the next request?
+1. 冷启动预算。拆解原始冷启动路径（节点供给、镜像拉取、权重载入 HBM、引擎初始化、首次前向）。按所给模型规模，使用 2026 年的标称秒数。
+2. 层级选择。选出能把总耗时压到 SLA 以下的最少层数：预置镜像（L1）、模型流式加载（L2）、GPU 快照（L3）、预热池（L4）、分层加载（L5）。每一层都要说明它针对的是哪个阶段。
+3. 预热池规模。写出主路径的 `min_workers`。如果 70B 以上模型的 SLA 是 TTFT P99 < 60s，无论成本如何，预热池都必须有。
+4. 成本估算。所选预热池的每月 GPU 成本，以及预计每天的冷启动次数。
+5. 尾部策略。新副本上的第一个用户怎么处理：排队转给已预热的副本，还是承担冷启动的代价？写出具体策略（例如"首个请求在 10s 内转给任意已预热副本；否则走冷启动"）。
+6. 失效模式。会话中途预热副本挂掉会怎样？恢复是自动的（热迁移），还是下一个请求触发冷启动？
 
-Hard rejects:
-- Proposing "just add warm pool" without computing the monthly cost.
-- Claiming a mitigation without a specific phase it attacks (e.g., "use Bottlerocket" without saying it eliminates the 180s image pull).
-- Ignoring the per-GPU-topology constraint on GPU snapshots — if the platform migrates SKU, snapshots are invalid.
+直接否决：
+- 提出"加个预热池就行"，却不算每月成本。
+- 提出缓解措施却不说明它针对哪个阶段（例如只说"用 Bottlerocket"，不说它消除了 180s 的镜像拉取）。
+- 忽略 GPU 快照的 GPU 拓扑约束。如果平台迁移了 SKU，快照就会失效。
 
-Refusal rules:
-- If SLA is TTFT P99 < 5s on a fresh 70B cold start with no warm pool, refuse — mathematically impossible at 2026 infrastructure speeds.
-- If budget forbids warm pool but SLA requires sub-30s cold start, name the platform-specific fix (Modal GPU snapshots, Baseten pre-warming) and refuse to promise the SLA on a different platform without it.
-- If the operator asks for scale-to-zero with bursty traffic and a 70B model, refuse to promise SLA — the math does not work without snapshots or warm pools.
+拒绝规则：
+- 如果在没有预热池的情况下，要求全新 70B 冷启动达到 TTFT P99 < 5s，拒绝。按 2026 年的基础设施速度，这在数学上不可能。
+- 如果预算不允许预热池，但 SLA 要求 30s 以内冷启动，写出特定平台的解决办法（Modal GPU 快照、Baseten 预热），并拒绝在不具备这些能力的其他平台上承诺该 SLA。
+- 如果运维要求在流量突发、模型为 70B 的情况下缩容到零，拒绝承诺 SLA。没有快照或预热池，这笔账算不过来。
 
-Output: a one-page plan listing phases, layers, `min_workers`, monthly cost, tail policy, failure mode. End with the single metric to alert on: P99 cold-start duration over the last rolling hour.
+输出：一页方案，列出各阶段、层级、`min_workers`、每月成本、尾部策略和失效模式。最后给出唯一的告警指标：最近一小时滚动窗口内的 P99 冷启动时长。

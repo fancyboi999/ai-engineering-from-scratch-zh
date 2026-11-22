@@ -1,37 +1,37 @@
 ---
 name: verification-gate
-description: Generate a deterministic verification gate that combines scope, rule, and feedback artifacts into a single verification_report.json per task, plus CI wiring that refuses to merge without a green verdict.
+description: 生成一道确定性的验证关卡，把范围、规则和反馈产物合并成每个任务一份 verification_report.json，并接入 CI：没有绿色结论就拒绝合并。
 version: 1.0.0
 phase: 14
 lesson: 38
 tags: [verification, gate, deterministic, ci, override-log]
 ---
 
-Given a project's acceptance criteria and existing workbench artifacts, produce the verification gate and override audit log.
+给定项目的验收标准和现有的工作台产物，产出验证关卡和覆盖操作的审计日志。
 
-Produce:
+产出：
 
-1. `tools/verify_agent.py` exposing `verify(task_id, artifacts) -> VerdictReport`. Pure function, deterministic, no LLM calls.
-2. `outputs/verification/<task_id>.json` as the single source of truth verdict.
-3. `tools/override.py` that appends signed override entries to `outputs/verification/overrides.jsonl` (must include reason, user id, timestamp, finding code).
-4. CI workflow that fails on `passed: false` and surfaces the report inline.
-5. `docs/verification.md` listing every check, its severity, its source artifact, and the override policy.
+1. `tools/verify_agent.py`，提供 `verify(task_id, artifacts) -> VerdictReport`。纯函数、确定性、不调用 LLM。
+2. `outputs/verification/<task_id>.json`，作为结论的唯一事实来源。
+3. `tools/override.py`，向 `outputs/verification/overrides.jsonl` 追加带签名的覆盖记录（必须包含原因、用户 id、时间戳和发现代码）。
+4. CI 工作流：遇到 `passed: false` 时失败，并在线内展示报告。
+5. `docs/verification.md`，列出每项检查、严重级别、来源产物以及覆盖策略。
 
-Hard rejects:
+直接否决：
 
-- A check that calls an LLM. The gate is deterministic plumbing; LLM judgment belongs to the reviewer.
-- An override path the agent can take without a signed entry. Overrides are human-only.
-- A verification report that omits the artifact paths it consumed. Reports must be auditable.
-- Block-severity findings the workflow can silently downgrade. Severity is fixed at write time, not at read time.
+- 调用 LLM 的检查。关卡是确定性的管道工作，LLM 判断属于审查者。
+- agent 不留签名记录就能走的覆盖路径。覆盖只能由人来做。
+- 验证报告不写明它消费了哪些产物路径。报告必须可审计。
+- 工作流可以悄悄降级的 block 级发现。严重级别在写入时确定，不在读取时改。
 
-Refusal rules:
+拒绝规则：
 
-- If the project has no acceptance command, refuse to ship the gate until one exists. A gate that proves nothing is theater.
-- If the rule report does not exist, refuse to skip the rule check; fail closed.
-- If the feedback log does not exist, refuse to skip the acceptance check; missing logs are themselves a block.
-- If override entries are not version-controlled, refuse to wire the override path; off-the-record overrides defeat the gate.
+- 项目没有验收命令时，在有了之前拒绝交付关卡。什么都证明不了的关卡只是表演。
+- 规则报告不存在时，拒绝跳过规则检查，按失败处理。
+- 反馈日志不存在时，拒绝跳过验收检查；日志缺失本身就是一个 block。
+- 覆盖记录没有纳入版本控制时，拒绝接入覆盖路径；不留记录的覆盖会让关卡形同虚设。
 
-Output structure:
+输出结构：
 
 ```
 <repo>/
@@ -45,8 +45,8 @@ Output structure:
 └── .github/workflows/verify.yml
 ```
 
-End with "what to read next" pointing to:
+最后给出"接下来读什么"，指向：
 
-- Lesson 39 for the reviewer agent that picks up after a green verdict.
-- Lesson 40 for the handoff generator that includes the verdict in the packet.
-- Lesson 41 for running the gate against a real-style sample app.
+- 第 39 课：在绿色结论之后接手的审查 agent。
+- 第 40 课：把结论放进交接包的交接生成器。
+- 第 41 课：在仿真实风格的示例应用上运行关卡。

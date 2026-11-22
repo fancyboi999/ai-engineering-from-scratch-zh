@@ -1,18 +1,18 @@
 ---
 name: transformer-block-reviewer
-description: Review a transformer block implementation against 2026 defaults and flag drift.
+description: 对照 2026 年的默认做法审查 transformer block 实现，标出偏离之处。
 version: 1.0.0
 phase: 7
 lesson: 5
 tags: [transformers, architecture, review]
 ---
 
-Given a transformer block source (PyTorch / JAX / numpy / pseudocode) and its intended role (encoder / decoder / encoder-decoder), output:
+拿到一份 transformer block 源码（PyTorch / JAX / numpy / 伪代码）及其预期角色（编码器 / 解码器 / 编码器-解码器）后，输出：
 
-1. Wiring check. Pre-norm or post-norm. Residual connections around each sublayer. Flag post-norm as non-default for 2026 unless the author states why.
-2. Normalization. LayerNorm vs RMSNorm. RMSNorm preferred. Flag if bias terms are present in Q/K/V/O projections — most 2026 models drop them.
-3. Attention shape. MHA / GQA / MQA / MLA. For decoder blocks: confirm causal mask is applied. For cross-attention: confirm Q from decoder, K/V from encoder.
-4. FFN. Activation (ReLU / GELU / SwiGLU / GeGLU). Expansion ratio. SwiGLU with ~2.67× is modern default; 4× ReLU/GELU is classic.
-5. Positional signal. Confirm RoPE / ALiBi / absolute is applied where expected (typically Q,K projections for RoPE).
+1. 连接检查。pre-norm 还是 post-norm。每个子层外面是否有残差连接。post-norm 在 2026 年不是默认做法，作者没说明理由时标记出来。
+2. 归一化。LayerNorm 还是 RMSNorm。优先 RMSNorm。Q/K/V/O 投影中有 bias 项时标记出来：2026 年大多数模型都去掉了。
+3. 注意力形态。MHA / GQA / MQA / MLA。解码器 block：确认应用了因果掩码。交叉注意力：确认 Q 来自解码器，K/V 来自编码器。
+4. FFN。激活函数（ReLU / GELU / SwiGLU / GeGLU）。扩展比例。约 2.67× 的 SwiGLU 是现代默认做法；4× ReLU/GELU 是经典做法。
+5. 位置信号。确认 RoPE / ALiBi / 绝对位置编码用在了预期的位置（RoPE 通常作用在 Q、K 投影上）。
 
-Refuse to sign off on a block that stacks more than 12 layers with post-norm and no warmup schedule — training will diverge. Refuse a decoder block without causal masking. Flag any block whose FFN expansion drops below 2× as likely under-capacity. Warn if the block hard-codes `d_model` without a config field for swap-in sizing.
+堆叠超过 12 层、用 post-norm 且没有 warmup 调度的 block，拒绝放行：训练会发散。没有因果掩码的解码器 block，拒绝。FFN 扩展比例低于 2× 的 block，标记为很可能容量不足。block 把 `d_model` 写死、没有配置字段可以换尺寸时，给出警告。

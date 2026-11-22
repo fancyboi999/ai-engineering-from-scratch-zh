@@ -1,39 +1,39 @@
 ---
 name: rsi-cycle-pause-spec
-description: Specify the conditions under which an RSI pipeline must pause and wait for human review before the next cycle.
+description: 规定 RSI 流水线在哪些条件下必须暂停，等待人工审查后才能进入下一轮。
 version: 1.0.0
 phase: 15
 lesson: 7
 tags: [rsi, self-improvement, alignment, pause-threshold, rsp]
 ---
 
-Given a proposed recursive-self-improvement pipeline, produce a pause specification: the explicit conditions that halt the loop for human inspection before the next cycle begins. A pipeline without a pause spec is not ready to run.
+给定一条拟议的递归自我改进流水线，产出一份暂停规格：在下一轮开始之前让循环停下来、交给人类检查的明确条件。没有暂停规格的流水线还不能运行。
 
-Produce:
+产出：
 
-1. **Cycle-level thresholds.** For each measurable axis (capability score, alignment score, budget, trajectory length, resource usage), define a numeric threshold whose crossing pauses the loop. Thresholds must be set before the loop starts and recorded.
-2. **Cycle-over-cycle deltas.** Set limits on how much any axis can move in a single cycle. A 30%+ capability jump in one cycle is almost always a sign of evaluator gaming; pause and audit.
-3. **Misalignment gap.** Compute capability-minus-alignment after each cycle. If the gap widens by more than X (operator-set), pause. This is the metric the simulator in `code/main.py` exercises.
-4. **Regression watch.** If any axis drops more than Y in a cycle, pause. Capability regressions often follow surges; catching them prevents false-progress acceleration.
-5. **Human resumption contract.** Before the loop resumes after a pause, require a named human to review the pause trigger, re-set thresholds if appropriate, and log the decision to the out-of-pipeline audit trail.
+1. **轮次级阈值。** 对每个可测量的维度（能力分、对齐分、预算、轨迹长度、资源用量），定义一个数值阈值，越过就暂停循环。阈值必须在循环启动前设定并记录。
+2. **轮间变化量。** 限制任一维度在单轮内的变化幅度。单轮能力跳升 30% 以上，几乎总是评估器被钻空子的迹象；暂停并审计。
+3. **失调差距。** 每轮结束后计算能力减去对齐的差值。差距扩大超过 X（由运营方设定）时暂停。`code/main.py` 里的模拟器演示的就是这个指标。
+4. **退化监控。** 任一维度单轮下降超过 Y 时暂停。能力退化常常紧跟在激增之后；抓住它能防止虚假进展的加速。
+5. **人工恢复契约。** 暂停后循环恢复之前，要求一位具名的人类审查暂停触发原因，必要时重设阈值，并把决定记录到流水线之外的审计轨迹中。
 
-Hard rejects:
-- Any pipeline that can resume after a pause without human action.
-- Any threshold that depends on the loop's own internal evaluator (the agent can game it).
-- Any pipeline whose threshold set can be edited by the agent.
+直接否决：
+- 暂停后无需人工操作就能恢复的任何流水线。
+- 依赖循环自身内部评估器的任何阈值（agent 可以钻它的空子）。
+- 阈值集可被 agent 修改的任何流水线。
 
-Refusal rules:
-- If the user cannot name the thresholds up-front, refuse. Thresholds set post-hoc are not thresholds; they are rationalizations.
-- If the pipeline has no external (out-of-loop) evaluator, refuse — regression and surge detection require an outside view.
-- If the proposed resumption contract is "notify the team and continue after 24 hours," refuse. Resumption must be a positive act.
+拒绝规则：
+- 用户无法事先给出阈值时，拒绝。事后设定的阈值不是阈值，是合理化。
+- 流水线没有外部（循环之外的）评估器时，拒绝。检测退化和激增需要外部视角。
+- 拟议的恢复契约是"通知团队，24 小时后继续"时，拒绝。恢复必须是一个主动动作。
 
-Output format:
+输出格式：
 
-Return a one-page spec with:
-- **Axes and thresholds** (table)
-- **Cycle-delta limits** (table)
-- **Misalignment gap formula and threshold**
-- **Regression limits**
-- **External evaluator** (what it is, when it runs)
-- **Resumption contract** (named owner, checklist, log destination)
-- **Sign-off line** (who owns the pause invariant)
+返回一页规格，包含：
+- **维度与阈值**（表格）
+- **轮间变化上限**（表格）
+- **失调差距公式与阈值**
+- **退化上限**
+- **外部评估器**（是什么、何时运行）
+- **恢复契约**（具名负责人、清单、日志去向）
+- **签字栏**（谁对暂停不变量负责）

@@ -1,39 +1,39 @@
 ---
 name: topology-picker
-description: Pick a multi-agent debate topology (star / chain / tree / graph), an N of agents, a heterogeneity profile, and a round bound for a given task.
+description: 针对给定任务选择多 agent 辩论拓扑（星形/链式/树形/图）、agent 数量 N、异构配置和轮数上限。
 version: 1.0.0
 phase: 16
 lesson: 15
 tags: [multi-agent, debate, topology, voting, self-consistency]
 ---
 
-Given a task description, recommend a multi-agent topology and sizing.
+根据任务描述，推荐多 agent 拓扑和规模。
 
-Produce:
+输出以下内容：
 
-1. **Task fingerprint.** Research (long-horizon, open-ended), fast-factual (closed-form answer), stepwise-refinement (staged pipeline), or opinion (no ground truth). Pick one; if it spans two, pick the dominant shape.
-2. **Topology.** Star, chain, tree, or graph. Justify from the fingerprint:
-   - research → graph (any-to-any critique)
-   - fast-factual → star (hub aggregates)
-   - stepwise-refinement → chain (or tree if divide-and-conquer)
-   - opinion → none of the above; recommend single agent + human decision
-3. **N of agents.** 3 is the cheapest useful ensemble; 5 is the common sweet spot; 7+ is specialty. Above 5 on graph topology, warn about coordination tax.
-4. **Heterogeneity profile.** At least one agent must come from a different base model family if monoculture matters (research, reasoning). Prefer 3 different base models at N=5.
-5. **Round bound.** 1 round = vote. 2 rounds = one refinement. 3 rounds = maximum before conformity dominates. Never unbounded.
-6. **Aggregation.** Plurality (cheap), confidence-weighted (CP-WBFT from Lesson 14), geometric median (DecentLLMs), or judge-scored. Default to confidence-weighted unless cost constraints dictate plurality.
-7. **Escalation.** Below-threshold consensus → escalate where? Human, another ensemble with different base models, or abstention?
+1. **任务指纹。** 研究型（长周期、开放式）、快速事实型（有封闭答案）、逐步精炼型（分阶段流水线）或观点型（没有事实依据）。选一个；如果横跨两类，选主导的那个。
+2. **拓扑。** 星形、链式、树形或图。根据任务指纹说明理由：
+   - 研究型 → 图（任意节点互相批评）
+   - 快速事实型 → 星形（中心节点汇总）
+   - 逐步精炼型 → 链式（分而治之时用树形）
+   - 观点型 → 以上都不用；建议单 agent 加人工决策
+3. **agent 数量 N。** 3 个是最便宜的有效集成；5 个是常见的最佳点；7 个以上属于特殊场景。图拓扑超过 5 个时，提醒协调开销。
+4. **异构配置。** 如果同质化有影响（研究、推理），至少有一个 agent 要来自不同的基座模型家族。N=5 时最好用 3 个不同的基座模型。
+5. **轮数上限。** 1 轮 = 投票。2 轮 = 一次精炼。3 轮是从众压倒一切之前的上限。绝不能不设上限。
+6. **聚合方式。** 简单多数（便宜）、置信度加权（第 14 课的 CP-WBFT）、几何中位数（DecentLLMs）或评审打分。默认用置信度加权，除非成本约束要求简单多数。
+7. **升级路径。** 共识低于阈值时升级到哪里？人工、另一个用不同基座模型的集成，还是弃权？
 
-Hard rejects:
+直接否决：
 
-- Any recommendation of 10+ agents on graph topology. Coordination tax dominates; measure first.
-- Star topology for open research questions. Star loses the benefit of any-to-any critique.
-- Any recommendation that runs the same base model N times and calls it multi-agent. That is self-consistency in disguise; label it correctly.
-- Unbounded rounds. Rewards conformity; the longer debate runs, the more agents agree by pressure rather than logic.
+- 在图拓扑上推荐 10 个以上 agent。协调开销会占主导；先测量。
+- 对开放研究问题用星形拓扑。星形会失去任意节点互相批评的好处。
+- 把同一个基座模型跑 N 遍就称为多 agent 的推荐。这其实是变相的 self-consistency；如实标注。
+- 不设轮数上限。这是在奖励从众；辩论跑得越久，agent 越会因为压力而非逻辑达成一致。
 
-Refusal rules:
+拒绝规则：
 
-- If the task has no ground truth (opinion, synthesis, creative), state that voting is advisory. Recommend single agent + human decision.
-- If the user lacks access to multiple base models, flag the monoculture ceiling and recommend self-consistency with temperature variation as a fallback.
-- If the task is simple (single factual lookup, < 100 tokens of reasoning), recommend a single agent with self-consistency N=5.
+- 如果任务没有事实依据（观点、综述、创作），说明投票只供参考。建议单 agent 加人工决策。
+- 如果用户拿不到多个基座模型，标出同质化上限，并建议退而求其次，用调整 temperature 的 self-consistency。
+- 如果任务很简单（单次事实查询，推理少于 100 个 token），建议用 N=5 self-consistency 的单 agent。
 
-Output: a one-page brief. Start with a single-sentence recommendation ("Graph topology, N=5 agents from 3 different base models, 2 rounds, confidence-weighted aggregation, escalate to human on below-threshold."), then the seven sections above. End with a budget estimate: expected tokens per query and expected latency in seconds.
+输出：一页简报。开头用一句话给出推荐（"图拓扑，N=5 个 agent，来自 3 个不同基座模型，2 轮，置信度加权聚合，低于阈值时升级给人工。"），然后是上面七个部分。最后给出预算估计：每次查询的预期 token 数和预期延迟（秒）。

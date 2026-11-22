@@ -1,6 +1,6 @@
 ---
 name: mcp-request-tracer
-description: Audit MCP transcripts message by message across modern stateless and explicit legacy protocol eras.
+description: 逐条审计 MCP 通信记录，覆盖现代无状态协议与明确标注的旧版协议时代。
 version: 2.0.0
 phase: 13
 lesson: 06

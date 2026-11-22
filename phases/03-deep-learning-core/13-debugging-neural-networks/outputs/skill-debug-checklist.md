@@ -1,108 +1,108 @@
 ---
 name: skill-debug-checklist
-description: Decision-tree checklist for debugging neural network training failures
+description: 调试神经网络训练故障的决策树式清单
 version: 1.0.0
 phase: 3
 lesson: 13
 tags: [debugging, neural-networks, training, diagnostics, deep-learning]
 ---
 
-# Neural Network Debug Checklist
+# 神经网络调试清单
 
-Systematic debugging protocol for when training goes wrong. Work through these in order -- most bugs are caught in the first 3 steps.
+训练出问题时的系统化调试流程。按顺序逐项排查，大多数 bug 在前 3 步就能抓到。
 
-## Before training (prevent bugs)
+## 训练之前（预防 bug）
 
-1. Print model architecture and parameter count. Does the size make sense for your data?
-2. Run a single forward pass with random input. Does the output shape match your target shape?
-3. Check that labels are the correct dtype (CrossEntropyLoss needs Long, BCELoss needs Float)
-4. Verify data normalization: inputs should have mean near 0 and std near 1
-5. Print 5 random (input, label) pairs. Do the labels match what you expect?
-6. Confirm train/test split has no duplicate samples
+1. 打印模型结构和参数量。这个规模对你的数据来说合理吗？
+2. 用随机输入跑一次前向传播。输出形状和目标形状一致吗？
+3. 检查标签的 dtype 是否正确（CrossEntropyLoss 要 Long，BCELoss 要 Float）
+4. 核实数据归一化：输入的均值应接近 0，标准差接近 1
+5. 随机打印 5 对（输入, 标签）。标签和你预期的一致吗？
+6. 确认训练/测试划分之间没有重复样本
 
-## Overfit-one-batch test (60 seconds, catches 80% of bugs)
+## 单 batch 过拟合测试（60 秒，能抓到 80% 的 bug）
 
-1. Take 8-32 samples from your training set
-2. Train for 200 steps with a reasonable learning rate
-3. Loss should approach 0. Training accuracy should hit 100%
-4. If it fails: the bug is in your model, loss function, or training loop -- not your data or hyperparameters
-5. If it passes: proceed to full training
+1. 从训练集里取 8-32 个样本
+2. 用合理的学习率训练 200 步
+3. 损失应趋近 0，训练准确率应达到 100%
+4. 如果失败：bug 在模型、损失函数或训练循环里，而不在数据或超参数上
+5. 如果通过：进入完整训练
 
-## Loss not decreasing
+## 损失不下降
 
-1. Check learning rate. Try 3 values: current/10, current, current*10
-2. Print gradient norms per layer. All zeros means dead network or detached graph
-3. Check `requires_grad=True` on parameters. Check that `loss.backward()` is called
-4. Check that `optimizer.zero_grad()` is called before `loss.backward()`
-5. Check that `optimizer.step()` is called after `loss.backward()`
-6. Verify model parameters are passed to the optimizer: `optimizer = Adam(model.parameters())`
+1. 检查学习率。试 3 个值：当前值/10、当前值、当前值*10
+2. 打印每层的梯度范数。全为零说明网络已死或计算图被断开了
+3. 检查参数是否设置了 `requires_grad=True`。检查是否调用了 `loss.backward()`
+4. 检查是否在 `loss.backward()` 之前调用了 `optimizer.zero_grad()`
+5. 检查是否在 `loss.backward()` 之后调用了 `optimizer.step()`
+6. 核实模型参数确实传给了优化器：`optimizer = Adam(model.parameters())`
 
-## Loss is NaN or Inf
+## 损失为 NaN 或 Inf
 
-1. Reduce learning rate by 10x
-2. Add epsilon to all log() calls: `torch.log(x + 1e-7)`
-3. Add epsilon to all division: `x / (y + 1e-8)`
-4. Clamp predictions: `torch.clamp(pred, 1e-7, 1 - 1e-7)` before BCE loss
-5. Use `torch.autograd.detect_anomaly()` to find the exact operation
-6. Check for NaN in input data: `assert not torch.isnan(x).any()`
+1. 把学习率降低 10 倍
+2. 所有 log() 调用都加 epsilon：`torch.log(x + 1e-7)`
+3. 所有除法都加 epsilon：`x / (y + 1e-8)`
+4. 在 BCE 损失之前截断预测值：`torch.clamp(pred, 1e-7, 1 - 1e-7)`
+5. 用 `torch.autograd.detect_anomaly()` 找出出问题的那一步操作
+6. 检查输入数据里有没有 NaN：`assert not torch.isnan(x).any()`
 
-## Loss oscillating
+## 损失震荡
 
-1. Reduce learning rate by 3-10x
-2. Increase batch size (reduces gradient noise)
-3. Add gradient clipping: `torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)`
-4. Switch from SGD to Adam (adaptive LR per parameter)
-5. Add learning rate warmup for the first 5-10% of training
+1. 把学习率降低 3-10 倍
+2. 增大 batch size（减少梯度噪声）
+3. 加梯度裁剪：`torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)`
+4. 从 SGD 换成 Adam（每个参数自适应 LR）
+5. 在训练的前 5-10% 加学习率预热
 
-## Overfitting (train acc high, test acc low)
+## 过拟合（训练准确率高，测试准确率低）
 
-1. Add dropout (start with p=0.1, increase to 0.5)
-2. Add weight decay to optimizer: `Adam(params, weight_decay=1e-4)`
-3. Reduce model size (fewer layers or narrower layers)
-4. Add data augmentation
-5. Use early stopping: stop when validation loss increases for 5+ epochs
-6. Check for data leakage between train and test sets
+1. 加 dropout（从 p=0.1 开始，逐步加到 0.5）
+2. 给优化器加权重衰减：`Adam(params, weight_decay=1e-4)`
+3. 缩小模型（减少层数或收窄每层）
+4. 加数据增强
+5. 用早停：验证损失连续 5 个以上 epoch 上升时停止
+6. 检查训练集和测试集之间有没有数据泄漏
 
-## Underfitting (both train and test acc low)
+## 欠拟合（训练和测试准确率都低）
 
-1. Increase model capacity (more layers, wider layers)
-2. Train for more epochs
-3. Increase learning rate (carefully)
-4. Remove regularization temporarily to verify the model can learn
-5. Check that your model is expressive enough for the task
+1. 增大模型容量（更多层、更宽的层）
+2. 训练更多 epoch
+3. 提高学习率（谨慎操作）
+4. 暂时去掉正则化，确认模型学得动
+5. 检查模型的表达能力是否足以胜任任务
 
-## Dead ReLU neurons
+## ReLU 神经元死亡
 
-1. Check fraction of zero activations per layer. >50% is a problem
-2. Switch to LeakyReLU(0.01) or GELU
-3. Use Kaiming initialization for weights
-4. Reduce learning rate (large updates can push neurons into the dead zone)
-5. Add batch normalization before activation functions
+1. 检查每层零激活的比例。超过 50% 就有问题
+2. 换成 LeakyReLU(0.01) 或 GELU
+3. 权重用 Kaiming 初始化
+4. 降低学习率（大幅更新会把神经元推进死区）
+5. 在激活函数之前加批归一化
 
-## Quick reference: learning rate starting points
+## 速查：学习率起始值
 
-| Optimizer | Task | Starting LR |
+| 优化器 | 任务 | 起始 LR |
 |-----------|------|------------|
-| Adam | Training from scratch | 1e-3 |
-| Adam | Fine-tuning pretrained | 1e-5 |
-| SGD + momentum | Training from scratch | 1e-1 |
-| SGD + momentum | Fine-tuning pretrained | 1e-3 |
-| AdamW | Transformer training | 3e-4 |
+| Adam | 从头训练 | 1e-3 |
+| Adam | 微调预训练模型 | 1e-5 |
+| SGD + momentum | 从头训练 | 1e-1 |
+| SGD + momentum | 微调预训练模型 | 1e-3 |
+| AdamW | 训练 Transformer | 3e-4 |
 
-## Quick reference: batch size effects
+## 速查：batch size 的影响
 
-| Batch size | Gradient noise | Memory | Generalization |
+| Batch size | 梯度噪声 | 内存 | 泛化 |
 |-----------|---------------|--------|---------------|
-| 8-16 | High (noisy) | Low | Often better |
-| 32-64 | Moderate | Moderate | Good default |
-| 128-256 | Low (smooth) | High | May need warmup |
-| 512+ | Very low | Very high | Needs LR scaling |
+| 8-16 | 高（噪声大） | 低 | 往往更好 |
+| 32-64 | 中等 | 中等 | 不错的默认值 |
+| 128-256 | 低（平滑） | 高 | 可能需要预热 |
+| 512+ | 很低 | 很高 | 需要缩放 LR |
 
-## When nothing works
+## 什么都不管用时
 
-1. Simplify the model to 1 hidden layer. Does it learn?
-2. Simplify the data to 100 samples. Does it overfit?
-3. Replace your loss with MSE. Does it converge?
-4. Replace your optimizer with SGD(lr=0.01). Does it make progress?
-5. Replace your data with synthetic data (e.g., y = x[0] > 0). Does it learn?
-6. If none of these work: the bug is in code you are not looking at (data loading, preprocessing, tensor shapes)
+1. 把模型简化到 1 个隐藏层。它能学吗？
+2. 把数据精简到 100 个样本。它能过拟合吗？
+3. 把损失换成 MSE。它能收敛吗？
+4. 把优化器换成 SGD(lr=0.01)。它有进展吗？
+5. 把数据换成合成数据（例如 y = x[0] > 0）。它能学会吗？
+6. 如果以上都不行：bug 在你没在看的代码里（数据加载、预处理、张量形状）

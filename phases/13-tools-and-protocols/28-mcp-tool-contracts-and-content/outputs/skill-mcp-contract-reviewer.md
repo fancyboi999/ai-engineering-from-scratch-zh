@@ -1,6 +1,6 @@
 ---
 name: mcp-contract-reviewer
-description: Review MCP tool descriptors, results, pagination, completions, and parameter-header policy before exposing tools to a model.
+description: 在把工具暴露给模型之前，审查 MCP 工具描述符、结果、分页、补全与参数头策略。
 version: 1.0.0
 phase: 13
 lesson: 28

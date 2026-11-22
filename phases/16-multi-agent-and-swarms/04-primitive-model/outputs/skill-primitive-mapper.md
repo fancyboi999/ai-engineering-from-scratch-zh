@@ -1,32 +1,32 @@
 ---
 name: primitive-mapper
-description: Map any multi-agent framework or codebase to the four primitive axes (agent, handoff, shared state, orchestrator).
+description: 把任意多 agent 框架或代码库映射到四条原语轴（agent、交接、共享状态、编排器）上。
 version: 1.0.0
 phase: 16
 lesson: 04
 tags: [multi-agent, primitives, framework-comparison, architecture]
 ---
 
-Given a multi-agent framework (or a codebase that uses one), produce the four-primitive mapping so the reader can understand the framework in one paragraph.
+给定一个多 agent 框架（或使用该框架的代码库），产出四原语映射，让读者用一段话就能理解这个框架。
 
-Produce:
+产出：
 
-1. **Agent definition.** How is an agent constructed? What parameters? What state does it carry? Name the exact class or factory.
-2. **Handoff mechanism.** Which of the three handoff patterns does it use — function return, graph edge, or speaker selection? If a hybrid, which is primary? Show the minimum code that triggers one handoff.
-3. **Shared state model.** Full message pool or projected view? In-memory or durable (checkpointed)? Is it thread-safe for concurrent writers? Who reconciles conflicts?
-4. **Orchestrator type.** Static, LLM-selected, handoff-driven, or queue-driven? If LLM-selected, which model by default? If static, is the graph cyclic or DAG?
-5. **Cross-axis tradeoffs.** One sentence each on: determinism, scalability ceiling, debuggability, typical failure mode.
+1. **Agent 定义。** agent 怎么构造？有哪些参数？携带什么状态？写出具体的类或工厂函数名。
+2. **交接机制。** 它用的是三种交接模式中的哪一种：函数返回、图的边，还是发言人选择？如果是混合，以哪种为主？给出触发一次交接的最少代码。
+3. **共享状态模型。** 完整消息池还是投影视图？内存中还是持久化（带检查点）？并发写入时是否线程安全？冲突由谁调和？
+4. **编排器类型。** 静态、LLM 选择、交接驱动，还是队列驱动？若是 LLM 选择，默认用哪个模型？若是静态，图是有环的还是 DAG？
+5. **跨轴权衡。** 各用一句话说明：确定性、扩展上限、可调试性、典型失败模式。
 
-Hard rejects:
+直接否决：
 
-- Any mapping that claims an abstraction is "new" without showing it does not collapse to one of the four primitives. If you cannot reduce it, name the gap precisely rather than inventing a fifth primitive.
-- Framework comparisons that only cite marketing docs. Always cite a concrete code example from the framework's repository or official cookbook.
-- Statements like "Framework X is better for agents" without specifying which primitive the framework optimizes.
+- 声称某个抽象是"新的"，却没有证明它无法归约为四种原语之一的任何映射。如果确实归约不了，准确说明缺口，而不是发明第五种原语。
+- 只引用营销文档的框架对比。始终引用来自框架仓库或官方 cookbook 的具体代码示例。
+- "框架 X 更适合做 agent"之类的说法，却不说明框架优化的是哪个原语。
 
-Refusal rules:
+拒绝规则：
 
-- If the framework is closed-source and the public docs do not expose the agent-handoff-state-orchestrator surface, state that mapping is not possible without internals.
-- If the user supplies a codebase but no framework (hand-rolled agents), map the custom implementation instead and flag which primitive is under-designed.
-- If the framework is older than 2024 (original AutoGen v0.2, pre-Swarm) and no longer maintained, include a one-line note on whether its successor preserves the mapping.
+- 框架闭源、公开文档也没有暴露 agent-交接-状态-编排器这一层时，说明不了解内部实现就无法映射。
+- 用户提供了代码库但没有用框架（手写的 agent）时，改为映射这套自定义实现，并指出哪个原语设计不足。
+- 框架早于 2024 年（原版 AutoGen v0.2、Swarm 之前）且已不再维护时，加一行说明其后继者是否保留了同样的映射。
 
-Output: a one-page framework brief. Start with a single-sentence summary ("Framework X fixes handoff as graph edge and exposes shared state via a reducer."), then the five sections above, then a closing paragraph naming which production project this framework's primitives fit best.
+输出：一页框架简报。开头用一句话总结（"框架 X 把交接固定为图的边，并通过 reducer 暴露共享状态。"），然后是上面五个部分，最后用一段话说明这个框架的原语最适合哪类生产项目。

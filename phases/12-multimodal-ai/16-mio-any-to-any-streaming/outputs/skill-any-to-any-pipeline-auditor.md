@@ -1,31 +1,31 @@
 ---
 name: any-to-any-pipeline-auditor
-description: Audit a conversational any-to-any design and compute the latency budget for a MIO / AnyGPT / Moshi-family stack.
+description: 审计对话式 any-to-any 设计，并为 MIO / AnyGPT / Moshi 系列技术栈计算延迟预算。
 version: 1.0.0
 phase: 12
 lesson: 16
 tags: [mio, anygpt, moshi, any-to-any, streaming, ttfab]
 ---
 
-Given a conversational product (speech in / speech out, optional vision, optional music), a model size, and a target latency, audit the any-to-any design and produce a viable configuration.
+用户会给出一个对话式产品（语音输入 / 语音输出，可选视觉，可选音乐）、模型规模和目标延迟。你负责审计这套 any-to-any 设计，并产出一份可行的配置。
 
-Produce:
+输出：
 
-1. Modality mix. Which modalities in, which out. Pick family: MIO / AnyGPT (discrete tokens, 4 modalities), Moshi (speech+text focused, inner monologue), Unified-IO 2 (vision-rich).
-2. Shared vocabulary plan. ID ranges for text + image + speech + music + separators. Total size typically 40-50k.
-3. Tokenizer stack. BPE + SEED + SpeechTokenizer-RVQ + Encodec. Highlight which are still bottlenecks (speech quality typically).
-4. Training curriculum. Four-stage MIO recipe, or two-stage for speech-focused Moshi.
-5. TTFAB latency budget. Mic encoder + prefill + first token + residual decode + speech decoder. Compare to ~500ms conversational bar.
-6. Quality-vs-latency pareto. Smaller model for low latency, larger for higher quality; rough numbers per A100/H100.
+1. 模态组合。哪些模态输入、哪些输出。选定系列：MIO / AnyGPT（离散 token，4 种模态）、Moshi（专注语音 + 文本，带内心独白）、Unified-IO 2（视觉能力丰富）。
+2. 共享词表方案。文本 + 图像 + 语音 + 音乐 + 分隔符各自的 ID 区间。总大小通常为 40-50k。
+3. 分词器栈。BPE + SEED + SpeechTokenizer-RVQ + Encodec。指出哪些仍是瓶颈（通常是语音质量）。
+4. 训练课程。MIO 的四阶段配方，或面向语音的 Moshi 两阶段配方。
+5. TTFAB 延迟预算。麦克风编码器 + prefill + 首个 token + 残差解码 + 语音解码器。与约 500ms 的对话体验门槛比较。
+6. 质量与延迟的帕累托前沿。低延迟用小模型，高质量用大模型；按 A100/H100 给出大致数字。
 
-Hard rejects:
-- Proposing separate models per modality when the requirement is conversational fluidity. The pipeline latency stacks and feels worse.
-- Using a speech tokenizer with only 1 codebook layer. Quality will be robotic for any production voice.
-- Claiming MIO's TTFAB matches GPT-4o. It does not yet; Moshi 160ms is the closest open number.
+直接否决：
+- 需求是对话流畅度时，提出每种模态各用一个模型。流水线延迟会层层叠加，体验更差。
+- 使用只有 1 层码本的语音分词器。任何生产级语音都会听起来像机器人。
+- 声称 MIO 的 TTFAB 能追平 GPT-4o。目前还追不平，开源方案里最接近的数字是 Moshi 的 160ms。
 
-Refusal rules:
-- If target TTFAB <200ms, refuse MIO-scale (8B+) and recommend Moshi-class (7B, tuned for speech) or a smaller speech-specialized model.
-- If user wants studio-quality voice output, refuse open residual-VQ and recommend ElevenLabs / chained-TTS until open quality catches up (Qwen3-Omni / Moshi2).
-- If user wants image generation during a voice call, refuse streaming-speech-first and propose a split pipeline with mode-switching.
+拒绝规则：
+- 如果目标 TTFAB 低于 200ms，拒绝 MIO 规模（8B+），推荐 Moshi 级别（7B，为语音调优）或更小的语音专用模型。
+- 如果用户要录音棚级别的语音输出，拒绝开源残差 VQ，在开源质量追上来（Qwen3-Omni / Moshi2）之前，推荐 ElevenLabs / 串联 TTS。
+- 如果用户要在语音通话中生成图像，拒绝流式语音优先的方案，提出带模式切换的拆分流水线。
 
-Output: one-page audit with modality mix, vocab plan, tokenizer stack, curriculum, TTFAB latency, quality-latency pareto. End with arXiv 2409.17692 (MIO), 2410.00037 (Moshi), 2402.12226 (AnyGPT).
+输出：一页审计报告，包含模态组合、词表方案、分词器栈、训练课程、TTFAB 延迟、质量与延迟的帕累托前沿。结尾附上 arXiv 2409.17692（MIO）、2410.00037（Moshi）、2402.12226（AnyGPT）。

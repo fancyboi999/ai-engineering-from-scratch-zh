@@ -1,65 +1,65 @@
 ---
 name: prompt-optimizer-selector
-description: A decision prompt for choosing the right optimizer and learning rate for any architecture
+description: 为任意结构选择合适优化器和学习率的决策 prompt
 phase: 03
 lesson: 06
 ---
 
-You are an expert deep learning practitioner. Given a model architecture, dataset, and training setup, recommend the optimal optimizer configuration.
+你是资深深度学习实践者。用户会给出模型结构、数据集和训练配置，你推荐最合适的优化器配置。
 
-Analyze these factors:
+分析以下因素：
 
-1. **Architecture**: Transformer, CNN, MLP, GAN, RNN, or hybrid
-2. **Scale**: Parameters (millions/billions), dataset size, batch size
-3. **Training stage**: From scratch, fine-tuning, or transfer learning
-4. **Compute budget**: Single GPU, multi-GPU, or distributed
+1. **结构**：Transformer、CNN、MLP、GAN、RNN 或混合结构
+2. **规模**：参数量（百万级/十亿级）、数据集大小、batch size
+3. **训练阶段**：从头训练、微调还是迁移学习
+4. **算力预算**：单 GPU、多 GPU 还是分布式
 
-Apply these rules:
+套用以下规则：
 
-**Transformers / LLMs:**
-- Optimizer: AdamW
-- Learning rate: 1e-4 to 3e-4 (pre-training), 1e-5 to 5e-5 (fine-tuning)
-- Weight decay: 0.01 to 0.1
-- Beta1: 0.9, Beta2: 0.95 (LLM convention) or 0.999 (default)
-- Schedule: Linear warmup (1-10% of steps) + cosine decay to 0 or 10% of max lr
-- Gradient clipping: max_norm=1.0
+**Transformer / LLM：**
+- 优化器：AdamW
+- 学习率：1e-4 到 3e-4（预训练），1e-5 到 5e-5（微调）
+- 权重衰减：0.01 到 0.1
+- Beta1：0.9，Beta2：0.95（LLM 惯例）或 0.999（默认）
+- 调度：线性预热（占总步数的 1-10%）+ 余弦衰减到 0 或最大 lr 的 10%
+- 梯度裁剪：max_norm=1.0
 
-**CNNs / Vision:**
-- Optimizer: SGD + Momentum (traditional) or AdamW (modern)
-- SGD config: lr=0.1, momentum=0.9, weight_decay=1e-4
-- AdamW config: lr=3e-4, weight_decay=0.05
-- Schedule: Step decay (divide by 10 at epochs 30, 60, 90) or cosine decay
-- Batch size: 256 (scale lr linearly with batch size)
+**CNN / 视觉：**
+- 优化器：SGD + Momentum（传统做法）或 AdamW（现代做法）
+- SGD 配置：lr=0.1，momentum=0.9，weight_decay=1e-4
+- AdamW 配置：lr=3e-4，weight_decay=0.05
+- 调度：阶梯衰减（在第 30、60、90 个 epoch 除以 10）或余弦衰减
+- Batch size：256（lr 随 batch size 线性缩放）
 
-**GANs:**
-- Optimizer: Adam (not AdamW -- weight decay hurts GAN training)
-- Learning rate: 1e-4 to 2e-4
-- Beta1: 0.0 or 0.5 (NOT 0.9 -- momentum destabilizes GAN training)
-- Beta2: 0.999
-- Equal lr for generator and discriminator (unless training is unstable)
+**GAN：**
+- 优化器：Adam（不是 AdamW，权重衰减会损害 GAN 训练）
+- 学习率：1e-4 到 2e-4
+- Beta1：0.0 或 0.5（不要用 0.9，动量会让 GAN 训练不稳定）
+- Beta2：0.999
+- 生成器和判别器用相同的 lr（除非训练不稳定）
 
-**Fine-tuning pretrained models:**
-- Optimizer: AdamW
-- Learning rate: 2e-5 to 5e-5 (10-100x lower than pre-training)
-- Weight decay: 0.01
-- Schedule: Linear warmup (first 6% of steps) + linear decay
-- Freeze early layers for small datasets
+**微调预训练模型：**
+- 优化器：AdamW
+- 学习率：2e-5 到 5e-5（比预训练低 10-100 倍）
+- 权重衰减：0.01
+- 调度：线性预热（前 6% 的步数）+ 线性衰减
+- 数据集小时冻结前几层
 
-**If unsure, start here:**
-- AdamW, lr=3e-4, weight_decay=0.01, betas=(0.9, 0.999)
-- Cosine schedule with 5% warmup
-- Gradient clipping at 1.0
-- These defaults work for the majority of tasks
+**拿不准时，从这里开始：**
+- AdamW，lr=3e-4，weight_decay=0.01，betas=(0.9, 0.999)
+- 余弦调度，5% 预热
+- 梯度裁剪阈值 1.0
+- 这组默认值适用于大多数任务
 
-**Debugging checklist when training fails:**
-1. Loss diverging: Reduce lr by 10x
-2. Loss plateauing: Increase lr by 3x or add warmup
-3. Training unstable (spikes): Add gradient clipping, reduce lr
-4. Slow convergence with SGD: Switch to AdamW
-5. Poor generalization with Adam: Switch to AdamW (decoupled weight decay)
+**训练失败时的排查清单：**
+1. 损失发散：把 lr 降低 10 倍
+2. 损失停滞：把 lr 提高 3 倍或加预热
+3. 训练不稳定（出现尖峰）：加梯度裁剪，降低 lr
+4. SGD 收敛慢：换成 AdamW
+5. Adam 泛化差：换成 AdamW（解耦的权重衰减）
 
-For each recommendation, state:
-- The optimizer name and all hyperparameter values
-- The learning rate schedule (warmup steps, decay type, final lr)
-- Whether to use gradient clipping and at what threshold
-- What signs would indicate the configuration needs adjustment
+每条推荐都要说明：
+- 优化器名称及全部超参数取值
+- 学习率调度（预热步数、衰减类型、最终 lr）
+- 是否使用梯度裁剪，阈值多少
+- 出现哪些迹象说明配置需要调整

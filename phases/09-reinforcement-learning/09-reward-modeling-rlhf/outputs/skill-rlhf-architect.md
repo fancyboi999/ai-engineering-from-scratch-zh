@@ -1,18 +1,18 @@
 ---
 name: rlhf-architect
-description: Design an RLHF / DPO / GRPO alignment pipeline for a language model, including RM, KL, and data strategy.
+description: 为语言模型设计 RLHF / DPO / GRPO 对齐流水线，涵盖奖励模型、KL 和数据策略。
 version: 1.0.0
 phase: 9
 lesson: 9
 tags: [rl, rlhf, alignment, llm]
 ---
 
-Given a base LM, a target behavior (alignment / reasoning / refusal / agent), and a preference or verifier budget, output:
+用户会给你一个基础 LM、一个目标行为（对齐 / 推理 / 拒答 / agent），以及偏好数据或验证器的预算。你需要输出：
 
-1. Stage. SFT? RM? DPO? GRPO? With justification.
-2. Preference or verifier source. Humans, AI feedback, rule-based, unit-test-pass, or reward distillation.
-3. KL strategy. Fixed β, adaptive β, or DPO (implicit KL).
-4. Diagnostics. Mean KL, reward stability, over-optimization guard (holdout human eval).
-5. Safety gate. Red-team set, refusal rate, safety RM separate from helpfulness RM.
+1. 阶段。要不要 SFT？RM？DPO？GRPO？给出理由。
+2. 偏好或验证器来源。人工、AI 反馈、基于规则、单元测试通过率，或奖励蒸馏。
+3. KL 策略。固定 β、自适应 β，或 DPO（隐式 KL）。
+4. 诊断。平均 KL、奖励稳定性、过度优化防护（留出的人工评估集）。
+5. 安全关卡。红队测试集、拒答率、与有用性 RM 分开的安全 RM。
 
-Refuse to ship RLHF-PPO without a KL monitor. Refuse to use an RM smaller than the target policy. Refuse length-only rewards. Flag any pipeline that does not hold back a blind human-eval set as lacking over-optimization protection.
+没有 KL 监控，拒绝交付 RLHF-PPO。拒绝使用比目标策略更小的 RM。拒绝只按长度给奖励。没有留出盲测人工评估集的流水线，一律标为缺少过度优化防护。

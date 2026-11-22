@@ -1,47 +1,47 @@
 ---
 name: multi-agent-team
-description: Build a multi-agent software team with architect, parallel coders, reviewer, and tester; measure against SWE-bench Pro and produce a handoff post-mortem.
+description: 构建一支多 agent 软件团队，包含架构师、并行编码者、评审者和测试者；在 SWE-bench Pro 上评估，并产出交接环节的复盘报告。
 version: 1.0.0
 phase: 19
 lesson: 10
 tags: [capstone, multi-agent, swe-bench, langgraph, a2a, worktree, roles]
 ---
 
-Given a GitHub issue URL and a parallelism level, deploy a multi-agent software team that produces a merge-ready PR. Evaluate on 50 SWE-bench Pro issues and publish a handoff-failure histogram.
+给定一个 GitHub issue URL 和并行度，部署一支多 agent 软件团队，产出可直接合并的 PR。在 50 个 SWE-bench Pro issue 上评估，并发布交接失败直方图。
 
-Build plan:
+构建计划：
 
-1. Task board: file-backed (or Redis) JSONL store of typed messages. Message kinds: plan_request, subtask, diff_ready, review_needed, review_feedback, approved, test_needed, test_passed, test_failed, replan_needed.
-2. Architect (Opus 4.7): reads the issue, writes a plan, emits a DAG of subtasks with explicit interfaces (files touched, public functions, test impact).
-3. N coders (Sonnet 4.7): each claims a subtask, spawns a fresh `git worktree add` + Daytona sandbox, implements independently.
-4. Merge coordinator: three-way merge; LLM-mediated conflict resolution only on file-level overlap.
-5. Reviewer (GPT-5.4): reads merged diff; cannot approve diffs it authored; emits approved or review_feedback routed to the relevant coder.
-6. Tester (Gemini 2.5 Pro): runs the test suite in a clean sandbox; emits test_passed or test_failed with artifacts.
-7. Handoff accounting: every cross-role message becomes a Langfuse span with payload size and model. Compute token amplification = total_tokens / single_agent_baseline_tokens.
-8. Inject an obvious bug probe (10% of runs) to measure reviewer false-approve rate.
-9. Run on 50 SWE-bench Pro issues; publish pass@1, wall-clock vs single-agent baseline, per-role token breakdown, handoff-failure histogram.
+1. 任务看板：基于文件（或 Redis）的 JSONL 存储，存放带类型的消息。消息类型：plan_request、subtask、diff_ready、review_needed、review_feedback、approved、test_needed、test_passed、test_failed、replan_needed。
+2. 架构师（Opus 4.7）：阅读 issue，写出计划，产出一张子任务 DAG，每个子任务写明接口（涉及的文件、公开函数、对测试的影响）。
+3. N 个编码者（Sonnet 4.7）：各自认领一个子任务，新建一个 `git worktree add` + Daytona 沙箱，独立实现。
+4. 合并协调者：三方合并；只有在文件级重叠时才用 LLM 调解冲突。
+5. 评审者（GPT-5.4）：阅读合并后的 diff；不能批准自己写的 diff；产出 approved，或把 review_feedback 发回相应的编码者。
+6. 测试者（Gemini 2.5 Pro）：在干净的沙箱里跑测试套件；产出 test_passed 或 test_failed，并附上产物。
+7. 交接核算：每条跨角色消息都记为一个 Langfuse span，带载荷大小和模型。计算 token 放大倍数 = total_tokens / single_agent_baseline_tokens。
+8. 注入明显 bug 的探针（10% 的运行），测量评审者的误批准率。
+9. 在 50 个 SWE-bench Pro issue 上运行；发布 pass@1、相对单 agent 基线的墙钟时间、各角色的 token 拆分、交接失败直方图。
 
-Assessment rubric:
+评分标准：
 
-| Weight | Criterion | Measurement |
+| 权重 | 评分项 | 衡量方式 |
 |:-:|---|---|
-| 25 | SWE-bench Pro pass@1 | 50-issue subset pass@1 |
-| 20 | Parallel speedup | Wall-clock vs single-agent baseline |
-| 20 | Review quality | False-approval rate on injected-bug probe |
-| 20 | Token efficiency | Total tokens per solved issue vs single-agent |
-| 15 | Coordination engineering | Merge-conflict resolution, handoff-failure histogram |
+| 25 | SWE-bench Pro pass@1 | 50 个 issue 子集上的 pass@1 |
+| 20 | 并行加速比 | 相对单 agent 基线的墙钟时间 |
+| 20 | 评审质量 | 在注入 bug 探针上的误批准率 |
+| 20 | token 效率 | 每个解决的 issue 的总 token 数，对比单 agent |
+| 15 | 协调工程 | 合并冲突的解决、交接失败直方图 |
 
-Hard rejects:
+直接否决：
 
-- Reviewer that can approve diffs it authored or proposed. Hard constraint.
-- Reports without a matched single-agent baseline run. Multi-agent has to win *per dollar*, not just pass@1.
-- Task boards where messages are free-form strings instead of typed A2A messages.
-- Merge coordinators that silently drop conflicting diffs rather than routing back for replan.
+- 评审者能批准自己写的或自己提议的 diff。这是硬约束。
+- 报告没有对照的单 agent 基线运行。多 agent 必须在*每一美元*上胜出，而不只是 pass@1。
+- 任务看板里的消息是自由格式字符串，而不是带类型的 A2A 消息。
+- 合并协调者悄悄丢弃有冲突的 diff，而不是发回去重新规划。
 
-Refusal rules:
+拒绝规则：
 
-- Refuse to run without budget ceilings per role (token + dollar).
-- Refuse to open a PR whose tester has not verified in a clean sandbox.
-- Refuse to scale coders beyond 8 in a single run. Coordination overhead dominates above that.
+- 没有按角色设置预算上限（token + 美元）时，拒绝运行。
+- 测试者还没在干净沙箱里验证过时，拒绝开 PR。
+- 单次运行中拒绝把编码者扩到 8 个以上。超过这个数，协调开销会占主导。
 
-Output: a repo containing the task board + role workers, the 50-issue SWE-bench Pro run log, a matched single-agent baseline run, a Langfuse dashboard with role-tagged spans and per-role token breakdowns, an injected-bug probe report, and a post-mortem naming the three handoffs that broke most often and the message-schema or prompt change that reduced each.
+输出：一个仓库，包含任务看板 + 各角色 worker、50 个 issue 的 SWE-bench Pro 运行日志、一次对照的单 agent 基线运行、一个带角色标签 span 和各角色 token 拆分的 Langfuse 看板、一份注入 bug 探针报告，以及一份复盘报告，写出最常出问题的三个交接环节，以及缓解每个问题的消息 schema 或 prompt 改动。

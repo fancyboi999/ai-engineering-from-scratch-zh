@@ -1,49 +1,49 @@
 ---
 name: skill-freeze-inspector
-description: Report which parameters are trainable, which BatchNorm layers are in eval mode, and whether the optimizer is actually consuming the trainable parameters
+description: 报告哪些参数可训练、哪些 BatchNorm 层处于 eval 模式，以及优化器是否真的接管了可训练参数
 version: 1.0.0
 phase: 4
 lesson: 5
 tags: [computer-vision, transfer-learning, debugging, pytorch]
 ---
 
-# Freeze Inspector
+# 冻结检查器
 
-Transfer-learning bugs hide in three places: parameters that should be frozen but are not, parameters that should be trainable but are not, and optimizers that were built before the freeze state changed. This skill surfaces all three in one pass.
+迁移学习的 bug 藏在三个地方：该冻结的参数没冻结，该训练的参数没打开，以及优化器在冻结状态改变之前就已经构建好了。这个 skill 一次就把三类问题全部找出来。
 
-## When to use
+## 何时使用
 
-- Right after setting `requires_grad` on a subset of parameters.
-- Before the first training step of a fine-tune run.
-- After calling `freeze_bn_stats` or any helper that flips BN mode.
-- When val accuracy is stuck at random and you suspect nothing is actually training.
+- 刚对一部分参数设置完 `requires_grad`。
+- 微调开始前，第一步训练之前。
+- 调用 `freeze_bn_stats` 或任何会切换 BN 模式的辅助函数之后。
+- 验证准确率一直停在随机水平，怀疑其实什么都没在训练。
 
-## Inputs
+## 输入
 
-- `model`: a PyTorch `nn.Module`.
-- `optimizer`: the optimizer about to be used for training.
-- Optional `expected_frozen_prefixes`: list of parameter-name prefixes that should be frozen (e.g. `["conv1", "bn1", "layer1"]`).
+- `model`：一个 PyTorch `nn.Module`。
+- `optimizer`：即将用于训练的优化器。
+- 可选 `expected_frozen_prefixes`：应当被冻结的参数名前缀列表（例如 `["conv1", "bn1", "layer1"]`）。
 
-## Steps
+## 步骤
 
-1. **Walk parameters.** For each `(name, param)`:
-   - record `requires_grad`
-   - record `shape` and `numel`
+1. **遍历参数。** 对每个 `(name, param)`：
+   - 记录 `requires_grad`
+   - 记录 `shape` 和 `numel`
 
-2. **Walk modules.** For each module:
-   - if it is BatchNorm, record whether it is in eval mode and whether its affine parameters are trainable.
+2. **遍历模块。** 对每个模块：
+   - 如果是 BatchNorm，记录它是否处于 eval 模式，以及它的仿射参数是否可训练。
 
-3. **Inspect the optimizer.** For each parameter group:
-   - flatten its `params` into a set of `id(p)`.
-   - compare with the set of all `id(p)` for params where `requires_grad == True`.
+3. **检查优化器。** 对每个参数组：
+   - 把其中的 `params` 展平成一个 `id(p)` 集合。
+   - 与所有 `requires_grad == True` 的参数的 `id(p)` 集合做比较。
 
-4. **Detect the four failure modes:**
-   - `leaked_train`: a param has `requires_grad=True` but does not appear in the optimizer (gradient is computed but never applied).
-   - `ghost_train`: a param appears in the optimizer but has `requires_grad=False` (optimizer state is wasted; can also cause bugs if you later re-enable requires_grad).
-   - `bn_mismatch`: either (a) a BN layer is in train mode (accumulates running stats) while its affine parameters (`weight`, `bias`) are frozen, or (b) a BN layer is in eval mode (frozen stats) while its affine parameters are trainable. Both states are inconsistent and almost always a bug.
-   - `expected_vs_actual`: any prefix listed in `expected_frozen_prefixes` still has a trainable parameter.
+4. **检测四种失败模式：**
+   - `leaked_train`：参数设置了 `requires_grad=True`，却不在优化器里（梯度算出来了，但从未被应用）。
+   - `ghost_train`：参数在优化器里，却设置了 `requires_grad=False`（优化器状态白白浪费；如果之后重新打开 requires_grad，还可能引发 bug）。
+   - `bn_mismatch`：(a) BN 层处于 train 模式（会累积运行统计量），而它的仿射参数（`weight`、`bias`）被冻结；或者 (b) BN 层处于 eval 模式（统计量冻结），而它的仿射参数可训练。这两种状态都不一致，几乎一定是 bug。
+   - `expected_vs_actual`：`expected_frozen_prefixes` 中列出的某个前缀下仍有可训练参数。
 
-## Report
+## 报告
 
 ```
 [freeze-inspector]
@@ -68,10 +68,10 @@ Transfer-learning bugs hide in three places: parameters that should be frozen bu
   ok | <one-line summary of the most severe issue>
 ```
 
-## Rules
+## 规则
 
-- Only report parameter names; never print the weights themselves.
-- Sort every list alphabetically by parameter name.
-- If optimizer coverage is 100% and there are no mismatches, return `ok` and stop.
-- For `leaked_train`, always recommend rebuilding the optimizer after the freeze state changed.
-- For `ghost_train`, recommend removing the parameter group or setting `requires_grad=True` if the intent was to train it.
+- 只报告参数名，绝不打印权重本身。
+- 每个列表都按参数名字母顺序排序。
+- 如果优化器覆盖率为 100% 且没有任何不一致，返回 `ok` 并停止。
+- 对 `leaked_train`，一律建议在冻结状态改变之后重新构建优化器。
+- 对 `ghost_train`，建议移除该参数组；如果本意是训练它，则设置 `requires_grad=True`。

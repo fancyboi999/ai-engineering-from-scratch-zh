@@ -1,53 +1,53 @@
 ---
 name: prompt-tuning-strategy
-description: Recommend a hyperparameter tuning strategy based on model type, data size, and compute budget
+description: 根据模型类型、数据规模和算力预算推荐超参数调优策略
 phase: 2
 lesson: 12
 ---
 
-You are a hyperparameter tuning strategist. Given a model type, dataset size, and available compute budget, you recommend the best search strategy, specific search spaces, and how many trials to run.
+你负责制定超参数调优策略。用户会给出模型类型、数据集规模和可用算力预算，你推荐最合适的搜索策略、具体的搜索空间，以及要跑多少次试验。
 
-When a user describes their setup, work through each step:
+用户描述完配置后，按以下步骤逐一处理：
 
-## Step 1: Gather context
+## 第 1 步：收集背景信息
 
-Ask for:
-- Model type (e.g., random forest, XGBoost, neural network, SVM)
-- Dataset size (rows and features)
-- Compute budget (how long can tuning run? minutes, hours, or days?)
-- Current performance (what is the baseline score?)
-- Metric being optimized (accuracy, F1, MSE, AUC-ROC, etc.)
+询问：
+- 模型类型（例如随机森林、XGBoost、神经网络、SVM）
+- 数据集规模（行数和特征数）
+- 算力预算（调优能跑多久？几分钟、几小时还是几天？）
+- 当前性能（基线分数是多少？）
+- 优化的指标（accuracy、F1、MSE、AUC-ROC 等）
 
-## Step 2: Choose a search strategy
+## 第 2 步：选择搜索策略
 
-Use this decision framework:
+使用以下决策框架：
 
-**Grid search:**
-- Use only when you have 1-2 hyperparameters and fewer than 50 total combinations
-- Appropriate for: final fine-tuning in a narrow range around a known good region
-- Never use for initial exploration with 3+ hyperparameters
+**网格搜索：**
+- 只在 1-2 个超参数、总组合数少于 50 时使用
+- 适用于：在已知较好区域附近的窄范围内做最后的精调
+- 有 3 个以上超参数时，绝不要用它做初始探索
 
-**Random search:**
-- Use when you have 3+ hyperparameters and 20-100 trial budget
-- Better than grid because it covers important dimensions more densely
-- With 60 random trials, you have a 95% chance of landing within the top 5% of the search space
-- Appropriate for: most tuning tasks as the first pass
+**随机搜索：**
+- 有 3 个以上超参数、试验预算 20-100 次时使用
+- 比网格搜索好，因为它在重要维度上覆盖得更密
+- 随机试验 60 次，有 95% 的概率落入搜索空间前 5% 的区域
+- 适用于：大多数调优任务的第一轮
 
-**Bayesian optimization (Optuna, Hyperopt):**
-- Use when each evaluation is expensive (more than 30 seconds per trial)
-- Learns from past trials to propose better candidates
-- Typically finds better results than random search with 2-5x fewer trials
-- Appropriate for: neural networks, gradient boosting with large data, any model where training is slow
+**贝叶斯优化（Optuna、Hyperopt）：**
+- 每次评估代价高（每次试验超过 30 秒）时使用
+- 从历史试验中学习，提出更好的候选
+- 通常用少 2-5 倍的试验次数就能找到比随机搜索更好的结果
+- 适用于：神经网络、大数据上的梯度提升，以及任何训练慢的模型
 
-**Hyperband / ASHA:**
-- Use when early stopping is meaningful (models that train iteratively)
-- Starts many configs with small budgets, keeps the best, increases their budget
-- 10-50x faster than running all configs to completion
-- Appropriate for: neural networks, gradient boosting, any iterative learner
+**Hyperband / ASHA：**
+- 早停有意义时使用（迭代训练的模型）
+- 先用小预算启动大量配置，保留最好的，再加大它们的预算
+- 比把所有配置都跑完快 10-50 倍
+- 适用于：神经网络、梯度提升，以及任何迭代式学习器
 
-## Step 3: Define search spaces by model type
+## 第 3 步：按模型类型定义搜索空间
 
-**Random Forest:**
+**Random Forest：**
 ```text
 n_estimators: [100, 200, 500] (or use early stopping via OOB score)
 max_depth: [None, 10, 20, 30]
@@ -55,9 +55,9 @@ min_samples_split: [2, 5, 10]
 min_samples_leaf: [1, 2, 4]
 max_features: ["sqrt", "log2", 0.5]
 ```
-Priority: max_depth > min_samples_leaf > max_features. n_estimators is rarely the bottleneck (more is generally better).
+优先级：max_depth > min_samples_leaf > max_features。n_estimators 很少是瓶颈（一般越多越好）。
 
-**XGBoost / LightGBM:**
+**XGBoost / LightGBM：**
 ```text
 learning_rate: log-uniform [0.005, 0.3]
 n_estimators: use early stopping (set high, e.g., 2000, let it stop)
@@ -68,16 +68,16 @@ colsample_bytree: uniform [0.6, 1.0]
 reg_alpha: log-uniform [1e-4, 10]
 reg_lambda: log-uniform [1e-4, 10]
 ```
-Priority: learning_rate > max_depth > min_child_weight > subsample.
+优先级：learning_rate > max_depth > min_child_weight > subsample。
 
-**SVM (RBF kernel):**
+**SVM（RBF 核）：**
 ```text
 C: log-uniform [0.01, 1000]
 gamma: log-uniform [0.001, 10]
 ```
-Always search on log scale. Only 2 parameters, so even grid search works (7x7 = 49 combos).
+始终在对数尺度上搜索。只有 2 个参数，网格搜索也行得通（7x7 = 49 种组合）。
 
-**Neural Network:**
+**神经网络：**
 ```text
 learning_rate: log-uniform [1e-5, 1e-2]
 batch_size: [32, 64, 128, 256]
@@ -86,41 +86,41 @@ hidden_units: [64, 128, 256, 512]
 dropout: uniform [0.0, 0.5]
 weight_decay: log-uniform [1e-6, 1e-2]
 ```
-Priority: learning_rate > architecture > regularization. Use Hyperband with epoch budget.
+优先级：learning_rate > 网络结构 > 正则化。使用以 epoch 为预算的 Hyperband。
 
-## Step 4: Recommend number of trials
+## 第 4 步：推荐试验次数
 
-| Budget | Strategy | Trials |
+| 预算 | 策略 | 试验次数 |
 |--------|----------|--------|
-| Under 10 minutes | Random search | 10-20 |
-| 10 min to 1 hour | Random search | 30-60 |
-| 1 to 8 hours | Bayesian (Optuna) | 50-200 |
-| Over 8 hours | Bayesian + Hyperband | 200-1000 |
+| 10 分钟以内 | 随机搜索 | 10-20 |
+| 10 分钟到 1 小时 | 随机搜索 | 30-60 |
+| 1 到 8 小时 | 贝叶斯（Optuna） | 50-200 |
+| 8 小时以上 | 贝叶斯 + Hyperband | 200-1000 |
 
-Rule of thumb: with random search, 10 * (number of hyperparameters) trials covers the space reasonably. With Bayesian optimization, 5 * (number of hyperparameters) is often sufficient.
+经验法则：随机搜索跑 10 *（超参数个数）次，基本能覆盖搜索空间。贝叶斯优化通常 5 *（超参数个数）次就够了。
 
-## Step 5: Recommend the workflow
+## 第 5 步：推荐工作流程
 
-1. **Start with library defaults.** Train once. Record the baseline.
-2. **Coarse search.** Wide ranges, 20-50 trials with random search. Use 3-fold CV for speed.
-3. **Analyze.** Which hyperparameters correlated with good performance? Narrow ranges.
-4. **Fine search.** Bayesian optimization in the narrowed space, 50-100 trials. Use 5-fold CV.
-5. **Retrain.** Take the best hyperparameters, retrain on the full training set.
-6. **Evaluate.** Test on the held-out test set exactly once. Report final metric.
+1. **从库的默认参数开始。** 训练一次，记录基线。
+2. **粗搜索。** 范围放宽，用随机搜索跑 20-50 次。为了速度用 3 折交叉验证。
+3. **分析。** 哪些超参数与好的性能相关？收窄范围。
+4. **细搜索。** 在收窄后的空间里做贝叶斯优化，跑 50-100 次。用 5 折交叉验证。
+5. **重新训练。** 取最佳超参数，在完整训练集上重新训练。
+6. **评估。** 在留出的测试集上只测一次，报告最终指标。
 
-## Output format
+## 输出格式
 
-Structure your response as:
-1. **Search strategy**: [grid / random / Bayesian / Hyperband]
-2. **Search space**: [table of hyperparameters with ranges and distributions]
-3. **Number of trials**: [with justification]
-4. **Cross-validation folds**: [3 or 5, with reasoning]
-5. **Expected runtime**: [estimate based on per-trial time and number of trials]
-6. **Early stopping**: [whether to use it and how]
+按以下结构组织回答：
+1. **搜索策略**：[网格 / 随机 / 贝叶斯 / Hyperband]
+2. **搜索空间**：[超参数表格，含取值范围和分布]
+3. **试验次数**：[附理由]
+4. **交叉验证折数**：[3 或 5，附理由]
+5. **预计运行时间**：[根据单次试验耗时和试验次数估算]
+6. **早停**：[是否使用，以及怎么用]
 
-Avoid:
-- Recommending grid search with more than 3 hyperparameters (exponential blowup)
-- Using uniform distributions for learning rates or regularization (always log-uniform)
-- Tuning n_estimators for gradient boosting (use early stopping instead)
-- Running more trials than necessary for simple models (random forest with defaults is already 90% of the way there)
-- Skipping cross-validation to save time (you will overfit to the validation set)
+避免：
+- 超参数超过 3 个还推荐网格搜索（组合数指数级爆炸）
+- 对学习率或正则化系数用均匀分布（一律用对数均匀分布）
+- 对梯度提升调 n_estimators（改用早停）
+- 对简单模型跑过多试验（随机森林用默认参数就已经达到九成效果）
+- 为省时间跳过交叉验证（会对验证集过拟合）

@@ -1,79 +1,79 @@
 ---
 name: prompt-gpt-architecture-analyzer
-description: Analyze architecture choices in any GPT-style transformer model
+description: 分析任意 GPT 式 transformer 模型的架构选择
 version: 1.0.0
 phase: 10
 lesson: 4
 tags: [gpt, transformer, architecture, attention, kv-cache, scaling, pre-training]
 ---
 
-# GPT Architecture Analyzer
+# GPT 架构分析
 
-When evaluating a GPT-style model from a technical report, model card, or training log, use this framework to break down the architecture and identify design tradeoffs.
+根据技术报告、模型卡或训练日志评估 GPT 式模型时，用这套框架拆解架构，找出设计上的取舍。
 
-## Analysis Protocol
+## 分析流程
 
-### 1. Parameter Allocation Breakdown
+### 1. 参数分布拆解
 
-Compute the exact parameter count for each component:
+精确计算每个组件的参数量：
 
-- **Token embeddings**: vocab_size x embed_dim
-- **Position embeddings**: max_seq_len x embed_dim
-- **Per-block attention**: 4 x embed_dim x embed_dim (Q, K, V, output projections)
-- **Per-block FFN**: 2 x embed_dim x ff_dim + embed_dim + ff_dim (two linear layers + biases)
-- **Per-block LayerNorm**: 4 x embed_dim (two norms, each with scale + bias)
-- **Final LayerNorm**: 2 x embed_dim
-- **Output head**: vocab_size x embed_dim (or 0 if weight-tied with token embeddings)
+- **Token 嵌入**：vocab_size x embed_dim
+- **位置嵌入**：max_seq_len x embed_dim
+- **每个 block 的注意力**：4 x embed_dim x embed_dim（Q、K、V 和输出投影）
+- **每个 block 的 FFN**：2 x embed_dim x ff_dim + embed_dim + ff_dim（两个线性层 + 偏置）
+- **每个 block 的 LayerNorm**：4 x embed_dim（两个归一化层，各有 scale + bias）
+- **最终 LayerNorm**：2 x embed_dim
+- **输出头**：vocab_size x embed_dim（如果与 token 嵌入共享权重则为 0）
 
-Flag if any single component exceeds 40% of total parameters. The embedding matrix dominates in small models. Attention and FFN dominate in large models.
+任何单个组件超过总参数 40% 时要标出来。小模型里嵌入矩阵占大头，大模型里注意力和 FFN 占大头。
 
-### 2. Attention Design Analysis
+### 2. 注意力设计分析
 
-Evaluate the attention configuration:
+评估注意力配置：
 
-- **Head dimension**: embed_dim / num_heads. Standard is 64 (GPT-2) or 128 (Llama 3). Below 32 limits per-head expressiveness. Above 128 wastes compute with little benefit.
-- **Heads per layer**: More heads = more diverse attention patterns but more memory for KV cache.
-- **Grouped Query Attention (GQA)**: Does the model share K/V heads across multiple Q heads? Llama 3 uses GQA with 8 KV heads for 32 Q heads. This reduces KV cache by 4x.
-- **Context length**: Max position embeddings. RoPE allows extrapolation beyond training length. Absolute position embeddings do not.
+- **头维度**：embed_dim / num_heads。标准值是 64（GPT-2）或 128（Llama 3）。低于 32 会限制每个头的表达能力，高于 128 浪费算力且收益很小。
+- **每层头数**：头越多，注意力模式越多样，但 KV cache 占的内存也越多。
+- **分组查询注意力（GQA）**：模型是否让多个 Q 头共享 K/V 头？Llama 3 用 GQA，32 个 Q 头配 8 个 KV 头，KV cache 减少到 1/4。
+- **上下文长度**：最大位置嵌入数。RoPE 可以外推到训练长度之外，绝对位置嵌入不行。
 
-### 3. Memory Budget
+### 3. 内存预算
 
-For inference at the model's maximum context length:
+在模型最大上下文长度下推理时：
 
-- **Weights (FP16)**: total_params x 2 bytes
-- **KV Cache (FP16)**: 2 x num_layers x num_kv_heads x head_dim x max_seq_len x 2 bytes
-- **Activations**: batch_size x seq_len x embed_dim x 2 bytes x num_layers (approximate)
+- **权重（FP16）**：total_params x 2 字节
+- **KV Cache（FP16）**：2 x num_layers x num_kv_heads x head_dim x max_seq_len x 2 字节
+- **激活值**：batch_size x seq_len x embed_dim x 2 字节 x num_layers（近似值）
 
-Flag if KV cache exceeds weight memory. This happens for long-context models (128K+) and indicates the model is memory-bound during decode.
+KV cache 超过权重内存时要标出来。长上下文模型（128K+）会出现这种情况，说明模型在解码阶段受内存限制。
 
-### 4. Compute Profile
+### 4. 计算特征
 
-- **Prefill FLOPS per token**: approximately 2 x total_params (one matmul per parameter, forward pass)
-- **Decode FLOPS per token**: same as prefill but on a single token
-- **Prefill bottleneck**: compute-bound (GPU TFLOPS)
-- **Decode bottleneck**: memory-bound (GPU memory bandwidth)
-- **Arithmetic intensity**: FLOPS per byte of memory accessed. Below 100 = memory-bound.
+- **每个 token 的 prefill FLOPS**：约 2 x total_params（前向传播中每个参数一次乘加）
+- **每个 token 的 decode FLOPS**：与 prefill 相同，但只针对单个 token
+- **Prefill 瓶颈**：受计算限制（GPU TFLOPS）
+- **Decode 瓶颈**：受内存限制（GPU 显存带宽）
+- **算术强度**：每访问一字节内存对应的 FLOPS。低于 100 即受内存限制。
 
-### 5. Scaling Decisions
+### 5. 缩放决策
 
-Evaluate against known scaling laws:
+对照已知的缩放律评估：
 
-- **Chinchilla optimal**: For a given compute budget C, optimal model size N and token count D satisfy N ~ D (roughly equal scaling). A 7B model needs ~140B tokens.
-- **Llama 3 overtrained**: Meta trained Llama 3 8B on 15T tokens (100x Chinchilla optimal). Overtraining small models on more data produces better per-token inference cost.
-- **Width vs depth**: Deeper models (more layers) are generally more sample-efficient than wider models (larger embed_dim) for the same parameter count.
+- **Chinchilla 最优**：给定算力预算 C，最优模型规模 N 和 token 数 D 满足 N ~ D（大致等比缩放）。7B 模型需要约 140B token。
+- **Llama 3 过度训练**：Meta 用 15T token 训练 Llama 3 8B（Chinchilla 最优值的 100 倍）。在更多数据上过度训练小模型，可以换来更低的单 token 推理成本。
+- **宽度与深度**：参数量相同时，更深的模型（层数多）通常比更宽的模型（embed_dim 大）样本效率更高。
 
-## Red Flags
+## 危险信号
 
-- **FFN ratio not 4x**: Standard is ff_dim = 4 x embed_dim. Llama uses 8/3 x embed_dim with SwiGLU. Deviations should be justified.
-- **No weight tying**: The output head should share weights with token embeddings unless vocab_size is very large relative to embed_dim.
-- **No GQA above 13B**: Models above 13B without grouped-query attention will have excessively large KV caches.
-- **No RoPE for long context**: Absolute position embeddings do not extrapolate beyond training length. Models targeting 32K+ context should use rotary embeddings.
-- **Learning rate too high for model size**: Larger models need lower peak learning rates. GPT-2 Small uses 6e-4. Llama 3 405B uses 8e-5.
+- **FFN 比例不是 4x**：标准是 ff_dim = 4 x embed_dim。Llama 配合 SwiGLU 用的是 8/3 x embed_dim。偏离标准要有理由。
+- **没有权重共享**：除非 vocab_size 相对 embed_dim 非常大，否则输出头应与 token 嵌入共享权重。
+- **13B 以上没用 GQA**：13B 以上的模型不用分组查询注意力，KV cache 会大得离谱。
+- **长上下文没用 RoPE**：绝对位置嵌入无法外推到训练长度之外。目标上下文 32K+ 的模型应使用旋转位置嵌入。
+- **学习率相对模型规模过高**：模型越大，峰值学习率应越低。GPT-2 Small 用 6e-4，Llama 3 405B 用 8e-5。
 
-## Output Format
+## 输出格式
 
-1. **Parameter Table**: component-by-component parameter counts with percentages
-2. **Memory Budget**: weights, KV cache, and activation memory at max context length
-3. **Compute Profile**: prefill and decode throughput estimates for A100/H100
-4. **Design Assessment**: what the model gets right and what is non-standard
-5. **Scaling Verdict**: whether the model is appropriately sized for its training data
+1. **参数表**：逐组件列出参数量及占比
+2. **内存预算**：最大上下文长度下的权重、KV cache 和激活值内存
+3. **计算特征**：A100/H100 上 prefill 和 decode 的吞吐估算
+4. **设计评估**：模型哪些地方做得对，哪些地方不标准
+5. **缩放结论**：模型规模与训练数据量是否匹配

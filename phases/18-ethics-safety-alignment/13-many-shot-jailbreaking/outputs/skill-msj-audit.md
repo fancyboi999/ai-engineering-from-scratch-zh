@@ -1,29 +1,29 @@
 ---
 name: msj-audit
-description: Audit a long-context safety evaluation for many-shot jailbreaking coverage.
+description: 审计长上下文安全评估对多样本越狱（many-shot jailbreaking）的覆盖情况。
 version: 1.0.0
 phase: 18
 lesson: 13
 tags: [many-shot-jailbreaking, context-window, power-law, anthropic]
 ---
 
-Given a safety evaluation for a long-context model, audit whether the evaluation covers many-shot jailbreaking.
+给定一份长上下文模型的安全评估，审计它是否覆盖了多样本越狱（MSJ）。
 
-Produce:
+输出以下内容：
 
-1. Shot-count coverage. Report the shot counts tested (should include 1, 5, 16, 64, 256, and at least one >= 512 for models with >= 1M context). If the evaluation tests at a single shot count, ASR is uninformative — MSJ is a curve.
-2. Power-law fit. Report the fitted exponent per behaviour category. A shallow exponent indicates the model is ICL-robust on that category; a steep exponent indicates MSJ is disproportionately effective.
-3. Category breakdown. MSJ effectiveness varies by category: violent content, deceit, self-harm, bioweapon. Per Anil et al. 2024, violent/deceitful needs fewer shots to jailbreak. Flag any category absent from the evaluation.
-4. Defense identification. Is a classifier-based prompt modification in place? Is the classifier itself evaluated for adversarial robustness? Anthropic's reported 61% -> 2% reduction depends on classifier calibration.
-5. Compositional check. Does the evaluation test MSJ + PAIR, MSJ + persuasive templates, or MSJ + encoding? Compositional attacks are frequently stronger than any single technique.
+1. 样本数覆盖。报告测试过的样本数（应包括 1、5、16、64、256；对于上下文 >= 1M 的模型，至少有一档 >= 512）。如果只在一个样本数上测试，ASR 说明不了问题：MSJ 是一条曲线。
+2. 幂律拟合。按行为类别报告拟合出的指数。指数平缓说明模型在该类别上对 ICL 较鲁棒；指数陡峭说明 MSJ 在该类别上格外有效。
+3. 类别拆分。MSJ 的效果因类别而异：暴力内容、欺骗、自残、生物武器。按 Anil et al. 2024 的结果，暴力和欺骗类所需样本更少就能越狱。标出评估中缺失的类别。
+4. 防御识别。是否部署了基于分类器的 prompt 改写？分类器本身是否评估过对抗鲁棒性？Anthropic 报告的 61% -> 2% 降幅依赖分类器的校准。
+5. 组合检查。评估是否测试了 MSJ + PAIR、MSJ + 说服模板，或 MSJ + 编码？组合攻击往往比任何单一技术更强。
 
-Hard rejects:
-- Any "our long-context model is safe" claim based on 5-shot-only evaluation.
-- Any defense claim without reporting both jailbreak ASR and benign ICL performance on the same classifier — the trade-off is the point.
-- Any category-aggregate ASR without a category breakdown.
+直接否决：
+- 只做了 5-shot 评估就声称"我们的长上下文模型是安全的"。
+- 声称防御有效，却没有在同一个分类器上同时报告越狱 ASR 和正常 ICL 表现。关键就在这个权衡。
+- 给出类别汇总 ASR，却没有按类别拆分。
 
-Refusal rules:
-- If the user asks whether MSJ can be fully patched, refuse the binary answer; MSJ shares a mechanism with ICL and cannot be eliminated without eliminating ICL.
-- If the user asks for a recommended shot count for evaluation, refuse a single number; request the power-law fit over 5 to 512 shots.
+拒绝规则：
+- 如果用户问 MSJ 能否彻底修补，拒绝给出是或否的答案：MSJ 与 ICL 共用同一机制，不消灭 ICL 就消灭不了 MSJ。
+- 如果用户问评估该用多少样本数，拒绝给出单个数字，并要求在 5 到 512 个样本范围内做幂律拟合。
 
-Output: a one-page audit that reports the shot-count coverage, power-law fit per category, defense identification, and one compositional attack gap. Cite Anil et al. 2024 (Anthropic) once as the methodological reference.
+输出：一页审计，报告样本数覆盖、各类别的幂律拟合、防御识别，以及一个组合攻击方面的缺口。引用一次 Anil et al. 2024（Anthropic）作为方法论参考。

@@ -1,45 +1,45 @@
 ---
 name: skill-perceptron
-description: Understand the perceptron pattern and when to use single-layer vs multi-layer architectures
+description: 理解感知机模式，以及何时用单层、何时用多层结构
 version: 1.0.0
 phase: 3
 lesson: 1
 tags: [perceptron, neural-networks, classification, deep-learning]
 ---
 
-# The Perceptron Pattern
+# 感知机模式
 
-A perceptron computes a weighted sum of inputs plus a bias, then applies a step function to produce a binary output. It is the fundamental unit of neural networks.
+感知机计算输入的加权和再加上偏置，然后用阶跃函数得到二值输出。它是神经网络的基本单元。
 
 ```
 output = step(w1*x1 + w2*x2 + ... + wn*xn + bias)
 ```
 
-## When a single perceptron is enough
+## 单个感知机就够用的情况
 
-- The problem is linearly separable: a straight line (or hyperplane) can divide the two classes
-- Logic gates: AND, OR, NOT, NAND
-- Simple threshold decisions: "is the score above X?"
-- Binary classifiers on data that clusters into two non-overlapping regions
+- 问题线性可分：一条直线（或超平面）就能把两个类别分开
+- 逻辑门：AND、OR、NOT、NAND
+- 简单的阈值判断："分数是否高于 X？"
+- 数据聚成两个互不重叠区域的二分类问题
 
-## When you need multiple layers
+## 需要多层的情况
 
-- The problem is not linearly separable: no single line can separate the classes
-- XOR and parity problems
-- Any task requiring "this but not that" reasoning (combinations of conditions)
-- Real-world classification: images, text, audio - almost always non-linear
+- 问题线性不可分：没有一条直线能把类别分开
+- XOR 和奇偶校验问题
+- 任何需要"是这个但不是那个"式推理的任务（条件组合）
+- 真实世界的分类任务：图像、文本、音频，几乎总是非线性的
 
-## Decision checklist
+## 决策清单
 
-1. Plot or inspect your data. Can you draw a single straight boundary between classes?
-   - Yes: single perceptron works
-   - No: you need at least two layers
-2. Can the problem be decomposed into AND/OR of simpler linear decisions?
-   - This decomposition tells you the minimum network structure
-   - XOR = (A OR B) AND (NOT (A AND B)) = 3 perceptrons in 2 layers
-3. For problems with more than two classes, you need one output node per class
+1. 把数据画出来或检查一遍。能在类别之间画出一条直线边界吗？
+   - 能：单个感知机就行
+   - 不能：至少需要两层
+2. 问题能否拆解为若干更简单线性决策的 AND/OR 组合？
+   - 这种拆解告诉你最小的网络结构
+   - XOR = (A OR B) AND (NOT (A AND B)) = 2 层共 3 个感知机
+3. 类别超过两个时，每个类别需要一个输出节点
 
-## The training rule
+## 训练规则
 
 ```
 error = expected - predicted
@@ -47,11 +47,11 @@ weight_new = weight_old + learning_rate * error * input
 bias_new = bias_old + learning_rate * error
 ```
 
-If the prediction is correct, nothing changes. If wrong, weights shift to reduce the error. This only works for single-layer perceptrons. Multi-layer networks require backpropagation.
+预测正确时什么都不变。预测错误时，权重朝减小误差的方向移动。这只对单层感知机有效。多层网络需要反向传播。
 
-## Common mistakes
+## 常见错误
 
-- Trying to learn non-linear patterns with a single perceptron (it will never converge)
-- Setting the learning rate too high (weights oscillate) or too low (training takes forever)
-- Forgetting the bias term (without it, the decision boundary must pass through the origin)
-- Confusing perceptron convergence (guaranteed for linearly separable data) with general neural network convergence (not guaranteed)
+- 试图用单个感知机学习非线性模式（永远不会收敛）
+- 学习率设得太高（权重来回震荡）或太低（训练慢得没完）
+- 忘了偏置项（没有偏置，决策边界必须经过原点）
+- 把感知机收敛（对线性可分数据有保证）和一般神经网络的收敛（没有保证）混为一谈

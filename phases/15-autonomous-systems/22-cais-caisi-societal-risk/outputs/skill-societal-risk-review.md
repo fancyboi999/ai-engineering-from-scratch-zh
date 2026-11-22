@@ -1,40 +1,40 @@
 ---
 name: societal-risk-review
-description: Review a deployment for societal-scale-risk posture using the CAIS four-risk framework and CAISI / SB-53 regulatory context.
+description: 借助 CAIS 四类风险框架和 CAISI / SB-53 监管背景，审查一个部署在社会级风险方面的态势。
 version: 1.0.0
 phase: 15
 lesson: 22
 tags: [cais, caisi, four-risk-framework, organizational-risk, sb-53, societal-risk]
 ---
 
-Given a proposed or operating AI deployment, produce a societal-scale-risk review that tags the deployment against the CAIS four-risk framework, inventories organizational-risk sub-levers, and names the regulatory surface.
+给定一个拟议或正在运行的 AI 部署，产出一份社会级风险审查：对照 CAIS 四类风险框架给部署打标签，盘点组织风险的各个子杠杆，并写明适用的监管面。
 
-Produce:
+产出：
 
-1. **Four-risk tagging.** For each of the four categories (malicious use, AI races, organizational risks, rogue AIs), state whether the deployment touches it and how. A deployment can touch multiple categories; "does not apply" must be justified in one sentence.
-2. **Organizational-risk inventory.** Score the deployment against the four sub-levers: safety culture, audit rigor, multi-layered defenses, information security. Any lever scored "missing" is a flagged gap.
-3. **Regulatory surface.** Name the applicable regulatory frameworks: EU AI Act (if in EU or serving EU users), California SB-53 (if signed and applicable), CAISI voluntary agreements (if the lab has signed one). Compliance is a deployment gate, not a deployment nice-to-have.
-4. **External-evaluation posture.** Name the external evaluations the deployment or its base model has undergone (METR, CAISI, Apollo, Gray Swan, etc.). No external evaluation is a flagged gap for long-horizon autonomous deployments.
-5. **Structural-force exposure.** Estimate how much competitive-deployment pressure the organization is under and how that trades against the organizational-risk levers. Teams under heavy race pressure de-prioritize audit first; this is the CAIS finding.
+1. **四类风险标注。** 对四个类别（恶意使用、AI 竞赛、组织风险、失控 AI），逐一说明部署是否涉及、如何涉及。一个部署可以同时涉及多个类别；"不适用"必须用一句话说明理由。
+2. **组织风险清单。** 按四个子杠杆给部署打分：安全文化、审计严格度、多层防御、信息安全。任何被评为"缺失"的杠杆都标记为缺口。
+3. **监管面。** 写明适用的监管框架：EU AI Act（位于欧盟或服务欧盟用户时）、加州 SB-53（已签署且适用时）、CAISI 自愿协议（实验室签署过时）。合规是部署的关卡，不是锦上添花。
+4. **外部评测态势。** 写明部署或其基座模型接受过的外部评测（METR、CAISI、Apollo、Gray Swan 等）。对长时间跨度的自主部署，没有外部评测就标记为缺口。
+5. **结构性压力暴露。** 估计组织承受多大的竞争性部署压力，以及这种压力如何与组织风险杠杆相互抵消。竞赛压力大的团队最先砍掉的就是审计，这是 CAIS 的结论。
 
-Hard rejects:
-- Deployments touching harmful-capability categories without a hardcoded-prohibition layer (Lesson 17).
-- Deployments in competitive-race conditions with no independent audit.
-- Long-horizon autonomous deployments with no external capability evaluation.
-- EU deployments with no Article 14 HITL (Lesson 15).
-- California deployments with no incident-reporting process if SB-53 is signed.
+直接否决：
+- 涉及有害能力类别却没有硬编码禁令层（第 17 课）的部署。
+- 处于竞争性竞赛条件下却没有独立审计的部署。
+- 没有外部能力评测的长时间跨度自主部署。
+- 没有第 14 条 HITL（第 15 课）的欧盟部署。
+- SB-53 已签署、却没有事件上报流程的加州部署。
 
-Refusal rules:
-- If the user cannot name the external evaluator for the base model, refuse and require identification first. Self-evaluation alone is insufficient.
-- If the user treats "we have a scaling policy" as compliance with catastrophic-risk regulation, refuse and require specific regulatory-surface mapping.
-- If the user proposes deploying under race pressure without audit, refuse and name the CAIS finding on organizational risk.
+拒绝规则：
+- 用户说不出基座模型的外部评测方时，拒绝，要求先确认。只有自评不够。
+- 用户把"我们有扩展策略"当作符合灾难性风险监管时，拒绝，要求给出具体的监管面映射。
+- 用户提议在竞赛压力下不经审计就部署时，拒绝，并指出 CAIS 关于组织风险的结论。
 
-Output format:
+输出格式：
 
-Return a societal-risk review with:
-- **Four-risk row table** (category, touched y/n, nature)
-- **Organizational-risk scorecard** (safety culture / audit / defenses / infosec)
-- **Regulatory surface** (applicable frameworks with compliance status)
-- **External-evaluation posture** (evaluator, scope, cadence)
-- **Structural-force exposure** (low / medium / high with rationale)
-- **Deployment readiness** (production / staging / research-only)
+返回一份社会风险审查，包含：
+- **四类风险表格**（类别、是否涉及 y/n、性质）
+- **组织风险计分卡**（安全文化 / 审计 / 防御 / 信息安全）
+- **监管面**（适用框架及合规状态）
+- **外部评测态势**（评测方、范围、节奏）
+- **结构性压力暴露**（low / medium / high，附理由）
+- **部署就绪度**（production / staging / research-only）

@@ -1,30 +1,30 @@
 ---
 name: patch-geometry-reader
-description: Read a ViT config and produce a patch-token, parameter, and VRAM analysis for downstream VLM planning.
+description: 读取 ViT 配置，产出 patch token、参数量和显存分析，供下游 VLM 规划使用。
 version: 1.0.0
 phase: 12
 lesson: 01
 tags: [vit, patch-tokens, dinov2, siglip, vlm-backbone]
 ---
 
-Given a vision backbone config (patch size, resolution, hidden dim, depth, heads, optional registers), produce a geometry analysis that tells the caller how many tokens this encoder will emit, how much VRAM it costs to run, and whether it is the right pick for a downstream VLM or dense-prediction task.
+给定一份视觉骨干网络配置（patch 大小、分辨率、隐藏维度、深度、头数、可选的 register），产出一份几何分析，告诉调用方：这个编码器会输出多少 token，运行它要多少显存，以及它是否适合下游的 VLM 或密集预测任务。
 
-Produce:
+产出：
 
-1. Patch grid and sequence length. Grid shape (H/P, W/P). Sequence length including CLS, registers, and any pooling token. Highlight multi-resolution support (NaFlex, AnyRes) when declared.
-2. Parameter breakdown. Patch embed, position embed, transformer blocks (attention + MLP), final LN, totals in both exact counts and human-readable (e.g., 86.4M).
-3. FLOPs per forward. Attention (4 N D^2 + 2 N^2 D per block) and MLP (16 N D^2 per block), summed across depth. Flag quadratic-in-N costs that will bite at high resolution.
-4. VRAM estimate. Activation memory at inference for a single forward on one image, plus KV-equivalent cache if the encoder feeds a downstream LLM.
-5. Pooling recommendation. CLS, mean patch, register-based, or skip-pooling-for-VLM, based on the declared downstream task.
+1. Patch 网格与序列长度。网格形状 (H/P, W/P)。序列长度，包括 CLS、register 和任何池化 token。如果声明了多分辨率支持（NaFlex、AnyRes），要重点标出。
+2. 参数拆解。patch embedding、位置 embedding、transformer 块（注意力 + MLP）、最后的 LN，总量同时给出精确数值和易读形式（例如 86.4M）。
+3. 单次前向 FLOPs。注意力（每块 4 N D^2 + 2 N^2 D）和 MLP（每块 16 N D^2），按深度累加。标出随 N 二次增长、在高分辨率下会变得很痛的开销。
+4. 显存估算。单张图片单次前向推理的激活显存，如果编码器要喂给下游 LLM，再加上等效 KV 缓存。
+5. 池化建议。根据声明的下游任务，在 CLS、patch 平均、基于 register，或 VLM 场景下跳过池化之间选择。
 
-Hard rejects:
-- Any analysis that treats patch tokens as pixel-identical to the input. The projection is a learned linear map; patches are abstract vectors, not pixels.
-- Claiming CLS is always the right pooling. Modern dense-feature and VLM paths skip CLS entirely.
-- Treating 2D-RoPE and learned positional embeddings as interchangeable without noting NaFlex-style native-resolution flexibility.
+硬性否决：
+- 任何把 patch token 当成与输入像素完全等同的分析。投影是一个学出来的线性映射；patch 是抽象向量，不是像素。
+- 声称 CLS 永远是正确的池化方式。现代的密集特征和 VLM 路径完全跳过 CLS。
+- 把 2D-RoPE 和学习式位置 embedding 当成可以互换，却不提 NaFlex 式的原生分辨率灵活性。
 
-Refusal rules:
-- If the provided config declares a patch size that does not evenly divide the image size, refuse — this is not a NaFlex-compatible config without a declared padding scheme.
-- If the caller asks for exact pretrained weight counts for proprietary models (Gemini, Claude, GPT-5), refuse — these are not published.
-- If the target deployment VRAM is under 4GB for a ViT-g/14-class model, refuse and recommend a SigLIP SO400m/14 or smaller backbone.
+拒绝规则：
+- 如果提供的配置声明的 patch 大小不能整除图像尺寸，拒绝；在没有声明 padding 方案的情况下，这不是兼容 NaFlex 的配置。
+- 如果调用方要求给出闭源模型（Gemini、Claude、GPT-5）的精确预训练权重数量，拒绝；这些数据没有公开。
+- 如果 ViT-g/14 级别模型的目标部署显存低于 4GB，拒绝，并推荐 SigLIP SO400m/14 或更小的骨干网络。
 
-Output: a one-page geometry analysis with token count, parameter breakdown, FLOPs estimate, VRAM budget, and a recommended pooling strategy. End with a "what to read next" paragraph pointing to the SigLIP 2 paper (arXiv:2502.14786) for NaFlex details, the DINOv2 paper for dense features, or Lesson 12.06 for patch-n'-pack implementation.
+输出：一页篇幅的几何分析，包含 token 数、参数拆解、FLOPs 估算、显存预算和推荐的池化策略。最后用一段"延伸阅读"收尾：NaFlex 细节看 SigLIP 2 论文（arXiv:2502.14786），密集特征看 DINOv2 论文，patch-n'-pack 的实现看第 12.06 课。

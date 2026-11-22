@@ -1,36 +1,36 @@
 ---
 name: reviewer-agent
-description: Stand up a reviewer agent role with a five-dimension rubric that reads builder artifacts, produces a structured review report, and starts human review from a written page instead of a blank one.
+description: 搭建一个审查 agent 角色，用五维评分标准读取构建者的产物，输出结构化审查报告，让人工审查从一页写好的报告开始，而不是从白纸开始。
 version: 1.0.0
 phase: 14
 lesson: 39
 tags: [reviewer, rubric, role-separation, second-loop, review-report]
 ---
 
-Given a builder agent already producing workbench artifacts, stand up a reviewer that reads them and writes structured reports.
+给定一个已经在产出工作台产物的构建者 agent，搭建一个读取这些产物并撰写结构化报告的审查者。
 
-Produce:
+产出：
 
-1. `agents/reviewer.md` with the reviewer system prompt: read-only access, five-dimension rubric, must cite the artifact path for each score.
-2. `tools/reviewer.py` that loads `ReviewerInputs` from the workbench and runs the LLM scorer per dimension.
-3. `outputs/review/<task_id>.json` as the canonical review report path.
-4. `docs/reviewer-rubric.md` listing the five dimensions, the question each one answers, and the 0-1-2 anchor descriptions.
-5. CI step that posts the review report as a PR comment whenever a builder task closes.
+1. `agents/reviewer.md`，写入审查者的系统 prompt：只读权限、五维评分标准、每个分数都必须引用产物路径。
+2. `tools/reviewer.py`，从工作台加载 `ReviewerInputs`，按维度运行 LLM 评分器。
+3. `outputs/review/<task_id>.json`，作为审查报告的标准路径。
+4. `docs/reviewer-rubric.md`，列出五个维度、每个维度回答的问题，以及 0-1-2 各档的锚点描述。
+5. CI 步骤：每当构建者关闭一个任务，就把审查报告发成 PR 评论。
 
-Hard rejects:
+直接否决：
 
-- A reviewer with write access to the diff. The gap between builder and reviewer is the whole signal; collapsing it destroys reliability.
-- A rubric without anchor descriptions per score. "Score from 0 to 2" without anchors collapses to vibes.
-- Review reports that omit citations. Every score must point at a file or trace entry.
-- Sharing the builder's system prompt. Same model is fine; same prompt is not.
+- 对 diff 有写权限的审查者。构建者和审查者之间的距离就是全部信号所在，抹平它就毁掉了可靠性。
+- 评分标准里每档分数没有锚点描述。只写"0 到 2 打分"而没有锚点，最后只会凭感觉。
+- 审查报告不带引用。每个分数都必须指向一个文件或 trace 条目。
+- 共用构建者的系统 prompt。同一个模型可以，同一个 prompt 不行。
 
-Refusal rules:
+拒绝规则：
 
-- If the builder produces no verification report, refuse to run the reviewer. Acceptance must hold before judgment is worth asking for.
-- If the project has fewer than three closed tasks, refuse to claim the rubric is calibrated. Save the first reports as the calibration set.
-- If the reviewer is asked to score below a minimum confidence, refuse and surface the uncertain dimension to a human.
+- 构建者没有产出验证报告时，拒绝运行审查者。验收先成立，判断才值得问。
+- 项目已关闭的任务少于三个时，拒绝声称评分标准已校准。把最初几份报告存为校准集。
+- 被要求在低于最低置信度的情况下打分时，拒绝执行，把拿不准的维度交给人类。
 
-Output structure:
+输出结构：
 
 ```
 <repo>/
@@ -42,8 +42,8 @@ Output structure:
 └── .github/workflows/review.yml
 ```
 
-End with "what to read next" pointing to:
+最后给出"接下来读什么"，指向：
 
-- Lesson 40 for the handoff packet that combines verification + review.
-- Lesson 41 for the real-style task that exercises builder/reviewer separation end to end.
-- Lesson 05 (Self-Refine and CRITIC) for the single-agent self-review baseline this lesson improves on.
+- 第 40 课：合并验证与审查结果的交接包。
+- 第 41 课：端到端演练构建者与审查者分离的仿真实任务。
+- 第 05 课（Self-Refine 与 CRITIC）：本课所改进的单 agent 自我审查基线。

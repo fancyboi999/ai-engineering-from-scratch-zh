@@ -1,18 +1,18 @@
 ---
 name: transformer-review
-description: Review a transformer-from-scratch implementation against the 13 Phase 7 lessons.
+description: 对照阶段 7 的 13 节课，审查从零实现的 transformer。
 version: 1.0.0
 phase: 7
 lesson: 14
 tags: [transformers, review, capstone]
 ---
 
-Given a transformer-from-scratch codebase (PyTorch / JAX), review against the 2026 defaults and flag missing or incorrect pieces:
+拿到一份从零实现 transformer 的代码库（PyTorch / JAX），对照 2026 年的默认做法审查，标出缺失或错误的部分：
 
-1. Attention. Causal mask present. Scale by `sqrt(d_head)`. Multi-head split works. Flash Attention used if available. GQA mentioned if d_model ≥ 1024.
-2. Positional encoding. RoPE (preferred 2026) or learned absolute (acceptable for small models). Flag sinusoidal as historical.
-3. Block wiring. Pre-norm (not post-norm). RMSNorm (not LayerNorm). SwiGLU FFN (not ReLU/GELU). Residuals around every sublayer. Biases dropped in linear layers (modern default).
-4. Training. AdamW (or Muon for 2026+), cosine LR schedule with linear warmup, gradient clipping at 1.0, bf16 autocast. Weight tying between token embedding and lm_head.
-5. Loss. Shift-by-one cross-entropy at every position. Mask out padding if any. Log train and val loss at a fixed interval.
+1. 注意力。有因果掩码。按 `sqrt(d_head)` 缩放。多头切分正确。可用时使用 Flash Attention。d_model ≥ 1024 时提到 GQA。
+2. 位置编码。RoPE（2026 年首选）或可学习绝对位置（小模型可接受）。正弦编码标记为过时做法。
+3. Block 连接。pre-norm（不是 post-norm）。RMSNorm（不是 LayerNorm）。SwiGLU FFN（不是 ReLU/GELU）。每个子层外都有残差。线性层去掉 bias（现代默认）。
+4. 训练。AdamW（2026 年以后也可用 Muon），带线性 warmup 的余弦学习率调度，梯度裁剪到 1.0，bf16 autocast。token 嵌入与 lm_head 权重绑定。
+5. 损失。每个位置都做错位一位的交叉熵。有 padding 就把它屏蔽掉。按固定间隔记录训练和验证损失。
 
-Refuse to sign off on a codebase with any of: post-norm without explicit reason, LayerNorm in 2026 production code without justification, missing causal mask in decoder self-attention, untied embeddings in a small LM. Flag: no validation split, no gradient clipping, LR > 1e-3 without warmup, or a block_size that exceeds positional embedding range without fallback. Recommend running `python code/main.py` end-to-end and checking final val loss lands under 2.5 on tinyshakespeare at nano config.
+代码库只要有以下任一问题就拒绝放行：没有明确理由的 post-norm、2026 年的生产代码用 LayerNorm 却不说明理由、解码器自注意力缺少因果掩码、小型 LM 的嵌入没有绑定。需要标记的问题：没有验证集划分、没有梯度裁剪、LR > 1e-3 却没有 warmup、block_size 超出位置嵌入范围且没有后备方案。建议端到端运行 `python code/main.py`，检查 nano 配置下 tinyshakespeare 的最终验证损失低于 2.5。

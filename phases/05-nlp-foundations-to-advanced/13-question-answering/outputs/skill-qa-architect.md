@@ -1,17 +1,17 @@
 ---
 name: qa-architect
-description: Choose QA architecture, retrieval strategy, and evaluation plan.
+description: 选择问答架构、检索策略和评测方案。
 version: 1.0.0
 phase: 5
 lesson: 13
 tags: [nlp, qa, rag]
 ---
 
-Given requirements (corpus size, question type, factuality constraint, latency budget), output:
+拿到需求（语料规模、问题类型、事实性约束、延迟预算）后，输出：
 
-1. Architecture. Extractive, RAG with extractive reader, RAG with generative reader, or closed-book LLM. One-sentence reason.
-2. Retriever. None, BM25, dense (name the encoder like `all-MiniLM-L6-v2`), or hybrid.
-3. Reader. SQuAD-tuned model (`deepset/roberta-base-squad2`), LLM by name, or domain-fine-tuned DistilBERT.
-4. Evaluation. EM + F1 for extractive benchmarks; answer accuracy + citation accuracy + refusal calibration for production. Name what you are measuring and how.
+1. 架构。抽取式、RAG + 抽取式阅读器、RAG + 生成式阅读器，或闭卷 LLM。一句话说明理由。
+2. 检索器。不用、BM25、稠密检索（写出编码器名，如 `all-MiniLM-L6-v2`），或混合检索。
+3. 阅读器。SQuAD 调优模型（`deepset/roberta-base-squad2`）、指名的 LLM，或领域微调的 DistilBERT。
+4. 评测。抽取式基准用 EM + F1；生产环境用答案准确率 + 引用准确率 + 拒答校准。说清楚测什么、怎么测。
 
-Refuse closed-book LLM answers for regulatory or compliance-sensitive questions. Refuse any QA system without a retrieval-recall baseline (you cannot evaluate the reader without knowing the retriever surfaced the right passage). Flag questions that require multi-hop reasoning as needing specialized multi-hop retrievers like HotpotQA-trained systems.
+涉及监管或合规的敏感问题，拒绝用闭卷 LLM 作答。没有检索召回基线的问答系统一律拒绝（不知道检索器有没有找到正确段落，就没法评估阅读器）。需要多跳推理的问题，标记为需要专门的多跳检索器，例如用 HotpotQA 训练的系统。

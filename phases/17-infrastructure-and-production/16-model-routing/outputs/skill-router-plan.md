@@ -1,31 +1,31 @@
 ---
 name: router-plan
-description: Design an LLM model-routing plan — pick pattern (pre-route, cascade, ensemble), signals (task, length, embedding, confidence), and online quality gates.
+description: 设计 LLM 模型路由方案：选择模式（预路由、级联、集成）、信号（任务、长度、嵌入、置信度）和线上质量门禁。
 version: 1.0.0
 phase: 17
 lesson: 16
 tags: [routing, cascade, model-cascade, routellm, notdiamond, cost-reduction]
 ---
 
-Given workload mix (task classification sample), quality floor, latency tolerance, and current monthly spend, produce a routing plan.
+给定负载构成（任务分类样本）、质量下限、延迟容忍度和当前每月支出，制定路由方案。
 
-Produce:
+输出以下内容：
 
-1. Pattern. Pre-route (fastest, classifier-dependent), cascade (best quality floor), or ensemble (sample A/B only). Justify with quality tolerance + latency budget.
-2. Signals. Pick from: task classification, prompt length, embedding similarity to known-hard, self-confidence. State which combine (usually 2-3) and the composition rule.
-3. Cheap/frontier pair. Name the specific models. Example: Claude Haiku 3.5 + GPT-5. Justify with cost curve + capability.
-4. Expected savings. Compute blended cost at the recommended split; state expected monthly $ vs current.
-5. Online quality gates. Specify the live-traffic judge: sampled 5% per route evaluated by a frontier judge; alert if Δ quality > 2%. Track escalation rate; alert if climbs >10 points in a month.
-6. Rollout. Shadow (route but ignore; compare offline), canary 10% by user-cohort, expand on passing gate.
+1. 模式。预路由（最快，依赖分类器）、级联（质量下限最有保障）或集成（只用于 A/B 抽样）。结合质量容忍度和延迟预算说明理由。
+2. 信号。从以下选择：任务分类、prompt 长度、与已知难题的嵌入相似度、模型自身置信度。写明组合哪几个（通常 2-3 个）以及组合规则。
+3. 便宜模型/前沿模型组合。写出具体模型。例如：Claude Haiku 3.5 + GPT-5。用成本曲线和能力说明理由。
+4. 预期节省。按推荐的分流比例计算混合成本；写出预期每月支出与当前的对比。
+5. 线上质量门禁。写明线上流量的评审方式：每条路由抽样 5%，由前沿模型评审打分；质量差值超过 2% 就告警。跟踪升级率；一个月内上升超过 10 个百分点就告警。
+6. 上线。影子模式（路由但不采用结果；离线对比），按用户群做 10% 金丝雀，门禁通过后扩大。
 
-Hard rejects:
-- Routing without online quality gates. Refuse — drift is the #1 failure.
-- Using only task classification as the signal. Refuse — misses difficulty within tasks.
-- Routing frontier-eligible tasks (code, math, multi-step) to cheap without a cascade fallback. Refuse — quality floor will breach.
+直接否决：
+- 没有线上质量门禁的路由。拒绝。漂移是头号失效原因。
+- 只用任务分类作为信号。拒绝。它看不到同类任务内部的难度差异。
+- 把适合前沿模型的任务（代码、数学、多步推理）路由到便宜模型，却没有级联兜底。拒绝。质量下限会被突破。
 
-Refusal rules:
-- If the quality tolerance is stated as "zero regression," refuse pre-route and propose cascade with high escalation rate.
-- If the cheap model is non-Anthropic/non-OpenAI/non-frontier and has known refusal patterns (e.g., uncensored models for agent tool-use), refuse the pair — it will break tool calls silently.
-- If the routing is to a different provider for cheap (cross-provider cascade), require the AI gateway layer (Phase 17 · 19) to unify APIs.
+拒绝规则：
+- 如果质量容忍度写的是"零回归"，拒绝预路由，提出高升级率的级联方案。
+- 如果便宜模型不是 Anthropic/OpenAI/前沿模型，且有已知的拒答模式（例如用于 agent 工具调用的无审查模型），拒绝这个组合。它会静默搞坏工具调用。
+- 如果便宜模型来自另一家供应商（跨供应商级联），要求加 AI 网关层（阶段 17 · 19）统一 API。
 
-Output: a one-page plan naming pattern, signals, model pair, expected savings, online gates, rollout plan. End with the single metric: escalation-rate over rolling 7 days; drift trigger if change > 10 percentage points.
+输出：一页方案，写明模式、信号、模型组合、预期节省、线上门禁和上线计划。最后给出唯一指标：7 天滚动窗口内的升级率；变化超过 10 个百分点就触发漂移告警。

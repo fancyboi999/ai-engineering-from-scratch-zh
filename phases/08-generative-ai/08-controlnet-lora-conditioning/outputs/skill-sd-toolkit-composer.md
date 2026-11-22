@@ -1,19 +1,19 @@
 ---
 name: sd-toolkit-composer
-description: Compose ControlNets, LoRAs, and IP-Adapters on top of an SD / Flux base for a given set of inputs.
+description: 针对给定输入，在 SD / Flux 基座上组合 ControlNet、LoRA 和 IP-Adapter。
 version: 1.0.0
 phase: 8
 lesson: 08
 tags: [controlnet, lora, ip-adapter, diffusion]
 ---
 
-Given a task (target image), inputs (prompt, reference image, pose / depth / scribble / seg, subject identity), and base model (SDXL, SD3.5, Flux.1-dev), output:
+拿到任务（目标图像）、输入（prompt、参考图、姿态 / 深度 / 涂鸦 / 分割图、主体身份）和基座模型（SDXL、SD3.5、Flux.1-dev）后，输出：
 
-1. ControlNet stack. Which ControlNets (canny / openpose / depth / scribble / seg / lineart / tile), at what weight, in what order. Max sum of weights &lt;= 1.5.
-2. LoRA stack. Named LoRAs, rank, alpha. Warn when alpha &gt; 1.5 or multiple LoRAs target the same concept.
-3. IP-Adapter. None, plain, or FaceID variant; weight 0.4-0.8 typical.
-4. Text prompt + negative prompt. Keyword order, token budget, negative scaffolding.
-5. Sampler + CFG + seed. Euler A / DPM-Solver++ / LCM; CFG scale tied to base. Reproducible seed protocol.
-6. QA checklist. Visual check for ControlNet drift, LoRA over-saturation, IP-Adapter identity leak, anatomy issues.
+1. ControlNet 组合。用哪些 ControlNet（canny / openpose / depth / scribble / seg / lineart / tile），各自权重多少，按什么顺序。权重总和上限 &lt;= 1.5。
+2. LoRA 组合。具名 LoRA、rank、alpha。alpha &gt; 1.5 或多个 LoRA 针对同一概念时给出警告。
+3. IP-Adapter。不用、普通版或 FaceID 版；权重通常 0.4-0.8。
+4. 文本 prompt + 负向 prompt。关键词顺序、token 预算、负向 prompt 的骨架。
+5. 采样器 + CFG + 种子。Euler A / DPM-Solver++ / LCM；CFG 强度与基座挂钩。可复现的种子方案。
+6. QA 清单。目视检查 ControlNet 漂移、LoRA 过饱和、IP-Adapter 身份泄漏、解剖结构问题。
 
-Refuse to stack a SD 1.5 LoRA on an SDXL base (dimension mismatch). Refuse to run 3+ ControlNets at weight 1.0 each (feature collision). Flag any SD 1.5 recommendation when the user has GPU budget for SDXL or Flux. Flag LoRA identity training on &lt; 10 images as likely to overfit.
+拒绝把 SD 1.5 的 LoRA 叠在 SDXL 基座上（维度不匹配）。拒绝同时跑 3 个以上权重都为 1.0 的 ControlNet（特征冲突）。用户有足够 GPU 预算跑 SDXL 或 Flux 时还推荐 SD 1.5 的，标记出来。用 &lt; 10 张图训练身份 LoRA 的，标记为很可能过拟合。

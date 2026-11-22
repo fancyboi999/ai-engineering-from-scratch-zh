@@ -1,18 +1,18 @@
 ---
 name: stylegan-inversion
-description: Choose an inversion and editing pipeline for a pretrained StyleGAN over a real photo.
+description: 为在真实照片上使用预训练 StyleGAN 选择反演与编辑流水线。
 version: 1.0.0
 phase: 8
 lesson: 05
 tags: [stylegan, inversion, editing]
 ---
 
-Given a real photo + pretrained StyleGAN checkpoint (FFHQ-1024, StyleGAN-XL, a custom fine-tune) and target edit (age, smile, pose, hair, identity preservation), output:
+拿到一张真实照片 + 预训练 StyleGAN checkpoint（FFHQ-1024、StyleGAN-XL、自定义微调版本）和目标编辑（年龄、微笑、姿态、发型、身份保持）后，输出：
 
-1. Inversion method. e4e (fast, low fidelity), ReStyle (iterative encoder), HyperStyle (hypernet), PTI (pivotal tuning), or direct W-optimization. One-sentence reason tied to fidelity vs speed.
-2. Target space. W, W+, or StyleSpace. Trade-offs: W = most disentangled but lowest fidelity, W+ = per-layer w, StyleSpace = channel-level.
-3. Editing direction. Named direction source: InterFaceGAN (SVM-based), StyleSpace channels, GANSpace PCA, or a learned classifier.
-4. Fidelity budget. LPIPS threshold before identity drift; rollback heuristic.
-5. Eval. ID similarity (ArcFace cosine), LPIPS to original, edit strength (target attribute classifier score).
+1. 反演方法。e4e（快，保真度低）、ReStyle（迭代式编码器）、HyperStyle（超网络）、PTI（pivotal tuning），或直接在 W 空间优化。一句话说明理由，并和保真度与速度的取舍挂钩。
+2. 目标空间。W、W+ 或 StyleSpace。取舍：W 解耦最好但保真度最低，W+ 是逐层的 w，StyleSpace 是通道级。
+3. 编辑方向。写明方向来源：InterFaceGAN（基于 SVM）、StyleSpace 通道、GANSpace PCA，或学习得到的分类器。
+4. 保真度预算。身份开始漂移前的 LPIPS 阈值；回滚的启发式规则。
+5. 评测。身份相似度（ArcFace 余弦）、与原图的 LPIPS、编辑强度（目标属性分类器的分数）。
 
-Refuse any pipeline that edits directly in Z (entangled). Refuse large edits (&gt;1.5 sigma in W) without identity checks. Flag requests that need open-domain editing (e.g. "make him a cartoon") - those require diffusion + IP-Adapter, not StyleGAN.
+任何直接在 Z 空间编辑的流水线一律拒绝（Z 空间是纠缠的）。没有身份检查就拒绝大幅编辑（W 中 &gt;1.5 sigma）。需要开放领域编辑的请求（例如"把他变成卡通"）标记出来：这类需求要用扩散 + IP-Adapter，而不是 StyleGAN。

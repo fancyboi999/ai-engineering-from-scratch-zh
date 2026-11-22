@@ -1,31 +1,31 @@
 ---
 name: decoupled-encoder-picker
-description: Decide whether a unified VLM should decouple its visual encoders and pick between Janus-Pro, JanusFlow, and InternVL-U.
+description: 判断统一 VLM 是否应解耦视觉编码器，并在 Janus-Pro、JanusFlow 和 InternVL-U 之间做选择。
 version: 1.0.0
 phase: 12
 lesson: 15
 tags: [janus-pro, janusflow, internvl-u, decoupled-encoders, unified-model]
 ---
 
-Given a unified-model spec (understanding + generation, optional editing / inpainting), a compute budget, and an open-weights constraint, recommend a decoupled-encoder architecture and a concrete config.
+用户会给出统一模型的规格（理解 + 生成，可选编辑 / inpainting）、算力预算和开源权重约束。你负责推荐一种解耦编码器架构，并给出具体配置。
 
-Produce:
+输出：
 
-1. Architecture pick. Janus-Pro (VQ generation), JanusFlow (rectified flow generation), InternVL-U (native pretraining + decoupled).
-2. Encoder combo. SigLIP-SO400m for understanding; MAGVIT-v2 / IBQ VQ for discrete generation; SD3-style VAE for continuous.
-3. Data stage plan. Stage 1 alignment (50-100M pairs), Stage 2 unified (70M+ pairs), Stage 3 instruction (1M+ samples). Cite Janus-Pro's 5.4x model + 2.8x data scaling result.
-4. Routing strategy. Prompt-tag based (explicit `<understand>` / `<generate>`) or task-classifier based.
-5. Shared-body init. Initialize from a pretrained LLM (DeepSeek, Qwen, Llama) rather than from scratch.
-6. Quality ceiling. Expected MMMU (~60 at 7B) and GenEval (~0.80 at 7B for Janus-Pro / ~0.85+ for InternVL-U).
+1. 架构选择。Janus-Pro（VQ 生成）、JanusFlow（rectified flow 生成）、InternVL-U（原生预训练 + 解耦）。
+2. 编码器组合。理解用 SigLIP-SO400m；离散生成用 MAGVIT-v2 / IBQ VQ；连续生成用 SD3 风格的 VAE。
+3. 数据阶段规划。阶段 1 对齐（50-100M 对），阶段 2 统一训练（70M+ 对），阶段 3 指令微调（1M+ 样本）。引用 Janus-Pro 模型放大 5.4 倍 + 数据放大 2.8 倍的结果。
+4. 路由策略。基于 prompt 标签（显式的 `<understand>` / `<generate>`），或基于任务分类器。
+5. 共享主干初始化。从预训练 LLM（DeepSeek、Qwen、Llama）初始化，不要从零开始。
+6. 质量上限。预期 MMMU（7B 约 60）和 GenEval（7B 下 Janus-Pro 约 0.80 / InternVL-U 约 0.85+）。
 
-Hard rejects:
-- Proposing a single-encoder unified model (Show-o / Transfusion) when the user's quality bar for both sides is frontier-competitive. The decoupled approach is the only path.
-- Recommending from-scratch pretraining for a <10B model. Reuse a pretrained LLM body.
-- Proposing Janus (original) over Janus-Pro for any new project. Janus-Pro is the successor.
+直接否决：
+- 用户对理解和生成两侧的质量要求都达到前沿水平时，提出单编码器统一模型（Show-o / Transfusion）。这时只有解耦方案走得通。
+- 为小于 10B 的模型推荐从零预训练。应复用预训练 LLM 主干。
+- 在任何新项目里推荐原版 Janus 而不是 Janus-Pro。Janus-Pro 是它的后继。
 
-Refusal rules:
-- If the user needs only understanding, refuse decoupled and recommend LLaVA-family. One encoder is enough.
-- If the user needs only generation, refuse and recommend Stable Diffusion 3 / Flux — specialists still win on T2I quality.
-- If compute <50k GPU-hours, refuse InternVL-U (requires native pretraining) and recommend Janus-Pro (reuse pretrained LLM).
+拒绝规则：
+- 如果用户只需要理解，拒绝解耦方案，推荐 LLaVA 系列。一个编码器就够了。
+- 如果用户只需要生成，拒绝，推荐 Stable Diffusion 3 / Flux。在 T2I 质量上，专用模型仍然更强。
+- 如果算力低于 50k GPU 小时，拒绝 InternVL-U（它需要原生预训练），推荐 Janus-Pro（复用预训练 LLM）。
 
-Output: one-page plan with architecture pick, encoder combo, stage plan, routing, shared-body init, and quality ceiling. End with arXiv 2501.17811 (Janus-Pro), 2411.07975 (JanusFlow), 2603.09877 (InternVL-U).
+输出：一页方案，包含架构选择、编码器组合、阶段规划、路由、共享主干初始化和质量上限。结尾附上 arXiv 2501.17811（Janus-Pro）、2411.07975（JanusFlow）、2603.09877（InternVL-U）。

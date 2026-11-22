@@ -1,31 +1,31 @@
 ---
 name: mtp-planner
-description: Plan a multi-token prediction integration for a new pre-training run.
+description: 为新的预训练任务规划多 token 预测（MTP）的集成。
 version: 1.0.0
 phase: 10
 lesson: 18
 tags: [mtp, multi-token-prediction, deepseek-v3, pre-training, speculative-decoding]
 ---
 
-Given a pre-training run specification (model scale, hidden size, layers, data tokens budget, GPU topology, target deployment) and a stated goal (denser training signal vs speculative-decoding draft vs both), produce an MTP integration plan.
+用户会给你一份预训练任务规格（模型规模、hidden 大小、层数、数据 token 预算、GPU 拓扑、目标部署）和一个明确目标（更密集的训练信号、投机解码草稿，还是两者兼得）。你需要输出 MTP 集成方案。
 
-Produce:
+输出：
 
-1. Depth D. Pick 1 or 2. DeepSeek-V3 uses D=1 and reports the first-depth speculative-decoding acceptance at 80%+. D=2 is diminishing-returns territory for most runs. Justify the choice against compute budget — each extra depth adds roughly one transformer block of compute per training step.
-2. Lambda schedule. Default: 0.3 for the first 10% of training, 0.1 afterward. Adjust up to 0.5 early for small models (under 7B) where the denser signal matters more; adjust down if you observe the MTP loss dominating the main loss.
-3. Parameter budget. Report per-module parameter count against the main model. Confirm overhead is under 5% of main parameters (dense) or under 3% (MoE).
-4. Memory and compute overhead. Quantify extra forward-pass FLOPs per step (roughly `D * transformer_block_cost`), extra backward-pass memory (activation memory for D modules), and extra peak VRAM (shared embedding and head do not count, projection and transformer block do).
-5. Inference-time wiring. Describe how to consume the MTP module as a speculative-decoding draft at inference. Name the Leviathan rule integration path and the KV-rollback bookkeeping. Confirm compatibility with the target inference stack (vLLM, SGLang, TensorRT-LLM).
+1. 深度 D。选 1 或 2。DeepSeek-V3 用 D=1，报告第一层深度的投机解码接受率在 80% 以上。对大多数训练来说，D=2 已进入收益递减区。结合算力预算论证选择：每多一层深度，每个训练步大约多出一个 transformer block 的计算量。
+2. Lambda 调度。默认：训练前 10% 用 0.3，之后用 0.1。小模型（7B 以下）更需要密集信号，前期可上调到 0.5；如果发现 MTP 损失盖过了主损失，就下调。
+3. 参数预算。报告每个模块相对主模型的参数量。确认开销低于主模型参数的 5%（稠密）或 3%（MoE）。
+4. 内存与计算开销。量化每步多出的前向 FLOPs（约 `D * transformer_block_cost`）、多出的反向内存（D 个模块的激活值内存），以及多出的峰值显存（共享的嵌入层和输出头不算，投影层和 transformer block 要算）。
+5. 推理时的接线方式。说明推理时如何把 MTP 模块当作投机解码的草稿来用。写明 Leviathan 规则的集成路径和 KV 回滚的状态记录。确认与目标推理技术栈（vLLM、SGLang、TensorRT-LLM）兼容。
 
-Hard rejects:
-- Adding MTP to a dense model pre-trained without it. Cannot retrofit — the MTP modules are not trained.
-- D > 2 for a first integration. Gain over D=1 is small; complexity grows quickly.
-- MTP on a model under 1B active parameters. Signal is weaker than the overhead cost at that scale.
-- Using parallel (Gloeckle-style) heads when the goal is speculative decoding. They do not chain causally.
+直接否决：
+- 给一个没用 MTP 预训练的稠密模型加 MTP。没法事后补装：MTP 模块根本没训练过。
+- 首次集成就用 D > 2。相对 D=1 的收益很小，复杂度却增长很快。
+- 在激活参数少于 1B 的模型上用 MTP。这种规模下信号带来的收益抵不过开销。
+- 目标是投机解码时却用并行（Gloeckle 式）的头。它们之间没有因果链。
 
-Refusal rules:
-- If the pre-training data is dominated by short sequences (under 2k), refuse. MTP gains assume sequences long enough for depth-2 supervision to matter.
-- If the target inference stack does not support speculative decoding at all, note that MTP still buys the denser training signal and proceed, but flag the mismatch.
-- If the user is continuing pre-training on an existing dense checkpoint without MTP, refuse and recommend adding MTP only at the start of a clean training run or at a clean data-boundary reset.
+拒绝规则：
+- 预训练数据以短序列（2k 以下）为主时，拒绝。MTP 的收益以序列足够长、深度 2 的监督有意义为前提。
+- 目标推理技术栈完全不支持投机解码时，说明 MTP 仍能带来更密集的训练信号，可以继续，但要标出这个不匹配。
+- 用户在一个没有 MTP 的现有稠密 checkpoint 上继续预训练时，拒绝，建议只在一次全新训练开始时，或在一个干净的数据边界重置点加入 MTP。
 
-Output: a one-page integration plan listing D, lambda schedule, parameter overhead (absolute and percentage), compute overhead (percentage per training step), and the inference-time speculative-decoding wiring plan. End with a "success criterion" paragraph naming the measured metric that justifies keeping MTP: acceptance rate at depth 1 after 50B training tokens must be above 70%, otherwise the architecture should be reverted.
+输出：一页集成方案，列出 D、lambda 调度、参数开销（绝对值和百分比）、计算开销（每个训练步的百分比），以及推理时的投机解码接线方案。结尾用一段“成功标准”，写明足以证明应保留 MTP 的实测指标：训练 50B token 后，深度 1 的接受率必须高于 70%，否则应回退架构。

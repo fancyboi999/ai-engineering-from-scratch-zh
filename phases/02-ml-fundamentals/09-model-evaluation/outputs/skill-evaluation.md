@@ -1,77 +1,77 @@
 ---
 name: skill-evaluation
-description: Evaluation strategy checklist for classification and regression models
+description: 分类与回归模型的评估策略清单
 version: 1.0.0
 phase: 2
 lesson: 9
 tags: [evaluation, metrics, cross-validation, model-selection]
 ---
 
-# Model Evaluation Strategy
+# 模型评估策略
 
-A checklist for correctly evaluating any ML model. Follow this sequence to avoid the most common evaluation mistakes.
+一份正确评估任意机器学习模型的清单。按顺序执行，就能避开最常见的评估错误。
 
-## Step 1: Split the data correctly
+## 第 1 步：正确划分数据
 
-- Split before any preprocessing (scaling, imputation, encoding)
-- Use stratified splits for classification tasks
-- Reserve a test set that you touch exactly once at the end
-- For small datasets, use 5-fold or 10-fold cross-validation instead of a single split
-- For time series, use time-based splits (never shuffle)
+- 在任何预处理（缩放、填充、编码）之前先划分
+- 分类任务使用分层划分
+- 留出一个测试集，只在最后用一次
+- 小数据集用 5 折或 10 折交叉验证，不要只做一次划分
+- 时间序列按时间划分（绝不打乱）
 
-## Step 2: Pick the right metric
+## 第 2 步：选对指标
 
-### Classification
+### 分类
 
-| Situation | Use this metric | Why |
+| 场景 | 使用指标 | 原因 |
 |-----------|----------------|-----|
-| Balanced classes, simple comparison | Accuracy | Easy to interpret, meaningful when classes are equal |
-| False positives are costly (spam filter, fraud alerts) | Precision | Measures how many flagged items are actually positive |
-| False negatives are costly (cancer screening, security) | Recall | Measures how many actual positives you catch |
-| Need to balance precision and recall | F1 Score | Harmonic mean, punishes extreme imbalance |
-| Comparing models across thresholds | AUC-ROC | Threshold-independent ranking quality |
-| Imbalanced data | F1, AUC-ROC, or PR-AUC | Accuracy is misleading with imbalanced classes |
+| 类别均衡，简单比较 | Accuracy | 易于解释，类别均衡时有意义 |
+| 假阳性代价高（垃圾邮件过滤、欺诈告警） | Precision | 衡量被标记的样本中有多少真的是正例 |
+| 假阴性代价高（癌症筛查、安全） | Recall | 衡量实际正例中你抓到了多少 |
+| 需要平衡精确率和召回率 | F1 Score | 调和平均，严惩一方极端偏低 |
+| 跨阈值比较模型 | AUC-ROC | 与阈值无关的排序质量 |
+| 不均衡数据 | F1、AUC-ROC 或 PR-AUC | 类别不均衡时 accuracy 会误导人 |
 
-### Regression
+### 回归
 
-| Situation | Use this metric | Why |
+| 场景 | 使用指标 | 原因 |
 |-----------|----------------|-----|
-| Standard regression, outliers acceptable | RMSE | Same units as target, penalizes large errors |
-| Outlier-robust evaluation | MAE | Treats all errors equally, not dominated by outliers |
-| Comparing models on different scales | R-squared | Normalized 0-1 scale (fraction of variance explained) |
-| Business requires dollar amounts | MAE or RMSE | Directly interpretable as error magnitude |
+| 标准回归，可接受离群点 | RMSE | 与目标同单位，对大误差惩罚更重 |
+| 对离群点稳健的评估 | MAE | 所有误差一视同仁，不被离群点主导 |
+| 比较不同尺度上的模型 | R-squared | 归一化到 0-1（被解释的方差比例） |
+| 业务需要以金额表示 | MAE 或 RMSE | 可直接解读为误差大小 |
 
-## Step 3: Establish baselines
+## 第 3 步：建立基线
 
-Before evaluating your model, compute baseline performance:
-- Classification: majority class predictor (always predict the most common class)
-- Regression: always predict the mean of the training target
-- Any model that cannot beat these baselines is not learning
+评估模型之前，先算出基线性能：
+- 分类：多数类预测器（永远预测最常见的类别）
+- 回归：永远预测训练集目标的均值
+- 连这些基线都打不过的模型，就是没学到东西
 
-## Step 4: Cross-validate
+## 第 4 步：交叉验证
 
-- Use K-fold (K=5 or K=10) for stable estimates
-- Use stratified K-fold for classification
-- Report mean and standard deviation across folds
-- A model with mean=0.85 and std=0.02 is more trustworthy than mean=0.87 and std=0.10
+- 用 K 折（K=5 或 K=10）得到稳定的估计
+- 分类任务用分层 K 折
+- 报告各折的均值和标准差
+- mean=0.85、std=0.02 的模型比 mean=0.87、std=0.10 的更可信
 
-## Step 5: Compare models statistically
+## 第 5 步：用统计方法比较模型
 
-- Do not pick the model with the highest average score without checking significance
-- Use a paired t-test across cross-validation folds
-- If |t| < 2.78 (for K=5, df=4, p<0.05), the difference may be due to chance
-- Consider the simpler model when performance differences are not significant
+- 不要不做显著性检验就直接选平均分最高的模型
+- 在交叉验证的各折上做配对 t 检验
+- 如果 |t| < 2.78（K=5，df=4，p<0.05），差异可能只是偶然
+- 性能差异不显著时，优先考虑更简单的模型
 
-## Step 6: Check for common mistakes
+## 第 6 步：排查常见错误
 
-- Data leakage: did any test data information flow into training? (scaling before splitting, target-derived features)
-- Class imbalance: is accuracy hiding poor minority-class performance?
-- Overfitting: is the gap between training and validation performance large?
-- Too many evaluations: have you looked at the test set more than once?
+- 数据泄漏：是否有测试数据的信息流入了训练？（先缩放后划分、由目标衍生的特征）
+- 类别不均衡：accuracy 是否掩盖了少数类上的糟糕表现？
+- 过拟合：训练和验证性能之间的差距是否很大？
+- 评估次数过多：你是否看过测试集不止一次？
 
-## Step 7: Report final performance
+## 第 7 步：报告最终性能
 
-- Train on train + validation combined
-- Evaluate on the held-out test set exactly once
-- Report the chosen metric with confidence intervals if possible
-- State the baseline comparison (how much better than random/mean)
+- 在训练集 + 验证集合并后的数据上训练
+- 在留出的测试集上只评估一次
+- 报告所选指标，尽可能附上置信区间
+- 说明与基线的对比（比随机/均值好多少）

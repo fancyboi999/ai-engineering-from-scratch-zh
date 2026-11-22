@@ -1,34 +1,34 @@
 ---
 name: skill-end-to-end-safety-gate
-description: Three-checkpoint safety gate composing the input detector, streaming token filter, output classifier, and rules engine with a deterministic aggregation table and per-request trace
+description: 三检查点安全门，组合输入检测器、流式 token 过滤器、输出分类器和规则引擎，配有确定性的聚合表和逐请求 trace
 version: 1.0.0
 phase: 19
 lesson: 87
 tags: [safety, harness, composition]
 ---
 
-# End-to-End Safety Gate
+# 端到端安全门
 
-## Lifecycle
+## 生命周期
 
-1. pre-gen - run the lesson 83 detector on the prompt
-   - if confidence >= block_threshold: return refusal, emit trace, stop
-2. during-gen - stream from the model, buffer two chunks, scan for known harmful continuations
-   - if matched: terminate iterator, mark trace, treat as medium severity
-3. post-gen - if no early termination, run the lesson 85 classifier router and the lesson 86 rules engine on the completed output
-4. aggregate - take the maximum severity across pre, during, post.classifier, post.rules
-5. apply - map to block, redact, warn, or allow
+1. pre-gen - 对 prompt 运行第 83 课的检测器
+   - 如果 confidence >= block_threshold：返回拒绝，输出 trace，结束
+2. during-gen - 从模型流式读取，缓冲两个 chunk，扫描已知的有害续写
+   - 如果命中：终止迭代器，在 trace 上标记，按 medium 严重度处理
+3. post-gen - 如果没有提前终止，对完整输出运行第 85 课的分类器路由器和第 86 课的规则引擎
+4. aggregate - 取 pre、during、post.classifier、post.rules 中的最高严重度
+5. apply - 映射为 block、redact、warn 或 allow
 
-## Aggregation table
+## 聚合表
 
-| Signal state | Action |
+| 信号状态 | 动作 |
 |---|---|
-| any high severity | block |
-| any medium severity | redact |
-| any low severity | warn |
-| nothing | allow |
+| 存在 high 严重度 | block |
+| 存在 medium 严重度 | redact |
+| 存在 low 严重度 | warn |
+| 都没有 | allow |
 
-## Trace structure
+## Trace 结构
 
 ```text
 RequestTrace
@@ -42,6 +42,6 @@ RequestTrace
   latency_ms: float
 ```
 
-## Artifact
+## 产物
 
-`outputs/gate_trace.json` contains the summary and one trace per request, including 50 taxonomy fixtures and 10 benign prompts.
+`outputs/gate_trace.json` 包含汇总信息和每个请求的 trace，覆盖 50 个分类法测试样例和 10 个正常 prompt。

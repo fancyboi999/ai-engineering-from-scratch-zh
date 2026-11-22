@@ -7,33 +7,33 @@ lesson: 18
 tags: [clip, retrieval, faiss, zero-shot]
 ---
 
-# Image-Text Retriever
+# 图文检索器
 
-Turn a folder of images into a searchable index using CLIP embeddings.
+用 CLIP 嵌入把一个图像文件夹变成可搜索的索引。
 
-## When to use
+## 何时使用
 
-- Building a zero-shot image search on an internal catalog.
-- Deduplicating near-identical images by embedding distance.
-- Building a quick "find similar" component without a labelled dataset.
+- 在内部图库上搭建零样本图像搜索。
+- 按嵌入距离对几乎相同的图像去重。
+- 没有标注数据集，也想快速做一个"查找相似"组件。
 
-## Inputs
+## 输入
 
-- `image_folder`: directory of image files.
-- `clip_model`: HuggingFace id like `openai/clip-vit-base-patch32` or `google/siglip-base-patch16-224`.
-- `index_type`: flat | IVF | HNSW.
-- `embedding_dim`: inferred from the model.
+- `image_folder`：图像文件所在目录。
+- `clip_model`：HuggingFace id，例如 `openai/clip-vit-base-patch32` 或 `google/siglip-base-patch16-224`。
+- `index_type`：flat | IVF | HNSW。
+- `embedding_dim`：从模型推断。
 
-## Steps
+## 步骤
 
-1. Load the CLIP model and preprocessor.
-2. Batch-encode every image in the folder. Save embeddings as (N, D) float32 + filename list.
-3. Build a FAISS index over the embeddings. Use inner-product on L2-normalised vectors for cosine similarity.
-4. Expose two query interfaces:
-   - `search_by_text(text, k)` — embed the text, search.
-   - `search_by_image(image_path, k)` — embed the image, search.
+1. 加载 CLIP 模型和预处理器。
+2. 分批编码文件夹里的每张图像。把嵌入保存为 (N, D) 的 float32 数组，外加文件名列表。
+3. 在嵌入上构建 FAISS 索引。对 L2 归一化后的向量使用内积，即得到余弦相似度。
+4. 暴露两个查询接口：
+   - `search_by_text(text, k)`：嵌入文本，然后搜索。
+   - `search_by_image(image_path, k)`：嵌入图像，然后搜索。
 
-## Output template
+## 输出模板
 
 ```python
 import os
@@ -100,7 +100,7 @@ class ImageTextRetriever:
         return [(self.filenames[i], float(d)) for d, i in zip(dist[0], idx[0])]
 ```
 
-## Report
+## 报告
 
 ```
 [retriever]
@@ -111,10 +111,10 @@ class ImageTextRetriever:
   index_size_mb:  <float>
 ```
 
-## Rules
+## 规则
 
-- Always L2-normalise embeddings before indexing; FAISS's inner product on normalised vectors equals cosine similarity.
-- For < 100k images, `IndexFlatIP` (exact) is simplest and fastest.
-- For 100k-10M, `IndexIVFFlat` is the standard trade-off.
-- For > 10M, use HNSW or a product-quantised variant.
-- Never rebuild the index on every query; embed once, search many times.
+- 建索引前一律对嵌入做 L2 归一化；在归一化向量上，FAISS 的内积就等于余弦相似度。
+- 少于 100k 张图像时，`IndexFlatIP`（精确检索）最简单也最快。
+- 100k 到 10M 之间，`IndexIVFFlat` 是标准的折中方案。
+- 超过 10M 时，用 HNSW 或乘积量化变体。
+- 绝不在每次查询时重建索引；嵌入一次，多次搜索。

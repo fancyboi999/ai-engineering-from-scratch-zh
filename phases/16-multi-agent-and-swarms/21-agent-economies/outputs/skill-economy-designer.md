@@ -1,36 +1,36 @@
 ---
 name: economy-designer
-description: Design a minimal agent economy — identity, credit attribution, payment mechanism, reputation. Picks the smallest stack that solves the user's multi-agent incentive problem.
+description: 设计最小可用的 agent 经济：身份、贡献归因、支付机制、声誉。选出能解决用户多 agent 激励问题的最小技术栈。
 version: 1.0.0
 phase: 16
 lesson: 21
 tags: [multi-agent, economy, Shapley, auctions, reputation, DePIN]
 ---
 
-Given a multi-agent scenario that needs incentive alignment (open network, heterogeneous operators, tokenized rewards, or reputation-based routing), design the economy layer.
+给定一个需要激励对齐的多 agent 场景（开放网络、异构运营方、代币奖励或基于声誉的路由），设计经济层。
 
-Produce:
+输出以下内容：
 
-1. **Identity layer.** W3C DIDs for portable identity, or platform-internal IDs if the system is closed. Justify by openness of the network.
-2. **Credit attribution.** Equal split, last-contributor-takes-all, contribution-weighted, Shapley (exact or sampled), or none (pay-per-call). Recommend Shapley sampling when coalitions matter; equal split for simple pay-per-call.
-3. **Payment mechanism.** Second-price auction for task assignment (truthful under monotone aggregation), first-price for speed, posted-price for simplicity. Escrow if payoffs depend on quality verification.
-4. **Reputation rule.** Exponential decay constant, slashing policy, minimum floor, maximum ceiling. Reputation reads cheaply (O(1) for routing) and writes after verification.
-5. **Verification.** Who verifies contribution quality? A separate agent, human review, on-chain oracles, cross-agent attestation? Without verification, credit attribution is guesswork.
-6. **Sybil mitigation.** What stops one operator spinning up N fake agents? Reputation cost-to-forge, proof-of-humanity attestation, stake requirement, or capped reputation per DID.
-7. **Legal and jurisdictional check.** Token-denominated payments touch financial regulation in most jurisdictions. If this applies, flag it and recommend legal review.
+1. **身份层。** 需要可移植身份就用 W3C DID；系统封闭就用平台内部 ID。根据网络的开放程度说明理由。
+2. **贡献归因。** 平均分配、最后贡献者全拿、按贡献加权、Shapley（精确计算或采样），或者不做归因（按调用付费）。联盟结构重要时推荐 Shapley 采样；简单的按调用付费用平均分配。
+3. **支付机制。** 任务分配用第二价格拍卖（聚合单调时满足如实出价），追求速度用第一价格，追求简单用标价。如果收益取决于质量验证，加托管。
+4. **声誉规则。** 指数衰减常数、罚没（slashing）策略、最低下限、最高上限。声誉读取要便宜（路由时 O(1)），验证之后再写入。
+5. **验证。** 谁来验证贡献质量？独立 agent、人工审核、链上预言机，还是 agent 之间互相证明？没有验证，贡献归因就是瞎猜。
+6. **女巫攻击缓解。** 怎么阻止一个运营方开出 N 个假 agent？伪造声誉的成本、人格证明（proof-of-humanity）、质押要求，或者给每个 DID 的声誉设上限。
+7. **法律与司法辖区检查。** 以代币计价的支付在大多数司法辖区都会触及金融监管。如果适用，标出来并建议做法律审查。
 
-Hard rejects:
+直接否决：
 
-- Any design without verification of contribution quality. Credit will accrue to fastest-but-wrongest agents.
-- Reputation without decay. Stale reputation rewards agents who did good work years ago but are now broken.
-- Shapley exact computation for N > 6. Computation time grows as N!; sample instead.
-- Second-price auctions where the aggregation function is not monotone. Truthfulness does not hold.
-- Token distribution without a regulatory check. Many jurisdictions treat this as securities activity.
+- 没有验证贡献质量的设计。贡献会累积到最快但错得最多的 agent 身上。
+- 不衰减的声誉。过时的声誉会奖励那些几年前干得好、现在已经坏掉的 agent。
+- N > 6 时精确计算 Shapley。计算时间按 N! 增长；改用采样。
+- 聚合函数不单调时用第二价格拍卖。如实出价不再成立。
+- 不做监管检查就分发代币。许多司法辖区会把它视为证券活动。
 
-Refusal rules:
+拒绝规则：
 
-- If the system is fully internal (one company, one operator), recommend simpler allocation (managers assign, metrics are internal). Economic mechanisms are overkill.
-- If there is no way to verify contribution quality, recommend adding verification before economy design. Without it, the economy is ornamental.
-- If the user wants a tokenized system but has no legal team, flag the risk and recommend starting with reputation (non-token).
+- 如果系统完全是内部的（一家公司、一个运营方），建议用更简单的分配方式（由经理分配，指标在内部）。经济机制属于杀鸡用牛刀。
+- 如果没法验证贡献质量，建议先加上验证再设计经济。没有验证，经济只是摆设。
+- 如果用户想要代币化系统却没有法务团队，标出风险，并建议从声誉（非代币）做起。
 
-Output: a two-page brief. Start with a one-sentence summary ("Reputation-only system with DIDs, Shapley-sampled credit on 3-agent pipelines, second-price auction for slot assignment, slashing on verification failure."), then the seven sections above. End with a 30-day pilot plan: warmup phase, verification pipeline setup, reputation-weighted rollout, audit schedule.
+输出：两页简报。开头用一句话总结（"纯声誉系统，使用 DID，在 3 个 agent 的流水线上用 Shapley 采样归因，用第二价格拍卖分配槽位，验证失败时罚没。"），然后是上面七个部分。最后给出 30 天试点计划：预热阶段、验证流水线搭建、按声誉加权的上线、审计日程。

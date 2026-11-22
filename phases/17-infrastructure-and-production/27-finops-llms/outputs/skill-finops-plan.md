@@ -1,31 +1,31 @@
 ---
 name: finops-plan
-description: Design an LLM FinOps program — attribution schema (user/task/tenant + four token layers), three-tier enforcement ladder, and unit metric (cost per resolved / artifact).
+description: 设计 LLM FinOps 体系：归因 schema（用户/任务/租户 + 四层 token）、三级管控阶梯和单位指标（每次解决 / 每个产物的成本）。
 version: 1.0.0
 phase: 17
 lesson: 27
 tags: [finops, cost-attribution, multi-tenant, kill-switch, unit-economics, rate-limit]
 ---
 
-Given product surface, tenant tiers, monthly spend, and current attribution state, produce a FinOps plan.
+给定产品形态、租户等级、每月支出和当前归因状况，制定 FinOps 方案。
 
-Produce:
+输出以下内容：
 
-1. Attribution schema. `user_id`, `task_id`, `route`, `tenant_id` stamped at call site. Four token-layer counts (prompt / tool / memory / response). Telemetry-joiner pattern preferred.
-2. Unit metric. Define the product outcome metric — cost per resolved ticket, cost per artifact, cost per agent task, cost per session. Tie to billing model.
-3. Enforcement ladder. Rate limit per tenant (2-3x peak), daily spend cap (1.5-3x contract), kill switch on z-score > 4.
-4. Dashboard. Top 5 views: per-tenant spend today, per-task cost-per-outcome, per-user distribution, cache hit rate impact, model routing split.
-5. Stacked optimization audit. Check cache (Phase 17 · 14), batch (Phase 17 · 15), routing (Phase 17 · 16), gateway (Phase 17 · 19) are all engaged. Flag missing levers.
-6. Review cadence. Weekly: top spenders + anomalies. Monthly: per-tenant unit-economics. Quarterly: re-triage workloads into interactive/semi/batch.
+1. 归因 schema。在调用处打上 `user_id`、`task_id`、`route`、`tenant_id`。统计四层 token 数（prompt / 工具 / 记忆 / 响应）。优先采用遥测关联（telemetry-joiner）模式。
+2. 单位指标。定义产品结果指标：每张已解决工单的成本、每个产物的成本、每个 agent 任务的成本、每个会话的成本。与计费模式挂钩。
+3. 管控阶梯。每租户限流（峰值的 2-3 倍）、每日支出上限（合同额的 1.5-3 倍）、z-score > 4 时触发熔断开关。
+4. 看板。前 5 个视图：各租户今日支出、各任务的单次结果成本、按用户的分布、缓存命中率的影响、模型路由分流比例。
+5. 叠加优化审计。检查缓存（阶段 17 · 14）、批处理（阶段 17 · 15）、路由（阶段 17 · 16）、网关（阶段 17 · 19）是否都已用上。标出缺失的手段。
+6. 复盘节奏。每周：支出最高的对象 + 异常。每月：各租户的单位经济。每季度：把负载重新分到交互/半交互/批处理通道。
 
-Hard rejects:
-- Shipping without attribution at call site. Refuse — retroactive tagging loses ~10-30% of spend.
-- Single-bucket billing. Refuse — require four token-layer breakdown.
-- Kill switch with no z-score basis. Refuse — require baseline statistics before arming.
+直接否决：
+- 不在调用处做归因就上线。拒绝。事后打标签会丢掉约 10-30% 的支出。
+- 所有支出放在一个桶里计费。拒绝。要求按四层 token 拆分。
+- 熔断开关没有 z-score 依据。拒绝。启用前先有基线统计。
 
-Refusal rules:
-- If the product has < 10 tenants, refuse full multi-tenant enforcement — require basic per-tenant attribution first.
-- If cost/outcome is undefined, refuse the dashboard — pick a unit metric first.
-- If any single tenant is > 40% of total spend, require dedicated unit-economics review before the plan ships.
+拒绝规则：
+- 如果产品租户少于 10 个，拒绝完整的多租户管控。先要求做基本的按租户归因。
+- 如果单次结果成本没有定义，拒绝做看板。先选定单位指标。
+- 如果某个租户占总支出超过 40%，方案上线前要求单独做一次单位经济复盘。
 
-Output: a one-page plan with attribution schema, unit metric, enforcement ladder, dashboard, stacked optimization audit, review cadence. End with the single alert: daily spend vs projection; page when delta > 20%.
+输出：一页方案，写明归因 schema、单位指标、管控阶梯、看板、叠加优化审计和复盘节奏。最后给出唯一告警：每日支出与预测值对比；偏差 > 20% 就呼叫值班。
