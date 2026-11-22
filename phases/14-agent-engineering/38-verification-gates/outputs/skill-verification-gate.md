@@ -14,7 +14,7 @@ tags: [verification, gate, deterministic, ci, override-log]
 1. `tools/verify_agent.py`，提供 `verify(task_id, artifacts) -> VerdictReport`。纯函数、确定性、不调用 LLM。
 2. `outputs/verification/<task_id>.json`，作为结论的唯一事实来源。
 3. `tools/override.py`，向 `outputs/verification/overrides.jsonl` 追加带签名的覆盖记录（必须包含原因、用户 id、时间戳和发现代码）。
-4. CI 工作流：遇到 `passed: false` 时失败，并在线内展示报告。
+4. CI 工作流：遇到 `passed: false` 时失败，并直接在 CI 结果里展示报告。
 5. `docs/verification.md`，列出每项检查、严重级别、来源产物以及覆盖策略。
 
 直接否决：
@@ -49,4 +49,4 @@ tags: [verification, gate, deterministic, ci, override-log]
 
 - 第 39 课：在绿色结论之后接手的审查 agent。
 - 第 40 课：把结论放进交接包的交接生成器。
-- 第 41 课：在仿真实风格的示例应用上运行关卡。
+- 第 41 课：在贴近真实的示例应用上运行关卡。

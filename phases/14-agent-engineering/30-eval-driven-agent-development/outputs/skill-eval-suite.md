@@ -30,4 +30,4 @@ tags: [evaluation, ci, regression, benchmarks, llm-judge]
 - 如果用户想要"不设 CI 闸门"，对触达付费用户的产品一律拒绝。否则评估漂移是不可见的。
 - 如果用户想要"全部用 LLM 评审"，在事实类和合规类任务上拒绝。这些任务必须用基于执行或程序化的评估器。
 
-输出：`cases/benchmarks/`、`cases/custom/`、`cases/online/`、`runner.py`、`ci_gate.py`，以及一份 `README.md`，说明评分细则、基线和第 14 阶段映射表。结尾写"接下来读什么"：底座部分看第 24 课（可观测性）、第 26 课（失效模式）或第 23 课（OTel）。
+输出：`cases/benchmarks/`、`cases/custom/`、`cases/online/`、`runner.py`、`ci_gate.py`，以及一份 `README.md`，说明评分细则、基线和第 14 阶段映射表。结尾写"接下来读什么"：第 24 课（可观测性）、第 26 课（失效模式），或讲底层基础的第 23 课（OTel）。
