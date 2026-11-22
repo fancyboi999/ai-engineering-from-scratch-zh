@@ -1198,6 +1198,27 @@ function safeRepoDirectory(relPath, baseDir) {
   return stat.isDirectory() && !stat.isSymbolicLink() ? candidate : null;
 }
 
+// 课程 code/ 与 outputs/ 的顶层清单，形状与 GitHub contents API 一致
+// （name/path/size/type），预渲染页据此渲染文件面板，不再逐课请求 GitHub API。
+// 本地运行代码留下的缓存与隐藏文件不进清单，保证构建结果只取决于仓库内容。
+function lessonDirectoryEntries(lessonRelPath, folderName) {
+  const folderPath = safeRepoDirectory(path.join(lessonRelPath, folderName), REPO_ROOT);
+  if (!folderPath) return [];
+  return fs.readdirSync(folderPath, { withFileTypes: true })
+    .filter(entry => !entry.name.startsWith('.') && entry.name !== '__pycache__' && !entry.name.endsWith('.pyc'))
+    .filter(entry => entry.isFile() || entry.isDirectory())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(entry => {
+      const isDir = entry.isDirectory();
+      return {
+        name: entry.name,
+        path: `${lessonRelPath}/${folderName}/${entry.name}`,
+        size: isDir ? 0 : fs.statSync(path.join(folderPath, entry.name)).size,
+        type: isDir ? 'dir' : 'file',
+      };
+    });
+}
+
 function certificationDocMeta(markdown, fallbackName) {
   const result = {
     name: fallbackName || '',
@@ -2625,7 +2646,14 @@ function writeLessonPages(phases, lessonManifest) {
         }) + '<!-- AIFS:LESSON-HUBS:END -->');
     }
     // 注入预渲染标记：boot 据此跳过运行时 fetch，直接走 enhanceLesson + fetchQuiz
-    const prerenderedPayload = { path: f.rel, quiz };
+    const prerenderedPayload = {
+      path: f.rel,
+      quiz,
+      files: {
+        code: lessonDirectoryEntries(f.rel, 'code'),
+        outputs: lessonDirectoryEntries(f.rel, 'outputs'),
+      },
+    };
     page = page.replace(
       SCRIPT_ANCHOR,
       '  <script>window.__PRERENDERED__ = ' + JSON.stringify(prerenderedPayload).replace(/</g, '\\u003c') + ';</script>\n' + SCRIPT_ANCHOR
@@ -3031,6 +3059,7 @@ module.exports = {
   canonicalCertificationUrl,
   canonicalLessonUrl,
   githubSourceUrl,
+  lessonDirectoryEntries,
   lessonDocumentSeo,
   parseReadme,
   parseRoadmap,

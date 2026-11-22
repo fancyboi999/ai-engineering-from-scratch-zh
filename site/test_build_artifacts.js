@@ -16,6 +16,7 @@ const {
   discoverFigureProviderOrder,
   discoverUsedFigureIds,
   discoverArtifacts,
+  lessonDirectoryEntries,
   lessonDocumentSeo,
   parseLearningPaths,
   parseCertifications,
@@ -2746,4 +2747,47 @@ test('lesson drop cap is driven only by the renderer-marked paragraph, never by 
   const css = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
   assert.doesNotMatch(css, /p:first-of-type::first-letter/);
   assert.match(css, /\.lesson-article \.drop-cap::first-letter \{/);
+});
+
+function loadRepoRootCommand() {
+  const html = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  const match = html.match(/function repoRootCommand\(filename, path\) \{[\s\S]*?\n      \}\n/);
+  assert.ok(match, 'repoRootCommand must stay extractable');
+  const context = {};
+  vm.runInNewContext(match[0] + 'this.repoRootCommand = repoRootCommand;', context);
+  return context.repoRootCommand;
+}
+
+test('lesson run commands compile Rust as edition 2021 and run Go with go run', () => {
+  const repoRootCommand = loadRepoRootCommand();
+  const rs = 'phases/13-tools-and-protocols/32-program-anatomy-elf-from-scratch/code/main.rs';
+  assert.equal(
+    repoRootCommand('main.rs', rs),
+    'rustc --edition 2021 ' + rs + ' -o /tmp/aieng-zh-lesson-main && /tmp/aieng-zh-lesson-main'
+  );
+  const go = 'phases/13-tools-and-protocols/07-building-an-mcp-server/code/main.go';
+  assert.equal(repoRootCommand('main.go', go), 'go run ' + go);
+  assert.equal(repoRootCommand('main.py', 'phases/x/y/code/main.py'), 'python3 phases/x/y/code/main.py');
+});
+
+test('prerendered lessons carry their code and outputs listings so file panels skip the GitHub API', () => {
+  const lesson = 'phases/13-tools-and-protocols/07-building-an-mcp-server';
+  const code = lessonDirectoryEntries(lesson, 'code');
+  assert.deepEqual(code.map(entry => [entry.name, entry.type]), [
+    ['main.go', 'file'], ['main.py', 'file'], ['main.ts', 'file'], ['tests', 'dir'],
+  ]);
+  for (const entry of code) {
+    assert.equal(entry.path, lesson + '/code/' + entry.name);
+    if (entry.type === 'file') assert.ok(entry.size > 0);
+  }
+  assert.deepEqual(lessonDirectoryEntries(lesson, 'outputs').map(entry => entry.name), ['skill-mcp-server-scaffolder.md']);
+  assert.deepEqual(lessonDirectoryEntries(lesson, 'missing-folder'), []);
+  assert.deepEqual(lessonDirectoryEntries('phases/../..', 'code'), []);
+
+  const build = fs.readFileSync(path.join(__dirname, 'build.js'), 'utf8');
+  assert.match(build, /files: \{\s*code: lessonDirectoryEntries\(f\.rel, 'code'\),\s*outputs: lessonDirectoryEntries\(f\.rel, 'outputs'\),/);
+  const html = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  const fetcher = html.match(/function repositoryDirectoryFetch\(apiPath, cb\) \{[\s\S]*?\n      \}\n/)[0];
+  assert.ok(fetcher.indexOf('prerendered.files') < fetcher.indexOf('githubDirectoryFetch'), 'build-time listing must win over the GitHub API');
+  assert.match(html, /if \(file\.type === 'dir'\) \{[\s\S]*?打开目录[\s\S]*?return;/);
 });

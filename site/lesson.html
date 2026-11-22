@@ -2009,6 +2009,11 @@
       gap: 8px;
     }
 
+    .code-card--dir .code-card-actions {
+      grid-row: 3;
+      align-self: end;
+    }
+
     .output-cards:not(.single) .output-card:last-child:nth-child(odd),
     .code-cards:not(.single) .code-card:last-child:nth-child(odd) {
       grid-column: 1 / -1;
@@ -5263,6 +5268,18 @@
           return;
         }
 
+        // 预渲染页自带构建时清单：不依赖 GitHub API（未登录每 IP 每小时 60 次），
+        // 同一网络下的学员连续阅读也不会让文件面板失效。
+        var prerenderedFiles = prerendered && prerendered.files;
+        if (prerenderedFiles) {
+          var folder = apiPath === lessonPath + '/code' ? 'code' : apiPath === lessonPath + '/outputs' ? 'outputs' : '';
+          if (folder && Array.isArray(prerenderedFiles[folder])) {
+            repositoryDirectoryCache[apiPath] = prerenderedFiles[folder];
+            cb(null, prerenderedFiles[folder]);
+            return;
+          }
+        }
+
         var source = window.AIFSContentSource;
         var request = source && typeof source.isLocal === 'function' && source.isLocal() && typeof source.localDirectoryFiles === 'function'
           ? source.localDirectoryFiles(apiPath).catch(function () { return githubDirectoryFetch(apiPath); })
@@ -5314,7 +5331,7 @@
 
       function langIcon(filename) {
         var ext = filename.split('.').pop().toLowerCase();
-        var map = { py: 'PY', python: 'PY', ts: 'TS', js: 'JS', rust: 'RS', rs: 'RS', jl: 'JL', julia: 'JL', sh: 'SH', bash: 'SH' };
+        var map = { py: 'PY', python: 'PY', ts: 'TS', js: 'JS', rust: 'RS', rs: 'RS', go: 'GO', jl: 'JL', julia: 'JL', sh: 'SH', bash: 'SH' };
         return map[ext] || '··';
       }
 
@@ -5327,7 +5344,9 @@
         if (ext === 'py') return 'python3 ' + pathArg;
         if (ext === 'ts') return 'npx tsx ' + pathArg;
         if (ext === 'js') return 'node ' + pathArg;
-        if (ext === 'rs') return 'rustc ' + pathArg + ' -o /tmp/aieng-zh-lesson-main && /tmp/aieng-zh-lesson-main';
+        // 课程 Rust 代码按 2021 edition 编写（TryInto 等在 2015 默认 edition 下不在 prelude 中）。
+        if (ext === 'rs') return 'rustc --edition 2021 ' + pathArg + ' -o /tmp/aieng-zh-lesson-main && /tmp/aieng-zh-lesson-main';
+        if (ext === 'go') return 'go run ' + pathArg;
         if (ext === 'jl') return 'julia ' + pathArg;
         if (ext === 'sh') return 'bash ' + pathArg;
         return 'test -e ' + pathArg;
@@ -5516,8 +5535,18 @@
 
         var html = '<div class="code-cards' + (data.length === 1 ? ' single' : '') + '">';
         data.forEach(function (file) {
-          var icon = langIcon(file.name);
           var filePath = file.path || (lessonPath + '/code/' + file.name);
+          if (file.type === 'dir') {
+            // 目录（tests/、fixtures/ 等）只提供浏览入口，不伪造运行命令和 0 B 大小。
+            html += '<div class="code-card code-card--dir">';
+            html += '<div class="code-card-header"><span class="code-lang-icon">/</span><span class="code-card-name">' + escapeHtml(file.name) + '/</span><span class="code-card-size">目录</span></div>';
+            html += '<div class="code-card-actions">';
+            html += '<a class="code-card-btn" href="' + escapeAttr(lessonFileViewUrl(file)) + '" target="_blank" rel="noopener">打开目录</a>';
+            html += '</div>';
+            html += '</div>';
+            return;
+          }
+          var icon = langIcon(file.name);
           var runCmd = repoRootCommand(file.name, filePath);
           html += '<div class="code-card">';
           html += '<div class="code-card-header"><span class="code-lang-icon">' + icon + '</span><span class="code-card-name">' + escapeHtml(file.name) + '</span><span class="code-card-size">' + formatSize(Number(file.size || 0)) + '</span></div>';
