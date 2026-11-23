@@ -1,6 +1,6 @@
 ---
 name: mcp-server-scaffolder
-description: Design a stateless MCP 2026-07-28 server with discovery, request validation, and deterministic primitives.
+description: 设计符合 MCP 2026-07-28 的无状态 server，包含能力发现、请求校验和确定性原语。
 version: 2.0.0
 phase: 13
 lesson: 07

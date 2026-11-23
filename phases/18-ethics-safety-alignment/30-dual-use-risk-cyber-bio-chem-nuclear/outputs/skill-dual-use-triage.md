@@ -1,29 +1,29 @@
 ---
 name: dual-use-triage
-description: Triage a capability claim or incident report across the four CBRN domains.
+description: 按 CBRN 四个领域对能力结论或事件报告做分诊。
 version: 1.0.0
 phase: 18
 lesson: 30
 tags: [dual-use, cbrn, bio, chem, cyber, nuclear, uplift]
 ---
 
-Given a capability claim, evaluation report, or incident, triage across the four CBRN domains and identify whether the claim affects novice-relative uplift, expert-absolute capability, or both.
+给定一项能力结论、评估报告或事件，按 CBRN 四个领域分诊，并判断它影响的是对新手的相对增益、专家层面的绝对能力，还是两者都有。
 
-Produce:
+输出以下内容：
 
-1. Domain identification. Map the claim to bio, chem, cyber, or nuclear. Multi-domain claims get multi-domain triage.
-2. Uplift type. Novice-relative (multiplicative), expert-absolute (ceiling), or both. Each has different safety-case implications.
-3. 2025 benchmark. Compare against the 2025 state for the identified domain: bio (2.53x), chem (execution-gap erosion), cyber (80-90% automation), nuclear (material-bounded).
-4. Bottleneck residual. Identify what non-informational bottleneck remains (procurement, equipment, tacit skill, material access). Bottlenecks are the defense of last resort.
-5. Safety-case pillar. Identify which of the three pillars (monitoring, illegibility, incapability, per Lesson 18) the claim most stresses. Recommend pillar-specific evaluation.
+1. 领域识别。把结论归到生物、化学、网络或核领域。跨领域的结论按多个领域分别分诊。
+2. 增益类型。对新手的相对增益（倍增型）、专家的绝对能力（上限型），或两者兼有。每种对安全论证的含义不同。
+3. 2025 基准。对照该领域 2025 年的现状：生物（2.53x）、化学（执行门槛逐步降低）、网络（80-90% 自动化）、核（受材料限制）。
+4. 剩余瓶颈。找出仍然存在的非信息类瓶颈（采购、设备、隐性技能、材料获取）。这些瓶颈是最后一道防线。
+5. 安全论证支柱。判断结论对三大支柱（监控、不可读性、能力不足，见第 18 课）中的哪一个压力最大。推荐针对该支柱的评估。
 
-Hard rejects:
-- Any dual-use safety claim without novice-vs-expert decomposition.
-- Any cyber claim post-November 2025 that treats AI cyber capability as non-agentic.
-- Any bio claim without WMDP-equivalent capability evidence (Lesson 17).
+直接否决：
+- 两用安全结论没有区分新手和专家。
+- 2025 年 11 月之后的网络领域结论，仍把 AI 的网络能力当成非 agent 式的。
+- 生物领域结论没有 WMDP 同等的能力证据（第 17 课）。
 
-Refusal rules:
-- If the user asks for a numeric uplift forecast, refuse; the 2024-2025 trajectory is specific to each domain.
-- If the user asks whether a model "meets ASL-3," refuse without the lab's specific evaluation; thresholds are lab-specific.
+拒绝规则：
+- 如果用户要一个增益的数值预测，拒绝：2024-2025 年的发展轨迹因领域而异。
+- 如果用户问模型是否"达到 ASL-3"，在没有该实验室具体评估的情况下拒绝回答：阈值因实验室而异。
 
-Output: a one-page triage filling the five sections, benchmarking against 2025, and naming the single largest uncovered safety-case gap. Cite Anthropic RSP v3.0 (Lesson 18) and OpenAI PF v2 once each as appropriate.
+输出：一页分诊报告，填完五部分，对照 2025 年基准，并点名最大的一个未覆盖的安全论证缺口。视情况各引用一次 Anthropic RSP v3.0（第 18 课）和 OpenAI PF v2。

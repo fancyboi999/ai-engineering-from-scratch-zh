@@ -1,40 +1,40 @@
 ---
 name: browser-agent-trust-boundary
-description: Scope a proposed browser-agent deployment — trust zones, authorized writes, required defenses — before the agent touches a real site.
+description: 在浏览器 agent 接触真实网站之前，为拟议部署划定范围：信任区、获准的写操作和必需的防御。
 version: 1.0.0
 phase: 15
 lesson: 11
 tags: [browser-agents, prompt-injection, trust-boundary, osworld, webarena]
 ---
 
-Given a proposed browser-agent workflow, produce a trust-boundary scoping document that enumerates every read, every write, and the minimum defense stack required for first run.
+给定一个拟议的浏览器 agent 工作流，产出一份信任边界范围文档，逐项列出每个读操作、每个写操作，以及首次运行所需的最小防御栈。
 
-Produce:
+产出：
 
-1. **Read surface.** List every origin the agent will fetch. Classify each as in-trust (first-party sites operated by the user's organization) or out-of-trust (any third-party, any user-generated content, any search result). All out-of-trust reads must be treated as potential prompt-injection channels.
-2. **Write surface.** List every consequential action the agent is authorized to take (submit form, post content, call a backend tool, write to memory). For each, state the blast radius and whether the action is reversible.
-3. **Required defenses.** Minimum stack: content sanitizer, read/write boundary (writes require fresh approval when content_origin is out-of-trust), tool allowlist per task, session isolation with scoped credentials, canary tokens on persistent memory, HITL on irreversible actions.
-4. **Benchmark-to-distribution fit.** If the agent reports a BrowseComp, OSWorld, or WebArena-Verified score, name the distribution overlap between the benchmark and the real task. A high BrowseComp score does not predict booking-flow reliability.
-5. **Known-attack checklist.** Confirm the deployment is hardened against (a) visible-text injection, (b) URL-fragment / query injection, (c) memory-binding attacks (Tainted Memories class), (d) CSRF-shaped attacks on authenticated sessions, (e) one-click hijacks. For each, name the specific defense and where it fires.
+1. **读取面。** 列出 agent 会访问的每个源。把每个源归为可信（用户所在组织运营的第一方网站）或不可信（任何第三方、任何用户生成内容、任何搜索结果）。所有不可信读取都必须视为潜在的 prompt 注入通道。
+2. **写入面。** 列出 agent 获准执行的每个有后果的动作（提交表单、发布内容、调用后端工具、写入记忆）。对每个动作说明爆炸半径，以及能否撤销。
+3. **必需的防御。** 最小防御栈：内容清洗器；读写边界（content_origin 为不可信时，写操作需要重新审批）；按任务设定的工具白名单；使用限定范围凭证的会话隔离；持久记忆上的 canary token；不可逆操作上的 HITL。
+4. **基准测试与真实分布的匹配度。** 如果 agent 报告了 BrowseComp、OSWorld 或 WebArena-Verified 分数，说明该基准测试与真实任务在分布上的重合部分。BrowseComp 分数高，并不能预测预订流程的可靠性。
+5. **已知攻击清单。** 确认部署已针对以下攻击加固：(a) 可见文本注入，(b) URL 片段 / 查询参数注入，(c) 记忆绑定攻击（Tainted Memories 类），(d) 针对已认证会话的 CSRF 式攻击，(e) 一键劫持。对每一项写明具体防御措施及其触发位置。
 
-Hard rejects:
-- Browser agents with access to production credentials and no session isolation.
-- Any deployment where a write initiated from out-of-trust content does not require fresh HITL approval.
-- Any deployment relying solely on a content sanitizer (sanitizers catch easy attacks; sophisticated payloads pass).
-- Persistent memory with no canary entries.
-- Workflows that touch financial transactions or customer data with no HITL on writes.
+直接否决：
+- 能访问生产凭证却没有会话隔离的浏览器 agent。
+- 由不可信内容发起的写操作不需要重新经过 HITL 审批的任何部署。
+- 只依赖内容清洗器的任何部署（清洗器能拦住简单攻击，精心构造的载荷照样能过）。
+- 没有 canary 条目的持久记忆。
+- 涉及金融交易或客户数据、写操作上却没有 HITL 的工作流。
 
-Refusal rules:
-- If the user cannot name the blast radius of an injection-driven wrong write, refuse and require an explicit sentence.
-- If the user proposes a browser agent on a stack where scoped credentials are not available, refuse and require a separate identity first.
-- If the user cites a benchmark score (BrowseComp, OSWorld, WebArena) as evidence the agent "can" do a production task, refuse and require internal evals on the real distribution.
+拒绝规则：
+- 用户说不出一次由注入导致的错误写入会有多大爆炸半径时，拒绝，要求写出一句明确说明。
+- 用户在无法使用限定范围凭证的技术栈上部署浏览器 agent 时，拒绝，要求先配置独立身份。
+- 用户拿基准测试分数（BrowseComp、OSWorld、WebArena）证明 agent "能"完成生产任务时，拒绝，要求在真实分布上做内部评测。
 
-Output format:
+输出格式：
 
-Return a trust-boundary memo with:
-- **Read surface table** (origin, in-trust / out-of-trust)
-- **Write surface table** (action, blast radius, reversible y/n)
-- **Defense stack** (bulleted list of configured layers)
-- **Benchmark-fit note** (if applicable)
-- **Known-attack checklist** (five rows, defense named per row)
-- **Deployment verdict** (production / staging / research-only)
+返回一份信任边界备忘录，包含：
+- **读取面表格**（源、可信 / 不可信）
+- **写入面表格**（动作、爆炸半径、可撤销 y/n）
+- **防御栈**（已配置防御层的列表）
+- **基准测试匹配说明**（如适用）
+- **已知攻击清单**（五行，每行写明防御措施）
+- **部署结论**（production / staging / research-only）

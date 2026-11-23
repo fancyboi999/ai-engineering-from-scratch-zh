@@ -7,48 +7,48 @@ lesson: 15
 tags: [edge, deployment, profiling, benchmarking]
 ---
 
-# Latency Profiler
+# 延迟分析器
 
-Produce a disciplined latency benchmark for any PyTorch model. Reports that anyone downstream can actually trust.
+为任意 PyTorch 模型做一次严谨的延迟基准测试。产出的报告，下游任何人都能真正信得过。
 
-## When to use
+## 何时使用
 
-- Comparing multiple candidate backbones before picking one to deploy.
-- Before and after quantisation or pruning.
-- After a runtime change (eager vs ONNX vs TensorRT).
-- Generating a deployment-readiness report.
+- 部署前比较多个候选骨干网络。
+- 量化或剪枝的前后对比。
+- 更换运行时之后（eager、ONNX、TensorRT）。
+- 生成部署就绪报告。
 
-## Inputs
+## 输入
 
-- `model`: PyTorch `nn.Module`.
-- `input_shape`: tuple like `(1, 3, 224, 224)`.
-- `device`: `cpu` | `cuda` | `mps`.
-- `warmup`: default 10.
-- `iters`: default 100.
+- `model`：PyTorch `nn.Module`。
+- `input_shape`：形如 `(1, 3, 224, 224)` 的元组。
+- `device`：`cpu` | `cuda` | `mps`。
+- `warmup`：默认 10。
+- `iters`：默认 100。
 
-## Checks
+## 检查项
 
-### 1. Warmup
-Run the model `warmup` times without timing. Catches first-forward JIT compilation and cold cache effects.
+### 1. 预热
+先不计时运行模型 `warmup` 次。这样可以排除首次前向传播的 JIT 编译和冷缓存影响。
 
-### 2. Synchronisation
-For `cuda`, call `torch.cuda.synchronize()` before and after each timed forward pass.
-For `mps`, call `torch.mps.synchronize()`.
+### 2. 同步
+对 `cuda`，在每次计时的前向传播前后调用 `torch.cuda.synchronize()`。
+对 `mps`，调用 `torch.mps.synchronize()`。
 
-### 3. Timer
-Use `time.perf_counter()` for wall-clock measurement. Convert to milliseconds.
+### 3. 计时器
+用 `time.perf_counter()` 测量挂钟时间，换算成毫秒。
 
-### 4. Percentiles
-Sort the full list of timings. Report `p50, p90, p95, p99, mean, std`.
+### 4. 百分位
+对全部计时结果排序。报告 `p50, p90, p95, p99, mean, std`。
 
-### 5. Memory
-For `cuda`, call `torch.cuda.max_memory_allocated()` after the run and subtract any baseline.
-For `cpu`, use `tracemalloc` or `psutil.Process().memory_info().rss` before and after.
+### 5. 内存
+对 `cuda`，运行结束后调用 `torch.cuda.max_memory_allocated()`，并减去基线。
+对 `cpu`，在运行前后使用 `tracemalloc` 或 `psutil.Process().memory_info().rss`。
 
-### 6. Batch-size sweep
-Optionally repeat the benchmark for `batch_size in [1, 4, 16, 32]` to reveal throughput vs latency tradeoffs.
+### 6. Batch size 扫描
+可选：对 `batch_size in [1, 4, 16, 32]` 重复基准测试，揭示吞吐量与延迟之间的取舍。
 
-## Output template
+## 输出模板
 
 ```python
 import time
@@ -106,10 +106,10 @@ def profile(model, input_shape, device="cpu", warmup=10, iters=100):
     return report
 ```
 
-## Rules
+## 规则
 
-- Always run warmup; never trust a first-forward timing.
-- Percentiles, not mean — a single outlier can double the mean but barely move p50.
-- Use the same input_shape as production; latency on 224x224 is not latency on 384x384.
-- For CUDA, never omit `torch.cuda.synchronize()`; the numbers are meaningless without it.
-- Log the torch version, CUDA version, and device name alongside the numbers — they stop being comparable otherwise.
+- 一律先预热；绝不相信首次前向传播的计时。
+- 看百分位，不看均值：一个离群值就能让均值翻倍，p50 却几乎不动。
+- 用和生产环境相同的 input_shape；224x224 上的延迟不等于 384x384 上的延迟。
+- 对 CUDA，绝不能省略 `torch.cuda.synchronize()`；没有它，数字毫无意义。
+- 把 torch 版本、CUDA 版本和设备名称与数字一起记录下来；否则这些数字就没法比较。

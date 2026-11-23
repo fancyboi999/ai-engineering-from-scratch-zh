@@ -1,30 +1,30 @@
 ---
 name: nsa-integrator
-description: Integration plan for Native Sparse Attention in a long-context pre-training run.
+description: 在长上下文预训练任务中引入 Native Sparse Attention 的集成方案。
 version: 1.0.0
 phase: 10
 lesson: 17
 tags: [nsa, sparse-attention, long-context, pre-training, kernel-aligned, deepseek]
 ---
 
-Given a long-context pre-training run specification (target context, base architecture, training tokens available, GPU topology, deployment target), produce an NSA integration plan.
+用户会给你一份长上下文预训练任务规格（目标上下文、基础架构、可用训练 token 数、GPU 拓扑、部署目标）。你需要输出 NSA 集成方案。
 
-Produce:
+输出：
 
-1. Compression block size `l`. Pick 32, 64, or 128. Justify against target context: `l = 32` for 16k-32k, `l = 64` for 64k-128k, `l = 128` for 256k-plus. Larger `l` means fewer compressed keys but coarser routing signal.
-2. Top-k selection count. Pick between 8 and 32. The paper's default is 16. Justify against the target task mix: reasoning-heavy tasks (math, code) benefit from higher `k` because selection precision matters more. Retrieval-heavy tasks work at lower `k`.
-3. Sliding window `W`. Pick 256, 512, or 1024. Default 512. Shorter for heavily structured content (code) where local context is enough; longer for prose.
-4. Gate MLP. Specify width and initialization. Default: linear layer from `hidden` to 3, with `sigmoid` or `softplus` activation. Warn if gate weights collapse to favor one branch — this indicates `l`, `k`, or `W` is mistuned.
-5. Kernel choice. Confirm Triton or CUDA kernel availability for the target accelerator. Reject fallback to dense attention at inference (the whole point of NSA is to save decode compute). If only forward kernels exist and not backward, refuse pre-training and recommend continued training on existing dense checkpoints.
+1. 压缩块大小 `l`。从 32、64 或 128 中选。结合目标上下文论证：16k-32k 用 `l = 32`，64k-128k 用 `l = 64`，256k 以上用 `l = 128`。`l` 越大，压缩后的 key 越少，但路由信号越粗。
+2. Top-k 选择数量。在 8 到 32 之间选。论文默认值是 16。结合目标任务构成论证：推理密集型任务（数学、代码）对选择精度要求更高，`k` 取大一些更好；检索密集型任务用较小的 `k` 就够了。
+3. 滑动窗口 `W`。从 256、512 或 1024 中选。默认 512。结构性很强、局部上下文就够用的内容（代码）取短一些；散文取长一些。
+4. 门控 MLP。给出宽度和初始化方式。默认：从 `hidden` 到 3 的线性层，配 `sigmoid` 或 `softplus` 激活。如果门控权重坍缩到只偏向某一个分支，要发出警告：这说明 `l`、`k` 或 `W` 没调好。
+5. Kernel 选择。确认目标加速器上有 Triton 或 CUDA kernel 可用。否决推理时回退到稠密注意力（NSA 的意义就在于节省 decode 计算）。如果只有前向 kernel、没有反向 kernel，拒绝做预训练，建议在现有稠密 checkpoint 上继续训练。
 
-Hard rejects:
-- NSA on a model pre-trained with dense attention without continued pre-training. Cannot be bolted on at inference.
-- Target context under 16k. The three-branch overhead dominates.
-- Inference-only deployments on stacks without NSA kernel support. Recommend MLA or sliding-window attention instead.
+直接否决：
+- 在用稠密注意力预训练的模型上不做继续预训练就用 NSA。它没法在推理时临时加装。
+- 目标上下文低于 16k。三分支的开销会占主导。
+- 在不支持 NSA kernel 的技术栈上做纯推理部署。改为推荐 MLA 或滑动窗口注意力。
 
-Refusal rules:
-- If long-context evaluation data (RULER, LongBench, needle-in-haystack) is not available, refuse and request calibration data first.
-- If the training-data context distribution is dominated by short sequences, refuse and recommend data reweighting before integrating NSA.
-- If the accelerator is older than A100, refuse — NSA's kernel advantages assume H100/H200/MI300 memory hierarchies.
+拒绝规则：
+- 没有长上下文评估数据（RULER、LongBench、needle-in-haystack）时，拒绝，并要求先提供校准数据。
+- 训练数据的上下文长度分布以短序列为主时，拒绝，建议先对数据重新加权，再集成 NSA。
+- 加速器比 A100 更老时，拒绝：NSA 的 kernel 优势以 H100/H200/MI300 的内存层级为前提。
 
-Output: a one-page integration plan listing `l`, `k`, `W`, gate config, kernel path, and expected compute savings at target context. End with a "success criterion" paragraph: the specific RULER or LongBench number (percentage points vs a matched dense-attention baseline) that justifies keeping NSA. Include a rollback trigger — the metric threshold below which the architecture should be reverted to MLA or dense GQA.
+输出：一页集成方案，列出 `l`、`k`、`W`、门控配置、kernel 路径，以及目标上下文下的预期计算节省。结尾用一段“成功标准”：写明足以证明应保留 NSA 的具体 RULER 或 LongBench 数值（相对匹配的稠密注意力基线的百分点差值）。附上回滚触发条件：指标低于哪个阈值时，架构应回退到 MLA 或稠密 GQA。

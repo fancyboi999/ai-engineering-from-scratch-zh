@@ -1,6 +1,6 @@
 ---
 name: mcp-client-harness
-description: Scaffold a multi-server MCP client with modern metadata, safe era negotiation, deterministic merge, and routing.
+description: 搭建多 server 的 MCP client，支持现代元数据、安全的协议时代协商、确定性合并与路由。
 version: 2.1.0
 phase: 13
 lesson: 08

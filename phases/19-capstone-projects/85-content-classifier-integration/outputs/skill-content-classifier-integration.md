@@ -1,17 +1,17 @@
 ---
 name: skill-content-classifier-integration
-description: Three output-side classifiers (toxicity, PII, instruction-leakage) behind a single severity router with block, redact, warn, log actions
+description: 三个输出端分类器（毒性、PII、指令泄漏）接在同一个严重度路由器后面，动作分为 block、redact、warn、log
 version: 1.0.0
 phase: 19
 lesson: 85
 tags: [safety, classifier, output-filter]
 ---
 
-# Content Classifier Integration
+# 内容分类器集成
 
-Three classifiers, one router, four actions.
+三个分类器，一个路由器，四种动作。
 
-## Verdict structure
+## 判定结构
 
 ```text
 ClassifierVerdict
@@ -21,21 +21,21 @@ ClassifierVerdict
   findings: list[str]
 ```
 
-## Action table
+## 动作表
 
-| Severity | Action | Effect |
+| 严重度 | 动作 | 效果 |
 |---|---|---|
-| high | block | output replaced by a policy refusal |
-| medium | redact | per-classifier redactors applied in order |
-| low | warn | output shipped with a soft notice appended |
-| none | log | output shipped unchanged, verdict logged |
+| high | block | 输出替换为策略性拒绝 |
+| medium | redact | 按顺序应用各分类器的脱敏器 |
+| low | warn | 输出照常发出，末尾附一条温和提示 |
+| none | log | 输出原样发出，记录判定结果 |
 
-## Per-classifier behavior
+## 各分类器行为
 
-- toxicity - harassment terms with whitespace boundary and a small left-window negation check; redacts to `[redacted-language]`
-- pii - email, phone, SSN, Luhn-validated card, IPv4; severity escalates for SSN and card; redacts each shape to a tag
-- instruction-leakage - trigram cosine vs a known system prompt; severity scales with overlap; redacts the first system-prompt line
+- toxicity - 骚扰类词汇，按空白边界匹配，并在左侧小窗口内做否定检查；脱敏为 `[redacted-language]`
+- pii - 邮箱、电话、SSN、通过 Luhn 校验的卡号、IPv4；SSN 和卡号的严重度会升级；每种形态都脱敏为一个标签
+- instruction-leakage - 与已知 system prompt 计算三元组余弦相似度；严重度随重合度上升；脱敏 system prompt 的第一行
 
-## Artifact
+## 产物
 
-`outputs/classifier_report.json` carries action verb, severity, redacted output, and full verdict list per case.
+`outputs/classifier_report.json` 记录每个用例的动作、严重度、脱敏后的输出和完整的判定列表。

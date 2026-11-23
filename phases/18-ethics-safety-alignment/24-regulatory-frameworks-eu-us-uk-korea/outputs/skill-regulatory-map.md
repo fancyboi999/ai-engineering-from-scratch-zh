@@ -1,29 +1,29 @@
 ---
 name: regulatory-map
-description: Map a deployment's AI regulatory obligations across EU, US, UK, Korea.
+description: 梳理一项部署在欧盟、美国、英国、韩国承担的 AI 监管义务。
 version: 1.0.0
 phase: 18
 lesson: 24
 tags: [eu-ai-act, gpai-code, caisi, uk-aisi, korean-framework-act]
 ---
 
-Given a deployment description (provider jurisdiction, infrastructure jurisdiction, user jurisdiction), map the applicable AI regulatory obligations.
+给定一份部署描述（提供方所在司法辖区、基础设施所在司法辖区、用户所在司法辖区），梳理适用的 AI 监管义务。
 
-Produce:
+输出以下内容：
 
-1. EU exposure. If the deployment touches EU users or infrastructure, apply the EU AI Act. Identify risk tier (prohibited, high-risk, GPAI-systemic, GPAI-other, limited). State the deadline for each obligation class.
-2. UK exposure. If UK users, state the UK AI Security Institute evaluation expectations. The UK does not have a comprehensive AI regulation (2026); sectoral rules apply.
-3. US exposure. If US users, identify federal activity (CAISI, NIST standards) and state-level rules (California AB 2013, Colorado AI Act, etc.). Federal framework is pro-growth; state rules set the floor.
-4. Korea exposure. If Korean users, apply the Korean AI Framework Act; identify whether the deployment is high-impact AI or generative AI; flag local-representative requirement for foreign providers.
-5. Binding-rule determination. For each substantive obligation (transparency, risk assessment, copyright), identify the strictest rule across jurisdictions. That is the binding rule.
+1. 欧盟敞口。如果部署涉及欧盟用户或基础设施，适用 EU AI Act。确定风险等级（禁止、高风险、具系统性风险的 GPAI、其他 GPAI、有限风险）。写明每类义务的截止日期。
+2. 英国敞口。如果有英国用户，说明 UK AI Security Institute 的评估预期。英国目前（2026）没有综合性 AI 法规，适用的是各行业规则。
+3. 美国敞口。如果有美国用户，找出联邦层面的动向（CAISI、NIST 标准）和州层面的规则（California AB 2013、Colorado AI Act 等）。联邦框架偏向促进增长；州规则划定底线。
+4. 韩国敞口。如果有韩国用户，适用韩国 AI 基本法（Korean AI Framework Act）；判断部署属于高影响 AI 还是生成式 AI；标出对境外提供方的本地代表要求。
+5. 约束性规则判定。对每项实质义务（透明度、风险评估、版权），找出各司法辖区中最严格的规则。那条就是约束性规则。
 
-Hard rejects:
-- Any deployment map without naming the applicable jurisdictions.
-- Any EU exposure assessment without risk-tier identification.
-- Any US exposure assessment that ignores state-level rules.
+直接否决：
+- 部署梳理没有写明适用的司法辖区。
+- 欧盟敞口评估没有确定风险等级。
+- 美国敞口评估忽略州层面的规则。
 
-Refusal rules:
-- If the user asks "is this deployment compliant," refuse the binary claim without jurisdiction-by-jurisdiction mapping.
-- If the user asks for a single global compliance strategy, refuse — the jurisdictions have different requirements.
+拒绝规则：
+- 如果用户问"这项部署合规吗"，在没有逐个司法辖区梳理之前，拒绝给出是或否的答案。
+- 如果用户要一套全球统一的合规策略，拒绝：各司法辖区的要求不同。
 
-Output: a one-page map filling the five sections above, identifying the binding rule on each substantive question, and naming the highest-risk compliance gap. Cite EU AI Act (Regulation 2024/1689), GPAI Code of Practice (2025), and Korean AI Framework Act once each.
+输出：一页梳理，填完上面五部分，给出每个实质问题上的约束性规则，并点名风险最高的合规缺口。EU AI Act（Regulation 2024/1689）、GPAI Code of Practice（2025）和 Korean AI Framework Act 各引用一次。

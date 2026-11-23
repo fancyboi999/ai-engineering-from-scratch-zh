@@ -1,45 +1,45 @@
 ---
 name: doc-qa
-description: Build a vision-first multimodal document QA system on 10k pages with late-interaction retrieval and evidence-region citations.
+description: 在 1 万页文档上构建视觉优先的多模态文档问答系统，采用延迟交互检索，并引用证据区域。
 version: 1.0.0
 phase: 19
 lesson: 04
 tags: [capstone, multimodal, rag, colpali, colqwen, late-interaction, pdf]
 ---
 
-Given a corpus of PDFs (10-Ks, scientific papers, scanned documents), build a pipeline that indexes pages as images using ColPali-style late interaction and answers questions with page-level evidence regions.
+给定一个 PDF 语料库（10-K 年报、科研论文、扫描文档），构建一条流水线：用 ColPali 式的延迟交互把页面当作图像建立索引，回答问题时给出页面级的证据区域。
 
-Build plan:
+构建计划：
 
-1. Render every PDF page to a 1536x2048 PNG with PyMuPDF at 180 DPI.
-2. Embed every page with ColQwen2.5-v0.2 or ColQwen3-omni. Store multi-vector patch embeddings in Vespa, Qdrant multi-vector, or AstraDB.
-3. Apply DocPruner-style 50% patch pruning. Verify accuracy drop stays under 0.5% on ViDoRe v3.
-4. At query time: embed query tokens; compute MaxSim against every page's patches; rank top-k.
-5. Synthesize with Qwen3-VL-30B or Gemini 2.5 Pro passing the query plus top-5 page images. Require cited `(doc_id, page, region)` anchors.
-6. For equation- or table-heavy pages, run Nougat or dots.ocr as an optional text channel and feed it alongside the image.
-7. Build a Next.js 15 viewer that overlays evidence regions as bounding boxes on the source page.
-8. Evaluate on ViDoRe v3 and M3DocVQA. Produce a content-class × approach matrix comparing vision-first vs OCR-then-text on plain text, tables, charts, handwriting, and equations.
+1. 用 PyMuPDF 以 180 DPI 把每页 PDF 渲染成 1536x2048 的 PNG。
+2. 用 ColQwen2.5-v0.2 或 ColQwen3-omni 为每页生成嵌入。把多向量的 patch 嵌入存进 Vespa、Qdrant multi-vector 或 AstraDB。
+3. 采用 DocPruner 式的 50% patch 剪枝。确认在 ViDoRe v3 上的准确率下降不超过 0.5%。
+4. 查询时：为查询 token 生成嵌入；对每一页的 patch 计算 MaxSim；取 top-k 排序。
+5. 用 Qwen3-VL-30B 或 Gemini 2.5 Pro 合成答案，输入为查询加上 top-5 页图像。强制要求引用 `(doc_id, page, region)` 锚点。
+6. 对公式或表格密集的页面，可选地运行 Nougat 或 dots.ocr 作为文本通道，与图像一起输入。
+7. 用 Next.js 15 构建一个查看器，把证据区域以边界框形式叠加在原始页面上。
+8. 在 ViDoRe v3 和 M3DocVQA 上评估。产出一张"内容类别 × 方法"矩阵，在纯文本、表格、图表、手写和公式上对比视觉优先与先 OCR 后文本两种方法。
 
-Assessment rubric:
+评分标准：
 
-| Weight | Criterion | Measurement |
+| 权重 | 评分项 | 衡量方式 |
 |:-:|---|---|
-| 25 | ViDoRe v3 / M3DocVQA accuracy | Benchmark vs OCR-then-text baseline on matched pages |
-| 20 | Evidence-region grounding | Fraction of cited regions that contain the answer span |
-| 20 | Storage and latency engineering | DocPruner compression, index p95, answer p95 under 2s |
-| 20 | Multi-page reasoning | Accuracy on a hand-labeled 100-question multi-page set |
-| 15 | Source-inspection UX | Overlay fidelity, comparison tools, page-by-page explorer |
+| 25 | ViDoRe v3 / M3DocVQA 准确率 | 在相同页面上对比先 OCR 后文本的基线 |
+| 20 | 证据区域定位 | 被引用区域中包含答案片段的比例 |
+| 20 | 存储与延迟工程 | DocPruner 压缩率、索引 p95、回答 p95 低于 2 秒 |
+| 20 | 跨页推理 | 在人工标注的 100 道跨页题上的准确率 |
+| 15 | 原文查看体验 | 叠加层的准确度、对比工具、逐页浏览器 |
 
-Hard rejects:
+直接否决：
 
-- OCR-first pipelines pitched as "vision-first" by retrofitting OCR text into a single-vector embed.
-- Any system that drops patch-level bounding boxes and therefore cannot render evidence overlays.
-- Storage numbers reported without documenting DocPruner settings.
+- 把 OCR 文本硬塞进单向量嵌入，却包装成"视觉优先"的 OCR 优先流水线。
+- 丢掉 patch 级边界框、因而无法渲染证据叠加层的系统。
+- 报告存储数据时没有写明 DocPruner 的设置。
 
-Refusal rules:
+拒绝规则：
 
-- Refuse to index scanned legal contracts without a dedicated redaction policy. ColQwen embeddings leak content.
-- Refuse to serve queries against a corpus the user has not disclosed. Audit trail is mandatory for regulated domains.
-- Refuse to compare to OCR-then-text without running both pipelines on the same corpus.
+- 没有专门的脱敏策略时，拒绝为扫描版法律合同建立索引。ColQwen 嵌入会泄漏内容。
+- 拒绝针对用户未披露的语料库提供查询服务。受监管领域必须有审计记录。
+- 没有在同一语料上把两条流水线都跑一遍，就拒绝与先 OCR 后文本的方法做比较。
 
-Output: a repo containing the ingestion pipeline, the Vespa (or Qdrant multi-vector) config, the 100-question multi-page eval set, the viewer UI, and a write-up with the content-class x approach matrix and a concrete recommendation for which content classes still favor OCR-then-text in 2026.
+输出：一个仓库，包含摄取流水线、Vespa（或 Qdrant multi-vector）配置、100 道题的跨页评估集、查看器 UI，以及一份说明文档，附上"内容类别 x 方法"矩阵，并具体建议在 2026 年哪些内容类别仍然更适合先 OCR 后文本。

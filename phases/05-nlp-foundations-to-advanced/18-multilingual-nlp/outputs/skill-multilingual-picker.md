@@ -1,17 +1,17 @@
 ---
 name: multilingual-picker
-description: Pick source language, target model, and evaluation plan for a multilingual NLP task.
+description: 为多语言 NLP 任务选择源语言、目标模型和评测方案。
 version: 1.0.0
 phase: 5
 lesson: 18
 tags: [nlp, multilingual, cross-lingual]
 ---
 
-Given requirements (target languages, task type, available labeled data per language), output:
+拿到需求（目标语言、任务类型、各语言可用的标注数据）后，输出：
 
-1. Source language for fine-tuning. Default English; check LANGRANK or qWALS if target language has a typologically close high-resource language.
-2. Base model. XLM-R (classification), mT5 (generation), NLLB (translation), Aya-23 (generative LLM).
-3. Few-shot budget. Start with 100-500 target-language examples if available. Zero-shot only if labeling is infeasible.
-4. Evaluation plan. Per-language accuracy (not aggregate), cross-lingual consistency, entity-level F1 on non-Latin scripts.
+1. 微调用的源语言。默认英语；如果目标语言有类型学上相近的高资源语言，用 LANGRANK 或 qWALS 查一下。
+2. 基座模型。XLM-R（分类）、mT5（生成）、NLLB（翻译）、Aya-23（生成式 LLM）。
+3. 少样本预算。有条件就从 100-500 条目标语言样本起步。只有无法标注时才用零样本。
+4. 评测方案。分语言的准确率（不是汇总值）、跨语言一致性、非拉丁文字上的实体级 F1。
 
-Refuse to ship a multilingual model without per-language evaluation — aggregate metrics hide long-tail failures. Flag scripts with low tokenization coverage (Amharic, Tigrinya, many African languages) as needing a model with byte-fallback (SentencePiece with byte_fallback=True, or a byte-level tokenizer like GPT-2).
+没有分语言评测就拒绝上线多语言模型：汇总指标会掩盖长尾失败。分词覆盖率低的文字（阿姆哈拉语、提格利尼亚语、许多非洲语言），标记为需要带字节回退的模型（设置 byte_fallback=True 的 SentencePiece，或 GPT-2 这类字节级分词器）。

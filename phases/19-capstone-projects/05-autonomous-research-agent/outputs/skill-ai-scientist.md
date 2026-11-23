@@ -1,46 +1,46 @@
 ---
 name: ai-scientist
-description: Build an autonomous research agent that runs experiment tree search, writes LaTeX papers with vision critique, and passes a sandbox-escape red team.
+description: 构建自主研究 agent：运行实验树搜索，撰写 LaTeX 论文并做视觉审阅，还要通过沙箱逃逸红队测试。
 version: 1.0.0
 phase: 19
 lesson: 05
 tags: [capstone, autonomous-agent, ai-scientist, sakana, langgraph, sandbox, research]
 ---
 
-Given a seed idea, a narrow domain, and a $30 compute budget, build an agent that runs an experiment tree search, writes a reviewable LaTeX paper, and emits a reproducibility bundle.
+给定一个种子想法、一个窄领域和 $30 的算力预算，构建一个 agent：运行实验树搜索，写出一篇可供评审的 LaTeX 论文，并产出可复现包。
 
-Build plan:
+构建计划：
 
-1. Literature pass: Semantic Scholar Graph API + OpenAlex; cache abstracts in FAISS; generate a 1-page domain digest.
-2. Tree search: implement best-first expansion over experiment nodes with `expand(node) -> children` (one config edit per child) and `score(node) = novelty*0.4 + quality*0.5 + budget*0.1`.
-3. Per-node sandbox: every experiment runs `docker run --network=none --memory=8g --cpus=2 --pids-limit=256 --read-only` or E2B equivalent; deterministic seeds; resource cap enforced.
-4. Plan-execute-verify: verify step checks that loss converged, baselines ran, ablations isolate the claim.
-5. Writer: generate LaTeX, compile to PDF, feed PDF to Claude Opus 4.7 vision mode for critique on layout and claim-evidence alignment, iterate up to 3 times.
-6. Reviewer ensemble: five judges (Opus 4.7, GPT-5.4, Gemini 3 Pro, DeepSeek R1, Qwen3-Max) score on NeurIPS rubric (novelty, rigor, clarity, reproducibility, impact); mean < 4.0 returns to writer.
-7. Red team: integrate adversarial tasks (fork bomb, filesystem escape, LLM-written network call). Confirm all blocked. Emit `red_team.md`.
-8. Reproducibility bundle: paper.pdf + review.md + tree-search trace JSON + seeds + W&B run links + sandbox config + one-line rerun command.
+1. 文献调研：使用 Semantic Scholar Graph API + OpenAlex；把摘要缓存进 FAISS；生成一页领域综述。
+2. 树搜索：在实验节点上实现最佳优先扩展，接口为 `expand(node) -> children`（每个子节点只改一处配置）和 `score(node) = novelty*0.4 + quality*0.5 + budget*0.1`。
+3. 每个节点一个沙箱：每个实验都用 `docker run --network=none --memory=8g --cpus=2 --pids-limit=256 --read-only` 或 E2B 等价方式运行；随机种子固定；强制资源上限。
+4. 规划-执行-验证：验证步骤检查损失是否收敛、基线是否跑过、消融实验是否把要证明的论断单独隔离出来。
+5. 写作器：生成 LaTeX，编译成 PDF，把 PDF 交给 Claude Opus 4.7 的视觉模式，审阅版式以及论断与证据是否对得上，最多迭代 3 次。
+6. 评审团：五个裁判（Opus 4.7、GPT-5.4、Gemini 3 Pro、DeepSeek R1、Qwen3-Max）按 NeurIPS 评分标准（新颖性、严谨性、清晰度、可复现性、影响力）打分；均分 < 4.0 就退回写作器。
+7. 红队：加入对抗任务（fork 炸弹、文件系统逃逸、LLM 写出的网络调用）。确认全部被拦下。产出 `red_team.md`。
+8. 可复现包：paper.pdf + review.md + 树搜索 trace JSON + 随机种子 + W&B 运行链接 + 沙箱配置 + 一行重跑命令。
 
-Assessment rubric:
+评分标准：
 
-| Weight | Criterion | Measurement |
+| 权重 | 评分项 | 衡量方式 |
 |:-:|---|---|
-| 25 | Paper quality | Blind rubric review against published workshop papers on the same seed topic |
-| 20 | Experimental rigor | Baselines, seeds, ablations; every claim backed by a cell in the results table |
-| 20 | Cost and compute discipline | $30 ceiling per paper enforced, Langfuse-traced |
-| 20 | Safety | Sandbox red team passes; network policy and kill-switch verified with logged attempts |
-| 15 | Reproducibility | One-command rerun reproduces the paper with identical seeds |
+| 25 | 论文质量 | 与同一种子主题下已发表的 workshop 论文做盲评对比 |
+| 20 | 实验严谨性 | 基线、随机种子、消融；每个论断都对应结果表中的一个单元格 |
+| 20 | 成本与算力纪律 | 每篇论文强制 $30 上限，有 Langfuse trace |
+| 20 | 安全性 | 通过沙箱红队测试；网络策略和紧急停止开关经过验证，尝试记录有日志 |
+| 15 | 可复现性 | 一条命令重跑即可用相同种子复现论文 |
 
-Hard rejects:
+直接否决：
 
-- Experiments that run outside a sandbox. The entire thesis of the capstone is that execution is contained.
-- Writer steps that do not re-read the compiled PDF (vision critique is load-bearing).
-- Papers without baselines, seeds, or an ablation section.
-- Cost budgets enforced only as post-hoc warnings, not hard ceilings.
+- 在沙箱之外运行的实验。这个综合项目的核心前提就是执行必须被隔离。
+- 写作步骤不重新读取编译后的 PDF（视觉审阅是关键环节）。
+- 论文没有基线、随机种子或消融章节。
+- 成本预算只作为事后警告，而不是硬性上限。
 
-Refusal rules:
+拒绝规则：
 
-- Refuse to publish a paper with reviewer mean below 4.0/5 without an explicit human override.
-- Refuse to run on a seed idea that requires network access from inside the sandbox. Add a separate read-only dataset volume instead.
-- Refuse to rerun a paper whose red-team has not been executed and logged.
+- 评审均分低于 4.0/5 时，没有明确的人工放行就拒绝发布论文。
+- 如果种子想法需要在沙箱内访问网络，拒绝运行。改为额外挂载一个只读数据集卷。
+- 红队测试还没执行并记录日志的论文，拒绝重跑。
 
-Output: a repo containing the tree-search engine, the sandbox policy, the writer/reviewer loop, three example runs with reproducibility bundles, a red-team report, a cost-ledger csv, and a write-up naming which of the Sakana v2 failure modes you reproduced and how the mitigation worked.
+输出：一个仓库，包含树搜索引擎、沙箱策略、写作/评审循环、三次带可复现包的示例运行、一份红队报告、一份成本台账 csv，以及一份说明文档，写清你复现了 Sakana v2 的哪些失败模式，以及缓解措施的效果。

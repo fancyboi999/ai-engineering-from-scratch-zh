@@ -1,39 +1,39 @@
 ---
 name: skill-point-cloud-loader
-description: Write a PyTorch Dataset for .ply / .pcd / .xyz files with correct normalisation, centring, and point sampling
+description: 为 .ply / .pcd / .xyz 文件编写 PyTorch Dataset，正确完成归一化、中心化和点采样
 version: 1.0.0
 phase: 4
 lesson: 13
 tags: [3d-vision, point-cloud, data-loading, pytorch]
 ---
 
-# Point Cloud Loader
+# 点云加载器
 
-Turn a folder of 3D scan files into a ready-to-train PyTorch `Dataset`.
+把一个装满 3D 扫描文件的文件夹，变成可以直接训练的 PyTorch `Dataset`。
 
-## When to use
+## 何时使用
 
-- Starting a new point-cloud classification / segmentation project.
-- Switching between `.ply`, `.pcd`, and `.xyz` formats.
-- Debugging a model that trains without error but converges poorly; often the data loader normalisation is wrong.
+- 开始新的点云分类 / 分割项目。
+- 在 `.ply`、`.pcd` 和 `.xyz` 格式之间切换。
+- 排查模型训练不报错却收敛很差的问题；通常是数据加载器的归一化写错了。
 
-## Inputs
+## 输入
 
-- `data_root`: folder of point-cloud files and an optional CSV with labels.
-- `file_format`: ply | pcd | xyz | npy.
-- `num_points`: fixed sampling size, typically 1024 or 2048.
-- `augmentation`: none | rotate | jitter | mixup.
+- `data_root`：点云文件所在的文件夹，以及一个可选的标签 CSV。
+- `file_format`：ply | pcd | xyz | npy。
+- `num_points`：固定的采样点数，通常为 1024 或 2048。
+- `augmentation`：none | rotate | jitter | mixup。
 
-## Normalisation policy
+## 归一化策略
 
-Every production point-cloud pipeline applies in order:
+每条生产级点云管线都按以下顺序处理：
 
-1. **Centre** the cloud: subtract the centroid.
-2. **Scale** to unit sphere: divide by the max distance from centre.
-3. **Sample** `num_points` points. If the cloud has more, use **farthest point sampling** (FPS) for faithful shape representation or random sampling for speed. If fewer, repeat points.
-4. **Shuffle** point order (order should not matter for the model anyway, but shuffling breaks accidental order dependencies).
+1. **中心化**：减去质心。
+2. **缩放**到单位球：除以离中心的最大距离。
+3. **采样** `num_points` 个点。点数更多时，要忠实保留形状就用**最远点采样**（FPS），要速度就用随机采样。点数更少时，重复已有的点。
+4. **打乱**点的顺序（模型本来就不该依赖顺序，但打乱能消除意外的顺序依赖）。
 
-## Output template
+## 输出模板
 
 ```python
 import numpy as np
@@ -50,7 +50,7 @@ def _read_ply(path):
     if HAS_O3D:
         pc = o3d.io.read_point_cloud(path)
         return np.asarray(pc.points, dtype=np.float32)
-    # Fallback: minimal ascii-ply reader
+    # 兜底：最简 ascii-ply 读取器
     ...
 
 def _fps(points, k):
@@ -88,8 +88,8 @@ class PointCloudDataset(Dataset):
         else:
             reps = int(np.ceil(self.num_points / len(pts)))
             pts = np.tile(pts, (reps, 1))[:self.num_points]
-        # Shuffle point order to break any accidental dependencies (especially
-        # important when tiling repeats points in deterministic order).
+        # 打乱点的顺序，消除意外的顺序依赖（tile 会按确定顺序重复点，
+        # 这时尤其重要）。
         np.random.shuffle(pts)
         if self.augment:
             theta = np.random.uniform(0, 2 * np.pi)
@@ -102,7 +102,7 @@ class PointCloudDataset(Dataset):
         return torch.from_numpy(pts).transpose(0, 1), int(self.labels[i])
 ```
 
-## Report
+## 报告
 
 ```
 [dataset]
@@ -114,9 +114,9 @@ class PointCloudDataset(Dataset):
   augmentation:   <list>
 ```
 
-## Rules
+## 规则
 
-- Always centre before scaling; swapping the order changes the meaning of "unit sphere".
-- Prefer FPS over random sampling for shape tasks; random is fine for segmentation where every point matters anyway.
-- Never augment during evaluation; only during training.
-- If point cloud files include colour or normals as extra channels, extend the Dataset to return a `(3 + C, num_points)` tensor, not just xyz.
+- 一律先中心化再缩放；顺序反了，"单位球"的含义就变了。
+- 形状类任务优先用 FPS 而不是随机采样；分割任务每个点都要预测，用随机采样没问题。
+- 评估时绝不做数据增强，只在训练时做。
+- 如果点云文件带有颜色或法向量作为额外通道，就扩展 Dataset，让它返回 `(3 + C, num_points)` 张量，而不只是 xyz。

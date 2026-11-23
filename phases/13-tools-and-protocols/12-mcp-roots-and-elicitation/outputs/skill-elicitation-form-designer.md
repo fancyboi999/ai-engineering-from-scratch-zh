@@ -1,6 +1,6 @@
 ---
 name: elicitation-form-designer
-description: Design explicit resource scope and stateless MCP 2026-07-28 elicitation with authorization, safe forms, and signed retry state.
+description: 设计明确的资源范围和无状态 MCP 2026-07-28 elicitation，包含授权、安全表单与签名重试状态。
 version: 2.0.0
 phase: 13
 lesson: 12

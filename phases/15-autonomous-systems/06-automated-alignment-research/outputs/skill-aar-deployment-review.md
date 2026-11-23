@@ -1,39 +1,39 @@
 ---
 name: aar-deployment-review
-description: Pre-deployment review of an automated-alignment-research pipeline, including sandbox isolation and log integrity.
+description: 对自动化对齐研究流水线做上线前审查，覆盖沙箱隔离与日志完整性。
 version: 1.0.0
 phase: 15
 lesson: 6
 tags: [aar, alignment-research, sandbox, log-integrity, rsp]
 ---
 
-Given a proposed Automated-Alignment-Research deployment (model, sandbox, task queue, forum), produce a pre-deployment review that a frontier-lab safety team would sign off on.
+给定一个拟议的自动化对齐研究（AAR）部署（模型、沙箱、任务队列、论坛），产出一份前沿实验室安全团队愿意签字的上线前审查。
 
-Produce:
+产出：
 
-1. **Sandbox isolation.** Verify filesystem, network, and process limits for each AAR instance. Confirm no AAR can read or modify another AAR's sandbox. Confirm no AAR can reach the forum storage's write endpoint directly (all posts go through a separate service).
-2. **Forum log integrity.** The forum must be append-only and tamper-evident. Specify the storage (e.g. S3 with object lock, immutable ledger, append-only WAL). Specify the verification interval and the response if tampering is detected.
-3. **Task allocation policy.** State how tasks are assigned: who writes them, who approves them, whether AARs can propose their own follow-up tasks, and under what conditions. Free decomposition wins on performance; prescribed workflow wins on auditability. Document the tradeoff explicitly.
-4. **Human review gate.** Before any AAR output influences real research direction, training data, or published work, a named human reviewer must sign off. Specify the review checklist: experiment reproducibility, log completeness, claim-to-evidence mapping.
-5. **Threshold monitoring.** Track signals that the AAR system approaches RSP v3.0 AI R&D-4 territory: task complexity delta, autonomous sub-task spawning, cross-task information transfer. Define thresholds that require elevated review.
+1. **沙箱隔离。** 核实每个 AAR 实例的文件系统、网络和进程限制。确认任何 AAR 都无法读取或修改另一个 AAR 的沙箱。确认任何 AAR 都无法直接访问论坛存储的写入端点（所有帖子都经过一个独立服务）。
+2. **论坛日志完整性。** 论坛必须只追加、可发现篡改。指定存储方式（例如开启 object lock 的 S3、不可变账本、只追加的 WAL）。指定核验间隔，以及发现篡改时的响应。
+3. **任务分配策略。** 说明任务如何分配：谁编写、谁批准、AAR 能否提出自己的后续任务、在什么条件下可以。自由拆解在性能上占优，预设工作流在可审计性上占优。把这个权衡明确写下来。
+4. **人工审查关卡。** 任何 AAR 产出影响真实研究方向、训练数据或公开发表的工作之前，必须有一位具名的人类审查者签字。给出审查清单：实验可复现性、日志完整性、结论与证据的对应关系。
+5. **阈值监控。** 跟踪 AAR 系统逼近 RSP v3.0 AI R&D-4 区域的信号：任务复杂度变化、自主派生子任务、跨任务信息传递。定义需要升级审查的阈值。
 
-Hard rejects:
-- Any AAR deployment without tamper-evident, out-of-sandbox logs.
-- Any pipeline where AARs' outputs feed directly into training data or production policy without named human review.
-- Any pipeline where a single AAR has sufficient credentials to influence multiple downstream systems.
+直接否决：
+- 没有可发现篡改、存放在沙箱之外的日志的任何 AAR 部署。
+- AAR 产出未经具名人工审查就直接进入训练数据或生产策略的任何流水线。
+- 单个 AAR 拥有足以影响多个下游系统的凭证的任何流水线。
 
-Refusal rules:
-- If the sandbox isolation is unspecified or relies on a single layer (Docker only, no seccomp / gVisor), refuse and require defense-in-depth.
-- If the log storage is editable by anyone (even operators), refuse and require write-once media.
-- If the deployment's goal is to automate a part of the capability pipeline — not just alignment research — refuse and escalate to RSP review.
+拒绝规则：
+- 沙箱隔离未明确说明，或只依赖单层防护（只有 Docker，没有 seccomp / gVisor）时，拒绝，要求纵深防御。
+- 日志存储可被任何人（哪怕是运维人员）编辑时，拒绝，要求使用一次写入介质。
+- 部署目标是把能力流水线的一部分自动化（而不仅是对齐研究）时，拒绝，并升级到 RSP 审查。
 
-Output format:
+输出格式：
 
-Return a review memo with:
-- **Pipeline summary** (one paragraph)
-- **Isolation score** (per-dimension: fs, net, proc, peer)
-- **Log integrity score** (with verification plan)
-- **Task allocation decision** (fixed / free / hybrid, with rationale)
-- **Human review gate** (reviewer name, checklist)
-- **Threshold monitors** (list of signals, thresholds, response)
-- **Deployment verdict** (go / hold / no-go)
+返回一份审查备忘录，包含：
+- **流水线摘要**（一段话）
+- **隔离评分**（按维度：fs、net、proc、peer）
+- **日志完整性评分**（附核验计划）
+- **任务分配决定**（固定 / 自由 / 混合，附理由）
+- **人工审查关卡**（审查者姓名、清单）
+- **阈值监控**（信号列表、阈值、响应）
+- **部署结论**（go / hold / no-go）

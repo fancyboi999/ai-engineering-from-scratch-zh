@@ -1,29 +1,29 @@
 ---
 name: skill-ctc-decoder
-description: Write greedy and beam-search CTC decoders from scratch, including length normalisation
+description: 从零编写贪心和 beam search 两种 CTC 解码器，包括长度归一化
 version: 1.0.0
 phase: 4
 lesson: 19
 tags: [ocr, ctc, decoding, sequence-models]
 ---
 
-# CTC Decoder
+# CTC 解码器
 
-Produce two decoding routines for CTC outputs: greedy (fast) and beam (better on noisy inputs).
+为 CTC 输出生成两种解码例程：贪心（快）和 beam（在噪声输入上更好）。
 
-## When to use
+## 何时使用
 
-- Running OCR inference on custom CRNN outputs.
-- Benchmarking a pretrained OCR model against different decoders.
-- Implementing a simple beam search without pulling in ctcdecode.
+- 在自定义 CRNN 的输出上跑 OCR 推理。
+- 用不同的解码器对预训练 OCR 模型做基准测试。
+- 不想引入 ctcdecode，只想实现一个简单的 beam search。
 
-## Inputs
+## 输入
 
-- `log_probs`: (T, N, C) log-softmax over vocab (index 0 = blank by convention).
-- `vocab`: list of C characters.
-- `beam_width` (beam only): typically 5-10.
+- `log_probs`：(T, N, C)，对词表做的 log-softmax（按惯例，索引 0 = blank）。
+- `vocab`：C 个字符组成的列表。
+- `beam_width`（仅 beam）：通常为 5-10。
 
-## Greedy decoder
+## 贪心解码器
 
 ```python
 def greedy_ctc_decode(log_probs, vocab, blank=0):
@@ -40,7 +40,7 @@ def greedy_ctc_decode(log_probs, vocab, blank=0):
     return out
 ```
 
-## Beam search decoder
+## Beam search 解码器
 
 ```python
 import heapq
@@ -51,7 +51,7 @@ def beam_ctc_decode(log_probs, vocab, beam_width=5, blank=0):
     lp = log_probs.cpu()
     results = []
     for n in range(N):
-        beams = {("",): (0.0, -math.inf)}  # (prefix_tuple) -> (p_blank, p_nonblank)
+        beams = {("",): (0.0, -math.inf)}  # (前缀元组) -> (p_blank, p_nonblank)
         for t in range(T):
             logits_t = lp[t, n]
             new_beams = {}
@@ -70,10 +70,10 @@ def beam_ctc_decode(log_probs, vocab, beam_width=5, blank=0):
                         last = prefix[-1] if prefix else ""
                         char = vocab[c]
                         if char == last:
-                            # Case 1: stay on same prefix (collapse from p_nb)
+                            # 情况 1：停留在同一前缀（由 p_nb 合并）
                             upd = new_beams.get(prefix, (-math.inf, -math.inf))
                             new_beams[prefix] = (upd[0], _logsumexp(upd[1], p_nb + p))
-                            # Case 2: extend prefix via blank-separated repeat ("a_a" -> "aa")
+                            # 情况 2：经由 blank 分隔的重复字符扩展前缀（"a_a" -> "aa"）
                             new_prefix = prefix + (char,)
                             upd = new_beams.get(new_prefix, (-math.inf, -math.inf))
                             new_beams[new_prefix] = (upd[0], _logsumexp(upd[1], p_b + p))
@@ -99,10 +99,10 @@ def _logsumexp(a, b):
     return m + math.log(math.exp(a - m) + math.exp(b - m))
 ```
 
-## Rules
+## 规则
 
-- The blank index in CTC is 0 by convention in PyTorch's `nn.CTCLoss`.
-- Beam search improves accuracy on low-confidence inputs; on clean inputs the improvement is <1% CER.
-- Never prune the beam below 5; the accuracy-latency trade flattens below that.
-- When running beam search inside a tight latency budget, drop to greedy; the quality hit is small on most production OCR data.
-- For large vocabularies (CJK with 3000+ characters), switch to `ctcdecode` (C++) instead of the pure Python version above; the Python beam quickly becomes the bottleneck.
+- 在 PyTorch 的 `nn.CTCLoss` 中，CTC 的 blank 索引按惯例为 0。
+- beam search 能提升低置信度输入的准确率；在干净输入上，CER 的提升不到 1%。
+- beam 宽度不要剪到 5 以下；低于这个值，准确率与延迟的取舍曲线就平了。
+- 在很紧的延迟预算下跑 beam search 时，退回到贪心；在大多数生产 OCR 数据上，质量损失很小。
+- 词表很大时（CJK 有 3000 多个字符），换成 `ctcdecode`（C++），不要用上面的纯 Python 版本；Python 版的 beam 很快就会成为瓶颈。

@@ -1,18 +1,18 @@
 ---
 name: feature-extractor
-description: Pick feature type, mel count, frame/hop, and normalization to match a downstream audio model.
+description: 选择特征类型、mel 数量、帧长/帧移和归一化方式，使其匹配下游音频模型。
 version: 1.0.0
 phase: 6
 lesson: 02
 tags: [audio, features, spectrogram, mel]
 ---
 
-Given a target model (ASR / TTS / classifier / speaker / music) and input audio (sample rate, domain), output:
+拿到目标模型（ASR / TTS / 分类器 / 说话人 / 音乐）和输入音频（采样率、领域）后，输出：
 
-1. Feature type. Log-mel, mel, MFCC, raw waveform, or discrete codec (EnCodec, SoundStream). One-sentence reason.
-2. Mel count and frequency range. `n_mels`, `fmin`, `fmax`. Reason tied to domain (speech vs music) and model target.
-3. Frame and hop. `frame_len`, `hop_len`, window type. Reason tied to the required temporal resolution.
-4. Normalization. Per-utterance mean/var, global stats, or dB with fixed reference; pre or post featurization.
-5. Validation snippet. Python that prints the resulting shape, min/max, mean/std on a 1-second reference clip and asserts they match training.
+1. 特征类型。log-mel、mel、MFCC、原始波形，或离散编解码 token（EnCodec、SoundStream）。一句话说明理由。
+2. mel 数量和频率范围。`n_mels`、`fmin`、`fmax`。理由要和领域（语音还是音乐）及模型目标挂钩。
+3. 帧长和帧移。`frame_len`、`hop_len`、窗函数类型。理由要和所需的时间分辨率挂钩。
+4. 归一化。逐条语音的均值/方差、全局统计量，或固定参考的 dB；在特征提取之前还是之后做。
+5. 验证代码片段。用 Python 在一段 1 秒参考音频上打印输出形状、最小/最大值、均值/标准差，并断言它们与训练时一致。
 
-Refuse to ship a feature pipeline whose frame/hop/mel count diverges from the published training config of the target model. Flag any MFCC-based setup for Whisper or Parakeet as wrong — those models consume log-mel. Flag any feature extractor without a normalization assertion.
+特征流水线的帧长/帧移/mel 数量与目标模型公开的训练配置不一致时，拒绝上线。任何给 Whisper 或 Parakeet 用 MFCC 的方案都标记为错误：这些模型吃的是 log-mel。任何没有归一化断言的特征提取器，标记出来。

@@ -1,79 +1,79 @@
 ---
 name: skill-feature-selector
-description: Quick reference decision tree for choosing the right feature selection method
+description: 选择合适特征选择方法的速查决策树
 version: 1.0.0
 phase: 2
 lesson: 18
 tags: [feature-selection, mutual-information, rfe, lasso, tree-importance]
 ---
 
-# Feature Selection Strategy
+# 特征选择策略
 
-A quick reference for picking and applying the right feature selection method.
+一份挑选并应用合适特征选择方法的速查指南。
 
-## Step 1: Start with cleanup
+## 第 1 步：先做清理
 
-Before applying any method, remove obviously useless features:
+使用任何方法之前，先去掉明显没用的特征：
 
-- **Constant features**: variance = 0. Remove them.
-- **Near-constant features**: variance < 0.01 (or your threshold). Remove them.
-- **Duplicate features**: identical columns. Keep one, drop the rest.
-- **ID columns**: unique per row, carry no generalizable information. Remove them.
+- **常量特征**：方差 = 0。去掉。
+- **近似常量特征**：方差 < 0.01（或你设定的阈值）。去掉。
+- **重复特征**：完全相同的列。保留一列，其余删掉。
+- **ID 列**：每行唯一，不携带可泛化的信息。去掉。
 
-This takes seconds and can eliminate 10-30% of features in messy real-world datasets.
+这一步只要几秒钟，在杂乱的真实数据集里能砍掉 10-30% 的特征。
 
-## Step 2: Choose a method based on your situation
+## 第 2 步：根据情况选择方法
 
-### Quick Decision Tree
+### 快速决策树
 
-1. **< 50 features?** Start with mutual information ranking. Keep top K.
-2. **50 - 500 features?** Use variance threshold first, then L1 (Lasso) if using a linear model, or tree importance if using trees.
-3. **> 500 features?** Chain methods: variance threshold -> mutual information filter (top 50%) -> RFE on survivors.
-4. **Need interpretability?** L1 regularization gives you exact zero/nonzero. Tree importance gives ranked scores.
-5. **Need to capture nonlinear relationships?** Mutual information or tree-based importance. Avoid L1 (linear only).
-6. **Need feature interactions?** RFE or tree-based importance. Filter methods miss interactions.
+1. **特征 < 50 个？** 从互信息排序开始，保留前 K 个。
+2. **50 - 500 个特征？** 先用方差阈值；线性模型接着用 L1（Lasso），树模型接着用树重要性。
+3. **> 500 个特征？** 串联多种方法：方差阈值 -> 互信息过滤（保留前 50%）-> 对剩余特征做 RFE。
+4. **需要可解释性？** L1 正则化给出明确的零/非零。树重要性给出排序分数。
+5. **需要捕捉非线性关系？** 用互信息或基于树的重要性。避免 L1（只能处理线性）。
+6. **需要特征交互？** 用 RFE 或基于树的重要性。过滤法会漏掉交互。
 
-### Method Reference
+### 方法参考
 
-| Method | When to Use | When to Avoid |
+| 方法 | 何时使用 | 何时避免 |
 |--------|------------|---------------|
-| Variance threshold | Always, as a first step | Never skip this |
-| Mutual information | Quick ranking, nonlinear relationships | When you need feature interaction detection |
-| RFE | Thorough selection, moderate feature count | Very expensive models, > 1000 features |
-| L1 / Lasso | Linear models, fast embedded selection | Nonlinear problems, highly correlated features |
-| Tree importance | Nonlinear relationships, feature interactions | Biased by high-cardinality features |
-| Permutation importance | Model-agnostic validation, final check | Too slow for initial screening |
+| 方差阈值 | 永远作为第一步 | 绝不跳过 |
+| 互信息 | 快速排序、非线性关系 | 需要检测特征交互时 |
+| RFE | 彻底的筛选、特征数量适中 | 模型训练非常昂贵、特征 > 1000 个 |
+| L1 / Lasso | 线性模型、快速的嵌入式选择 | 非线性问题、特征高度相关 |
+| 树重要性 | 非线性关系、特征交互 | 会偏向高基数特征 |
+| 置换重要性 | 与模型无关的验证、最后检查 | 用于初筛太慢 |
 
-## Step 3: Validate your selection
+## 第 3 步：验证选择结果
 
-- Compare model performance with selected features vs all features
-- Use cross-validation, not a single train/test split
-- If performance drops by more than 1-2%, you may have removed useful features
-- If performance improves, you successfully removed noise
+- 比较用所选特征和用全部特征时的模型性能
+- 用交叉验证，不要只做一次训练/测试划分
+- 如果性能下降超过 1-2%，你可能删掉了有用的特征
+- 如果性能提升，说明你成功去掉了噪声
 
-## Step 4: Handle common pitfalls
+## 第 4 步：处理常见坑
 
-### Correlated features
-- L1 arbitrarily picks one from a correlated group and zeros the others
-- Compute the correlation matrix first and decide which correlated features to keep
-- Tree importance spreads importance across correlated features
+### 相关特征
+- L1 会从一组相关特征里随意挑一个，把其余的置零
+- 先计算相关矩阵，再决定保留哪些相关特征
+- 树重要性会把重要性分摊到相关特征上
 
-### Data leakage
-- Fit feature selection on training data only
-- Apply the same selection to test data
-- In cross-validation, feature selection must happen inside each fold
+### 数据泄漏
+- 只在训练数据上拟合特征选择
+- 对测试数据应用同样的选择
+- 交叉验证时，特征选择必须在每一折内部进行
 
-### Overfitting to feature selection
-- RFE with too many iterations can overfit to the training set
-- Validate on held-out data, not the data used for selection
-- Use stability selection (repeat on subsamples) for more robust results
+### 对特征选择过拟合
+- 迭代次数过多的 RFE 可能对训练集过拟合
+- 在留出数据上验证，而不是在用于选择的数据上验证
+- 用稳定性选择（在子样本上重复）得到更稳健的结果
 
-## Step 5: Production checklist
+## 第 5 步：上线检查清单
 
-- [ ] Variance threshold applied as first filter
-- [ ] Feature selection fitted on training data only
-- [ ] Selected features documented (names, method used, scores)
-- [ ] Performance compared: selected features vs all features
-- [ ] Cross-validated, not single-split evaluation
-- [ ] Feature selection integrated into the training pipeline (not done manually)
-- [ ] Monitoring in place for feature drift (selected features may become stale)
+- [ ] 已把方差阈值作为第一道过滤
+- [ ] 特征选择只在训练数据上拟合
+- [ ] 所选特征已记录在案（名称、所用方法、分数）
+- [ ] 已比较性能：所选特征 vs 全部特征
+- [ ] 采用交叉验证，而不是单次划分评估
+- [ ] 特征选择已集成到训练流水线中（而不是手动完成）
+- [ ] 已对特征漂移设置监控（所选特征可能会过时）

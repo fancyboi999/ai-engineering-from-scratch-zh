@@ -1,40 +1,40 @@
 ---
 name: constitution-review
-description: Audit a deployment's constitutional layer — hardcoded prohibitions, soft-coded defaults, operator-adjustable bounds, and four-tier hierarchy resolution.
+description: 审计部署的宪法层：硬编码禁令、软编码默认值、运营方可调边界，以及四级优先级的裁决顺序。
 version: 1.0.0
 phase: 15
 lesson: 17
 tags: [constitutional-ai, rule-override, hierarchy, cai, rlaif, hardcoded-prohibition]
 ---
 
-Given a deployment's constitutional layer (system prompt, operator config, declared principles), audit it against the Claude Constitution reference and flag missing hardcoded prohibitions, ambiguous principles, or misordered tiers.
+给定一个部署的宪法层（系统 prompt、运营方配置、声明的原则），对照 Claude Constitution 参考模型审计它，指出缺失的硬编码禁令、含糊的原则或排错顺序的层级。
 
-Produce:
+产出：
 
-1. **Hardcoded prohibition inventory.** List every prohibition that must not bend regardless of operator or user instruction. Minimum floor: bioweapons / CBRN uplift, CSAM, critical infrastructure attack planning, false-identity-when-asked. Additions are deployment-specific (e.g., financial services adds specific fraud prohibitions).
-2. **Soft-coded defaults.** List every behaviour the operator can adjust. For each, state the declared bound. An "adjustable" setting with no bound is a back-door override.
-3. **Tier ordering.** Confirm the resolution order is: safety > ethics > guidelines > helpfulness. If helpfulness ever wins over ethics in the implemented resolver, flag as a deployment break.
-4. **Principle ambiguity flags.** Identify any principle whose text leaves room for materially different interpretations. Ambiguity compounds over training cycles (principle drift).
-5. **Layer completeness.** Confirm runtime-layer controls (Lessons 10, 13, 14) are present in addition to the constitutional layer. Constitution alone is insufficient; runtime alone is insufficient.
+1. **硬编码禁令清单。** 列出无论运营方或用户怎么指示都不能松动的每条禁令。最低底线：生物武器 / CBRN 能力提升、CSAM、关键基础设施攻击策划、被问到时冒充虚假身份。其余条目视部署而定（例如金融服务会增加特定的欺诈禁令）。
+2. **软编码默认值。** 列出运营方可以调整的每项行为。为每项写明声明的边界。没有边界的"可调"设置就是一扇后门。
+3. **层级顺序。** 确认裁决顺序为：安全 > 伦理 > 准则 > 有用性。实际实现的裁决器里只要出现有用性压过伦理的情况，就标记为部署缺陷。
+4. **原则含糊标记。** 找出文字留有空间、可被理解成实质不同含义的任何原则。含糊会在训练轮次中不断累积（原则漂移）。
+5. **分层完整性。** 确认除宪法层之外，还有运行时层控制（第 10、13、14 课）。只有宪法不够，只有运行时也不够。
 
-Hard rejects:
-- Deployments without any hardcoded prohibition layer.
-- Operator config that claims to override a hardcoded prohibition (even by renaming).
-- Tier orders that place helpfulness above ethics.
-- Principle text so general it cannot be evaluated ("be good").
-- Treating Constitutional AI as a replacement for runtime controls.
+直接否决：
+- 没有任何硬编码禁令层的部署。
+- 声称能覆盖硬编码禁令的运营方配置（哪怕是通过改名）。
+- 把有用性排在伦理之上的层级顺序。
+- 笼统到无法评估的原则文字（"做个好人"）。
+- 把 Constitutional AI 当作运行时控制的替代品。
 
-Refusal rules:
-- If the user names a hardcoded prohibition but cannot point to a runtime-layer backstop for it, flag the deployment as single-layer and refuse production.
-- If the operator config includes an adjustable "safety" setting with no declared bound, refuse.
-- If the user treats the 2023 participatory-constitution findings as actionable in the current deployment, check: the 2026 Constitution did not incorporate them, so "inherits democratically" is a claim the deployment cannot back up.
+拒绝规则：
+- 用户说出一条硬编码禁令，却指不出它在运行时层的兜底措施时，把部署标记为单层防护并拒绝上生产。
+- 运营方配置里有一个没有声明边界的可调"安全"设置时，拒绝。
+- 用户把 2023 年参与式宪法的研究结论当作当前部署可直接采用的依据时，要核查：2026 年版 Constitution 并没有吸收这些结论，所以"以民主方式继承"是部署无法证实的说法。
 
-Output format:
+输出格式：
 
-Return a constitutional audit with:
-- **Hardcoded floor** (prohibitions, enforcement layer: weights / inference / both)
-- **Soft-coded defaults** (setting, operator bound, user-visible y/n)
-- **Tier order** (listed; confirmed safety > ethics > guidelines > helpfulness)
-- **Ambiguity flags** (principle, specific ambiguity, proposed tightening)
-- **Layer completeness** (constitutional y/n, runtime controls y/n, both required)
-- **Readiness** (production / staging / research-only)
+返回一份宪法审计，包含：
+- **硬编码底线**（禁令、执行层：权重 / 推理 / 两者）
+- **软编码默认值**（设置项、运营方边界、用户可见 y/n）
+- **层级顺序**（逐级列出；确认为安全 > 伦理 > 准则 > 有用性）
+- **含糊标记**（原则、具体含糊之处、建议的收紧措辞）
+- **分层完整性**（宪法层 y/n、运行时控制 y/n，两者都必须有）
+- **就绪度**（production / staging / research-only）

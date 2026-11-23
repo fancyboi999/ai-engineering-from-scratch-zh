@@ -1,19 +1,19 @@
 ---
 name: eval-report
-description: Plan a full generative-model evaluation: sample quality, adherence, preference, failure audit.
+description: 规划完整的生成模型评估：样本质量、指令遵循、偏好对比、失败审计。
 version: 1.0.0
 phase: 8
 lesson: 14
 tags: [evaluation, fid, clip, elo]
 ---
 
-Given a new generative-model checkpoint, a reference baseline, and a modality (image / video / audio / 3D), output a full eval plan:
+用户会给你一个新的生成模型 checkpoint、一个参考基线和一种模态（图像 / 视频 / 音频 / 3D）。你需要输出完整的评估方案：
 
-1. Sample quality. FID / FD-DINO / CMMD on 10-30k samples vs held-out real set. Matched resolution. Report 3-seed mean +/- std.
-2. Adherence. CLIP score / CMMD on prompt-image pairs. Include HPSv2 + ImageReward + PickScore for text-to-image. For video, add vision-language metrics (V-Eval). For audio, CLAP + MOS.
-3. Pairwise preference. Blinded A/B on 200-2000 prompts vs baseline. Human + LLM-judge + PartiPrompts coverage.
-4. Category breakdown. Performance per prompt category (people, animals, text rendering, composition, style). Flag regressions per category even if global metrics improve.
-5. Safety / misuse. NSFW classifier, deepfake detector, watermark check, copyright similarity scan on top-K generations.
-6. Sign-off. Explicit gate: FID within +5% of baseline OR &gt;55% human win rate OR documented qualitative advantage. No single-metric claims.
+1. 样本质量。用 10-30k 个样本对比留出的真实数据集，计算 FID / FD-DINO / CMMD。分辨率要对齐。报告 3 个种子的均值 +/- 标准差。
+2. 指令遵循。在 prompt-图像对上算 CLIP 分数 / CMMD。文生图还要加上 HPSv2 + ImageReward + PickScore。视频加视觉语言指标（V-Eval）。音频用 CLAP + MOS。
+3. 成对偏好。在 200-2000 个 prompt 上与基线做盲测 A/B。覆盖人工评审、LLM 评审和 PartiPrompts。
+4. 分类拆解。按 prompt 类别（人物、动物、文字渲染、构图、风格）分别看表现。即使全局指标变好，也要标出每个类别的退化。
+5. 安全与滥用。对 top-K 生成结果跑 NSFW 分类器、深度伪造检测、水印检查和版权相似度扫描。
+6. 签字放行。明确门槛：FID 在基线 +5% 以内，或人工胜率 &gt;55%，或有记录在案的定性优势。不接受只靠单一指标的结论。
 
-Refuse to report FID at N &lt; 5000. Refuse to ship benchmarks computed on prompts the model may have seen in training. Refuse to report only LLM-judge results without human cross-check. Flag any claim that a metric "went up 20%" without reporting the absolute base value and reporting a single seed.
+N &lt; 5000 时拒绝报告 FID。拒绝交付在模型训练时可能见过的 prompt 上算出的基准结果。拒绝只报告 LLM 评审结果而没有人工交叉核对。凡是说某指标“涨了 20%”却不报告绝对基准值、且只用单个种子的结论，一律标出来。

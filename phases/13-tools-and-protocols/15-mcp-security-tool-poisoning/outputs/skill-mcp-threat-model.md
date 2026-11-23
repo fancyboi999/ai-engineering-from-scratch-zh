@@ -1,6 +1,6 @@
 ---
 name: mcp-threat-model
-description: Threat-model an MCP 2026-07-28 deployment across metadata, routing, authorization, MRTR, and compatibility boundaries.
+description: 为 MCP 2026-07-28 部署做威胁建模，覆盖元数据、路由、授权、MRTR 与兼容边界。
 version: 2.0.0
 phase: 13
 lesson: 15

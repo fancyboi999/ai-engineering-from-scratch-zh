@@ -1,40 +1,40 @@
 ---
 name: swarm-optimizer
-description: Choose between PSO, ACO, genetic algorithms, and gradient-based optimizers for a given LLM or agent optimization problem. Bio-inspired swarm algorithms are gradient-free and suit LLM-era workloads where the search space is discrete or the fitness function is black-box.
+description: 针对给定的 LLM 或 agent 优化问题，在 PSO、ACO、遗传算法和基于梯度的优化器之间做选择。仿生群体算法不需要梯度，适合搜索空间离散或适应度函数是黑盒的 LLM 时代任务。
 version: 1.0.0
 phase: 16
 lesson: 19
 tags: [multi-agent, swarm-optimization, PSO, ACO, prompt-optimization, routing]
 ---
 
-Given an LLM or agent optimization problem, choose the right optimizer.
+给定一个 LLM 或 agent 优化问题，选出合适的优化器。
 
-Produce:
+输出以下内容：
 
-1. **Problem fingerprint.** Search space (continuous numeric, prompt string, model weights, routing graph), fitness signal (automatic test, LLM judge, human rater, business KPI), time-to-value (minutes, hours, days).
-2. **Optimizer choice.** PSO, ACO, genetic algorithm, DPO/RL, manual tuning. Each has a default use case:
-   - continuous numeric on a bounded space → PSO
-   - routing or path selection → ACO
-   - discrete symbolic / programs → genetic algorithms
-   - differentiable reward → DPO/RL
-   - low-dimensional, fast eval → grid/random search
-3. **Population sizing.** 10-30 for PSO/GA, pheromone matrix size for ACO. Budget calculation: N × T × cost-per-eval. Do not run swarms that cost more than the value they produce.
-4. **Fitness + quality gate.** What function scores a candidate? For ACO routing, what quality threshold triggers pheromone deposit?
-5. **Convergence monitoring.** Log g_best or pheromone stability per iteration. Alert on divergence (catastrophic drift) and on premature convergence (local optimum).
-6. **Decay / exploration tuning.** PSO inertia and cognitive/social weights; ACO pheromone decay rate and deposit amount. Trade-off: low decay → stuck on early winner; high decay → no memory.
-7. **Reset conditions.** When the eval distribution shifts or the deployment pattern changes, reset g_best or zero pheromones temporarily. Stale memories are worse than no memories.
+1. **问题指纹。** 搜索空间（连续数值、prompt 字符串、模型权重、路由图）、适应度信号（自动化测试、LLM 评审、人工评分、业务 KPI）、见效时间（分钟、小时、天）。
+2. **优化器选择。** PSO、ACO、遗传算法、DPO/RL、手动调参。各自有默认适用场景：
+   - 有界空间上的连续数值 → PSO
+   - 路由或路径选择 → ACO
+   - 离散符号 / 程序 → 遗传算法
+   - 可微的奖励 → DPO/RL
+   - 低维且评估快 → 网格搜索 / 随机搜索
+3. **种群规模。** PSO/GA 用 10-30，ACO 看信息素矩阵大小。预算计算：N × T × 单次评估成本。成本超过产出价值的群体优化不要跑。
+4. **适应度与质量门槛。** 用什么函数给候选打分？ACO 路由中，达到什么质量阈值才沉积信息素？
+5. **收敛监控。** 每轮迭代记录 g_best 或信息素稳定度。发散（灾难性漂移）和过早收敛（局部最优）都要告警。
+6. **衰减与探索调参。** PSO 的惯性权重以及认知/社会权重；ACO 的信息素衰减率和沉积量。取舍：衰减低 → 卡在早期赢家上；衰减高 → 没有记忆。
+7. **重置条件。** 评估分布变化或部署模式改变时，重置 g_best 或暂时把信息素清零。过时的记忆比没有记忆更糟。
 
-Hard rejects:
+直接否决：
 
-- Swarm optimizers on tasks where fitness needs human review. Cost-per-iteration dwarfs budget.
-- Population sizes > 50 without a clear budget justification. Diminishing returns dominate.
-- Pheromone routing without a quality gate. Fast-but-wrong agents lock in.
-- PSO on discrete search spaces that do not have a natural continuous embedding. Use GA or simulated annealing instead.
+- 在适应度需要人工审核的任务上用群体优化器。单轮成本远超预算。
+- 种群规模 > 50 却没有清晰的预算理由。收益递减会占主导。
+- 没有质量门槛的信息素路由。又快又错的 agent 会被锁定。
+- 在没有自然连续嵌入的离散搜索空间上用 PSO。改用 GA 或模拟退火。
 
-Refusal rules:
+拒绝规则：
 
-- If the user is trying to optimize something with no clear fitness function, recommend defining fitness first. Swarm optimizers cannot help without an evaluator.
-- If the user's budget is under $100, recommend manual tuning + caching rather than swarms.
-- If the distribution shifts daily, recommend online learning or bandits, not swarm optimizers.
+- 如果用户要优化的东西没有清晰的适应度函数，建议先定义适应度。没有评估器，群体优化器帮不上忙。
+- 如果用户预算低于 $100，建议手动调参加缓存，而不是群体优化。
+- 如果分布每天都在变，建议用在线学习或 bandit，而不是群体优化器。
 
-Output: a one-page brief. Start with a one-sentence recommendation ("Use ACO with quality-gated pheromone deposits on a 3-agent × 4-task-type routing problem. Decay 0.05, threshold 0.6, 200 warmup tasks."), then the seven sections above. End with a budget estimate and a 1-week rollout plan.
+输出：一页简报。开头用一句话给出推荐（"在 3 个 agent × 4 种任务类型的路由问题上使用 ACO，信息素沉积带质量门槛。衰减 0.05，阈值 0.6，200 个预热任务。"），然后是上面七个部分。最后给出预算估计和一周的上线计划。

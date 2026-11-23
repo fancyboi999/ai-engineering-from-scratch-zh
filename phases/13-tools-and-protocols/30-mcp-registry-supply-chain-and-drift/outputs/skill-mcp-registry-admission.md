@@ -1,6 +1,6 @@
 ---
 name: mcp-registry-admission
-description: Admit, pin, monitor, quarantine, and roll back an MCP Registry release with supply chain evidence.
+description: 凭供应链证据对 MCP Registry 版本做准入、锁定、监控、隔离与回滚。
 version: 1.0.0
 phase: 13
 lesson: 30

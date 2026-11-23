@@ -1,43 +1,43 @@
 ---
 name: runtime-shape
-description: Pick a production runtime shape (request-response, streaming, queue, event, cron, durable) and wire observability.
+description: 选择生产运行时形态（请求-响应、流式、队列、事件、cron、持久化执行），并接入可观测性。
 version: 1.0.0
 phase: 14
 lesson: 29
 tags: [production, runtime, queue, event, durable, observability]
 ---
 
-Given a task class (expected duration, step count, trigger type, latency budget), pick the runtime shape.
+用户会给出一个任务类别（预期时长、步数、触发方式、延迟预算）。你负责选定运行时形态。
 
-Decision:
+决策：
 
-1. < 30s, user waits -> **request-response**.
-2. Progressive UX or voice -> **streaming**.
-3. Minutes to hours, user doesn't wait -> **queue-based**.
-4. Reactive to external events -> **event-driven**.
-5. Periodic housekeeping -> **cron**.
-6. Any of the above where restart cost is high -> add **durable execution**.
+1. < 30s，用户在等 -> **请求-响应**。
+2. 渐进式 UX 或语音 -> **流式**。
+3. 几分钟到几小时，用户不等 -> **基于队列**。
+4. 响应外部事件 -> **事件驱动**。
+5. 周期性维护 -> **cron**。
+6. 以上任一种，且重启成本高 -> 加上**持久化执行**。
 
-Produce:
+输出：
 
-1. The shape scaffold in your stack.
-2. Observability: OTel GenAI spans (Lesson 23), backend wired (Lesson 24).
-3. For queue: DLQ + retry policy + queue depth metric.
-4. For event: explicit subscriber registry + replay path.
-5. For cron: lock file or distributed lock to prevent overlapping runs.
-6. For durable: checkpointer backend + resume semantics.
+1. 在你的技术栈中搭好该形态的脚手架。
+2. 可观测性：OTel GenAI span（第 23 课），接好后端（第 24 课）。
+3. 队列：DLQ + 重试策略 + 队列深度指标。
+4. 事件：显式的订阅者注册表 + 重放路径。
+5. cron：锁文件或分布式锁，防止运行重叠。
+6. 持久化执行：checkpointer 后端 + 恢复语义。
 
-Hard rejects:
+直接否决：
 
-- Synchronous HTTP for a 5-minute task. Users hang up; workers pile up.
-- Queue-based without DLQ. Failed jobs vanish.
-- Background work without trace export. Failures invisible until users complain.
-- "No durable state, we'll just retry." Long horizons must checkpoint.
+- 5 分钟的任务用同步 HTTP。用户会挂断，worker 会堆积。
+- 基于队列却没有 DLQ。失败的任务会凭空消失。
+- 后台工作不导出 trace。失败不可见，直到用户投诉。
+- "不需要持久化状态，重试就行。"长时程任务必须做 checkpoint。
 
-Refusal rules:
+拒绝规则：
 
-- If the product has SLA + replay requirements, refuse swarm topology + non-durable runtime.
-- If the task is compliance-bound, refuse event-driven without audit trail.
-- If the user wants cron + no lock, refuse. Overlapping cron runs are duplicate work at best, data corruption at worst.
+- 如果产品有 SLA + 重放要求，拒绝 swarm 拓扑 + 非持久化运行时的组合。
+- 如果任务受合规约束，拒绝没有审计轨迹的事件驱动方案。
+- 如果用户要 cron 却不加锁，拒绝。cron 运行重叠，往好了说是重复劳动，往坏了说是数据损坏。
 
-Output: runtime scaffold + observability hooks + README with SLA, retry policy, checkpointer choice. End with "what to read next" pointing to Lesson 23 (OTel), Lesson 24 (observability), or Lesson 17 (Managed Agents for hosted long-running).
+输出：运行时脚手架 + 可观测性 hook + README，写明 SLA、重试策略和 checkpointer 选择。结尾写"接下来读什么"：第 23 课（OTel）、第 24 课（可观测性），或托管长时间运行任务的第 17 课（Managed Agents）。

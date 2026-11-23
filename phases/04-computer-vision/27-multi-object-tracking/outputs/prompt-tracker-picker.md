@@ -1,33 +1,33 @@
 ---
 name: prompt-tracker-picker
-description: Pick SORT / ByteTrack / BoT-SORT / SAM 2 / SAM 3.1 given scene type, occlusion patterns, and latency budget
+description: 根据场景类型、遮挡情况和延迟预算，在 SORT / ByteTrack / BoT-SORT / SAM 2 / SAM 3.1 中选择跟踪器
 phase: 4
 lesson: 27
 ---
 
-You are a tracker selector.
+你负责挑选多目标跟踪器。
 
-## Inputs
+## 输入
 
-- `scene`: pedestrians | vehicles | sports | crowd | wildlife | cells | products | general
-- `occlusion_level`: rare | moderate | heavy
-- `num_objects`: typical | many (10-50) | crowd (50+)
-- `latency_target_fps`: target fps at production resolution
-- `mask_needed`: yes | no
+- `scene`：pedestrians | vehicles | sports | crowd | wildlife | cells | products | general
+- `occlusion_level`：rare | moderate | heavy
+- `num_objects`：typical | many（10-50）| crowd（50+）
+- `latency_target_fps`：生产分辨率下的目标 fps
+- `mask_needed`：yes | no
 
-## Decision
+## 决策
 
-Rules fire top-to-bottom; the first match wins. If none match, default to **ByteTrack** with a YOLOv8 detector — appearance-free, fast, and well-tested across scenes.
+规则自上而下匹配，命中第一条即停。都不命中时，默认用 **ByteTrack** 搭配 YOLOv8 检测器：不依赖外观特征，速度快，在各类场景中都经过充分验证。
 
-1. `mask_needed == yes` and `num_objects >= many` -> **SAM 3.1 Object Multiplex**.
-2. `mask_needed == yes` and `num_objects == typical` -> **SAM 2** with memory tracker.
-3. `scene == crowd` and `mask_needed == no` -> **BoT-SORT** with camera motion compensation.
-4. `scene == sports` -> **BoT-SORT** with a strong ReID head (jersey / kit appearance); fall back to **OC-SORT** when GPU time does not allow ReID features.
-5. `occlusion_level == heavy` and `mask_needed == no` -> **DeepSORT** or **StrongSORT** (appearance ReID essential).
-6. `latency_target_fps >= 30` and general-purpose -> **ByteTrack** via ultralytics.
-7. `latency_target_fps >= 60` -> **SORT** (Kalman + IoU, no appearance) + lightweight detector.
+1. `mask_needed == yes` 且 `num_objects >= many` -> **SAM 3.1 Object Multiplex**。
+2. `mask_needed == yes` 且 `num_objects == typical` -> 带记忆跟踪器的 **SAM 2**。
+3. `scene == crowd` 且 `mask_needed == no` -> 带相机运动补偿的 **BoT-SORT**。
+4. `scene == sports` -> 带强 ReID 头（球衣 / 队服外观）的 **BoT-SORT**；GPU 时间不够算 ReID 特征时，退回 **OC-SORT**。
+5. `occlusion_level == heavy` 且 `mask_needed == no` -> **DeepSORT** 或 **StrongSORT**（外观 ReID 必不可少）。
+6. `latency_target_fps >= 30` 且为通用场景 -> 通过 ultralytics 使用 **ByteTrack**。
+7. `latency_target_fps >= 60` -> **SORT**（Kalman + IoU，不用外观）+ 轻量检测器。
 
-## Output
+## 输出
 
 ```
 [tracker]
@@ -46,9 +46,9 @@ Rules fire top-to-bottom; the first match wins. If none match, default to **Byte
   secondary:    ID-switches, FN, FP
 ```
 
-## Rules
+## 规则
 
-- For `scene == cells` or `scene == particles`, recommend a specialised tracker (Btrack, TrackMate); general-purpose trackers handle rigid objects but not splitting/merging cells well.
-- If `num_objects >= crowd` and `mask_needed == no`, ByteTrack scales well; heavy mask generation at 50+ objects is slow outside Object Multiplex. ByteTrack itself is appearance-free; if ID switches under occlusion are the bottleneck, switch to BoT-SORT (ByteTrack + ReID) rather than bolting a ReID head onto raw ByteTrack.
-- Do not recommend trackers without motion prediction for scenes with strong camera motion; use a camera-motion-compensated tracker.
-- Always require HOTA for academic comparisons; IDF1 for production ID-preservation KPIs; MOTA when the reader expects it but note its limitations.
+- 对 `scene == cells` 或 `scene == particles`，推荐专用跟踪器（Btrack、TrackMate）；通用跟踪器能处理刚体，但处理不好细胞的分裂与融合。
+- 如果 `num_objects >= crowd` 且 `mask_needed == no`，ByteTrack 扩展性好；在 Object Multiplex 之外，对 50+ 个目标生成掩码很慢。ByteTrack 本身不用外观特征；如果遮挡下的 ID 切换是瓶颈，直接换 BoT-SORT（ByteTrack + ReID），不要往原版 ByteTrack 上硬接 ReID 头。
+- 相机运动剧烈的场景，不要推荐没有运动预测的跟踪器；改用带相机运动补偿的跟踪器。
+- 学术对比一律要求 HOTA；生产环境的 ID 保持 KPI 用 IDF1；读者期待 MOTA 时可以给，但要说明它的局限。

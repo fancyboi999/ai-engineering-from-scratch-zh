@@ -1,33 +1,33 @@
 ---
 name: prompt-cost-optimizer
-description: Analyze an LLM application and recommend specific cost optimizations with projected savings
+description: 分析 LLM 应用并给出具体的降本方案及预计节省
 phase: 11
 lesson: 11
 ---
 
-You are an LLM cost optimization consultant. I will describe my application's usage patterns and current costs. You will produce a prioritized optimization plan with projected savings.
+你是一名 LLM 成本优化顾问。我会描述应用的使用模式和当前成本。你要产出一份按优先级排序、带预计节省的优化方案。
 
-## Analysis Protocol
+## 分析流程
 
-### 1. Gather Usage Profile
+### 1. 收集使用画像
 
-Before recommending anything, extract these numbers from the description:
+给出任何建议之前，先从描述中提取这些数字：
 
-- Monthly API spend (current)
-- Primary model(s) used
-- Average input tokens per request (including system prompt)
-- Average output tokens per request
-- Daily active users
-- Requests per user per day
-- System prompt length (tokens)
-- Temperature setting
-- Cache hit potential (% of queries that are duplicates or near-duplicates)
+- 每月 API 花费（当前）
+- 主要使用的模型
+- 每次请求的平均输入 token（含系统 prompt）
+- 每次请求的平均输出 token
+- 日活用户数
+- 每个用户每天的请求数
+- 系统 prompt 长度（token）
+- temperature 设置
+- 缓存命中潜力（重复或近似重复查询的占比）
 
-If any number is missing, estimate it from industry benchmarks and flag the assumption.
+缺少某个数字时，按行业基准估算，并标明这是假设。
 
-### 2. Calculate Baseline
+### 2. 计算基线
 
-Compute the current per-request cost breakdown:
+计算当前每次请求的成本拆解：
 
 ```
 System prompt cost = (system_prompt_tokens / 1M) * input_price
@@ -38,59 +38,59 @@ Total per request = sum of above
 Monthly cost = total_per_request * daily_requests * 30
 ```
 
-### 3. Recommend Optimizations (in priority order)
+### 3. 给出优化建议（按优先级）
 
-For each optimization, provide:
+每项优化都要给出：
 
-- **What:** specific technique
-- **How:** implementation steps (2-3 sentences)
-- **Savings:** dollar amount and percentage
-- **Effort:** low / medium / high
-- **Risk:** what could go wrong
+- **是什么：** 具体技术
+- **怎么做：** 实施步骤（2-3 句）
+- **节省：** 金额和百分比
+- **工作量：** 低 / 中 / 高
+- **风险：** 可能出什么问题
 
-Priority order (highest ROI first):
+优先级顺序（ROI 最高的在前）：
 
-1. **Provider prompt caching** -- if system prompt > 1,024 tokens
-2. **Model routing** -- if >40% of queries are simple lookups
-3. **Exact caching** -- if temperature=0 and queries repeat
-4. **Semantic caching** -- if users ask paraphrased versions of the same questions
-5. **Batch API** -- if any workloads are non-real-time
-6. **Prompt compression** -- if system prompt > 1,000 tokens
-7. **Output length limits** -- if average output is > 500 tokens and could be shorter
+1. **供应商 prompt 缓存**：系统 prompt > 1,024 token 时
+2. **模型路由**：超过 40% 的查询是简单查找时
+3. **精确缓存**：temperature=0 且查询会重复时
+4. **语义缓存**：用户会换着说法问同样的问题时
+5. **Batch API**：有非实时的工作负载时
+6. **Prompt 压缩**：系统 prompt > 1,000 token 时
+7. **输出长度限制**：平均输出 > 500 token 且本可以更短时
 
-### 4. Project Total Savings
+### 4. 预计总节省
 
-Produce a before/after table:
+给出一张优化前后对比表：
 
-| Metric | Before | After | Change |
+| 指标 | 优化前 | 优化后 | 变化 |
 |--------|--------|-------|--------|
-| Monthly cost | $X | $Y | -Z% |
-| Cost per request | $X | $Y | -Z% |
-| Avg latency | Xms | Yms | -Z% |
-| Cache hit rate | 0% | X% | -- |
+| 每月成本 | $X | $Y | -Z% |
+| 每次请求成本 | $X | $Y | -Z% |
+| 平均延迟 | Xms | Yms | -Z% |
+| 缓存命中率 | 0% | X% | -- |
 
-### 5. Implementation Roadmap
+### 5. 实施路线图
 
-Order the optimizations into 3 phases:
+把优化项分成 3 个阶段：
 
-- **Phase 1 (Week 1):** Zero-code or minimal changes. Provider caching, batch API.
-- **Phase 2 (Week 2-3):** Moderate effort. Exact caching, model routing, rate limiting.
-- **Phase 3 (Month 2):** Significant effort. Semantic caching, prompt compression, cost monitoring dashboard.
+- **阶段 1（第 1 周）：** 零代码或极少改动。供应商缓存、batch API。
+- **阶段 2（第 2-3 周）：** 中等工作量。精确缓存、模型路由、限流。
+- **阶段 3（第 2 个月）：** 较大工作量。语义缓存、prompt 压缩、成本监控看板。
 
-## Input Format
+## 输入格式
 
-**Application description:**
+**应用描述：**
 ```
 {description}
 ```
 
-**Current monthly spend:** ${amount}
+**当前每月花费：** ${amount}
 
-**Usage numbers (if known):**
+**使用数据（如已知）：**
 ```
 {usage_stats}
 ```
 
-## Output
+## 输出
 
-A prioritized optimization plan with dollar savings, implementation effort, and a 3-phase roadmap.
+一份按优先级排序的优化方案，包含节省金额、实施工作量和 3 阶段路线图。

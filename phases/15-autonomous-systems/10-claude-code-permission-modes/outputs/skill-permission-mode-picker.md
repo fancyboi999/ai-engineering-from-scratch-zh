@@ -1,40 +1,40 @@
 ---
 name: permission-mode-picker
-description: Match a Claude Code task to the correct permission mode, budget caps, and required isolation before starting a run.
+description: 开始运行前，为 Claude Code 任务匹配正确的权限模式、预算上限和所需隔离。
 version: 1.0.0
 phase: 15
 lesson: 10
 tags: [claude-code, permission-modes, auto-mode, budgets, isolation]
 ---
 
-Given a proposed Claude Code task, pick the permission mode, set budgets, and specify the minimum isolation required before the agent is allowed to start.
+给定一个拟议的 Claude Code 任务，选定权限模式、设定预算，并规定 agent 获准启动前的最低隔离要求。
 
-Produce:
+产出：
 
-1. **Task profile.** One sentence on what the task does, one sentence on the blast radius if it goes wrong.
-2. **Mode recommendation.** One of: `plan`, `default`, `acceptEdits`, `auto`, `dontAsk`, `bypassPermissions`. Justify with a single sentence referencing the blast radius.
-3. **Budget numbers.** Concrete values for `max_turns`, `max_budget_usd`, and any per-tool caps. For unattended runs over an hour, specify a dollar cap equal to or below what you would pay for a human mistake you cannot roll back.
-4. **Isolation requirements.** File-system scope (project directory only, scratch directory, ephemeral container). Network policy (no egress, allowlist only, full). Credential surface (none, scoped token, broad token). For `bypassPermissions` or `dontAsk`, the run must be inside an ephemeral container with no production credentials mounted.
-5. **Trajectory audit plan.** How will a human review the trajectory after the run? Required for `auto`, `dontAsk`, and anything over a 30-minute horizon.
+1. **任务画像。** 一句话说明任务做什么，一句话说明出错时的爆炸半径。
+2. **模式建议。** 从 `plan`、`default`、`acceptEdits`、`auto`、`dontAsk`、`bypassPermissions` 中选一个。用一句结合爆炸半径的话说明理由。
+3. **预算数字。** 给出 `max_turns`、`max_budget_usd` 以及各工具上限的具体值。对超过一小时的无人值守运行，美元上限应不高于你为一次无法回滚的人为失误所愿付出的代价。
+4. **隔离要求。** 文件系统范围（仅项目目录、临时目录、临时容器）。网络策略（禁止出站、仅白名单、完全放开）。凭证面（无、限定范围的 token、宽权限 token）。使用 `bypassPermissions` 或 `dontAsk` 时，运行必须在临时容器内，且不挂载任何生产凭证。
+5. **轨迹审计计划。** 运行结束后由人如何审查轨迹？`auto`、`dontAsk` 以及时间跨度超过 30 分钟的任务都必须有。
 
-Hard rejects:
-- `bypassPermissions` against a repository with uncommitted changes.
-- `auto` with no budget cap.
-- Any mode above `acceptEdits` with broad credentials in the environment (AWS, GCP, GitHub PAT with repo scope).
-- Unattended runs longer than one hour with no trajectory audit scheduled.
-- Claims that the Auto Mode classifier alone is sufficient for a novel task distribution.
+直接否决：
+- 对有未提交改动的仓库使用 `bypassPermissions`。
+- 不设预算上限的 `auto`。
+- 环境里有宽权限凭证（AWS、GCP、带 repo 权限的 GitHub PAT）时，使用高于 `acceptEdits` 的任何模式。
+- 超过一小时却没有安排轨迹审计的无人值守运行。
+- 声称面对全新任务分布时，单靠 Auto Mode 分类器就足够。
 
-Refusal rules:
-- If the user cannot name the blast radius of a failure, refuse and require an explicit worst-case sentence before starting.
-- If the user requests `auto` in a workspace with production database credentials reachable, refuse and require scoped credentials or an ephemeral container first.
-- If the proposed budget cap exceeds what the user is willing to lose on a bad run, refuse and require a lower cap.
+拒绝规则：
+- 用户说不出失败的爆炸半径时，拒绝，要求启动前先写出一句明确的最坏情况。
+- 用户在能访问生产数据库凭证的工作区里要求使用 `auto` 时，拒绝，要求先换成限定范围的凭证或临时容器。
+- 拟议的预算上限超过用户愿意在一次失败运行上损失的金额时，拒绝，要求调低上限。
 
-Output format:
+输出格式：
 
-Return a one-page run card with:
-- **Task summary** (one sentence)
-- **Blast radius** (one sentence, worst case)
-- **Mode** (explicit)
-- **Budgets** (`max_turns`, `max_budget_usd`, per-tool caps)
-- **Isolation** (fs scope, network policy, credential surface)
-- **Audit plan** (who reviews the trajectory, when, against what rubric)
+返回一页运行卡，包含：
+- **任务摘要**（一句话）
+- **爆炸半径**（一句话，最坏情况）
+- **模式**（明确写出）
+- **预算**（`max_turns`、`max_budget_usd`、各工具上限）
+- **隔离**（文件系统范围、网络策略、凭证面）
+- **审计计划**（谁审查轨迹、何时审查、依据什么评分标准）

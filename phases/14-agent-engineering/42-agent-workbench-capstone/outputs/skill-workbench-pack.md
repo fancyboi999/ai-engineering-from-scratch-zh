@@ -1,36 +1,36 @@
 ---
 name: workbench-pack
-description: Generate a project-tuned drop-in agent workbench pack — rules sharpened to the team's history, scope globs matched to the repo, rubric dimensions extended with one domain-specific entry.
+description: 生成一套按项目调校、即装即用的 agent 工作台套件：规则按团队历史打磨，范围 glob 匹配仓库结构，评分标准额外加入一个领域专属维度。
 version: 1.0.0
 phase: 14
 lesson: 42
 tags: [capstone, workbench-pack, installer, schemas, drop-in]
 ---
 
-Given a repo, the team's incident history, and the agent product running inside it, emit a tuned agent-workbench-pack and an installer.
+给定一个仓库、团队的事故历史和在其中运行的 agent 产品，输出一套调校过的 agent-workbench-pack 和安装器。
 
-Produce:
+产出：
 
-1. `agent-workbench-pack/` directory matching the canonical layout: AGENTS.md, docs/, schemas/, scripts/, bin/, README.md, VERSION.
-2. A `bin/install.sh` that refuses to clobber an existing pack without `--force` and writes `.workbench-version` into the target repo.
-3. Project-tuned versions of `agent-rules.md` (with at least one rule per category derived from the team's last six incidents), `reviewer-rubric.md` (with a sixth domain dimension), and `scope_contract.schema.json` (with project-specific globs).
-4. A `lint_pack.py` script that fails on drift between scripts and schemas or between VERSION and the schemas' `schema_version`.
-5. Optional CI integration that installs the pack on demo branches and runs the verification gate against a known-good task.
+1. `agent-workbench-pack/` 目录，符合标准布局：AGENTS.md、docs/、schemas/、scripts/、bin/、README.md、VERSION。
+2. `bin/install.sh`：没有 `--force` 时拒绝覆盖已有套件，并向目标仓库写入 `.workbench-version`。
+3. 按项目调校的 `agent-rules.md`（每个类别至少一条规则，来自团队最近六次事故）、`reviewer-rubric.md`（加入第六个领域维度）和 `scope_contract.schema.json`（使用项目专属的 glob）。
+4. `lint_pack.py` 脚本：脚本与 schema 不一致，或 VERSION 与 schema 中的 `schema_version` 不一致时失败。
+5. 可选的 CI 集成：在演示分支上安装套件，并针对一个已知正确的任务运行验证关卡。
 
-Hard rejects:
+直接否决：
 
-- A pack containing project-specific tasks. Tasks live on the target repo's board.
-- A pack tied to a single vendor SDK. Framework-agnostic only; SDK wiring is the target repo's job.
-- An installer that mutates state files. The installer is idempotent surface-only; state belongs to the agent and humans.
-- Rules without a corresponding check function. Aspirational rules belong in onboarding, not in the pack.
+- 套件里包含项目专属任务。任务放在目标仓库的看板上。
+- 绑定单一厂商 SDK 的套件。只做框架无关的部分，SDK 接线是目标仓库的事。
+- 会修改状态文件的安装器。安装器幂等，只动工作台各个面；状态归 agent 和人类管。
+- 没有对应检查函数的规则。只表达愿景的规则放进入职文档，不进套件。
 
-Refusal rules:
+拒绝规则：
 
-- If incident history is empty, refuse to ship a tuned `agent-rules.md`. Use the canonical default and surface the gap.
-- If the target repo's CI is incompatible with the install (no `.github/workflows/`, no equivalent), refuse the optional CI step and document the manual path.
-- If the team uses a private fork of the pack, refuse to write a public installer. Private installers carry private invariants.
+- 事故历史为空时，拒绝交付调校版 `agent-rules.md`。改用标准默认版本，并报告这个缺口。
+- 目标仓库的 CI 与安装方式不兼容（没有 `.github/workflows/`，也没有等价物）时，拒绝执行可选的 CI 步骤，改为记录手动安装路径。
+- 团队使用套件的私有 fork 时，拒绝编写公开安装器。私有安装器带有私有的不变量。
 
-Output structure:
+输出结构：
 
 ```
 agent-workbench-pack/
@@ -44,8 +44,8 @@ agent-workbench-pack/
 └── README.md
 ```
 
-End with "what to read next" pointing to:
+最后给出"接下来读什么"，指向：
 
-- Lesson 41 for the before/after benchmark this pack improves on.
-- Lesson 30 (Eval-Driven Agent Development) for the eval loop that consumes the pack's verdicts.
-- [SkillKit](https://github.com/rohitg00/skillkit) for distributing the pack across 32 AI agents.
+- 第 41 课：本套件所改进的前后对比基准测试。
+- 第 30 课（评测驱动的 agent 开发）：消费套件结论的评测循环。
+- [SkillKit](https://github.com/rohitg00/skillkit)：把套件分发到 32 个 AI agent。

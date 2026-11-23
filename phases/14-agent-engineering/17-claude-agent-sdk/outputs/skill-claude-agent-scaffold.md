@@ -1,33 +1,33 @@
 ---
 name: claude-agent-scaffold
-description: Scaffold a Claude Agent SDK app with subagents, lifecycle hooks, session store, MCP server attachment, and W3C trace propagation.
+description: 搭建 Claude Agent SDK 应用，包含子 agent、生命周期 hook、会话存储、MCP server 挂载和 W3C trace 传播。
 version: 1.0.0
 phase: 14
 lesson: 17
 tags: [claude-agent-sdk, subagents, hooks, session-store, mcp]
 ---
 
-Given a product domain and a list of MCP servers, scaffold a Claude Agent SDK app.
+用户会给出一个产品领域和一份 MCP server 列表。你负责搭建一个 Claude Agent SDK 应用。
 
-Produce:
+输出：
 
-1. A main agent definition with instructions, built-in tool access (read_file, write_file, shell, grep, glob, web fetch), and custom function tools.
-2. Subagent spawner for parallelization and context isolation. Use when the orchestrator would otherwise blow its context budget.
-3. Lifecycle hooks registered: PreToolUse + PostToolUse for audit, SessionStart for setup, SessionEnd for teardown, UserPromptSubmit for rule enforcement (see pro-workflow patterns).
-4. Session store (SQLite default) with `list_subkeys` wired to render a subagent tree.
-5. MCP server attachment for external tool/resource surfaces.
-6. W3C trace context propagation so OTel spans from the caller continue through the CLI.
+1. 一个主 agent 定义，包含指令、内置工具权限（read_file、write_file、shell、grep、glob、web fetch）和自定义 function tool。
+2. 用于并行化和上下文隔离的子 agent 派生器。在编排者否则会撑爆上下文预算时使用。
+3. 注册生命周期 hook：PreToolUse + PostToolUse 用于审计，SessionStart 用于初始化，SessionEnd 用于清理，UserPromptSubmit 用于规则执行（参见 pro-workflow 模式）。
+4. 会话存储（默认 SQLite），接好 `list_subkeys` 以渲染子 agent 树。
+5. 为外部工具/资源接口挂载 MCP server。
+6. W3C trace context 传播，让调用方的 OTel span 能延续穿过 CLI。
 
-Hard rejects:
+直接否决：
 
-- Spawning a subagent for a single-tool task. Subagents are for parallelization or context isolation; not for "one read_file call."
-- Hooks with synchronous expensive work. Hooks should be microseconds to milliseconds. Long work belongs in a subagent.
-- Session stores without a cascade-delete policy. Orphaned subagent sessions bloat storage.
+- 为单工具任务派生子 agent。子 agent 用于并行化或上下文隔离，不是用来"调用一次 read_file"的。
+- hook 里做同步的重活。hook 应在微秒到毫秒级完成。耗时的工作交给子 agent。
+- 没有级联删除策略的会话存储。孤儿子 agent 会话会让存储膨胀。
 
-Refusal rules:
+拒绝规则：
 
-- If the product needs long-running async work (hours-to-days), refuse the self-hosted SDK and route to Claude Managed Agents.
-- If the user asks for `--session-mirror` to a shared location, refuse. Session transcripts carry PII; mirror to per-user encrypted storage.
-- If the agent depends on raw LLM streaming for UX without tool use, refuse the Agent SDK and recommend the Client SDK directly.
+- 如果产品需要长时间运行的异步工作（数小时到数天），拒绝自托管 SDK，转到 Claude Managed Agents。
+- 如果用户要求把 `--session-mirror` 指向共享位置，拒绝。会话记录带有 PII；应镜像到按用户隔离的加密存储。
+- 如果 agent 的 UX 依赖原始 LLM 流式输出、不用工具，拒绝 Agent SDK，推荐直接用 Client SDK。
 
-Output: `agent.py`, `tools.py`, `hooks.py`, `session.py`, `README.md` explaining the subagent policy, hook registry, session backend, MCP attachments, and OTel wiring. End with "what to read next" pointing to Lesson 22 for voice handoffs, Lesson 23 for OTel span attribution, or Lesson 18 if product needs production runtime shape.
+输出：`agent.py`、`tools.py`、`hooks.py`、`session.py`，以及一份 `README.md`，说明子 agent 策略、hook 注册表、会话后端、MCP 挂载和 OTel 接线。结尾写"接下来读什么"：语音 handoff 看第 22 课，OTel span 归因看第 23 课，产品需要生产级运行时形态时看第 18 课。

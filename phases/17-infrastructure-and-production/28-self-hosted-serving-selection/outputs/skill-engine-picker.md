@@ -1,31 +1,31 @@
 ---
 name: engine-picker
-description: Pick a self-hosted LLM engine (llama.cpp, Ollama, TGI, vLLM, SGLang) given hardware, scale, and workload. Name 2026 TGI maintenance mode as a migration trigger.
+description: 根据硬件、规模和负载选择自托管 LLM 引擎（llama.cpp、Ollama、TGI、vLLM、SGLang），并把 2026 年 TGI 进入维护模式列为迁移触发条件。
 version: 1.0.0
 phase: 17
 lesson: 28
 tags: [self-hosted, vllm, sglang, llama-cpp, ollama, tgi, trt-llm, engine-selection]
 ---
 
-Given hardware (CPU / Apple Silicon / AMD / NVIDIA Hopper / NVIDIA Blackwell), scale (single-user / small team / production / enterprise), and workload (general chat / agentic / RAG / long-context / code), produce an engine recommendation.
+给定硬件（CPU / Apple Silicon / AMD / NVIDIA Hopper / NVIDIA Blackwell）、规模（单用户 / 小团队 / 生产 / 企业）和负载（通用聊天 / agent / RAG / 长上下文 / 代码），给出引擎推荐。
 
-Produce:
+输出以下内容：
 
-1. Engine. Name the specific engine. Cite the hardware-first, scale-second, workload-third tree.
-2. Why not the alternatives. For each alternative engine, state why it's not the pick (TGI maintenance mode, AMD excludes TRT-LLM, Ollama is dev-only).
-3. Pipeline. If production, name the pipeline pattern (dev Ollama → staging llama.cpp → prod vLLM/SGLang) and confirm weight format (GGUF or HF) flows through.
-4. Production stacking. At production scale, point to Phase 17 · 18 (production-stack), · 17 (disaggregated), · 11 (cache-aware router) for the composition.
-5. TGI migration. If incumbent is TGI, specify the migration plan and timeline — not urgent but should start within 6 months.
-6. Hardware gotcha. Call out the two hard constraints: CPU-only → llama.cpp; AMD → no TRT-LLM.
+1. 引擎。写出具体引擎。引用"先看硬件、再看规模、最后看负载"的决策树。
+2. 为什么不选其他引擎。对每个备选引擎，说明不选它的原因（TGI 进入维护模式、AMD 不能用 TRT-LLM、Ollama 只适合开发）。
+3. 流水线。如果是生产环境，写出流水线模式（开发用 Ollama → 预发用 llama.cpp → 生产用 vLLM/SGLang），并确认权重格式（GGUF 或 HF）能贯穿整条流水线。
+4. 生产组合。生产规模下，组合方式参见阶段 17 · 18（production-stack）、· 17（分离部署）、· 11（缓存感知路由器）。
+5. TGI 迁移。如果现有引擎是 TGI，写明迁移计划和时间线。不算紧急，但应在 6 个月内启动。
+6. 硬件陷阱。点出两条硬约束：只有 CPU → llama.cpp；AMD → 不能用 TRT-LLM。
 
-Hard rejects:
-- Defaulting new projects to TGI in 2026. Refuse — maintenance mode.
-- Ollama for shared production at >1 concurrent user. Refuse — throughput gap.
-- Suggesting TRT-LLM without confirming NVIDIA-only. Refuse — AMD / non-NVIDIA is a hard block.
+直接否决：
+- 2026 年新项目默认用 TGI。拒绝。它已进入维护模式。
+- 共享的生产环境、并发用户 >1 时用 Ollama。拒绝。吞吐差距太大。
+- 不确认是否纯 NVIDIA 就建议 TRT-LLM。拒绝。AMD / 非 NVIDIA 硬件直接不能用。
 
-Refusal rules:
-- If hardware is mixed (some AMD, some NVIDIA), require per-cluster engine decisions; do not force a single engine.
-- If the workload is "unknown/general" at production scale, default to vLLM and plan a re-evaluation after 3 months of traffic data.
-- If team wants "fastest per GPU without Blackwell availability" and insists on Hopper-only, confirm — TRT-LLM or vLLM are both acceptable.
+拒绝规则：
+- 如果硬件是混合的（部分 AMD、部分 NVIDIA），要求按集群分别选引擎；不要强行统一成一个。
+- 如果生产规模下负载是"未知/通用"，默认用 vLLM，并计划在积累 3 个月流量数据后重新评估。
+- 如果团队想要"在没有 Blackwell 的情况下单卡最快"，并坚持只用 Hopper，可以确认：TRT-LLM 和 vLLM 都可以接受。
 
-Output: a one-page recommendation with engine, alternatives dismissed, pipeline, production stacking, TGI migration posture. End with the single quarterly review: re-evaluate engine choice when workload shape changes materially.
+输出：一页推荐，写明引擎、被排除的备选、流水线、生产组合和 TGI 迁移策略。最后给出唯一的季度复查项：负载形态发生实质变化时，重新评估引擎选择。

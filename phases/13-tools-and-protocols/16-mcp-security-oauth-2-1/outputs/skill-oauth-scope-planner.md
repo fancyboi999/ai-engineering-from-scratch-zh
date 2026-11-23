@@ -1,6 +1,6 @@
 ---
 name: oauth-scope-planner
-description: Design MCP 2026-07-28 authorization with CIMD, issuer isolation, resource indicators, and step-up scopes.
+description: 设计 MCP 2026-07-28 授权，包含 CIMD、签发方隔离、资源指示符与逐级提权的 scope。
 version: 2.0.0
 phase: 13
 lesson: 16

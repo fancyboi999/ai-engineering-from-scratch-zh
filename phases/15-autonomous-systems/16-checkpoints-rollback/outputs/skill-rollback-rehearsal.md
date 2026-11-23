@@ -1,41 +1,41 @@
 ---
 name: rollback-rehearsal
-description: Design a rollback-rehearsal test for a proposed autonomous workflow and audit the checkpoint backend for audit-trail persistence.
+description: 为拟议的自主工作流设计回滚演练测试，并审计检查点后端能否持久保存审计轨迹。
 version: 1.0.0
 phase: 15
 lesson: 16
 tags: [checkpointing, rollback, idempotency, eu-ai-act-article-14, durable-execution]
 ---
 
-Given a proposed long-horizon autonomous workflow, design a rollback-rehearsal test that proves the idempotency + precondition + verify + rollback stack actually works end-to-end, and audit the checkpoint backend for regulator-readiness.
+给定一个拟议的长时间跨度自主工作流，设计一个回滚演练测试，证明"幂等 + 前置条件 + 验证 + 回滚"这一整套机制确实能端到端工作，并审计检查点后端是否满足监管要求。
 
-Produce:
+产出：
 
-1. **Rehearsal script.** Concrete test that (a) starts the workflow, (b) crashes it mid-commit, (c) resumes, (d) asserts the action fires exactly once, (e) injects a verify failure, (f) asserts the rollback fires and state is restored. No production workflow should run without this test having passed at least once.
-2. **Idempotency audit.** Confirm the idempotency key is derived from proposal content (Lesson 15) and commit logic uses explicit execution states (`pending` -> `executing` -> `committed`/`failed`). Reserve/lock by idempotency key before the side effect, and mark `committed` only after the side effect has been verified.
-3. **Precondition inventory.** List every precondition the workflow must re-check at commit time. Time-of-check vs time-of-use gaps are the most common production bug; the precondition must be evaluated at commit, not at propose.
-4. **Verify inventory.** For every consequential action, name the specific read that confirms the side effect happened. "Returned 200" is not acceptable.
-5. **Rollback inventory.** For every consequential action, classify the rollback as in-band, compensating transaction, or out-of-band alert. No-op rollbacks ("we cannot undo this") must be named explicitly in the proposal (Lesson 15 metadata).
+1. **演练脚本。** 一个具体测试：(a) 启动工作流，(b) 在提交中途让它崩溃，(c) 恢复，(d) 断言动作恰好触发一次，(e) 注入一次验证失败，(f) 断言回滚触发且状态已恢复。这个测试至少通过一次之前，任何生产工作流都不应运行。
+2. **幂等审计。** 确认幂等键由提议内容推导而来（第 15 课），且提交逻辑使用显式的执行状态（`pending` -> `executing` -> `committed`/`failed`）。在产生副作用之前按幂等键预留/加锁，只在副作用经过验证后才标记为 `committed`。
+3. **前置条件清单。** 列出工作流在提交时必须重新检查的每个前置条件。检查时刻与使用时刻之间的空档是最常见的生产 bug；前置条件必须在提交时评估，而不是在提议时。
+4. **验证清单。** 对每个有后果的动作，写明用哪一次具体读取来确认副作用已发生。"返回了 200"不可接受。
+5. **回滚清单。** 对每个有后果的动作，把回滚归类为带内回滚、补偿事务或带外告警。无法回滚的情况（"这个撤销不了"）必须在提议中明确写出（第 15 课的元数据）。
 
-Hard rejects:
-- Workflows with no rehearsed rollback.
-- Checkpoint backends that lose data on deploy.
-- Commit paths where status is written after execution, not before.
-- "Verified" states that only check the return code of the tool call.
-- Precondition checks that run only at propose time, not commit time.
+直接否决：
+- 没有演练过回滚的工作流。
+- 部署时会丢数据的检查点后端。
+- 状态在执行之后才写入、而不是之前写入的提交路径。
+- 只检查工具调用返回码的"已验证"状态。
+- 只在提议时运行、不在提交时运行的前置条件检查。
 
-Refusal rules:
-- If the user has not run the rehearsal script at least once in staging, refuse production rollout.
-- If the user cannot produce the checkpoint store schema, refuse and require schema documentation first. Regulators want queryable state.
-- If the workflow depends on an in-memory checkpoint (no persistence), refuse.
+拒绝规则：
+- 用户还没在预发环境里至少跑过一次演练脚本时，拒绝上线生产。
+- 用户拿不出检查点存储的 schema 时，拒绝，要求先补齐 schema 文档。监管方要的是可查询的状态。
+- 工作流依赖内存检查点（无持久化）时，拒绝。
 
-Output format:
+输出格式：
 
-Return a rehearsal plan with:
-- **Test script outline** (steps with assertions)
-- **Idempotency table** (key composition, status-write order)
-- **Precondition table** (check, when evaluated, consequence)
-- **Verify table** (action, read that confirms)
-- **Rollback table** (action, type, target state)
-- **Backend attestation** (store, survives-deploy y/n, query-ready y/n)
-- **Readiness** (production / staging / research-only)
+返回一份演练计划，包含：
+- **测试脚本大纲**（步骤及断言）
+- **幂等表格**（键的构成、状态写入顺序）
+- **前置条件表格**（检查项、评估时机、后果）
+- **验证表格**（动作、用于确认的读取）
+- **回滚表格**（动作、类型、目标状态）
+- **后端证明**（存储、部署后保留 y/n、可查询 y/n）
+- **就绪度**（production / staging / research-only）

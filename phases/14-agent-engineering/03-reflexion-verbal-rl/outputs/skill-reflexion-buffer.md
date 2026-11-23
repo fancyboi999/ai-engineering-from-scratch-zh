@@ -1,33 +1,33 @@
 ---
 name: reflexion-buffer
-description: Maintain an episodic-memory buffer of reflections for verbal RL with TTL, dedup, and scoped scope.
+description: 为语言强化学习维护一个反思的情景记忆缓冲区，支持 TTL、去重和作用域限定。
 version: 1.0.0
 phase: 14
 lesson: 03
 tags: [reflexion, episodic-memory, self-healing, verbal-rl, sleep-time]
 ---
 
-Given a task class (repeating kind of agent run — e.g. "refactor a function," "close a support ticket"), maintain an episodic-memory buffer of reflections. Each reflection records a failure mode and the corrective insight in natural language. The buffer is prepended to the next trial of the same task class.
+用户会给出一个任务类别（反复出现的一类 agent 运行，例如"重构一个函数""关闭一张客服工单"）。你负责维护一个存放反思的情景记忆缓冲区。每条反思用自然语言记录一种失败模式和对应的纠正思路。下次运行同一任务类别时，把缓冲区内容放在最前面。
 
-Produce:
+输出：
 
-1. Reflection capture. After a trial ends with an evaluator score below threshold, emit a one-line reflection in the shape "I failed to do X because Y; next time, Z." Discard reflections on external failures (network, upstream 500s) unless they are reproducible.
-2. TTL and dedup. Reflections expire after N trials by default (10 suggested). Exact duplicates collapse. Near-duplicates (>0.9 cosine on a small embedding model, or shared substring >= 80%) keep only the most recent.
-3. Scope policy. Three scopes: task-class (per task name), user (across tasks for same user), agent (across all users). Default is task-class. Escalate to user scope only if the reflection refers to user-specific preferences; never escalate to agent scope automatically.
-4. Compaction. When the buffer exceeds the budget, run sleep-time compaction: cluster near-duplicates, summarize, merge. Compaction runs off the hot path — do not delay the primary agent's response.
-5. Prompt integration. Emit a single block titled "What I learned from prior trials" with a bulleted list. Cap at 6 items in the prompt; overflow goes to a separate summary item ("... and 4 older reflections about timeouts").
+1. 反思采集。一次尝试结束且评估器分数低于阈值时，按"我没能做到 X，因为 Y；下次要 Z。"的格式输出一行反思。外部故障（网络、上游 500）导致的反思直接丢弃，除非能稳定复现。
+2. TTL 和去重。反思默认在 N 次尝试后过期（建议 10 次）。完全重复的合并为一条。近似重复的（用小型嵌入模型算余弦相似度 >0.9，或共享子串 >= 80%）只保留最新一条。
+3. 作用域策略。三种作用域：任务类别（按任务名）、用户（同一用户的所有任务）、agent（所有用户）。默认是任务类别。只有当反思涉及用户的个人偏好时才升级到用户作用域；永远不要自动升级到 agent 作用域。
+4. 压缩。缓冲区超出预算时，运行睡眠时压缩：把近似重复的聚类、摘要、合并。压缩在关键路径之外运行，不要拖慢主 agent 的响应。
+5. Prompt 集成。输出一个标题为"我从之前的尝试中学到了什么"的块，内容是项目符号列表。prompt 中最多放 6 条；多出来的归入一条单独的汇总（"……另有 4 条关于超时的较早反思"）。
 
-Hard rejects:
+直接否决：
 
-- Writing reflections as "be more careful next time." That is not actionable. Re-run the reflector with a prompt that forces a concrete next-time instruction.
-- Expiring reflections based on wall-clock time rather than trial count. TTL should be trial-scoped, not time-scoped, for offline-replayable runs.
-- Storing reflections that reference secrets (API keys, tokens, PII). Reject with a specific "contains secret"-class error before committing to the buffer.
+- 把反思写成"下次更小心一点"。这没法执行。用一个强制给出具体下次指令的 prompt 重新运行反思器。
+- 按挂钟时间而不是尝试次数让反思过期。为了让运行可以离线重放，TTL 应该按尝试次数计，而不是按时间计。
+- 存储引用了机密信息（API key、token、PII）的反思。在写入缓冲区之前，用一个明确的"包含机密"类错误拒绝。
 
-Refusal rules:
+拒绝规则：
 
-- If no evaluator is attached, refuse and recommend Lesson 05 (Self-Refine/CRITIC) — reflection requires a signal, not a gut feeling.
-- If the task class is one-shot (never recurs), refuse; episodic memory does nothing for a task that never repeats.
+- 如果没有接入评估器，拒绝，推荐第 05 课（Self-Refine/CRITIC）。反思需要信号，而不是直觉。
+- 如果任务类别是一次性的（永不重复），拒绝；对永不重复的任务，情景记忆毫无作用。
 
-Output: a structured buffer file (JSON with reflection objects: trial id, task class, scope, text, created_at, ttl_remaining), a prompt block for the next trial, and a "stale reflections" report listing entries that will expire soon.
+输出：一个结构化的缓冲区文件（JSON，包含反思对象：trial id、task class、scope、text、created_at、ttl_remaining）、一个供下次尝试使用的 prompt 块，以及一份"过期反思"报告，列出即将过期的条目。
 
-End with a "what to read next" note pointing to Lesson 06 (context compression) if the buffer keeps hitting its cap, or Lesson 08 (Letta sleep-time compute) to move compaction off the hot path.
+结尾写一段"接下来读什么"：缓冲区经常触顶的话，指向第 06 课（上下文压缩）；想把压缩移出关键路径的话，指向第 08 课（Letta 睡眠时计算）。

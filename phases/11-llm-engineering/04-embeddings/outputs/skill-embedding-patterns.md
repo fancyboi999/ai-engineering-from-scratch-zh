@@ -1,111 +1,111 @@
 ---
 name: skill-embedding-patterns
-description: Production patterns for embeddings, vector search, and similarity
+description: embedding、向量搜索与相似度计算的生产模式
 version: 1.0.0
 phase: 11
 lesson: 4
 tags: [embeddings, vectors, similarity, search, chunking, quantization]
 ---
 
-# Embedding Patterns
+# Embedding 模式
 
-Every embedding workflow follows this contract:
+所有 embedding 工作流都遵循这份约定：
 
 ```
 text -> embed(text) -> vector (float array)
 similarity(vector_a, vector_b) -> score (float)
 ```
 
-The embedding model and similarity metric are the only two decisions that matter. Everything else is plumbing.
+真正要紧的决策只有两个：embedding 模型和相似度度量。其余都是管道活。
 
-## When to use embeddings
+## 什么时候用 embedding
 
-- Semantic search across documents (find meaning, not keywords)
-- Clustering similar items (support tickets, product reviews, bug reports)
-- Classification by nearest neighbors (label new items by similarity to labeled examples)
-- Recommendation systems (find items similar to what the user liked)
-- Deduplication (find near-duplicate content using similarity threshold)
+- 跨文档的语义搜索（找含义，而不是关键词）
+- 对相似条目聚类（工单、商品评论、bug 报告）
+- 最近邻分类（按与已标注样本的相似度给新条目打标签）
+- 推荐系统（找与用户喜欢的条目相似的内容）
+- 去重（用相似度阈值找出近似重复的内容）
 
-## When NOT to use embeddings
+## 什么时候不要用 embedding
 
-- Exact keyword matching (use full-text search)
-- Structured queries (use SQL, filters)
-- Small datasets where manual labeling is faster (<100 items)
-- Tasks where explainability matters more than accuracy (embeddings are opaque)
+- 精确关键词匹配（用全文搜索）
+- 结构化查询（用 SQL、过滤条件）
+- 手工标注更快的小数据集（<100 条）
+- 可解释性比准确率更重要的任务（embedding 是不透明的）
 
-## Model selection
+## 模型选择
 
-Pick based on your constraints:
+按你的约束来选：
 
-- **Need an API, best value**: OpenAI text-embedding-3-small (1536d, $0.02/1M tokens)
-- **Need maximum accuracy**: Voyage-3 (1024d, $0.06/1M tokens, highest MTEB)
-- **Need local/private**: BGE-M3 (1024d, free, multilingual, GPU recommended)
-- **Need fast local prototyping**: all-MiniLM-L6-v2 (384d, free, runs on CPU)
-- **Need multilingual**: Cohere embed-v3 (1024d) or BGE-M3 (both strong multilingual)
+- **要用 API，追求性价比**：OpenAI text-embedding-3-small（1536d，$0.02/1M tokens）
+- **要最高准确率**：Voyage-3（1024d，$0.06/1M tokens，MTEB 最高）
+- **要本地/私有部署**：BGE-M3（1024d，免费，多语言，建议用 GPU）
+- **要快速本地原型**：all-MiniLM-L6-v2（384d，免费，可在 CPU 上运行）
+- **要多语言**：Cohere embed-v3（1024d）或 BGE-M3（两者多语言能力都强）
 
-Rule: never mix embedding models between indexing and querying. Vectors from different models live in incompatible spaces.
+规则：建索引和查询绝不能混用不同的 embedding 模型。不同模型产出的向量处在互不兼容的空间里。
 
-## Chunking rules
+## 分块规则
 
-1. Target 256-512 tokens per chunk with 50-token overlap
-2. Never split mid-sentence if you can avoid it
-3. Include metadata (source file, section title, position) with every chunk
-4. For structured docs (Markdown, HTML), split at heading boundaries first
-5. Test chunk quality by searching for known answers and checking retrieval
+1. 每块目标 256-512 token，重叠 50 token
+2. 能避免就绝不在句子中间切开
+3. 每个块都带上元数据（源文件、章节标题、位置）
+4. 结构化文档（Markdown、HTML）先按标题边界切分
+5. 用已知答案去搜索、检查检索结果，以此测试分块质量
 
-## Similarity metric selection
+## 相似度度量选择
 
-- **Cosine similarity**: default choice, handles variable-length text, normalized
-- **Dot product**: use when vectors are already unit-normalized (OpenAI models are), slightly faster
-- **Euclidean distance**: use for clustering, when absolute position matters
+- **余弦相似度**：默认选择，能处理长度不一的文本，自带归一化
+- **点积**：向量已是单位归一化时使用（OpenAI 模型即如此），略快
+- **欧氏距离**：用于聚类，或绝对位置有意义的场景
 
-All three give the same ranking when vectors are normalized. The choice only matters for non-normalized vectors.
+向量归一化后，三者给出的排序完全相同。只有向量未归一化时，选哪个才有区别。
 
-## Storage optimization
+## 存储优化
 
-Three levels of compression, stackable:
+三级压缩，可以叠加使用：
 
-1. **Matryoshka truncation**: reduce dimensions (1536 -> 256 = 6x savings, 3-5% accuracy loss)
-2. **Float16 quantization**: halve storage per dimension (2x savings, <1% accuracy loss)
-3. **Binary quantization**: 1 bit per dimension (32x savings, 5-10% accuracy loss, use with rescoring)
+1. **Matryoshka 截断**：降维（1536 -> 256 = 节省 6 倍，准确率损失 3-5%）
+2. **Float16 量化**：每个维度存储减半（节省 2 倍，准确率损失 <1%）
+3. **二值量化**：每个维度 1 bit（节省 32 倍，准确率损失 5-10%，需配合重新打分）
 
-Production pattern: binary search over full corpus, rescore top-1000 with float32 vectors.
+生产做法：先在全量语料上做二值搜索，再用 float32 向量对 top-1000 重新打分。
 
-## Retrieve-then-rerank
+## 先检索再重排序
 
-Two-stage pipeline for best accuracy:
+追求最佳准确率的两阶段流水线：
 
-1. Bi-encoder retrieves top-100 candidates (fast, uses pre-computed embeddings)
-2. Cross-encoder reranks to top-10 (slow, processes each query-doc pair)
+1. Bi-encoder 检索出 top-100 候选（快，使用预先算好的 embedding）
+2. Cross-encoder 重排到 top-10（慢，逐一处理每个查询-文档对）
 
-This beats single-stage retrieval by 10-15% on precision metrics. Use when accuracy matters more than latency.
+在精确率指标上，这比单阶段检索高 10-15%。准确率比延迟更重要时使用。
 
-## Common mistakes
+## 常见错误
 
-- Using different embedding models for indexing and querying
-- Embedding entire documents instead of chunks (embedding becomes average of everything)
-- Not normalizing vectors before cosine similarity (most models pre-normalize, but verify)
-- Ignoring chunk overlap (sentences split at boundaries lose context)
-- Storing only vectors without the original text (you need both for retrieval)
-- Not re-embedding when the model changes (old vectors are incompatible)
-- Choosing dimensions based on accuracy alone (storage and latency scale linearly with dimensions)
+- 建索引和查询用了不同的 embedding 模型
+- 嵌入整篇文档而不是分块（embedding 变成所有内容的平均）
+- 计算余弦相似度前没有归一化向量（大多数模型已预先归一化，但要核实）
+- 忽略块重叠（在边界处被切开的句子会丢失上下文）
+- 只存向量不存原文（检索时两者都需要）
+- 模型更换后没有重新嵌入（旧向量不兼容）
+- 只看准确率来选维度（存储和延迟随维度线性增长）
 
-## Debugging embeddings
+## 调试 embedding
 
-If search results are poor:
+搜索结果很差时：
 
-1. Verify the query embedding is non-zero (empty or whitespace input produces zero vectors)
-2. Check a known-relevant document's similarity score manually
-3. Try rephrasing the query to match document vocabulary
-4. Inspect chunk boundaries to ensure relevant content is not split across chunks
-5. Compare top-k results across metrics (cosine, dot, euclidean) to spot normalization issues
-6. Test with a trivially matching query (copy a sentence from a document) to confirm the pipeline works
+1. 确认查询 embedding 不是零向量（空字符串或纯空白输入会产生零向量）
+2. 手动检查一篇已知相关文档的相似度分数
+3. 换个说法改写查询，使其贴近文档用词
+4. 检查分块边界，确保相关内容没有被拆到不同块里
+5. 对比不同度量（余弦、点积、欧氏）下的 top-k 结果，找出归一化问题
+6. 用一个必然匹配的查询测试（从文档里复制一句话），确认流水线本身能跑通
 
-## Production parameters
+## 生产参数
 
-- Chunk size: 256-512 tokens
-- Chunk overlap: 50 tokens (10-20% of chunk size)
-- Top-k retrieval: 5-10 for direct use, 50-100 for reranking
-- Similarity threshold: 0.7+ for cosine (below this, results are usually irrelevant)
-- Batch embedding: process 100-500 texts per API call for throughput
-- Index rebuild: re-embed when the model changes or documents update significantly
+- 块大小：256-512 token
+- 块重叠：50 token（块大小的 10-20%）
+- Top-k 检索：直接使用取 5-10，用于重排序取 50-100
+- 相似度阈值：余弦 0.7 以上（低于这个值，结果通常不相关）
+- 批量嵌入：每次 API 调用处理 100-500 条文本以提高吞吐
+- 索引重建：模型更换或文档大幅更新时重新嵌入

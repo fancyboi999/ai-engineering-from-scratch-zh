@@ -1,44 +1,44 @@
 ---
 name: skill-mask-rcnn-head-swapper
-description: Generate the exact code for swapping box and mask heads on a torchvision Mask R-CNN for a custom num_classes
+description: 为 torchvision Mask R-CNN 生成替换框头和掩码头的精确代码，适配自定义 num_classes
 version: 1.0.0
 phase: 4
 lesson: 8
 tags: [computer-vision, mask-rcnn, fine-tuning, torchvision]
 ---
 
-# Mask R-CNN Head Swapper
+# Mask R-CNN 头部替换器
 
-Produces the head-swap boilerplate for Mask R-CNN specifically. The template below assumes `model.roi_heads.box_predictor` and `model.roi_heads.mask_predictor`, which exist on `maskrcnn_resnet50_fpn` and `maskrcnn_resnet50_fpn_v2` only. Faster R-CNN has a box predictor but no mask predictor; RetinaNet uses `RetinaNetHead` and has no `roi_heads` at all — both require different skills.
+专门为 Mask R-CNN 生成替换预测头的样板代码。下面的模板假定存在 `model.roi_heads.box_predictor` 和 `model.roi_heads.mask_predictor`，只有 `maskrcnn_resnet50_fpn` 和 `maskrcnn_resnet50_fpn_v2` 上才有这两个属性。Faster R-CNN 有框预测器但没有掩码预测器；RetinaNet 用的是 `RetinaNetHead`，根本没有 `roi_heads`。这两种模型都需要别的 skill。
 
-## When to use
+## 何时使用
 
-- Fine-tuning `maskrcnn_resnet50_fpn` or `maskrcnn_resnet50_fpn_v2` on a custom class set.
-- Porting a Mask R-CNN checkpoint trained on COCO to a non-COCO class count.
-- Debugging a Mask R-CNN training run that crashes on `cls_score.out_features` or `mask_predictor` mismatch.
+- 在自定义类别集上微调 `maskrcnn_resnet50_fpn` 或 `maskrcnn_resnet50_fpn_v2`。
+- 把在 COCO 上训练的 Mask R-CNN checkpoint 迁移到非 COCO 的类别数。
+- 排查因 `cls_score.out_features` 或 `mask_predictor` 不匹配而崩溃的 Mask R-CNN 训练。
 
-## Out of scope
+## 不在范围内
 
-- `fasterrcnn_*` — no mask_predictor. Swap only `box_predictor`; use a separate Faster R-CNN head-swap recipe.
-- `retinanet_*` — no `roi_heads`; classifier + regression heads live under `model.head.classification_head` and `model.head.regression_head`. Use a RetinaNet-specific skill.
-- `keypointrcnn_*` — uses `keypoint_predictor` instead of `mask_predictor`.
+- `fasterrcnn_*`：没有 mask_predictor。只替换 `box_predictor`；请使用单独的 Faster R-CNN 头部替换方案。
+- `retinanet_*`：没有 `roi_heads`；分类头和回归头分别位于 `model.head.classification_head` 和 `model.head.regression_head`。请使用 RetinaNet 专用的 skill。
+- `keypointrcnn_*`：用的是 `keypoint_predictor`，而不是 `mask_predictor`。
 
-## Inputs
+## 输入
 
-- `model_name`: torchvision detection model constructor, e.g. `maskrcnn_resnet50_fpn_v2`.
-- `num_classes`: including background. A 4-object-class dataset means `num_classes=5`.
-- `freeze`: one of `backbone`, `backbone_fpn`, `none`.
+- `model_name`：torchvision 检测模型构造函数，例如 `maskrcnn_resnet50_fpn_v2`。
+- `num_classes`：包含背景类。数据集有 4 个物体类别，就是 `num_classes=5`。
+- `freeze`：`backbone`、`backbone_fpn`、`none` 之一。
 
-## Steps
+## 步骤
 
-1. Import the model constructor and the two predictor classes (`FastRCNNPredictor`, `MaskRCNNPredictor`).
-2. Load the default-weights pretrained model.
-3. Replace `model.roi_heads.box_predictor` with a new `FastRCNNPredictor(in_features, num_classes)`.
-4. Replace `model.roi_heads.mask_predictor` with a new `MaskRCNNPredictor(in_features_mask, hidden_layer=256, num_classes)`.
-5. Apply the requested freeze policy.
-6. Print a confirmation block listing trainable params per module.
+1. 导入模型构造函数和两个预测器类（`FastRCNNPredictor`、`MaskRCNNPredictor`）。
+2. 加载带默认预训练权重的模型。
+3. 用新的 `FastRCNNPredictor(in_features, num_classes)` 替换 `model.roi_heads.box_predictor`。
+4. 用新的 `MaskRCNNPredictor(in_features_mask, hidden_layer=256, num_classes)` 替换 `model.roi_heads.mask_predictor`。
+5. 应用指定的冻结策略。
+6. 打印确认块，列出每个模块的可训练参数数量。
 
-## Output code template
+## 输出代码模板
 
 ```python
 from torchvision.models.detection import {MODEL_NAME}, {MODEL_WEIGHTS}
@@ -57,9 +57,9 @@ def build_model(num_classes={NUM_CLASSES}):
     return model
 ```
 
-Where `{FREEZE_BLOCK}` is:
+其中 `{FREEZE_BLOCK}` 为：
 
-- `none` -> empty
+- `none` -> 留空
 - `backbone` ->
   ```python
   for p in model.backbone.parameters():
@@ -69,10 +69,10 @@ Where `{FREEZE_BLOCK}` is:
   ```python
   for p in model.backbone.parameters():
       p.requires_grad = False
-  # FPN parameters live inside backbone.fpn
+  # FPN 参数位于 backbone.fpn 内
   ```
 
-## Report
+## 报告
 
 ```
 [head-swap]
@@ -83,9 +83,9 @@ Where `{FREEZE_BLOCK}` is:
   total:         <N>
 ```
 
-## Rules
+## 规则
 
-- Never recommend `num_classes` without the background included; always remind the user.
-- Always use the `_v2` variants of torchvision detection models when available; they have better pretrained weights than the legacy ones.
-- Do not instantiate the model inside this skill — produce the code block and let the user run it.
-- If the user requests `freeze backbone` on a dataset larger than 10,000 images, suggest they consider fine-tuning the backbone too.
+- 给出的 `num_classes` 必须包含背景类；每次都要提醒用户。
+- torchvision 检测模型有 `_v2` 版本时一律优先使用；它们的预训练权重比旧版更好。
+- 不要在这个 skill 内部实例化模型，只生成代码块，由用户自己运行。
+- 如果用户在超过 10,000 张图像的数据集上要求 `freeze backbone`，建议对方考虑把骨干网络也一起微调。

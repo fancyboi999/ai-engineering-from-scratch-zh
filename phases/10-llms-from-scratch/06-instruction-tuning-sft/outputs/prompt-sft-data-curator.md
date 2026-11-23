@@ -1,57 +1,57 @@
 ---
 name: prompt-sft-data-curator
-description: Design and curate instruction datasets for supervised fine-tuning
+description: 设计和整理用于监督微调的指令数据集
 version: 1.0.0
 phase: 10
 lesson: 6
 tags: [sft, instruction-tuning, fine-tuning, data-curation, alignment]
 ---
 
-# SFT Data Curator
+# SFT 数据整理
 
-When designing an instruction-tuning dataset for a specific capability (code generation, math, conversation, safety), use this framework to plan data collection, define quality criteria, and structure the training pipeline.
+为某项具体能力（代码生成、数学、对话、安全）设计指令微调数据集时，用这套框架规划数据收集、定义质量标准，并搭建训练流水线。
 
-## Input Requirements
+## 输入要求
 
-Provide:
-- **Target capability** (e.g., "Python code generation", "medical Q&A", "multi-turn conversation")
-- **Base model** (e.g., Llama 3 8B, Mistral 7B, Qwen 2.5 72B)
-- **Budget** (annotation hours, API costs for synthetic generation)
-- **Format preference** (Alpaca, ShareGPT, ChatML)
+请提供：
+- **目标能力**（例如“Python 代码生成”“医疗问答”“多轮对话”）
+- **基础模型**（例如 Llama 3 8B、Mistral 7B、Qwen 2.5 72B）
+- **预算**（标注工时、合成数据生成的 API 费用）
+- **格式偏好**（Alpaca、ShareGPT、ChatML）
 
-## Step 1: Dataset Design
+## 第 1 步：数据集设计
 
-### Size Guidelines
+### 规模参考
 
-| Quality Level | Examples Needed | Expected Outcome |
+| 质量档位 | 所需样本数 | 预期效果 |
 |--------------|----------------|------------------|
-| Research prototype | 1,000-5,000 | LIMA-quality: comparable to larger datasets if examples are expert-written |
-| Production v1 | 10,000-50,000 | Stanford Alpaca level: solid instruction following across common tasks |
-| Production v2 | 50,000-200,000 | Vicuna/Llama 2 Chat level: robust multi-turn, domain coverage |
+| 研究原型 | 1,000-5,000 | LIMA 水平：样本由专家撰写时，效果可与更大的数据集相当 |
+| 生产 v1 | 10,000-50,000 | Stanford Alpaca 水平：在常见任务上能稳定遵循指令 |
+| 生产 v2 | 50,000-200,000 | Vicuna/Llama 2 Chat 水平：多轮对话稳健，领域覆盖全面 |
 
-Quality always beats quantity. 1,000 expert-written examples (LIMA, May 2023) matched models trained on 50,000+ examples. Prioritize:
+质量永远比数量重要。1,000 条专家撰写的样本（LIMA，2023 年 5 月）就追平了用 50,000+ 条样本训练的模型。优先保证：
 
-1. **Diversity** -- cover the full range of target capabilities
-2. **Accuracy** -- every response must be factually correct
-3. **Clarity** -- responses should be concise and well-structured
-4. **Difficulty gradient** -- include easy, medium, and hard examples
+1. **多样性**：覆盖目标能力的全部范围
+2. **准确性**：每条回答都必须事实正确
+3. **清晰度**：回答简洁、结构清楚
+4. **难度梯度**：简单、中等、困难的样本都要有
 
-### Diversity Checklist
+### 多样性检查清单
 
-For a general-purpose assistant:
-- Open-ended questions (20%)
-- Factual Q&A (20%)
-- Creative writing (10%)
-- Code generation (15%)
-- Reasoning and math (15%)
-- Summarization (10%)
-- Instruction following with constraints (10%)
+通用助手的配比：
+- 开放式问题（20%）
+- 事实问答（20%）
+- 创意写作（10%）
+- 代码生成（15%）
+- 推理与数学（15%）
+- 摘要（10%）
+- 带约束的指令遵循（10%）
 
-Adjust percentages for domain-specific models. A coding assistant might allocate 60% to code generation and 20% to code explanation.
+领域模型要调整比例。编程助手可以把 60% 分给代码生成，20% 分给代码讲解。
 
-## Step 2: Data Format
+## 第 2 步：数据格式
 
-### Alpaca Format (single-turn)
+### Alpaca 格式（单轮）
 
 ```json
 {
@@ -61,9 +61,9 @@ Adjust percentages for domain-specific models. A coding assistant might allocate
 }
 ```
 
-Use when: single-turn tasks, simple instruction-response pairs, rapid prototyping.
+适用场景：单轮任务、简单的指令-回答对、快速原型。
 
-### ShareGPT Format (multi-turn)
+### ShareGPT 格式（多轮）
 
 ```json
 {
@@ -77,9 +77,9 @@ Use when: single-turn tasks, simple instruction-response pairs, rapid prototypin
 }
 ```
 
-Use when: conversational applications, multi-turn context is important.
+适用场景：对话类应用、多轮上下文很重要的场景。
 
-### ChatML Format (with special tokens)
+### ChatML 格式（带特殊 token）
 
 ```
 <|im_start|>system
@@ -90,58 +90,58 @@ How do I reverse a string?<|im_end|>
 Use slicing: s[::-1]<|im_end|>
 ```
 
-Use when: targeting models that use ChatML natively (Qwen, Yi).
+适用场景：目标模型原生使用 ChatML（Qwen、Yi）。
 
-## Step 3: Quality Criteria
+## 第 3 步：质量标准
 
-### Per-Example Checks
+### 逐条检查
 
-1. **Response relevance**: Does the response actually answer the instruction?
-2. **Factual accuracy**: Are all claims verifiable and correct?
-3. **Completeness**: Does the response fully address the instruction?
-4. **Conciseness**: Could the same information be conveyed in fewer words?
-5. **Format consistency**: Does the response follow the expected style?
+1. **回答相关性**：回答真的回应了指令吗？
+2. **事实准确性**：所有说法都可验证且正确吗？
+3. **完整性**：回答完整覆盖了指令的要求吗？
+4. **简洁性**：同样的信息能不能用更少的字表达？
+5. **格式一致性**：回答符合预期风格吗？
 
-### Red Flags (reject the example)
+### 危险信号（直接剔除该样本）
 
-- Response contradicts itself
-- Response includes harmful content without refusal
-- Response hallucinates facts or citations
-- Instruction is ambiguous and response doesn't clarify
-- Response is a copy of the instruction rephrased
+- 回答自相矛盾
+- 回答包含有害内容且没有拒答
+- 回答编造事实或引用
+- 指令有歧义，回答却没有澄清
+- 回答只是把指令换了个说法
 
-### Dataset-Level Checks
+### 数据集层面的检查
 
-- No more than 5% of examples from any single source/template
-- At least 80% of response tokens are meaningful (not filler)
-- Average response length is 50-200 tokens (avoid very short or very long)
-- System prompt diversity: at least 10 different system prompts represented
+- 来自任何单一来源或模板的样本不超过 5%
+- 回答中至少 80% 的 token 有实际意义（不是填充）
+- 平均回答长度在 50-200 token（避免过短或过长）
+- system prompt 多样性：至少包含 10 种不同的 system prompt
 
-## Step 4: Training Configuration
+## 第 4 步：训练配置
 
-| Parameter | Recommended Range | Notes |
+| 参数 | 推荐范围 | 说明 |
 |-----------|------------------|-------|
-| Learning rate | 1e-5 to 5e-5 | Lower for larger models (1e-5 for 70B, 5e-5 for 7B) |
-| Epochs | 1-3 | Monitor validation loss, stop at first sign of increase |
-| Batch size | 32-128 | Scale with gradient accumulation if GPU-limited |
-| Warmup | 0-5% of steps | Less critical than pre-training |
-| Weight decay | 0.0-0.1 | Optional for short fine-tuning runs |
-| Loss masking | Response tokens only | Mask instruction and system prompt tokens |
-| Pre-training data mixing | 2-5% | Mix raw text to prevent catastrophic forgetting |
+| 学习率 | 1e-5 到 5e-5 | 模型越大取值越低（70B 用 1e-5，7B 用 5e-5） |
+| Epoch 数 | 1-3 | 监控验证损失，一出现上升就停 |
+| Batch 大小 | 32-128 | GPU 受限时用梯度累积来扩大 |
+| Warmup | 步数的 0-5% | 没有预训练时那么关键 |
+| 权重衰减 | 0.0-0.1 | 短时间微调可选 |
+| 损失掩码 | 只计算回答 token | 屏蔽指令和 system prompt 的 token |
+| 混入预训练数据 | 2-5% | 混入原始文本，防止灾难性遗忘 |
 
-## Step 5: Evaluation Protocol
+## 第 5 步：评估流程
 
-After training, evaluate on:
+训练后评估以下几项：
 
-1. **Instruction following rate**: Percentage of test prompts where the model produces a relevant, complete response
-2. **Forgetting score**: Perplexity on a held-out general text corpus compared to the base model
-3. **Format compliance**: Percentage of responses that follow the expected chat format
-4. **MT-Bench or AlpacaEval**: Standard benchmarks for instruction-tuned models
-5. **Domain-specific eval**: Custom evaluation for your target capability
+1. **指令遵循率**：测试 prompt 中，模型给出相关且完整回答的比例
+2. **遗忘分数**：在留出的通用文本语料上，与基础模型对比 perplexity
+3. **格式合规率**：遵循预期对话格式的回答比例
+4. **MT-Bench 或 AlpacaEval**：指令微调模型的标准基准
+5. **领域评估**：针对目标能力的定制评估
 
-### Warning Signs
+### 警告信号
 
-- Validation loss increases after epoch 1: you're overfitting, reduce epochs or increase data
-- Forgetting score increases > 15%: learning rate too high or too many epochs
-- Model reproduces training examples verbatim: severe overfitting, needs more diverse data
-- Model refuses benign instructions: over-trained on safety data, rebalance the dataset
+- 第 1 个 epoch 后验证损失上升：过拟合了，减少 epoch 或增加数据
+- 遗忘分数上升 > 15%：学习率太高或 epoch 太多
+- 模型逐字复现训练样本：严重过拟合，需要更多样的数据
+- 模型拒绝无害指令：安全数据训练过度，重新平衡数据集

@@ -1,38 +1,38 @@
 ---
 name: marl-picker
-description: Choose a MARL algorithm (MADDPG, QMIX, MAPPO, IQL, or extensions) for a given multi-agent task. Consider cooperative vs competitive, action-space type, heterogeneity, reward structure, and scale.
+description: 为给定的多 agent 任务选择 MARL 算法（MADDPG、QMIX、MAPPO、IQL 或其扩展），考虑合作与竞争、动作空间类型、异构性、奖励结构和规模。
 version: 1.0.0
 phase: 16
 lesson: 20
 tags: [multi-agent, MARL, MADDPG, QMIX, MAPPO, CTDE]
 ---
 
-Given a multi-agent task description, pick the MARL algorithm.
+根据多 agent 任务描述，选出 MARL 算法。
 
-Produce:
+输出以下内容：
 
-1. **Task taxonomy.** Fully cooperative (shared reward), fully competitive (zero-sum), mixed, general-sum. Number of agents. Homogeneous vs heterogeneous.
-2. **Observability.** Full (every agent sees global state), partial (each sees own observation only), or communication-enabled.
-3. **Action space.** Discrete (Atari-like, SMAC) or continuous (particle world, MuJoCo). Affects algorithm choice.
-4. **Reward structure.** Dense (per-step shaped) vs sparse (terminal only). Dense makes MAPPO practical; sparse needs credit assignment help (QMIX's value decomposition).
-5. **Algorithm recommendation.** Start with MAPPO as baseline per Yu et al. 2022. Switch to:
-   - QMIX when cooperative + homogeneous + strong sparse-reward credit assignment needed
-   - MADDPG when mixed (cooperative + competitive) + continuous actions
-   - Extensions (QTRAN, QPLEX, FACMAC) when monotonicity constraint is too restrictive
-6. **Training infrastructure.** Do you have: enough interaction data, compute budget, reward shaping expertise, stability budget (5-10 seeds per experiment)? If not, recommend prompt-level policies for LLM agents.
-7. **Deployment contract.** CTDE: at deploy time each agent only sees local observation. Write the contract explicitly so runtime code respects it.
+1. **任务分类。** 完全合作（共享奖励）、完全竞争（零和）、混合、一般和。agent 数量。同构还是异构。
+2. **可观测性。** 完全可观测（每个 agent 都能看到全局状态）、部分可观测（只看到自己的观察），还是支持通信。
+3. **动作空间。** 离散（类 Atari、SMAC）或连续（粒子世界、MuJoCo）。这会影响算法选择。
+4. **奖励结构。** 稠密（每步都有塑形奖励）还是稀疏（只有终局奖励）。稠密奖励让 MAPPO 可行；稀疏奖励需要信用分配的帮助（QMIX 的值分解）。
+5. **算法推荐。** 按 Yu et al. 2022，先用 MAPPO 做基线。以下情况再切换：
+   - 合作 + 同构 + 稀疏奖励下急需强信用分配时，用 QMIX
+   - 混合（合作 + 竞争）+ 连续动作时，用 MADDPG
+   - 单调性约束限制太强时，用扩展算法（QTRAN、QPLEX、FACMAC）
+6. **训练基础设施。** 你有没有：足够的交互数据、算力预算、奖励塑形经验、稳定性预算（每个实验 5-10 个随机种子）？如果没有，对 LLM agent 建议用 prompt 层面的策略。
+7. **部署契约。** CTDE：部署时每个 agent 只能看到本地观察。把契约明确写下来，让运行时代码遵守。
 
-Hard rejects:
+直接否决：
 
-- Picking a non-MAPPO baseline for a first run. MAPPO is the 2026 baseline; start there.
-- Using QMIX for mixed cooperative-competitive tasks. Value decomposition assumes monotone aggregation.
-- Recommending MARL training for LLM-agent systems that lack interaction data or reward signal. Prompt-level policies will outperform until the data is there.
-- Training without logging per-agent observations and actions. Debugging is impossible.
+- 第一次跑就选非 MAPPO 的基线。MAPPO 是 2026 年的基线，从它开始。
+- 在混合合作-竞争任务上用 QMIX。值分解假设聚合是单调的。
+- 对缺少交互数据或奖励信号的 LLM agent 系统推荐 MARL 训练。在数据到位之前，prompt 层面的策略效果更好。
+- 训练时不记录每个 agent 的观察和动作。这样根本没法调试。
 
-Refusal rules:
+拒绝规则：
 
-- If the task has fewer than ~1000 episodes of interaction data, recommend prompt-level policies or supervised fine-tuning.
-- If the task is non-Markovian (requires memory) but the recommendation does not include recurrent critics, flag the gap.
-- If the task is general-sum competitive (multiple equilibria), MARL alone does not pick one; recommend mechanism design or equilibrium selection.
+- 如果任务的交互数据少于约 1000 个 episode，建议用 prompt 层面的策略或监督微调。
+- 如果任务是非马尔可夫的（需要记忆），而推荐方案没有包含循环 critic，标出这个缺口。
+- 如果任务是一般和竞争（存在多个均衡），MARL 本身不会选出其中一个；建议做机制设计或均衡选择。
 
-Output: a one-page brief. Start with a one-sentence recommendation ("MAPPO baseline with centralized value function; per-agent discrete actor; CTDE at deploy; 5 seeds per experiment."), then the seven sections above. End with a training-to-deployment pipeline: data collection, training, evaluation, rollout.
+输出：一页简报。开头用一句话给出推荐（"MAPPO 基线，集中式价值函数；每个 agent 一个离散 actor；部署时遵循 CTDE；每个实验 5 个随机种子。"），然后是上面七个部分。最后给出从训练到部署的流水线：数据收集、训练、评估、上线。

@@ -1,33 +1,33 @@
 ---
 name: memory-auditor
-description: Audit a multi-agent system's shared-memory design for provenance, versioning, verifier separation, and projection schema. Flag memory-poisoning exposure before production.
+description: 审计多 agent 系统的共享记忆设计，检查来源记录、版本管理、验证者隔离和投影 schema，在上生产前指出记忆投毒风险。
 version: 1.0.0
 phase: 16
 lesson: 13
 tags: [multi-agent, shared-state, blackboard, memory-poisoning, provenance]
 ---
 
-Given a multi-agent codebase or architecture doc, audit the shared-memory design and flag exposure to memory poisoning.
+给定一个多 agent 代码库或架构文档，审计其共享记忆设计，指出记忆投毒的暴露面。
 
-Produce:
+产出：
 
-1. **Topology.** Full message pool, topic-partitioned blackboard, projected per-agent view, or hybrid? Name the data structure (list, dict, pandas frame, vector store, SQL table). Count rough upper bound of writers and readers at steady state.
-2. **Provenance fields.** On every write, does the entry record: writer id, timestamp, prompt hash or prompt text, tool-call trace, source URI or tool name? List the fields present and the fields missing.
-3. **Update model.** Is the log append-only, or do writers mutate in place? If mutation, what is the concurrency-control mechanism (lock, optimistic versioning, none)? Corrections should be supersession entries, not in-place edits — flag any design that does not do this.
-4. **Verifier separation.** Is there a read-only agent with independent source access? Can it write to the main pool (it should not)? Where does its output go?
-5. **Projection schema.** If the design uses projections (LangGraph reducers, blackboard topics, role-scoped views), is the schema documented? How do new agents declare the projection they consume?
-6. **Poisoning risk score.** Score 1-5 on each axis: [provenance completeness], [supersession over mutation], [verifier independence], [projection schema clarity]. A system that scores below 3 on any axis is flagged.
+1. **拓扑。** 完整消息池、按主题分区的黑板、按 agent 投影的视图，还是混合方案？写明数据结构（list、dict、pandas frame、向量库、SQL 表）。粗略估算稳态下写入者和读取者数量的上限。
+2. **来源字段。** 每次写入时，条目是否记录了：写入者 id、时间戳、prompt 哈希或 prompt 文本、工具调用 trace、来源 URI 或工具名？列出已有字段和缺失字段。
+3. **更新模型。** 日志是只追加的，还是写入者就地修改？如果就地修改，用什么并发控制机制（锁、乐观版本控制、没有）？更正应该写成取代旧条目的新条目，而不是就地编辑；不这样做的设计都要标出来。
+4. **验证者隔离。** 是否有一个只读、拥有独立来源访问的 agent？它能否写入主池（不应该能）？它的输出去了哪里？
+5. **投影 schema。** 如果设计用了投影（LangGraph reducer、黑板主题、按角色限定的视图），schema 是否有文档？新 agent 如何声明自己消费的投影？
+6. **投毒风险评分。** 每个维度打 1-5 分：[来源完整性]、[以取代代替修改]、[验证者独立性]、[投影 schema 清晰度]。任一维度低于 3 分的系统都要标出。
 
-Hard rejects:
+直接否决：
 
-- Any audit that does not flag a missing verifier. An unwritable verifier with independent source access is the load-bearing mitigation; every other mitigation is decorative without it.
-- Audits that recommend "add more tests." Tests do not catch memory poisoning because poisoning produces plausible outputs that pass tests.
-- Audits that recommend hashing the content as the sole provenance. A hash tells you *what* was written, not *who* or *from where*.
+- 不指出缺少验证者的任何审计。一个不可写、拥有独立来源访问的验证者是承重的缓解措施；没有它，其他缓解措施都只是装饰。
+- 建议"多加点测试"的审计。测试抓不住记忆投毒，因为投毒产出的是能通过测试、看似合理的输出。
+- 建议只用内容哈希作为来源记录的审计。哈希只告诉你写了*什么*，不告诉你是*谁*写的、*从哪里*来的。
 
-Refusal rules:
+拒绝规则：
 
-- If the codebase hides shared state in an external service (Redis, Postgres, vector DB) with no inspection tools, state that the audit cannot complete without production read access.
-- If the system has fewer than three agents, note that memory poisoning risk is low but provenance is still cheap insurance.
-- If the system uses a framework with built-in state management (LangGraph checkpointer, AutoGen pool), audit the framework's guarantees rather than re-deriving them.
+- 代码库把共享状态藏在外部服务（Redis、Postgres、向量数据库）里且没有检查工具时，说明没有生产环境读权限就无法完成审计。
+- 系统少于三个 agent 时，注明记忆投毒风险较低，但来源记录仍是廉价的保险。
+- 系统使用自带状态管理的框架（LangGraph checkpointer、AutoGen 消息池）时，审计框架提供的保证，而不是从头重新推导。
 
-Output: a two-page report. Start with a one-sentence summary ("Shared state is a full message pool with no provenance and no verifier — high poisoning risk."), then the six sections above. End with a prioritized action list: three changes, each labeled [critical] [should] or [nice-to-have], with estimated time-to-implement.
+输出：一份两页报告。开头用一句话总结（"共享状态是一个没有来源记录、没有验证者的完整消息池，投毒风险高。"），然后是上面六个部分。最后给出按优先级排序的行动清单：三项改动，每项标为 [critical]、[should] 或 [nice-to-have]，并附预估实现时间。

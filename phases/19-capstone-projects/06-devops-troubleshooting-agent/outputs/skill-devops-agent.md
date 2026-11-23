@@ -1,46 +1,46 @@
 ---
 name: devops-agent
-description: Build a Kubernetes troubleshooting agent that walks a cluster knowledge graph, ranks root causes, and gates every remediation through Slack.
+description: 构建 Kubernetes 故障排查 agent：遍历集群知识图谱，对根因排序，每项修复操作都要经过 Slack 审批。
 version: 1.0.0
 phase: 19
 lesson: 06
 tags: [capstone, devops, sre, kubernetes, langgraph, fastmcp, aiops]
 ---
 
-Given a K8s cluster and an alert source (PagerDuty or Alertmanager), build an agent that produces ranked root-cause hypotheses in under five minutes and gates every remediation through a Slack approval card.
+给定一个 K8s 集群和一个告警源（PagerDuty 或 Alertmanager），构建一个 agent：五分钟内给出排好序的根因假设，并且每项修复操作都必须经过 Slack 审批卡片放行。
 
-Build plan:
+构建计划：
 
-1. Ingest kube-state-metrics into Neo4j or kuzu every 30s. Build a graph of Pods, Deployments, Services, Nodes, PVCs, HPAs plus telemetry-overlay edges to Prometheus, Loki, and Tempo sources.
-2. Stand up a FastAPI webhook receiver for PagerDuty and Alertmanager.
-3. Expose read-only tools through FastMCP with StreamableHTTP transport: kubectl get/describe, promql, logql, traceql.
-4. Build a LangGraph root-cause agent with three nodes: `sample` (pull 15m telemetry), `walk` (traverse graph neighbors), `hypothesize` (rank candidates by recency × specificity × citation count).
-5. Post the top-3 ranked hypotheses with graph-path visualization to Slack with approval buttons.
-6. Put destructive tools (scale, rollback, delete) on a separate FastMCP server behind an approval token the agent obtains only after Slack signoff.
-7. Maintain an append-only audit log: every *considered* command, whether approved, whether executed, who approved.
-8. Build 20 synthetic incident scenarios (OOMKill, DNS flap, HPA thrash, PVC fill, noisy neighbor, faulty sidecar, ConfigMap bad rollout, cert rotation, image-pull backoff, probe failure, and 10 more). Score agent on RCA accuracy and time-to-hypothesis.
+1. 每 30 秒把 kube-state-metrics 摄取进 Neo4j 或 kuzu。构建一张包含 Pod、Deployment、Service、Node、PVC、HPA 的图，并加上指向 Prometheus、Loki、Tempo 数据源的遥测叠加边。
+2. 搭一个 FastAPI webhook 接收器，对接 PagerDuty 和 Alertmanager。
+3. 通过 FastMCP（StreamableHTTP 传输）暴露只读工具：kubectl get/describe、promql、logql、traceql。
+4. 用 LangGraph 构建根因 agent，包含三个节点：`sample`（拉取 15 分钟遥测）、`walk`（遍历图上的邻居）、`hypothesize`（按时效性 × 具体程度 × 引用数对候选排序）。
+5. 把排名前 3 的假设连同图路径可视化发到 Slack，附审批按钮。
+6. 把破坏性工具（扩缩容、回滚、删除）放在另一个 FastMCP 服务器上，用审批令牌保护；agent 只有在 Slack 签字确认后才能拿到令牌。
+7. 维护一份只追加的审计日志：记录每条*考虑过*的命令、是否获批、是否执行、由谁批准。
+8. 构造 20 个合成故障场景（OOMKill、DNS 抖动、HPA 反复扩缩、PVC 写满、吵闹邻居、有问题的 sidecar、ConfigMap 错误发布、证书轮换、镜像拉取退避、探针失败，以及另外 10 个）。按根因分析准确率和出假设耗时给 agent 打分。
 
-Assessment rubric:
+评分标准：
 
-| Weight | Criterion | Measurement |
+| 权重 | 评分项 | 衡量方式 |
 |:-:|---|---|
-| 25 | RCA accuracy on scenario suite | At least 80% correct root cause across 20 synthetic incidents |
-| 20 | Safety | Destructive-action guard never fires without Slack approval in the audit log |
-| 20 | Time-to-hypothesis | p50 under 5 minutes from alert to Slack brief |
-| 20 | Explainability | Every hypothesis has graph paths and telemetry citations |
-| 15 | Integration completeness | PagerDuty, Slack, ArgoCD, Prometheus end-to-end working |
+| 25 | 场景集上的根因分析准确率 | 20 个合成故障中至少 80% 的根因判断正确 |
+| 20 | 安全性 | 审计日志显示，没有 Slack 审批时破坏性操作防护从未放行 |
+| 20 | 出假设耗时 | 从告警到 Slack 简报的 p50 低于 5 分钟 |
+| 20 | 可解释性 | 每个假设都附有图路径和遥测引用 |
+| 15 | 集成完整度 | PagerDuty、Slack、ArgoCD、Prometheus 端到端打通 |
 
-Hard rejects:
+直接否决：
 
-- Agents with a single MCP server that mixes read-only and destructive tools.
-- Any RCA produced without telemetry citations. Uncited hypotheses must be rejected.
-- Audit logs that only record executions. They must record every command considered.
-- Claims of accuracy without running the agent against the 20-scenario suite with seeds.
+- agent 只用一个 MCP 服务器，把只读工具和破坏性工具混在一起。
+- 根因分析结论没有遥测引用。无引用的假设必须拒掉。
+- 审计日志只记录执行过的命令。必须记录每一条考虑过的命令。
+- 没有用固定种子在 20 个场景集上跑过 agent，就声称准确率如何。
 
-Refusal rules:
+拒绝规则：
 
-- Refuse to remediate without Slack approval from a human on-caller. Even if the hypothesis is obvious.
-- Refuse to expose `kubectl exec`, `kubectl port-forward`, or any interactive tool via the read-only MCP. These are destructive in effect.
-- Refuse to batch-apply remediations across multiple deployments without per-deployment approval cards.
+- 没有值班人员在 Slack 上审批，拒绝执行修复。即使假设显而易见也一样。
+- 拒绝通过只读 MCP 暴露 `kubectl exec`、`kubectl port-forward` 或任何交互式工具。它们实际上具有破坏性。
+- 拒绝在没有逐个 deployment 审批卡片的情况下，批量对多个 deployment 执行修复。
 
-Output: a repo containing the FastAPI receiver, the LangGraph agent, the read-only and destructive MCP servers, the Slack integration, the 20-scenario test suite, a side-by-side comparison against AWS DevOps Agent on three shared incidents, and a write-up on near-miss commands (what the agent *considered* but did not execute) over a one-week observation window.
+输出：一个仓库，包含 FastAPI 接收器、LangGraph agent、只读和破坏性两个 MCP 服务器、Slack 集成、20 个场景的测试集、在三个共同故障上与 AWS DevOps Agent 的并排对比，以及一份说明文档，记录一周观察期内的险情命令（agent *考虑过*但没有执行的命令）。

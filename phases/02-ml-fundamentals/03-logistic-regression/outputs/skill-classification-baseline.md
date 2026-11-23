@@ -1,81 +1,81 @@
 ---
 name: skill-classification-baseline
-description: Establish a strong classification baseline before reaching for complex models
+description: 在动用复杂模型之前，先建立一个强有力的分类基线
 version: 1.0.0
 phase: 2
 lesson: 3
 tags: [classification, logistic-regression, baseline, preprocessing]
 ---
 
-# Classification Baseline Guide
+# 分类基线指南
 
-Before trying complex models, establish a baseline with logistic regression. It trains in seconds, produces probabilities, and is fully interpretable. A surprising number of real-world problems never need anything fancier.
+尝试复杂模型之前，先用逻辑回归建立基线。它几秒就能训练完，能输出概率，而且完全可解释。相当多的真实问题，根本用不着更花哨的东西。
 
-## Decision Checklist
+## 决策清单
 
-1. Is the decision boundary likely linear?
-   - Yes: logistic regression will probably be sufficient
-   - No: you still want it as a baseline to measure improvement
+1. 决策边界可能是线性的吗？
+   - 是：逻辑回归很可能就够了
+   - 否：仍然需要它作为基线，用来衡量改进幅度
 
-2. How many features do you have?
-   - Under 50: standard logistic regression works fine
-   - 50 to 10,000: add L2 regularization (Ridge)
-   - Over 10,000 (e.g., TF-IDF text features): use L1 regularization (Lasso) or LinearSVC
+2. 有多少个特征？
+   - 少于 50 个：标准逻辑回归就行
+   - 50 到 10,000 个：加 L2 正则化（Ridge）
+   - 超过 10,000 个（例如 TF-IDF 文本特征）：用 L1 正则化（Lasso）或 LinearSVC
 
-3. Is the dataset imbalanced?
-   - Under 5:1 ratio: probably fine without adjustment
-   - 5:1 to 50:1: use `class_weight="balanced"` in sklearn
-   - Over 50:1: combine class weighting with appropriate metric (precision, recall, or F1)
+3. 数据集不平衡吗？
+   - 比例低于 5:1：不调整大概也没问题
+   - 5:1 到 50:1：在 sklearn 中使用 `class_weight="balanced"`
+   - 超过 50:1：类别加权，再配合合适的指标（精确率、召回率或 F1）
 
-4. Are features on different scales?
-   - Always standardize before logistic regression. It uses gradient-based optimization, and unscaled features slow convergence or distort the decision boundary.
+4. 特征的尺度不同吗？
+   - 逻辑回归之前一律做标准化。它使用基于梯度的优化，未缩放的特征会拖慢收敛或扭曲决策边界。
 
-5. Are there missing values?
-   - Impute before fitting. Logistic regression cannot handle NaNs.
-   - Use median imputation for numeric columns, mode for categorical.
+5. 有缺失值吗？
+   - 拟合之前先填补。逻辑回归处理不了 NaN。
+   - 数值列用中位数填补，类别列用众数填补。
 
-## When logistic regression is good enough
+## 什么时候逻辑回归就够了
 
-- Binary classification with mostly linear feature relationships
-- You need probability outputs (not just class labels)
-- Interpretability is required (coefficients indicate feature importance direction and relative magnitude after standardization)
-- Training data is small (hundreds to low thousands of samples)
-- You need a fast model for real-time serving (single dot product at inference)
-- Regulatory or compliance requirements demand explainability
+- 二分类，且特征关系大多是线性的
+- 需要输出概率（而不只是类别标签）
+- 要求可解释性（标准化后，系数能说明特征影响的方向和相对大小）
+- 训练数据少（几百到几千个样本）
+- 实时服务需要快速的模型（推理时只做一次点积）
+- 监管或合规要求模型可解释
 
-## When to upgrade
+## 什么时候该升级
 
-- Accuracy plateaus well below the target and you have tried feature engineering
-- The relationship between features and target is clearly nonlinear (check residual plots)
-- You have large tabular data (10k+ rows): try gradient boosting (XGBoost or LightGBM)
-- Features have complex interactions that polynomial features cannot capture
-- You have image, text, or sequential data: logistic regression on raw inputs will not work
+- 已经做过特征工程，准确率仍远低于目标且停滞不前
+- 特征与目标之间的关系明显是非线性的（看残差图）
+- 有大规模表格数据（1 万行以上）：试试梯度提升（XGBoost 或 LightGBM）
+- 特征之间有多项式特征捕捉不到的复杂交互
+- 数据是图像、文本或序列：在原始输入上用逻辑回归行不通
 
-## Preprocessing steps for a classification baseline
+## 分类基线的预处理步骤
 
-1. **Train/test split** first, before any preprocessing. This prevents data leakage.
-2. **Handle missing values**: median impute numeric, mode impute categorical.
-3. **Encode categoricals**: one-hot for low cardinality (under 10 values), target encoding for higher. Fit target encoding only on training folds (use out-of-fold encoding to prevent leakage).
-4. **Scale numerics**: StandardScaler (zero mean, unit variance). Fit on train, transform both.
-5. **Fit logistic regression** with `C=1.0` (default regularization).
-6. **Evaluate**: confusion matrix, precision, recall, F1. Not just accuracy.
-7. **Tune threshold**: default 0.5 is rarely optimal. Sweep 0.1 to 0.9 and pick the threshold that matches your precision/recall priority.
+1. **先划分训练集/测试集**，再做任何预处理。这样可以防止数据泄漏。
+2. **处理缺失值**：数值列用中位数填补，类别列用众数填补。
+3. **编码类别特征**：取值少（少于 10 个）的用 one-hot，取值多的用目标编码。目标编码只在训练折上拟合（使用折外编码防止泄漏）。
+4. **缩放数值特征**：StandardScaler（零均值、单位方差）。在训练集上拟合，再同时变换训练集和测试集。
+5. **拟合逻辑回归**，使用 `C=1.0`（默认正则化）。
+6. **评估**：混淆矩阵、精确率、召回率、F1，不只看准确率。
+7. **调整阈值**：默认的 0.5 很少是最优的。在 0.1 到 0.9 之间扫描，选出符合你精确率/召回率优先级的阈值。
 
-## Common mistakes
+## 常见错误
 
-- Evaluating only accuracy on imbalanced data (a model predicting the majority class scores high but is useless)
-- Forgetting to scale features (logistic regression with unscaled features trains slowly and converges to a worse solution)
-- Using the test set to tune the decision threshold (use validation or cross-validation)
-- Skipping the baseline and jumping straight to XGBoost (you lose interpretability and have no reference point)
-- Not checking for multicollinearity (highly correlated features inflate coefficient variance)
+- 在不平衡数据上只看准确率（总是预测多数类的模型分数很高，却毫无用处）
+- 忘了缩放特征（特征未缩放时，逻辑回归训练慢，收敛到的解也更差）
+- 用测试集来调决策阈值（应该用验证集或交叉验证）
+- 跳过基线直接上 XGBoost（失去可解释性，也没有参照点）
+- 不检查多重共线性（高度相关的特征会放大系数的方差）
 
-## Quick reference
+## 速查
 
-| Scenario | Model | Regularization | Key setting |
+| 场景 | 模型 | 正则化 | 关键设置 |
 |----------|-------|---------------|-------------|
-| Few features, interpretable | LogisticRegression | L2 (default) | C=1.0 |
-| Many features, some irrelevant | LogisticRegression | L1 | penalty="l1", solver="saga" |
-| High-dim sparse (text) | SGDClassifier | L1 or ElasticNet | loss="log_loss" |
-| Imbalanced classes | LogisticRegression | L2 | class_weight="balanced" |
-| Need probabilities | LogisticRegression | L2 | predict_proba() |
-| Need class labels only | LinearSVC | L2 | Faster than LR for large data |
+| 特征少，要求可解释 | LogisticRegression | L2（默认） | C=1.0 |
+| 特征多，部分无关 | LogisticRegression | L1 | penalty="l1", solver="saga" |
+| 高维稀疏（文本） | SGDClassifier | L1 或 ElasticNet | loss="log_loss" |
+| 类别不平衡 | LogisticRegression | L2 | class_weight="balanced" |
+| 需要概率 | LogisticRegression | L2 | predict_proba() |
+| 只需要类别标签 | LinearSVC | L2 | 大数据上比 LR 快 |

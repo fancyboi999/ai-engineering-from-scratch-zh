@@ -1,29 +1,29 @@
 ---
 name: fairness-criterion
-description: Identify which fairness criterion a claim invokes and audit the associated assumptions.
+description: 识别一项结论援引的是哪种公平性标准，并审计其背后的假设。
 version: 1.0.0
 phase: 18
 lesson: 21
 tags: [fairness, demographic-parity, equalized-odds, counterfactual-fairness, impossibility]
 ---
 
-Given a fairness claim or policy, identify which criterion is being invoked, what assumptions the claim depends on, and what the impossibility theorems imply for the remaining criteria.
+给定一项公平性结论或政策，识别它援引的是哪种标准、依赖哪些假设，以及不可能性定理对其余标准意味着什么。
 
-Produce:
+输出以下内容：
 
-1. Criterion identification. Label the claim as targeting one of: demographic parity, equalized odds, conditional use accuracy equality, individual fairness, counterfactual fairness. Ambiguous claims must be resolved before proceeding.
-2. Base-rate audit. What are the per-group base rates in the deployment? Under unequal base rates, Chouldechova / KMR 2017 impossibility applies: no model satisfies all three group criteria.
-3. Causal-DAG dependency. If the claim is counterfactual fairness, what is the causal DAG? Counterfactual fairness is only as justified as the DAG. Lack of a DAG invalidates the claim.
-4. Similarity metric. If the claim is individual fairness, what is the similarity metric d? The choice is task-specific and is a policy decision, not a statistical one.
-5. Intervention legality. If the claim uses counterfactual reasoning, are interventions on protected attributes involved? If yes, consider backtracking counterfactuals (arXiv:2401.13935) to sidestep legal issues.
+1. 标准识别。把结论归入以下之一：人口均等（demographic parity）、均等化几率（equalized odds）、条件使用准确率均等、个体公平、反事实公平。含糊的结论必须先澄清再往下走。
+2. 基础率审计。部署中各群体的基础率是多少？基础率不等时，Chouldechova / KMR 2017 的不可能性定理适用：没有模型能同时满足三项群体标准。
+3. 因果 DAG 依赖。如果结论是反事实公平，因果 DAG 是什么？反事实公平的可信度完全取决于 DAG。没有 DAG，结论就不成立。
+4. 相似度度量。如果结论是个体公平，相似度度量 d 是什么？这个选择因任务而异，是政策决定，不是统计决定。
+5. 干预的合法性。如果结论用到反事实推理，是否涉及对受保护属性的干预？如果是，考虑用回溯式反事实（arXiv:2401.13935）绕开法律问题。
 
-Hard rejects:
-- Any "fair" claim without criterion identification.
-- Any "all fairness criteria satisfied" claim under unequal base rates without acknowledging Chouldechova / KMR 2017.
-- Any counterfactual-fairness claim without a published causal DAG.
+直接否决：
+- 不识别标准就声称"公平"。
+- 在基础率不等的情况下声称"满足所有公平性标准"，却不承认 Chouldechova / KMR 2017。
+- 声称反事实公平，却没有公开因果 DAG。
 
-Refusal rules:
-- If the user asks which fairness criterion is "the right one," refuse the ranking and explain it is a policy choice.
-- If the user asks whether a model is "fair," refuse the binary claim; fairness is criterion-relative.
+拒绝规则：
+- 如果用户问哪种公平性标准是"正确的"，拒绝排名，并解释这是政策选择。
+- 如果用户问模型是否"公平"，拒绝这种非此即彼的说法：公平是相对于某个标准而言的。
 
-Output: a one-page audit filling the five sections above, flagging the impossibility if applicable, and naming the policy choice implicit in the claim. Cite Dwork et al. 2012, Kusner et al. 2017, Chouldechova 2017 once each as appropriate.
+输出：一页审计，填完上面五部分，在适用时标出不可能性，并点明结论中隐含的政策选择。视情况各引用一次 Dwork et al. 2012、Kusner et al. 2017、Chouldechova 2017。

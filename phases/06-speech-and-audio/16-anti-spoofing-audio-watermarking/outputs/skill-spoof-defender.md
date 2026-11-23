@@ -1,27 +1,27 @@
 ---
 name: spoof-defender
-description: Pick detection model, watermark, provenance manifest, and operational playbook for a voice-generation / voice-auth deployment.
+description: 为语音生成 / 声纹认证部署选择检测模型、水印、溯源清单和运维预案。
 version: 1.0.0
 phase: 6
 lesson: 16
 tags: [anti-spoofing, watermark, audioseal, asvspoof, c2pa, voice-fraud]
 ---
 
-Given the workload (voice-gen vs voice-auth, deploy scale, compliance region, adversary profile), output:
+拿到负载情况（语音生成还是声纹认证、部署规模、合规区域、攻击者画像）后，输出：
 
-1. Detection (CM). AASIST · RawNet2 · NeXt-TDNN + WavLM · commercial (Pindrop, Validsoft). Training data: ASVspoof 2019 / ASVspoof 5 / domain-specific. Target EER.
-2. Watermarking (outbound gen). AudioSeal 16-bit payload encoding `(model_id, user_id, generation_ts)` · WaveVerify (alt) · none (with justification). Detector runs in CI on every output pre-ship.
-3. Provenance. C2PA manifest signed with deployer's key · IPTC metadata · none (for non-consumer audio).
-4. Voice-auth guards (if applicable). Liveness challenge (random phrase TTS' + transcribe), replay attack detection (AASIST + PA model), biometric threshold calibration per channel.
-5. Operational. Audit log retention, consent artifact retention (7+ years), abuse-detection signals (sudden volume burst, named-entity prompts), kill-switch procedure.
+1. 检测（CM）。AASIST · RawNet2 · NeXt-TDNN + WavLM · 商业方案（Pindrop、Validsoft）。训练数据：ASVspoof 2019 / ASVspoof 5 / 领域数据。目标 EER。
+2. 水印（对外生成）。AudioSeal 16 位载荷，编码 `(model_id, user_id, generation_ts)` · WaveVerify（替代方案）· 不加（需给出理由）。每条输出上线前，CI 都运行检测器。
+3. 溯源。用部署方密钥签名的 C2PA 清单 · IPTC 元数据 · 不加（非面向消费者的音频）。
+4. 声纹认证护栏（如适用）。活体挑战（TTS 播报随机短语 + 转写比对）、重放攻击检测（AASIST + PA 模型）、按信道校准生物识别阈值。
+5. 运维。审计日志保留、同意凭证保留（7 年以上）、滥用检测信号（请求量突增、具名人物 prompt）、紧急关停流程。
 
-Refuse voice-gen deploys without AudioSeal (or equivalent watermark). Refuse voice biometric deploys without anti-spoofing detection — voice cloning makes cosine-only auth trivially bypassable. Refuse deploys that depend on provenance manifest alone (strippable). Refuse detection thresholds trained on ASVspoof 2019 for real-world deploys without a channel-calibration sweep.
+语音生成部署没有 AudioSeal（或同等水印），一律拒绝。声纹生物识别部署没有反伪造检测，拒绝：有了声音克隆，只靠余弦相似度的认证轻易就能绕过。只依赖溯源清单的部署拒绝（清单可以被剥掉）。真实场景部署直接用 ASVspoof 2019 训练出的检测阈值、不做信道校准扫描，拒绝。
 
-Example input: "Bank customer-service IVR. Voice biometric unlock + AI-generated voice agent. 10M calls/month. US + EU."
+示例输入："银行客服 IVR。声纹解锁 + AI 生成的语音 agent。每月 1000 万通电话。美国 + 欧盟。"
 
-Example output:
-- Detection: Pindrop commercial (preferred) or NeXt-TDNN + WavLM open. Training on ASVspoof 5 + 100k bank-specific call samples. Target EER &lt; 0.5% on in-domain data.
-- Watermarking: AudioSeal 16-bit payload on every outbound TTS utterance; payload encodes bank_id + session_id + timestamp. Detector verifies before transmit.
-- Provenance: C2PA manifest on audio-export-to-customer workflows; internal-only calls skip.
-- Voice-auth: liveness challenge at every auth (TTS random 4-digit phrase; user repeats + detector + transcriber). Anti-spoofing runs on every inbound auth attempt. Biometric threshold at FAR 0.1%, FRR 1%.
-- Operational: 7-year retention on consent + audit log in region (EU data EU-resident). Alert on sudden clone-request volume &gt; 2σ; kill-switch on abuse detection.
+示例输出：
+- 检测：首选商业方案 Pindrop，或开源的 NeXt-TDNN + WavLM。在 ASVspoof 5 + 10 万条银行专属通话样本上训练。领域内数据目标 EER &lt; 0.5%。
+- 水印：每条对外 TTS 语音都加 AudioSeal 16 位载荷；载荷编码 bank_id + session_id + 时间戳。发送前由检测器验证。
+- 溯源：在向客户导出音频的流程上加 C2PA 清单；纯内部通话跳过。
+- 声纹认证：每次认证都做活体挑战（TTS 播报随机 4 位数字短语；用户复述 + 检测器 + 转写器）。每次呼入认证尝试都运行反伪造检测。生物识别阈值设在 FAR 0.1%、FRR 1%。
+- 运维：同意凭证 + 审计日志在本区域保留 7 年（EU 数据驻留 EU）。克隆请求量突增 &gt; 2σ 时告警；检测到滥用时触发紧急关停。

@@ -1,40 +1,40 @@
 ---
 name: tripwire-design
-description: Review a proposed agent detector stack (kill switch, circuit breakers, canary tokens) and flag missing tripwires before the first autonomous run.
+description: 审查拟议的 agent 检测器栈（kill switch、熔断器、canary token），在首次自主运行前指出缺失的绊线。
 version: 1.0.0
 phase: 15
 lesson: 14
 tags: [kill-switch, circuit-breaker, canary, honeytoken, detection-and-response]
 ---
 
-Given a proposed detector stack for an agent deployment, audit it against the three-detector reference (kill switch, circuit breaker, canary) and flag what is missing, mis-tuned, or exposed to the agent.
+给定一个 agent 部署的拟议检测器栈，对照三检测器参考模型（kill switch、熔断器、canary）审计它，指出哪些缺失、哪些调得不对、哪些暴露给了 agent。
 
-Produce:
+产出：
 
-1. **Kill-switch audit.** Where does the switch live (feature flag, Redis, signed config)? Confirm the agent's credentials cannot set it off. Confirm every consequential action checks the switch, not just startup. Confirm re-enable is an explicit human action.
-2. **Circuit-breaker inventory.** List every pattern a breaker watches (repetition, consecutive failures, rate, specific tool after out-of-trust read). State threshold and cool-down for each. Thresholds above 10 are usually too loose.
-3. **Canary design.** List every canary token in the environment. For each: what it is (fake credential, fake DB record, fake file, fake memory entry), where it lives, what access triggers the alarm, who is paged. Confirm no canary has a legitimate reason to be touched.
-4. **Statistical + hard layering.** Confirm the stack uses at least one hard limit (Lesson 17 constitutional style) in addition to any statistical detectors (EWMA, z-score). Statistical-only detectors accept slow drift.
-5. **Quarantine path.** What happens when a detector fires? Full agent stop, path-specific pause, traffic redirect (eBPF / Cilium honeypot), alert-only. Confirm the path has been tested end-to-end at least once.
+1. **Kill switch 审计。** 开关放在哪里（feature flag、Redis、签名配置）？确认 agent 的凭证无法触动它。确认每个有后果的动作都会检查开关，而不只是在启动时检查。确认重新启用是一个显式的人工动作。
+2. **熔断器清单。** 列出每个熔断器监视的模式（重复、连续失败、速率、不可信读取之后调用特定工具）。为每个模式写明阈值和冷却时间。阈值高于 10 通常太松。
+3. **Canary 设计。** 列出环境中的每个 canary token。对每个 token 说明：它是什么（假凭证、假数据库记录、假文件、假记忆条目）、放在哪里、什么访问会触发告警、呼叫谁。确认任何 canary 都没有被正常访问的理由。
+4. **统计检测与硬性限制分层。** 确认检测器栈在统计检测器（EWMA、z-score）之外，至少还有一条硬性限制（第 17 课的宪法式规则）。只有统计检测器会放过缓慢漂移。
+5. **隔离路径。** 检测器触发后会发生什么？完全停止 agent、暂停特定路径、重定向流量（eBPF / Cilium 蜜罐），还是只告警。确认这条路径至少做过一次端到端测试。
 
-Hard rejects:
-- Any deployment without an external kill switch.
-- Canary tokens stored in systems the agent has write access to.
-- Statistical-only detection with no hard limits.
-- Circuit breakers with cool-downs that auto-re-enable without human review.
-- Unattended runs where the kill switch is checked only at startup, not per action.
+直接否决：
+- 没有外部 kill switch 的任何部署。
+- 存放在 agent 有写权限的系统里的 canary token。
+- 只有统计检测、没有硬性限制。
+- 冷却结束后无需人工审查就自动恢复的熔断器。
+- 只在启动时检查 kill switch、而不是每个动作都检查的无人值守运行。
 
-Refusal rules:
-- If the user cannot name the specific systems outside the agent's credentials that host the kill switch, refuse. "We use a config file the agent reads" is not a kill switch if the agent can write config files.
-- If the user treats the Auto Mode classifier (Lesson 10) as a replacement for tripwires, refuse. The classifier is orthogonal to detection-and-response.
-- If the proposed canaries sit in systems the agent has legitimate reason to read, refuse and require redesign.
+拒绝规则：
+- 用户说不出 kill switch 托管在 agent 凭证之外的哪些具体系统上时，拒绝。如果 agent 能写配置文件，"我们用一个 agent 会读的配置文件"就不算 kill switch。
+- 用户把 Auto Mode 分类器（第 10 课）当作绊线的替代品时，拒绝。分类器与检测和响应无关。
+- 拟议的 canary 放在 agent 有正当理由读取的系统里时，拒绝，要求重新设计。
 
-Output format:
+输出格式：
 
-Return a tripwire audit with:
-- **Kill-switch line** (location, check cadence, re-enable procedure)
-- **Circuit-breaker table** (pattern, threshold, cool-down)
-- **Canary table** (token, location, alarm, owner)
-- **Layering note** (statistical + hard limits present y/n)
-- **Quarantine flow** (what fires, what happens, tested y/n)
-- **Readiness** (production / staging / research-only)
+返回一份绊线审计，包含：
+- **Kill switch 说明**（位置、检查频率、重新启用流程）
+- **熔断器表格**（模式、阈值、冷却时间）
+- **Canary 表格**（token、位置、告警、负责人）
+- **分层说明**（是否同时有统计检测与硬性限制 y/n）
+- **隔离流程**（什么触发、触发后怎么处理、是否测试过 y/n）
+- **就绪度**（production / staging / research-only）

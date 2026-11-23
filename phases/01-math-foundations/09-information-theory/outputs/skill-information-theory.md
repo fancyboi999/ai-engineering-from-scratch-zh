@@ -1,37 +1,37 @@
 ---
 name: skill-information-theory
-description: Apply information theory concepts to ML loss functions, model evaluation, and feature selection
+description: 把信息论概念用于机器学习的损失函数、模型评估和特征选择
 version: 1.0.0
 phase: 1
 lesson: 9
 tags: [information-theory, entropy, loss-functions]
 ---
 
-# Information Theory for ML
+# 机器学习中的信息论
 
-When to use entropy, cross-entropy, KL divergence, and mutual information in machine learning systems.
+在机器学习系统中，什么时候用熵、交叉熵、KL 散度和互信息。
 
-## Decision Checklist
+## 决策清单
 
-1. Measuring uncertainty in a single distribution? Use **entropy**.
-2. Measuring how well a model approximates true labels? Use **cross-entropy** (this is your classification loss).
-3. Measuring distance between two distributions? Use **KL divergence**.
-4. Checking if two variables are related? Use **mutual information**.
-5. Reporting language model quality? Use **perplexity** (exponential of cross-entropy).
-6. Distilling one model into another? Minimize **KL divergence** from teacher to student.
+1. 衡量单个分布的不确定性？用**熵**。
+2. 衡量模型对真实标签的逼近程度？用**交叉熵**（这就是分类损失）。
+3. 衡量两个分布之间的距离？用 **KL 散度**。
+4. 检查两个变量是否相关？用**互信息**。
+5. 报告语言模型的质量？用**困惑度**（交叉熵的指数）。
+6. 把一个模型蒸馏到另一个模型？最小化从教师到学生的 **KL 散度**。
 
-## When to use each measure
+## 各度量的适用场景
 
-| Measure | Formula | Use case | ML application |
+| 度量 | 公式 | 用途 | 机器学习应用 |
 |---|---|---|---|
-| Entropy H(P) | -sum(p log p) | How uncertain is this distribution? | Data complexity, maximum entropy models |
-| Cross-entropy H(P,Q) | -sum(p log q) | How good is model Q at predicting true P? | Classification loss, language model loss |
-| KL divergence D(P\|\|Q) | sum(p log(p/q)) | How different are P and Q? | VAE loss (ELBO), knowledge distillation, RLHF |
-| Mutual information I(X;Y) | H(X) - H(X\|Y) | How much does Y tell us about X? | Feature selection, representation learning |
-| Perplexity | exp(H(P,Q)) or 2^H | How confused is the model? | Language model evaluation |
-| Conditional entropy H(X\|Y) | -sum(p(x,y) log p(x\|y)) | Remaining uncertainty in X after knowing Y | Feature informativeness |
+| 熵 H(P) | -sum(p log p) | 这个分布有多不确定？ | 数据复杂度、最大熵模型 |
+| 交叉熵 H(P,Q) | -sum(p log q) | 模型 Q 预测真实分布 P 的效果如何？ | 分类损失、语言模型损失 |
+| KL 散度 D(P\|\|Q) | sum(p log(p/q)) | P 和 Q 差别有多大？ | VAE 损失（ELBO）、知识蒸馏、RLHF |
+| 互信息 I(X;Y) | H(X) - H(X\|Y) | Y 能告诉我们多少关于 X 的信息？ | 特征选择、表示学习 |
+| 困惑度 | exp(H(P,Q)) 或 2^H | 模型有多困惑？ | 语言模型评估 |
+| 条件熵 H(X\|Y) | -sum(p(x,y) log p(x\|y)) | 已知 Y 后 X 剩余的不确定性 | 特征的信息量 |
 
-## Key relationships
+## 关键关系
 
 ```
 Cross-entropy  = Entropy + KL divergence
@@ -47,48 +47,48 @@ Perplexity = exp(cross-entropy in nats)
            = 2^(cross-entropy in bits)
 ```
 
-## Quick reference: formulas and units
+## 速查：公式与单位
 
-| Formula | Bits (log base 2) | Nats (log base e) |
+| 公式 | 比特（以 2 为底） | 奈特（以 e 为底） |
 |---|---|---|
-| Information: -log(p) | -log2(p) | -ln(p) |
-| Entropy: -sum(p log p) | bits | nats |
-| 1 nat = | 1.4427 bits | 1 nat |
-| PyTorch default | -- | nats |
-| Information theory papers | bits | -- |
+| 信息量：-log(p) | -log2(p) | -ln(p) |
+| 熵：-sum(p log p) | 比特 | 奈特 |
+| 1 奈特 = | 1.4427 比特 | 1 奈特 |
+| PyTorch 默认 | -- | 奈特 |
+| 信息论论文 | 比特 | -- |
 
-## Interpreting values
+## 数值解读
 
-| Entropy value | What it means |
+| 熵值 | 含义 |
 |---|---|
-| 0 | Deterministic. One outcome has probability 1. |
-| log(n) | Maximum uncertainty. Uniform distribution over n outcomes. |
-| Low | Distribution is peaked. Model is confident. |
-| High | Distribution is flat. Model is uncertain. |
+| 0 | 确定性的。某个结果的概率为 1。 |
+| log(n) | 不确定性最大。n 个结果上的均匀分布。 |
+| 低 | 分布尖锐。模型很有把握。 |
+| 高 | 分布平坦。模型拿不准。 |
 
-| Perplexity value | Language model quality |
+| 困惑度 | 语言模型质量 |
 |---|---|
-| 1 | Perfect prediction (never happens in practice) |
-| 10 | Choosing among ~10 equally likely tokens on average |
-| 50 | GPT-2 level on standard benchmarks |
-| < 10 | State-of-the-art for well-represented domains |
+| 1 | 完美预测（实践中从不出现） |
+| 10 | 平均相当于在约 10 个等可能的 token 中做选择 |
+| 50 | GPT-2 在标准基准上的水平 |
+| < 10 | 在语料充分的领域达到当前最佳水平 |
 
-## Common mistakes
+## 常见错误
 
-- Computing KL divergence and treating it as symmetric. D_KL(P||Q) != D_KL(Q||P). For a symmetric measure, use Jensen-Shannon divergence: JS = 0.5 * KL(P||M) + 0.5 * KL(Q||M) where M = 0.5*(P+Q).
-- Forgetting that cross-entropy with one-hot labels simplifies to -log(p_true_class). You do not need to sum over all classes when the true distribution is one-hot.
-- Using log base 2 in code but reporting nats (or vice versa). PyTorch uses natural log by default. Multiply by log2(e) = 1.4427 to convert nats to bits.
-- Computing entropy of an empty or zero-probability event. Convention: 0 * log(0) = 0, because lim(p->0) p*log(p) = 0.
-- Comparing perplexity across different vocabularies. A model with vocab size 50k and perplexity 30 is not directly comparable to one with vocab size 10k and perplexity 30.
+- 计算 KL 散度时把它当成对称的。D_KL(P||Q) != D_KL(Q||P)。需要对称度量时，用 Jensen-Shannon 散度：JS = 0.5 * KL(P||M) + 0.5 * KL(Q||M)，其中 M = 0.5*(P+Q)。
+- 忘了 one-hot 标签下的交叉熵可化简为 -log(p_true_class)。真实分布是 one-hot 时，不需要对所有类别求和。
+- 代码里用以 2 为底的对数，汇报时却用奈特（或反过来）。PyTorch 默认用自然对数。乘以 log2(e) = 1.4427 即可把奈特换算成比特。
+- 对空事件或零概率事件计算熵。约定：0 * log(0) = 0，因为 lim(p->0) p*log(p) = 0。
+- 跨不同词表比较困惑度。词表大小 50k、困惑度 30 的模型，和词表大小 10k、困惑度 30 的模型不能直接比较。
 
-## Where each concept appears in production ML
+## 各概念在生产级机器学习中的位置
 
-| Concept | Where you see it |
+| 概念 | 出现位置 |
 |---|---|
-| Cross-entropy loss | Every classification model (nn.CrossEntropyLoss) |
-| KL divergence | VAE ELBO, PPO clipping, knowledge distillation |
-| Entropy regularization | Exploration bonus in RL (higher entropy = more exploration) |
-| Mutual information | Feature selection, InfoNCE loss (contrastive learning) |
-| Perplexity | Language model benchmarks (lower = better) |
-| Label smoothing | Replaces one-hot with soft targets, reduces cross-entropy overconfidence |
-| Temperature scaling | Divides logits by T before softmax, controls entropy of output |
+| 交叉熵损失 | 每个分类模型（nn.CrossEntropyLoss） |
+| KL 散度 | VAE ELBO、PPO 裁剪、知识蒸馏 |
+| 熵正则化 | 强化学习中的探索奖励（熵越高 = 探索越多） |
+| 互信息 | 特征选择、InfoNCE 损失（对比学习） |
+| 困惑度 | 语言模型基准（越低越好） |
+| 标签平滑 | 用软目标替换 one-hot，降低交叉熵带来的过度自信 |
+| 温度缩放 | softmax 之前把 logits 除以 T，控制输出的熵 |

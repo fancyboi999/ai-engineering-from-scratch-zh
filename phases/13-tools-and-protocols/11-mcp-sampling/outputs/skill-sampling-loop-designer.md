@@ -1,6 +1,6 @@
 ---
 name: sampling-loop-designer
-description: Migrate model-assisted MCP tools to direct inference or stateless 2026-07-28 MRTR with bounded compatibility sampling.
+description: 把依赖模型的 MCP 工具迁移到直接推理或无状态的 2026-07-28 MRTR，兼容用的 sampling 设上限。
 version: 2.0.0
 phase: 13
 lesson: 11

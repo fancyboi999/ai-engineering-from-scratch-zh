@@ -1,43 +1,43 @@
 ---
 name: rule-set-builder
-description: Interview a project owner, classify their existing prose instructions into five operational categories, and emit a versioned agent-rules.md plus a Python checker stub.
+description: 访谈项目负责人，把现有的散文式指令归入五个操作类别，输出带版本号的 agent-rules.md 和一个 Python 检查器桩代码。
 version: 1.0.0
 phase: 14
 lesson: 33
 tags: [rules, instructions, constraints, checker, workbench]
 ---
 
-Given a repo and any existing prose instructions (`AGENTS.md`, `CONTRIBUTING.md`, onboarding docs), produce a five-category rule set the workbench can execute.
+给定一个仓库和其中已有的散文式指令（`AGENTS.md`、`CONTRIBUTING.md`、入职文档），产出一套工作台可以执行的五类规则。
 
-The five categories:
+五个类别：
 
-1. `startup` — what must be true before work begins.
-2. `forbidden` — what must never happen.
-3. `definition_of_done` — what proves the task is complete.
-4. `uncertainty` — what the agent does when not sure.
-5. `approval` — what requires human sign-off.
+1. `startup`：开工前必须成立的条件。
+2. `forbidden`：绝不能发生的事。
+3. `definition_of_done`：用什么证明任务已完成。
+4. `uncertainty`：agent 拿不准时该怎么做。
+5. `approval`：哪些事需要人类签字确认。
 
-Produce:
+产出：
 
-1. `docs/agent-rules.md` with one `##` heading per rule. Each rule carries `category`, `check`, and a one-line description.
-2. `tools/rule_checker.py` with a `RuleChecker` class exposing one method per `check`. Each method takes a `TurnTrace` dataclass and returns `bool`.
-3. `tools/rule_report.py` runner that loads rules, runs the checker on a trace, emits a `rule_report.json`.
-4. A migration notes file: which prose lines became which rule, which were dropped as aspirational, why.
+1. `docs/agent-rules.md`，每条规则一个 `##` 标题。每条规则带 `category`、`check` 和一行说明。
+2. `tools/rule_checker.py`，其中的 `RuleChecker` 类为每个 `check` 提供一个方法。每个方法接收一个 `TurnTrace` dataclass，返回 `bool`。
+3. `tools/rule_report.py` 运行器：加载规则，在一条 trace 上运行检查器，输出 `rule_report.json`。
+4. 一份迁移说明文件：哪些散文句子变成了哪条规则，哪些因为只是愿景而被删掉，以及原因。
 
-Hard rejects:
+直接否决：
 
-- Rules without a `check` field. Aspirational-only rules belong in onboarding docs, not in the workbench rule set.
-- A single "be careful" rule. Specify a category and a check or remove it.
-- Checks that require LLM calls. Rule checks must be deterministic and cheap so they can run every turn.
-- Rule files over 200 lines. Split by category into `agent-rules.{startup,forbidden,done,uncertainty,approval}.md` and route from a parent index.
+- 没有 `check` 字段的规则。只表达愿景的规则应该放进入职文档，不属于工作台规则集。
+- 一条笼统的"小心点"规则。要么指定类别和检查，要么删掉。
+- 需要调用 LLM 的检查。规则检查必须确定且廉价，才能每一轮都跑。
+- 超过 200 行的规则文件。按类别拆成 `agent-rules.{startup,forbidden,done,uncertainty,approval}.md`，再由一个父级索引做路由。
 
-Refusal rules:
+拒绝规则：
 
-- If the agent product cannot supply a `TurnTrace` (no instrumentation), refuse to wire the checker until at least `read_state_file`, `edited_files`, and `tests_exit_code` are recorded.
-- If existing instructions are mostly aspirational (>50%), surface that finding before emitting rules. The rule set will look thin; that is correct.
-- If a rule is added because of a single past incident, attach the incident id so future review can decide if it is still needed.
+- agent 产品无法提供 `TurnTrace`（没有埋点）时，在至少记录下 `read_state_file`、`edited_files` 和 `tests_exit_code` 之前，拒绝接入检查器。
+- 现有指令大部分（超过 50%）只是愿景时，先报告这一发现，再输出规则。规则集会显得单薄，这是对的。
+- 某条规则因为过去的单次事故而加入时，附上事故 id，方便以后审查时判断它是否还有必要。
 
-Output structure:
+输出结构：
 
 ```
 <repo>/
@@ -49,8 +49,8 @@ Output structure:
 └── docs/migration-notes.md
 ```
 
-End with "what to read next" pointing to:
+最后给出"接下来读什么"，指向：
 
-- Lesson 36 for per-task scope contracts that extend the forbidden category.
-- Lesson 38 for verification gates that consume the rule report.
-- Lesson 39 for the reviewer agent that scores rule compliance.
+- 第 36 课：扩展 forbidden 类别的每任务范围契约。
+- 第 38 课：消费规则报告的验证关卡。
+- 第 39 课：给规则遵守情况打分的审查 agent。

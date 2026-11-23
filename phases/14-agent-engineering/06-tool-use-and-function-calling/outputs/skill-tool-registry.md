@@ -1,36 +1,36 @@
 ---
 name: tool-registry
-description: Build a production tool catalog and registry with JSON Schema validation, parallel dispatch, and observability.
+description: 构建生产级工具目录和注册表，包含 JSON Schema 校验、并行分发和可观测性。
 version: 1.0.0
 phase: 14
 lesson: 06
 tags: [function-calling, tools, schema, validation, bfcl, parallel-tools]
 ---
 
-Given a task domain, produce a tool catalog that an agent can use reliably across the BFCL V4 axes (agentic, multi-turn, live, non-live, hallucination).
+用户会给出一个任务领域。你负责产出一份工具目录，让 agent 在 BFCL V4 的各个维度（agentic、多轮、live、non-live、幻觉）上都能可靠使用。
 
-Produce:
+输出：
 
-1. Tool definitions. For each tool: `name` (snake_case), `description` (tells the model when to use it and when NOT to), JSON Schema input with typed properties, required fields, enums where applicable, minimum/maximum for numerics, per-tool timeout, per-tool sandbox policy (fs surface, network, memory cap).
-2. Description quality check. Run each description through "does this tell the model when to pick this tool over the others?" If two tools have overlapping descriptions, refuse and rewrite.
-3. Parallel-dispatch plan. For each realistic task, identify which tool calls are independent (can be parallelized) and which must be sequential. Emit an expected dispatch graph.
-4. Validation policy. Enum checks, type coercion rules (e.g. "accept int-as-string, reject float-as-string"), required-field enforcement. Every failure returns a structured observation string, never raises to the loop.
-5. Observability. Each tool emits an OpenTelemetry GenAI `tool_call` span with attributes `gen_ai.tool.name`, `gen_ai.tool.call.id`, `gen_ai.tool.call.arguments`, `gen_ai.tool.call.result` (reference, not inline, when content policy requires).
+1. 工具定义。每个工具包含：`name`（snake_case）、`description`（告诉模型什么时候用它、什么时候不用）、带类型属性的 JSON Schema 输入、必填字段、适用时的枚举、数值的 minimum/maximum、单工具超时、单工具沙箱策略（文件系统范围、网络、内存上限）。
+2. 描述质量检查。对每条描述问一句："它能否告诉模型什么时候该选这个工具而不是其他工具？"如果两个工具的描述有重叠，拒绝并重写。
+3. 并行分发规划。对每个现实任务，找出哪些工具调用相互独立（可以并行）、哪些必须串行。输出预期的分发图。
+4. 校验策略。枚举检查、类型强制转换规则（例如"接受字符串形式的 int，拒绝字符串形式的 float"）、必填字段强制。每次失败都返回一条结构化的 observation 字符串，绝不向循环抛异常。
+5. 可观测性。每个工具输出一个 OpenTelemetry GenAI `tool_call` span，属性包括 `gen_ai.tool.name`、`gen_ai.tool.call.id`、`gen_ai.tool.call.arguments`、`gen_ai.tool.call.result`（内容策略有要求时记引用，不内联）。
 
-Hard rejects:
+直接否决：
 
-- Generic shell/command-exec tool. Refuse and break into specific verbs (`git_status`, `fs_read`, `npm_test`).
-- Missing enums when the parameter has a closed set of values. Enum validation is the cheapest way to catch drift.
-- Same description for two different tools. The model cannot pick between them reliably.
-- `description` that only names the tool ("Adds two numbers"). Include WHEN to pick it over alternatives.
-- No timeout. Every tool call must have a ceiling.
+- 通用的 shell/命令执行工具。拒绝，并拆成具体的动作（`git_status`、`fs_read`、`npm_test`）。
+- 参数取值是封闭集合却没有枚举。枚举校验是发现漂移最便宜的手段。
+- 两个不同的工具用同一条描述。模型没法可靠地在它们之间做选择。
+- 只写了工具是什么的 `description`（"Adds two numbers"）。要写清楚什么时候该选它而不是其他选项。
+- 没有超时。每次工具调用都必须有上限。
 
-Refusal rules:
+拒绝规则：
 
-- If the tool list exceeds 30 tools for a single agent, refuse and recommend subagent delegation (Lesson 17).
-- If any tool performs a destructive action without a confirmation gate, refuse and point to Lesson 09 (permissions, sandboxing).
-- If the task is computer use (click, type, screenshot), refuse and point to Lesson 21 — that is a separate tool shape with vision-based actions.
+- 如果单个 agent 的工具列表超过 30 个，拒绝，推荐委托给子 agent（第 17 课）。
+- 如果任何工具在没有确认闸门的情况下执行破坏性操作，拒绝，并指向第 09 课（权限、沙箱）。
+- 如果任务是 computer use（点击、输入、截图），拒绝，并指向第 21 课。那是另一种基于视觉动作的工具形态。
 
-Output: a JSON tool catalog ready to paste into Anthropic / OpenAI / Gemini SDK calls, a dispatch-graph diagram, a validation-policy document, and a BFCL-style mini-eval the registry should pass.
+输出：一份可以直接粘贴到 Anthropic / OpenAI / Gemini SDK 调用中的 JSON 工具目录、一张分发图、一份校验策略文档，以及一个注册表应当通过的 BFCL 风格迷你评测。
 
-End with a "what to read next" pointer: Lesson 09 (sandboxing), Lesson 23 (OTel GenAI spans), or Lesson 30 (eval-driven).
+结尾给出"接下来读什么"：第 09 课（沙箱）、第 23 课（OTel GenAI span）或第 30 课（评估驱动开发）。

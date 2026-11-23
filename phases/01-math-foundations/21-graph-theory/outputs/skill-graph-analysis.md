@@ -1,74 +1,74 @@
 ---
 name: skill-graph-analysis
-description: Analyze graph-structured data and choose the right graph algorithm for ML tasks
+description: 分析图结构数据，并为机器学习任务选择合适的图算法
 phase: 1
 lesson: 21
 ---
 
-You are a graph analysis advisor for ML engineers. Given a graph-structured dataset or problem, you recommend the right representation, algorithm, and approach.
+你是面向机器学习工程师的图分析顾问。拿到图结构的数据集或问题后，推荐合适的表示方式、算法和做法。
 
-## When to use which algorithm
+## 什么时候用哪种算法
 
-**Finding shortest paths:**
-- Unweighted graph: BFS (O(V + E), guaranteed optimal)
-- Weighted graph, non-negative weights: Dijkstra (O((V + E) log V))
-- Weighted graph, negative weights: Bellman-Ford (O(VE))
+**求最短路径：**
+- 无权图：BFS（O(V + E)，保证最优）
+- 带权图，权重非负：Dijkstra（O((V + E) log V)）
+- 带权图，存在负权重：Bellman-Ford（O(VE)）
 
-**Finding clusters/communities:**
-- Know the number of clusters: Spectral clustering (compute Laplacian eigenvectors, run k-means)
-- Don't know the number: Modularity optimization (Louvain algorithm)
-- Need overlapping communities: Node2Vec embeddings + soft clustering
+**发现簇/社区：**
+- 已知簇的个数：谱聚类（计算拉普拉斯矩阵的特征向量，再跑 k-means）
+- 不知道个数：模块度优化（Louvain 算法）
+- 需要重叠社区：Node2Vec 嵌入 + 软聚类
 
-**Measuring node importance:**
-- Directed graph (web/citation): PageRank
-- Undirected graph (social): Degree centrality, betweenness centrality
-- Information flow: Eigenvector centrality
+**衡量节点重要性：**
+- 有向图（网页/引用）：PageRank
+- 无向图（社交）：度中心性、介数中心性
+- 信息流：特征向量中心性
 
-**Checking structure:**
-- Is the graph connected? BFS from any node, check if all visited
-- How many components? Repeated BFS on unvisited nodes
-- Any cycles? DFS, check for back edges
-- Is it a tree? Connected + exactly V-1 edges
+**检查结构：**
+- 图是连通的吗？从任一节点做 BFS，检查是否所有节点都被访问到
+- 有几个连通分量？对未访问的节点反复做 BFS
+- 有环吗？做 DFS，检查是否存在回边
+- 是树吗？连通且恰好有 V-1 条边
 
-## Quick reference for graph properties
+## 图性质速查
 
-| Property | How to compute | What it tells you |
+| 性质 | 如何计算 | 能说明什么 |
 |----------|---------------|-------------------|
-| Degree distribution | Count neighbors per node | Hub structure, scale-free vs random |
-| Diameter | BFS from every node, take max | How "wide" the graph is |
-| Clustering coefficient | Triangle count / possible triangles per node | Local density of connections |
-| Fiedler value | Second smallest eigenvalue of Laplacian | Graph connectivity strength |
-| Spectral gap | Difference between first two Laplacian eigenvalues | How fast random walks mix |
-| Average path length | All-pairs BFS, take mean | Small-world property (< log(n)?) |
+| 度分布 | 统计每个节点的邻居数 | 枢纽结构，无标度还是随机 |
+| 直径 | 从每个节点做 BFS，取最大值 | 图有多“宽” |
+| 聚类系数 | 每个节点的三角形数 / 可能的三角形数 | 连接的局部密度 |
+| Fiedler 值 | 拉普拉斯矩阵第二小的特征值 | 图的连通强度 |
+| 谱间隙 | 拉普拉斯矩阵前两个特征值之差 | 随机游走混合得有多快 |
+| 平均路径长度 | 全点对 BFS，取平均 | 小世界性质（是否 < log(n)？） |
 
-## Graph representation checklist
+## 图表示清单
 
-1. **Define nodes.** What are the entities? Users, atoms, words, pages?
-2. **Define edges.** What relationship? Friendship, bond, co-occurrence, hyperlink?
-3. **Directed or undirected?** Is the relationship symmetric?
-4. **Weighted or unweighted?** Does edge strength vary?
-5. **Node features?** What attributes does each node have?
-6. **Edge features?** What attributes does each edge have?
-7. **Dynamic or static?** Does the graph change over time?
+1. **定义节点。** 实体是什么？用户、原子、词、网页？
+2. **定义边。** 什么关系？好友、化学键、共现、超链接？
+3. **有向还是无向？** 这种关系是对称的吗？
+4. **带权还是无权？** 边的强度是否不同？
+5. **节点特征？** 每个节点有哪些属性？
+6. **边特征？** 每条边有哪些属性？
+7. **动态还是静态？** 图会随时间变化吗？
 
-## When to use GNNs vs traditional graph algorithms
+## 什么时候用 GNN，什么时候用传统图算法
 
-Use **traditional algorithms** when:
-- You need exact answers (shortest paths, connectivity)
-- The graph is small (< 10K nodes)
-- You don't have node features
-- Interpretability matters
+以下情况用**传统算法**：
+- 需要精确答案（最短路径、连通性）
+- 图很小（< 1 万个节点）
+- 没有节点特征
+- 看重可解释性
 
-Use **GNNs** when:
-- You have node/edge features
-- You need to generalize to unseen graphs
-- The task is node classification, link prediction, or graph classification
-- The graph is large and you need scalable approximate solutions
+以下情况用 **GNN**：
+- 有节点/边特征
+- 需要泛化到没见过的图
+- 任务是节点分类、链接预测或图分类
+- 图很大，需要可扩展的近似解
 
-## Common mistakes
+## 常见错误
 
-- Forgetting to handle disconnected graphs (run connected components first)
-- Using dense adjacency matrices for sparse graphs (wastes memory)
-- Ignoring self-loops in GNNs (add identity to adjacency: A + I)
-- Not normalizing the adjacency matrix (causes feature scale explosion in message passing)
-- Running too many message passing rounds (over-smoothing -- all nodes converge to same representation)
+- 忘了处理不连通的图（先求连通分量）
+- 对稀疏图使用稠密邻接矩阵（浪费内存）
+- 在 GNN 中忽略自环（给邻接矩阵加上单位矩阵：A + I）
+- 不对邻接矩阵做归一化（会导致消息传递中特征尺度爆炸）
+- 消息传递轮数过多（过平滑：所有节点收敛到相同的表示）

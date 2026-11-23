@@ -1,34 +1,34 @@
 ---
 name: batch-triager
-description: Triage LLM workloads into interactive / semi-interactive / batch lanes, compute stacked discount (batch + cache) savings, and flag mis-triaged workloads.
+description: 把 LLM 负载分到交互 / 半交互 / 批处理三条通道，计算叠加折扣（批处理 + 缓存）带来的节省，并标出分错通道的负载。
 version: 1.0.0
 phase: 17
 lesson: 15
 tags: [batch-api, openai-batch, anthropic-batches, vertex-batch, triage, cost]
 ---
 
-Given a workload (name, user expectation for latency, traffic volume, shared prompt structure), produce a triage + cost plan.
+给定一个负载（名称、用户对延迟的预期、流量规模、共享 prompt 结构），给出分流与成本方案。
 
-Produce:
+输出以下内容：
 
-1. Lane. Interactive (TTFT-bound, sync), semi-interactive (minutes OK, async queue), or batch (by-morning OK, batch API). Justify with the specific user expectation.
-2. Current cost. Compute monthly cost at current configuration (sync, no cache, etc.).
-3. Target cost. Compute cost after recommended config (batch + cache or sync + cache). Express as % of current.
-4. Migration plan. Provider-specific steps (pick the one that matches the workload's model, not both):
-   - OpenAI: migrate to `/v1/batches`. Prompt caching is enabled automatically for eligible prompts (≥1024 tokens) — no `cache_control` to set. Optionally pass `prompt_cache_key` for tighter attribution.
-   - Anthropic: migrate to Message Batches. Cache reuse requires explicit `cache_control` blocks (e.g., `{"type": "ephemeral"}`) on the cacheable prompt spans; batch discount stacks with cached-read pricing.
-   - Both: instrument a success/failure webhook and a spillover lane to sync for batches that miss their turnaround window.
-5. Risk. What if the batch turnaround is 20 hours at P99? Name the downstream system behavior (email delivery, queue spillover to sync).
-6. Observable. Metric that catches mis-triage: batch job completion latency P95; alert if > 12 hours.
+1. 通道。交互（受 TTFT 约束，同步）、半交互（几分钟可以接受，异步队列）或批处理（第二天早上前完成即可，batch API）。用具体的用户预期说明理由。
+2. 当前成本。按当前配置（同步、无缓存等）计算每月成本。
+3. 目标成本。按推荐配置（批处理 + 缓存，或同步 + 缓存）计算成本。用占当前成本的百分比表示。
+4. 迁移计划。按供应商给出步骤（选与负载所用模型对应的那一个，不要两个都写）：
+   - OpenAI：迁移到 `/v1/batches`。符合条件的 prompt（≥1024 token）会自动启用 prompt 缓存，不需要设置 `cache_control`。可以选择传入 `prompt_cache_key`，让归因更精确。
+   - Anthropic：迁移到 Message Batches。缓存复用需要在可缓存的 prompt 片段上显式加 `cache_control` 块（例如 `{"type": "ephemeral"}`）；批处理折扣可以和缓存读取价格叠加。
+   - 两者都要：配置成功/失败 webhook，并为错过周转时间窗口的批次设置溢出到同步通道的兜底。
+5. 风险。如果批处理周转时间 P99 达到 20 小时怎么办？写出下游系统的行为（邮件投递、队列溢出到同步通道）。
+6. 观测指标。能发现分错通道的指标：批处理任务完成延迟 P95；超过 12 小时告警。
 
-Hard rejects:
-- Running an overnight pipeline in sync mode without batch when the user only needs "by morning" latency. Refuse — call out the ~90% leaked spend.
-- Promising batch for anything with a sub-15-minute user expectation. Refuse — batch SLA is 24h.
-- Ignoring prompt caching on a batch workload with shared system prompt. Refuse — the stacked discount is the point.
+直接否决：
+- 用户只需要"早上前完成"，却用同步模式跑夜间流水线而不用批处理。拒绝，并指出约 90% 的支出被白白浪费。
+- 对用户预期在 15 分钟以内的任务承诺批处理。拒绝。批处理的 SLA 是 24 小时。
+- 系统 prompt 共享的批处理负载却不用 prompt 缓存。拒绝。叠加折扣才是重点。
 
-Refusal rules:
-- If the workload is marketed as "real-time" but the actual user expectation is minutes, require explicit confirmation before recommending batch.
-- If the workload targets a provider without prompt caching in batch (e.g., any custom or self-hosted stack without KV-prefix reuse), note that only the batch discount applies and recompute without stacked savings. OpenAI batch caching is automatic; Anthropic batch caching requires explicit `cache_control` blocks.
-- If the workload has strict latency SLA (e.g., P99 < 60s) refuse batch outright — it belongs on a different lane.
+拒绝规则：
+- 如果负载对外宣传是"实时"，但用户实际预期是几分钟，推荐批处理前需要明确确认。
+- 如果负载所用的供应商在批处理中不支持 prompt 缓存（例如任何没有 KV 前缀复用的自定义或自托管栈），说明只能享受批处理折扣，并在不叠加节省的前提下重新计算。OpenAI 批处理的缓存是自动的；Anthropic 批处理的缓存需要显式的 `cache_control` 块。
+- 如果负载有严格的延迟 SLA（例如 P99 < 60s），直接拒绝批处理。它属于另一条通道。
 
-Output: a one-page triage with lane, current cost, target cost, migration steps, risk, observable. End with a cadence: re-triage all workloads quarterly as product surface changes.
+输出：一页分流方案，写明通道、当前成本、目标成本、迁移步骤、风险和观测指标。最后给出节奏：随着产品形态变化，每季度对所有负载重新分流一次。

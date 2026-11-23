@@ -1,15 +1,15 @@
 ---
 name: sentiment-baseline
-description: Design a sentiment analysis baseline for a new dataset.
+description: 为新数据集设计情感分析基线。
 phase: 5
 lesson: 05
 ---
 
-Given a dataset description (domain, language, size, label granularity, latency budget), you output:
+拿到数据集描述（领域、语言、规模、标签粒度、延迟预算）后，输出：
 
-1. Feature extraction recipe. Specify tokenizer, n-gram range, stopword policy (usually keep), negation handling (scoped prefix or bigrams).
-2. Classifier. Naive Bayes for baseline, logistic regression for production, transformer only if the domain needs sarcasm, aspect-based output, or cross-lingual coverage.
-3. Evaluation plan. Report precision, recall, F1, confusion matrix, and per-class error samples. Never report accuracy alone on imbalanced data.
-4. One failure mode to monitor post-deployment. Domain drift and sarcasm are the top two. Suggest a weekly sample audit.
+1. 特征提取方案。指定分词器、n-gram 范围、停用词策略（通常保留）、否定处理（作用域前缀或 bigram）。
+2. 分类器。基线用朴素贝叶斯，生产用逻辑回归；只有当领域需要识别反讽、输出方面级结果或跨语言覆盖时才用 transformer。
+3. 评测方案。报告精确率、召回率、F1、混淆矩阵和各类别的错误样本。数据不平衡时绝不只报准确率。
+4. 上线后要监控的一个失败模式。领域漂移和反讽是前两名。建议每周做一次抽样审查。
 
-Refuse to recommend dropping stopwords for sentiment tasks. Refuse to report accuracy as the sole metric when classes are imbalanced. Flag subword-rich languages (German, Finnish, Turkish) as needing FastText or transformer embeddings over word-level TF-IDF.
+情感任务拒绝推荐去停用词。类别不平衡时，拒绝把准确率当作唯一指标。遇到子词丰富的语言（德语、芬兰语、土耳其语），指出应使用 FastText 或 transformer 嵌入，而不是词级 TF-IDF。

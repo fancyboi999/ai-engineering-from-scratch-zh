@@ -1,36 +1,36 @@
 ---
 name: workbench-benchmark
-description: Run the same task through prompt-only and workbench-guided pipelines on a project's own sample app and emit a five-outcome before/after report.
+description: 在项目自己的示例应用上，让同一个任务分别走纯 prompt 流水线和工作台引导流水线，输出一份包含五项结果的前后对比报告。
 version: 1.0.0
 phase: 14
 lesson: 41
 tags: [benchmark, before-after, evaluation, workbench, sample-app]
 ---
 
-Given a repo, an agent product, and a small sample app, produce a portable evaluation harness that compares prompt-only against workbench-guided pipelines.
+给定一个仓库、一个 agent 产品和一个小型示例应用，产出一套可移植的评测框架，对比纯 prompt 流水线和工作台引导流水线。
 
-Produce:
+产出：
 
-1. `eval/sample_app/` — a minimum-viable sample app drawn from the project's domain.
-2. `eval/run_prompt_only.py` and `eval/run_workbench.py` that each take a task description and return a `TaskOutcome`.
-3. `eval/report.py` that runs both pipelines and writes `before-after-report.md` plus `comparison.json`.
-4. CI workflow that fails when workbench outcomes regress on a fixed task suite.
-5. `docs/benchmark.md` explaining the five outcomes and what counts as a regression.
+1. `eval/sample_app/`：取材于项目领域的最小可用示例应用。
+2. `eval/run_prompt_only.py` 和 `eval/run_workbench.py`，各自接收一份任务描述，返回一个 `TaskOutcome`。
+3. `eval/report.py`，运行两条流水线，写出 `before-after-report.md` 和 `comparison.json`。
+4. CI 工作流：工作台在固定任务集上的结果出现退化时失败。
+5. `docs/benchmark.md`，解释五项结果以及什么算退化。
 
-Hard rejects:
+直接否决：
 
-- A benchmark with only one pipeline. Comparison is the whole point.
-- Outcomes phrased as percentages without a denominator. Always report `n / m`.
-- A sample app the agent product was trained on. Use a domain-tuned fixture.
-- Reports that hide false negatives. Tasks where prompt-only was faster must be enumerated.
+- 只有一条流水线的基准测试。对比才是重点。
+- 只写百分比不给分母的结果。始终报告 `n / m`。
+- agent 产品训练时见过的示例应用。用针对领域定制的测试夹具。
+- 隐藏假阴性的报告。纯 prompt 更快的任务必须逐一列出。
 
-Refusal rules:
+拒绝规则：
 
-- If the project has no acceptance command, refuse to ship the benchmark. There is nothing to measure.
-- If the workbench pipeline takes more than 3x the prompt-only pipeline on the median task, surface that finding; the workbench needs simplification, not the model.
-- If the harness cannot run offline, refuse to wire it into CI. Network flakiness will corrupt the comparison.
+- 项目没有验收命令时，拒绝交付基准测试。没有可测量的东西。
+- 中位数任务上工作台流水线耗时超过纯 prompt 流水线 3 倍时，报告这一发现；该简化的是工作台，不是模型。
+- 评测框架无法离线运行时，拒绝接入 CI。网络抖动会污染对比结果。
 
-Output structure:
+输出结构：
 
 ```
 <repo>/
@@ -46,8 +46,8 @@ Output structure:
 └── .github/workflows/benchmark.yml
 ```
 
-End with "what to read next" pointing to:
+最后给出"接下来读什么"，指向：
 
-- Lesson 42 for the capstone pack that bundles every surface used by the workbench pipeline.
-- Lesson 19 (SWE-bench, GAIA, AgentBench) for the macro benchmarks this complements.
-- Lesson 30 (Eval-Driven Agent Development) for ongoing eval loops once the benchmark is wired.
+- 第 42 课：把工作台流水线用到的所有面打包在一起的综合项目套件。
+- 第 19 课（SWE-bench、GAIA、AgentBench）：与本课互补的宏观基准测试。
+- 第 30 课（评测驱动的 agent 开发）：基准测试接好之后的持续评测循环。

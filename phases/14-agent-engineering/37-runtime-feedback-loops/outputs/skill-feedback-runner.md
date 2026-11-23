@@ -1,36 +1,36 @@
 ---
 name: feedback-runner
-description: Wrap shell commands with deterministic stdout/stderr/exit/duration capture, persist a JSONL record per command, and refuse to advance the agent loop when feedback is missing.
+description: 包装 shell 命令，确定性地捕获 stdout、stderr、退出码和耗时，每条命令持久化一条 JSONL 记录；反馈缺失时拒绝推进 agent 循环。
 version: 1.0.0
 phase: 14
 lesson: 37
 tags: [feedback, subprocess, runner, jsonl, loop-control]
 ---
 
-Given a project that runs shell commands inside an agent loop, produce a feedback runner and the JSONL it writes.
+给定一个在 agent 循环里执行 shell 命令的项目，产出一个反馈运行器以及它写入的 JSONL。
 
-Produce:
+产出：
 
-1. `tools/run_with_feedback.py` exposing `run_with_feedback(command: list[str], agent_note: str, timeout_s: float) -> FeedbackRecord`.
-2. `feedback_record.jsonl` location under the workbench, one record per line.
-3. `tools/feedback_loader.py` that returns the most recent N records for the active task.
-4. A `loop_can_advance(record) -> bool` helper the agent loop calls before claiming success.
-5. Tests covering: success path, non-zero exit, timeout, missing binary, deterministic head/tail truncation.
+1. `tools/run_with_feedback.py`，提供 `run_with_feedback(command: list[str], agent_note: str, timeout_s: float) -> FeedbackRecord`。
+2. 工作台下 `feedback_record.jsonl` 的存放位置，每行一条记录。
+3. `tools/feedback_loader.py`，返回当前任务最近的 N 条记录。
+4. 一个 `loop_can_advance(record) -> bool` 辅助函数，agent 循环在宣布成功前调用它。
+5. 测试覆盖：成功路径、非零退出、超时、可执行文件不存在、确定性的首尾截断。
 
-Hard rejects:
+直接否决：
 
-- `shell=True` anywhere in the runner. Argv-only.
-- Truncation that depends on the wall clock or random sampling. Same input must produce the same record.
-- Records without `duration_ms`. Slow probes are the first sign of a wedged workbench.
-- A loader that returns an unbounded list. Cap at the last N or paginate.
+- 运行器里任何地方出现 `shell=True`。只用 argv。
+- 截断逻辑依赖墙钟时间或随机采样。相同输入必须产出相同记录。
+- 记录里没有 `duration_ms`。探针变慢是工作台卡死的第一个信号。
+- 返回无上限列表的加载器。只取最近 N 条，或者分页。
 
-Refusal rules:
+拒绝规则：
 
-- If the project pipes secrets through stdout, refuse to ship the runner without a redaction step. Surface the lines that would have been captured.
-- If the project has commands that can hang indefinitely, refuse to ship without a default timeout and an explicit override list.
-- If the runner runs inside a worker with shared state, refuse to skip a file lock around the JSONL append. Multiple writers will tear the file.
+- 项目通过 stdout 输出密钥时，没有脱敏步骤就拒绝交付运行器。把本会被捕获的那些行指出来。
+- 项目有可能无限挂起的命令时，没有默认超时和显式的覆盖清单就拒绝交付。
+- 运行器跑在共享状态的 worker 里时，拒绝省掉追加 JSONL 时的文件锁。多个写入者会把文件写坏。
 
-Output structure:
+输出结构：
 
 ```
 <repo>/
@@ -41,8 +41,8 @@ Output structure:
     └── test_feedback_runner.py
 ```
 
-End with "what to read next" pointing to:
+最后给出"接下来读什么"，指向：
 
-- Lesson 38 for the verification gate that consumes the records.
-- Lesson 39 for the reviewer agent that reads feedback when scoring a run.
-- Lesson 23 for OTel GenAI conventions to add to the telemetry side once feedback is solid.
+- 第 38 课：消费这些记录的验证关卡。
+- 第 39 课：给一次运行打分时读取反馈的审查 agent。
+- 第 23 课：反馈稳定后，在遥测侧补上 OTel GenAI 约定。

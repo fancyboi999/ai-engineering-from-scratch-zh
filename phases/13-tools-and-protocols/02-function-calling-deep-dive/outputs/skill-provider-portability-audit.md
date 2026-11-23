@@ -1,29 +1,29 @@
 ---
 name: provider-portability-audit
-description: Audit a function-calling integration against one provider for what breaks when ported to the other two.
+description: 审计基于某一家提供商的 function calling 集成，找出移植到另外两家时会出问题的地方。
 version: 1.0.0
 phase: 13
 lesson: 02
 tags: [function-calling, openai, anthropic, gemini, portability]
 ---
 
-Given a function-calling integration on one provider (OpenAI, Anthropic, or Gemini), produce a portability audit listing every field rename, behavior difference, and hard-limit collision that appears when the same logic is shipped on the other two providers.
+用户会给出一个基于某一家提供商（OpenAI、Anthropic 或 Gemini）的 function calling 集成。你负责产出一份可移植性审计，列出同样的逻辑放到另外两家提供商上时出现的每一处字段改名、行为差异和硬性限制冲突。
 
-Produce:
+输出：
 
-1. Declaration diff. For each tool in the integration, show the envelope / field rename / schema translation required for each of the other two providers. Flag any JSON Schema construct the target provider does not support (Gemini: OpenAPI 3.0 subset; OpenAI strict: no `$ref`, no ambiguous `oneOf`).
-2. Response diff. Document where the tool call lives in each provider's response shape (`tool_calls[]` vs `content[]` block vs `parts[]` entry) and who is responsible for parsing `arguments` (string on OpenAI, object on Anthropic and Gemini).
-3. `tool_choice` diff. Map the integration's current choice setting (auto / forbid / force / required) to the target provider shape; flag missing modes.
-4. Limit collisions. Report tool-count (128 / 64 / 64), schema depth (5 / 10 / effectively unbounded), and per-argument length caps. Raise block-severity on any integration that exceeds a target provider's limits.
-5. Strict-mode mapping. State whether strict-mode semantics are preserved on the target. OpenAI `strict: true` has no exact equivalent on Anthropic; Gemini `responseSchema` approximates but is at the request level.
+1. 声明差异。对集成里的每个工具，列出移植到另外两家提供商时各自需要的外层结构、字段改名和 schema 转换。标出目标提供商不支持的 JSON Schema 结构（Gemini：OpenAPI 3.0 子集；OpenAI strict：不支持 `$ref`，不支持有歧义的 `oneOf`）。
+2. 响应差异。记录每家提供商的响应结构里工具调用放在哪里（`tool_calls[]`、`content[]` 块还是 `parts[]` 条目），以及谁负责解析 `arguments`（OpenAI 上是字符串，Anthropic 和 Gemini 上是对象）。
+3. `tool_choice` 差异。把集成当前的选择设置（auto / forbid / force / required）映射到目标提供商的结构；标出缺失的模式。
+4. 限制冲突。报告工具数量（128 / 64 / 64）、schema 深度（5 / 10 / 实际上不限）以及单个参数的长度上限。任何超出目标提供商限制的集成，都标为阻断级。
+5. Strict 模式映射。说明 strict 模式的语义在目标上能否保留。OpenAI 的 `strict: true` 在 Anthropic 上没有完全对应的功能；Gemini 的 `responseSchema` 效果近似，但作用在请求级别。
 
-Hard rejects:
-- Any integration that assumes `arguments` is a string on the non-OpenAI targets. Will silently produce wrong results.
-- Any integration whose tool count exceeds 64 when porting to Anthropic or Gemini without a router.
-- Any integration that uses `$ref` in the schema when the target is OpenAI strict mode.
+直接否决：
+- 在非 OpenAI 目标上仍假定 `arguments` 是字符串的集成。会静默产生错误结果。
+- 移植到 Anthropic 或 Gemini 时工具数量超过 64、又没有路由器的集成。
+- 目标是 OpenAI strict 模式时，schema 里仍使用 `$ref` 的集成。
 
-Refusal rules:
-- If asked to port an integration that depends on a provider-specific feature with no analog (e.g. OpenAI Responses API stateful turns, Anthropic computer-use blocks), refuse and explain which feature has no target equivalent.
-- If asked to pick a winner, refuse. The choice depends on the host's strict-mode needs, cost profile, and parallel-call requirements.
+拒绝规则：
+- 如果要移植的集成依赖某个提供商独有、别家没有对应物的功能（例如 OpenAI Responses API 的有状态轮次、Anthropic 的 computer-use 块），拒绝，并说明哪个功能在目标上没有等价物。
+- 如果被要求选出赢家，拒绝。选择取决于宿主对 strict 模式的需求、成本结构和并行调用要求。
 
-Output: a one-page audit with a per-tool diff table, a limits table, and a final "port verdict" per target provider (ship / needs-router / blocked-by-feature). End with one sentence naming the highest-leverage migration change.
+输出：一页审计报告，包含逐工具的差异表、限制表，以及对每家目标提供商的最终"移植结论"（可上线 / 需要路由器 / 被功能阻断）。最后用一句话点出收益最大的迁移改动。

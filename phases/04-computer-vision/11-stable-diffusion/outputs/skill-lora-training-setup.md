@@ -1,67 +1,67 @@
 ---
 name: skill-lora-training-setup
-description: Write a full LoRA training config for a custom dataset, including captions, rank, batch size, and learning rate
+description: 为自定义数据集编写完整的 LoRA 训练配置，包括描述文本、rank、batch size 和学习率
 version: 1.0.0
 phase: 4
 lesson: 11
 tags: [computer-vision, stable-diffusion, lora, fine-tuning]
 ---
 
-# LoRA Training Setup
+# LoRA 训练配置
 
-Turn a description of the fine-tune intent into a concrete training config that is ready to pass to `diffusers` or `kohya_ss`.
+把对微调意图的描述，变成一份可以直接交给 `diffusers` 或 `kohya_ss` 的具体训练配置。
 
-## When to use
+## 何时使用
 
-- Training a LoRA for a subject (person, object, character), a style (artist, brand), or a concept (pose, lighting).
-- Extending an existing LoRA with more data.
-- Debugging a LoRA run whose output underfits or overfits the training images.
+- 为某个主体（人物、物体、角色）、某种风格（艺术家、品牌）或某个概念（姿势、光照）训练 LoRA。
+- 用更多数据扩展已有的 LoRA。
+- 排查 LoRA 训练：输出对训练图像欠拟合或过拟合。
 
-## Inputs
+## 输入
 
-- `purpose`: subject | style | concept
-- `num_images`: how many training images are available
-- `base_model`: SD 1.5 | SDXL | SD3 | FLUX
-- `gpu_vram_gb`: 8 | 12 | 16 | 24 | 48+
-- `caption_source`: manual | BLIP2-generated | dataset-native
+- `purpose`：subject | style | concept
+- `num_images`：可用的训练图像数量
+- `base_model`：SD 1.5 | SDXL | SD3 | FLUX
+- `gpu_vram_gb`：8 | 12 | 16 | 24 | 48+
+- `caption_source`：manual | BLIP2-generated | dataset-native
 
-## Rank picker
+## Rank 选择
 
-| Purpose | Rank | Alpha |
+| 用途 | Rank | Alpha |
 |---------|------|-------|
-| Subject | 8-16 | rank |
-| Style | 16-32 | rank * 2 |
-| Concept | 32-64 | rank |
+| 主体 | 8-16 | rank |
+| 风格 | 16-32 | rank * 2 |
+| 概念 | 32-64 | rank |
 
-Higher rank = more capacity, more overfitting risk on small datasets. Alpha scales the LoRA's effect strength; `alpha == rank` is the safe default. Styles are the documented exception: `alpha == rank * 2` gives a stronger style push at the cost of more risk of baking the style too hard — use only when subject fidelity is not the goal.
+rank 越高，容量越大，在小数据集上过拟合的风险也越大。alpha 决定 LoRA 效果的强度；`alpha == rank` 是稳妥的默认值。风格是有据可查的例外：`alpha == rank * 2` 能更强地推动风格，代价是更容易把风格"烤死"，只在不追求主体保真度时使用。
 
-## Training step target
+## 训练步数目标
 
-- `subject` with 5-20 images: 500-1500 steps.
-- `style` with 30-100 images: 1500-4000 steps.
-- `concept` with 100+ images: 4000-10000 steps.
+- `subject`，5-20 张图：500-1500 步。
+- `style`，30-100 张图：1500-4000 步。
+- `concept`，100 张图以上：4000-10000 步。
 
-Overshoot at your peril — a LoRA that has memorised its training images cannot generalise.
+超了后果自负：把训练图像背下来的 LoRA 没法泛化。
 
-## Learning rate
+## 学习率
 
-- Text encoder LoRA: `1e-4` for SD 1.5, `5e-5` for SDXL.
-- U-Net LoRA: `1e-4` for SD 1.5, `1e-4` for SDXL.
-- FLUX / SD3: `5e-5` for the transformer, text encoders usually frozen.
-- Halve the LR when `num_images < 15` (subject) or when training for more than 3000 steps; tiny datasets and long runs both benefit from a gentler update.
+- 文本编码器 LoRA：SD 1.5 用 `1e-4`，SDXL 用 `5e-5`。
+- U-Net LoRA：SD 1.5 用 `1e-4`，SDXL 用 `1e-4`。
+- FLUX / SD3：transformer 用 `5e-5`，文本编码器通常冻结。
+- 当 `num_images < 15`（主体）或训练超过 3000 步时，学习率减半；数据集很小和训练很长，都适合更温和的更新。
 
-## Scheduler
+## 调度器
 
-- `cosine_with_warmup` (default): warmup over the first 5-10% of steps, then cosine decay. Use when `steps >= 1000`; the decay tail gives sharper final samples.
-- `constant`: use only for very short runs (`steps < 500`) or when resuming a previous LoRA where you want to preserve the current learned features without re-annealing.
+- `cosine_with_warmup`（默认）：前 5-10% 的步数做 warmup，之后余弦衰减。在 `steps >= 1000` 时使用；衰减尾段能让最终样本更清晰。
+- `constant`：只用于很短的训练（`steps < 500`），或者在已有 LoRA 上继续训练、希望保留当前已学到的特征而不重新退火时使用。
 
-## Caption format
+## 描述文本格式
 
-- Subject: prepend a unique trigger token ("myperson") to every caption. Keep trigger token rare so it does not overwrite existing concepts. Avoid real words and common names.
-- Style: append a unique style tag at the end of every caption ("...in mystyle style"). Treat the tag itself as a rare trigger token — `mystyle`, not `impressionism`, which already maps to a real concept.
-- Concept: describe the concept in every caption; no trigger token. The concept itself (e.g. "low-angle shot") is the anchor.
+- 主体：在每条描述文本前面加一个唯一的触发 token（"myperson"）。触发 token 要足够罕见，免得覆盖已有概念。避免使用真实单词和常见人名。
+- 风格：在每条描述文本末尾加一个唯一的风格标签（"...in mystyle style"）。标签本身也当作罕见的触发 token 来用：用 `mystyle`，不要用 `impressionism`，后者已经对应一个真实概念。
+- 概念：每条描述文本里都描述这个概念，不用触发 token。概念本身（例如 "low-angle shot"）就是锚点。
 
-## Output config
+## 输出配置
 
 ```yaml
 model:
@@ -71,7 +71,7 @@ model:
 lora:
   rank: <int>
   alpha: <int>
-  targets: unet.cross_attention  # and/or unet.to_q, to_k, to_v, to_out
+  targets: unet.cross_attention  # 以及/或 unet.to_q, to_k, to_v, to_out
 
 training:
   steps:          <int>
@@ -100,7 +100,7 @@ validation:
   every_steps: 250
 ```
 
-## Report
+## 报告
 
 ```
 [lora setup]
@@ -113,10 +113,10 @@ validation:
   vram est.: <float> GB
 ```
 
-## Rules
+## 规则
 
-- Never recommend `rank > 64`; above that the LoRA becomes a mini fine-tune and loses its "adapter" nature.
-- For `num_images < 5`, warn strongly — identity LoRAs on 1-3 images overfit every time.
-- For `gpu_vram_gb < 12`, require AdamW8bit and gradient checkpointing.
-- If `base_model == FLUX` and `gpu_vram_gb < 24`, route to the `schnell` variant and note that training is slower.
-- Never skip validation prompts; a LoRA without sample grids is impossible to evaluate.
+- 不要推荐 `rank > 64`；超过这个值，LoRA 就成了小型微调，失去了"适配器"的意义。
+- 当 `num_images < 5` 时，要强烈警告：只用 1-3 张图训练身份 LoRA，每次都会过拟合。
+- 当 `gpu_vram_gb < 12` 时，必须使用 AdamW8bit 和梯度检查点。
+- 如果 `base_model == FLUX` 且 `gpu_vram_gb < 24`，改用 `schnell` 变体，并注明训练会更慢。
+- 绝不能省略验证 prompt；没有样本网格图的 LoRA 无法评估。

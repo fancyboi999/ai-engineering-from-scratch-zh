@@ -1,40 +1,40 @@
 ---
 name: scaling-policy-review
-description: Review a frontier-lab scaling policy (Anthropic RSP, OpenAI Preparedness, DeepMind FSF, internal) against the RSP v3.0 reference shape.
+description: 对照 RSP v3.0 参考形态，审查前沿实验室的扩展策略（Anthropic RSP、OpenAI Preparedness、DeepMind FSF 或内部策略）。
 version: 1.0.0
 phase: 15
 lesson: 19
 tags: [rsp, scaling-policy, ai-rd-4, pause-commitment, saferai, governance]
 ---
 
-Given a published or proposed scaling policy, produce a structured review comparing it to the RSP v3.0 reference shape (AI R&D-4, affirmative case, two-tier mitigation, Frontier Safety Roadmap, Risk Report, independent review).
+给定一份已发布或拟议的扩展策略，产出一份结构化审查，把它与 RSP v3.0 参考形态（AI R&D-4、肯定性论证、双层缓解、Frontier Safety Roadmap、Risk Report、独立审查）做对比。
 
-Produce:
+产出：
 
-1. **Two-tier inventory.** Separate commitments into "lab-unilateral" and "industry-wide recommendation." Commitments in the recommendation tier are advocacy, not promises. Count the ratio; a policy where most commitments live in the recommendation tier is a weak policy.
-2. **Thresholds.** Name every capability threshold and the mitigation that triggers. Flag thresholds that are qualitative where v2 had quantitative. Flag missing thresholds for capabilities the policy claims to cover.
-3. **Pause commitment.** Confirm the policy names a pause clause (training stops, deployment halts, or similar) at specific thresholds. v3.0 removed this; policies that follow suit inherit the regression.
-4. **Standing artifacts.** Confirm the policy mandates standing Frontier Safety Roadmap and Risk Report documents with declared cadence. One-off artifacts published post-hoc do not qualify.
-5. **Independent review.** Name the external review mechanism. Internal-only review (a "Safety Advisory Group" made of lab employees) does not qualify as independent oversight.
+1. **双层清单。** 把承诺分为"实验室单方面承诺"和"全行业建议"两类。建议层里的承诺是倡导，不是保证。统计两者比例；大部分承诺都落在建议层的策略是弱策略。
+2. **阈值。** 列出每个能力阈值及其触发的缓解措施。标出 v2 中是定量、现在变成定性的阈值。标出策略声称覆盖、却缺少阈值的能力。
+3. **暂停承诺。** 确认策略在特定阈值处写明了暂停条款（停止训练、中止部署或类似措施）。v3.0 删掉了这一条；跟着删的策略也就继承了这一倒退。
+4. **常设产物。** 确认策略要求定期发布 Frontier Safety Roadmap 和 Risk Report，并声明发布节奏。事后一次性发布的产物不算。
+5. **独立审查。** 写明外部审查机制。只有内部审查（由实验室员工组成的"安全咨询组"）不算独立监督。
 
-Hard rejects:
-- Policies with no named capability threshold.
-- Policies whose mitigations all live in the industry-recommendation tier.
-- Policies with no standing Roadmap / Risk Report artifacts.
-- Policies with no independent review mechanism.
-- Policies that claim to "learn from real-world experience" without stating how the policy text updates and on what cadence.
+直接否决：
+- 没有写明任何能力阈值的策略。
+- 所有缓解措施都落在全行业建议层的策略。
+- 没有常设 Roadmap / Risk Report 产物的策略。
+- 没有独立审查机制的策略。
+- 声称"从真实世界经验中学习"，却不说明策略文本如何更新、按什么节奏更新的策略。
 
-Refusal rules:
-- If the policy document is marketing rather than governance (no specific commitments, no thresholds, no cadence), refuse to rate it as a scaling policy.
-- If the user treats a policy's existence as equivalent to compliance, refuse. A policy is a commitment device; compliance requires evidence.
-- If the user cites an older policy version (e.g., 2023 Anthropic RSP) as current, refuse and require the current version.
+拒绝规则：
+- 策略文件是营销而不是治理（没有具体承诺、没有阈值、没有节奏）时，拒绝把它当作扩展策略来评级。
+- 用户把策略的存在等同于合规时，拒绝。策略是一种承诺工具，合规需要证据。
+- 用户把旧版本策略（例如 2023 年的 Anthropic RSP）当作现行版本引用时，拒绝，要求使用现行版本。
 
-Output format:
+输出格式：
 
-Return a policy review with:
-- **Two-tier ratio** (unilateral / recommendation / total count)
-- **Threshold table** (name, type: quantitative / qualitative, trigger, mitigation)
-- **Pause commitment** (present y/n, specific clause)
-- **Standing artifacts** (Roadmap cadence, Risk Report cadence)
-- **Independent review** (mechanism, reviewer identity, frequency)
-- **Summary rating** (strong / moderate / weak, justified)
+返回一份策略审查，包含：
+- **双层比例**（单方面 / 建议 / 总数）
+- **阈值表格**（名称、类型：定量 / 定性、触发条件、缓解措施）
+- **暂停承诺**（有 y/n，具体条款）
+- **常设产物**（Roadmap 节奏、Risk Report 节奏）
+- **独立审查**（机制、审查方身份、频率）
+- **总体评级**（强 / 中 / 弱，附理由）

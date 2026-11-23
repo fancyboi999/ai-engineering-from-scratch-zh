@@ -1,127 +1,127 @@
 ---
 name: skill-production-checklist
-description: Decision framework for shipping LLM applications to production -- covers every component with specific thresholds and pass/fail criteria
+description: 把 LLM 应用推上生产的决策框架：覆盖每个组件，附具体阈值和通过/失败标准
 version: 1.0.0
 phase: 11
 lesson: 13
 tags: [production, deployment, llm, architecture, scaling, cost, observability, guardrails]
 ---
 
-# Production LLM Checklist
+# 生产环境 LLM 检查清单
 
-When shipping an LLM application, work through this checklist in order. Each section has pass/fail criteria with specific thresholds.
+交付 LLM 应用时，按顺序过一遍这份清单。每一节都有带具体阈值的通过/失败标准。
 
-## 1. Security (Ship Blockers)
+## 1. 安全（上线阻断项）
 
-Every item here must pass before any deployment.
+任何部署之前，这里的每一项都必须通过。
 
-| Check | Pass Criteria | How to Verify |
+| 检查项 | 通过标准 | 验证方法 |
 |-------|--------------|---------------|
-| API keys in env vars | Zero hardcoded keys in codebase | `grep -r "sk-" --include="*.py"` returns nothing |
-| Input guardrails active | Prompt injection patterns blocked | Send "Ignore all previous instructions" -- returns blocked response |
-| PII redaction | SSN, credit card, email patterns caught | Send "My SSN is 123-45-6789" -- PII redacted before LLM call |
-| Output filtering | Dangerous content blocked | Model cannot return `DROP TABLE`, `rm -rf`, `exec()` patterns |
-| Rate limiting | Per-user request cap enforced | 100 requests from same user in 10 seconds -- last 50+ rejected |
-| Auth on all endpoints | No unauthenticated LLM access | `curl /v1/chat` without token returns 401 |
-| CORS restricted | Only production domains allowed | `Origin: evil.com` request rejected |
-| Max input tokens | Requests over limit rejected | Send 50K token input -- returns 413 or truncation |
+| API key 放在环境变量里 | 代码库中没有任何硬编码的 key | `grep -r "sk-" --include="*.py"` 无输出 |
+| 输入护栏已启用 | prompt 注入模式被拦截 | 发送 "Ignore all previous instructions"，返回拦截响应 |
+| PII 脱敏 | SSN、信用卡号、邮箱模式都能识别 | 发送 "My SSN is 123-45-6789"，在调用 LLM 之前 PII 已被脱敏 |
+| 输出过滤 | 危险内容被拦截 | 模型无法返回 `DROP TABLE`、`rm -rf`、`exec()` 这类模式 |
+| 限流 | 按用户强制执行请求上限 | 同一用户 10 秒内发 100 个请求，后 50+ 个被拒 |
+| 所有接口都有认证 | 不存在未认证的 LLM 访问 | 不带 token 执行 `curl /v1/chat` 返回 401 |
+| 限制 CORS | 只允许生产域名 | `Origin: evil.com` 的请求被拒 |
+| 最大输入 token | 超限请求被拒 | 发送 50K token 的输入，返回 413 或被截断 |
 
-## 2. Reliability (Week-One Survival)
+## 2. 可靠性（撑过第一周）
 
-These prevent your first on-call incident.
+这些能帮你避开第一次 on-call 事故。
 
-| Check | Pass Criteria | How to Verify |
+| 检查项 | 通过标准 | 验证方法 |
 |-------|--------------|---------------|
-| Retry with backoff | 3 retries on 5xx, exponential delay | Kill LLM mock mid-request -- retries visible in logs |
-| Fallback model chain | 2+ models in chain | Primary model unavailable -- response still returns from fallback |
-| Request timeout | 30s max on all external calls | Slow LLM mock (60s) -- request times out at 30s |
-| Graceful degradation | Cache/RAG failure does not crash service | Stop cache -- requests still succeed (slower, more expensive) |
-| Health check endpoint | Returns dependency status | `GET /health` returns `{"status": "healthy", "cache": ..., "llm": ...}` |
-| Streaming works | First token under 500ms | Time-to-first-token measured, consistently < 500ms |
-| Error messages are safe | Internal errors never leak to users | Force 500 -- user sees generic error, not stack trace |
+| 带退避的重试 | 遇到 5xx 重试 3 次，指数退避 | 在请求中途杀掉 LLM mock，日志里能看到重试 |
+| 降级模型链 | 链上有 2 个以上模型 | 主模型不可用时，仍能从降级模型返回响应 |
+| 请求超时 | 所有外部调用最多 30s | 用慢速 LLM mock（60s），请求在 30s 时超时 |
+| 优雅降级 | 缓存/RAG 故障不会让服务崩溃 | 停掉缓存，请求仍能成功（更慢、更贵） |
+| 健康检查接口 | 返回依赖状态 | `GET /health` 返回 `{"status": "healthy", "cache": ..., "llm": ...}` |
+| 流式输出可用 | 首 token 在 500ms 内 | 测量首 token 时间，稳定 < 500ms |
+| 错误信息安全 | 内部错误绝不泄露给用户 | 强制触发 500，用户看到的是通用错误，而不是堆栈 |
 
-## 3. Cost Control (Month-One Economics)
+## 3. 成本控制（第一个月的账）
 
-These prevent the $50K surprise invoice.
+这些能帮你避开 $50K 的意外账单。
 
-| Check | Pass Criteria | How to Verify |
+| 检查项 | 通过标准 | 验证方法 |
 |-------|--------------|---------------|
-| Cost per request tracked | Every request logs token count + USD cost | Request log has `input_tokens`, `output_tokens`, `cost_usd` fields |
-| Semantic cache active | > 20% hit rate on repeated patterns | Cache stats show hit rate after 1000 test requests |
-| Cache TTL configured | Entries expire (default: 1 hour) | Entry inserted -- not returned after TTL |
-| Per-user cost tracking | Cost aggregated by user_id | Dashboard/API shows top 10 users by cost |
-| Cost alerting | Alert at 80% of daily budget | Set $10 daily budget, send $8.50 in requests -- alert fires |
-| Model routing by cost | Low-complexity queries use cheaper model | Simple question routes to gpt-4o-mini, complex to gpt-4o |
-| Max output tokens set | Responses capped per template | Template with max_output_tokens=512 -- response never exceeds it |
+| 跟踪单次请求成本 | 每个请求都记录 token 数和美元成本 | 请求日志里有 `input_tokens`、`output_tokens`、`cost_usd` 字段 |
+| 语义缓存已启用 | 重复模式的命中率 > 20% | 1000 次测试请求后，缓存统计显示命中率 |
+| 配置了缓存 TTL | 条目会过期（默认 1 小时） | 插入一条，TTL 之后不再返回 |
+| 按用户跟踪成本 | 按 user_id 汇总成本 | 看板/API 显示成本最高的 10 个用户 |
+| 成本告警 | 达到每日预算的 80% 时告警 | 设置 $10 每日预算，发出 $8.50 的请求，告警触发 |
+| 按成本做模型路由 | 低复杂度查询用更便宜的模型 | 简单问题路由到 gpt-4o-mini，复杂问题路由到 gpt-4o |
+| 设置最大输出 token | 每个模板都限制响应长度 | 模板设 max_output_tokens=512，响应从不超出 |
 
-**Cost estimation formula:**
+**成本估算公式：**
 ```
 Monthly LLM cost = DAU x queries_per_user x 30 x (1 - cache_hit_rate) x (avg_input_tokens x input_price + avg_output_tokens x output_price) / 1,000,000
 ```
 
-**Benchmark thresholds by scale:**
+**按规模的基准阈值：**
 
-| DAU | Target cost/request | Monthly budget |
+| 日活 | 目标单次请求成本 | 每月预算 |
 |-----|-------------------|----------------|
 | 1K | < $0.005 | < $750 |
 | 10K | < $0.003 | < $4,500 |
 | 100K | < $0.001 | < $15,000 |
 
-## 4. Observability (Debugging in Production)
+## 4. 可观测性（生产环境调试）
 
-You cannot fix what you cannot see.
+看不见的东西就修不了。
 
-| Check | Pass Criteria | How to Verify |
+| 检查项 | 通过标准 | 验证方法 |
 |-------|--------------|---------------|
-| Structured JSON logging | Every request produces a JSON log line | Log contains: request_id, user_id, model, tokens, latency_ms, cost |
-| Request tracing | End-to-end trace with component timing | Single request shows: guardrail (5ms) + cache (2ms) + llm (3200ms) + eval (1ms) |
-| Latency tracking | P50, P95, P99 measured | After 1000 requests: P50 < 2s, P99 < 10s |
-| Error rate monitoring | Errors counted and categorized | Dashboard shows: 0.5% API errors, 0.1% guardrail blocks, 0.01% timeouts |
-| Cache metrics | Hit rate, miss rate, entry count visible | `GET /v1/cache/stats` returns current numbers |
-| A/B test metrics | Per-variant quality metrics logged | Each request logs prompt_template + version for comparison |
-| Eval logging | Quality signals recorded per request | Response length, latency, model, template version stored for offline analysis |
+| 结构化 JSON 日志 | 每个请求产出一行 JSON 日志 | 日志包含：request_id、user_id、model、tokens、latency_ms、cost |
+| 请求链路追踪 | 端到端追踪，含各组件耗时 | 单个请求显示：guardrail (5ms) + cache (2ms) + llm (3200ms) + eval (1ms) |
+| 延迟跟踪 | 测量 P50、P95、P99 | 1000 次请求后：P50 < 2s，P99 < 10s |
+| 错误率监控 | 错误被计数并分类 | 看板显示：0.5% API 错误、0.1% 护栏拦截、0.01% 超时 |
+| 缓存指标 | 命中率、未命中率、条目数可见 | `GET /v1/cache/stats` 返回当前数据 |
+| A/B 测试指标 | 按变体记录质量指标 | 每个请求都记录 prompt_template 和版本，便于对比 |
+| 评估日志 | 每个请求都记录质量信号 | 存下响应长度、延迟、模型、模板版本，供离线分析 |
 
-## 5. Prompt Management
+## 5. Prompt 管理
 
-Prompts are code. Treat them like code.
+Prompt 就是代码，要像对待代码一样对待它。
 
-| Check | Pass Criteria | How to Verify |
+| 检查项 | 通过标准 | 验证方法 |
 |-------|--------------|---------------|
-| Versioned templates | Every template has a name + version string | Template change creates new version, old version preserved |
-| A/B testing support | Traffic split by deterministic user hash | Same user always sees same variant within experiment |
-| Rollback capability | Revert to previous version in < 1 minute | Change experiment config -- traffic instantly shifts |
-| Template validation | Variables validated before rendering | Missing variable in template raises clear error, not KeyError |
-| System prompt separation | System and user messages in separate fields | System prompt is not concatenated into user message |
+| 带版本的模板 | 每个模板都有名称和版本字符串 | 修改模板会生成新版本，旧版本保留 |
+| 支持 A/B 测试 | 按确定性的用户哈希分流 | 实验期间同一用户始终看到同一个变体 |
+| 可回滚 | 1 分钟内回退到上一版本 | 修改实验配置，流量立即切换 |
+| 模板校验 | 渲染前校验变量 | 模板缺变量时抛出清晰的错误，而不是 KeyError |
+| 系统 prompt 分离 | 系统消息和用户消息放在不同字段 | 系统 prompt 没有拼接进用户消息 |
 
-## 6. Scaling Readiness
+## 6. 扩展就绪
 
-Not needed at launch. Needed at 10x.
+上线时不需要，规模到 10 倍时需要。
 
-| Check | Pass Criteria | How to Verify |
+| 检查项 | 通过标准 | 验证方法 |
 |-------|--------------|---------------|
-| Async LLM calls | No thread blocking on API calls | 50 concurrent requests -- server CPU stays < 30% |
-| Connection pooling | HTTP connections reused | Network trace shows persistent connections to LLM provider |
-| Horizontal scaling | Stateless server design | 2 instances behind load balancer -- all requests succeed |
-| Queue support | Non-real-time tasks go to queue | Summarization request returns job_id, result available via polling |
-| Load tested | 100 concurrent users, < 5% error rate | `wrk` or `locust` test passes at target concurrency |
+| 异步 LLM 调用 | API 调用不阻塞线程 | 50 个并发请求，服务器 CPU 保持 < 30% |
+| 连接池 | HTTP 连接被复用 | 网络追踪显示与 LLM 供应商之间是持久连接 |
+| 水平扩展 | 无状态服务设计 | 负载均衡器后挂 2 个实例，所有请求都成功 |
+| 队列支持 | 非实时任务进入队列 | 摘要请求返回 job_id，结果可通过轮询获取 |
+| 做过压测 | 100 个并发用户，错误率 < 5% | `wrk` 或 `locust` 测试在目标并发下通过 |
 
-## Implementation order for new projects
+## 新项目的实施顺序
 
-1. **Day 1:** API server + prompt templates + single LLM call with retry
-2. **Day 2:** Input guardrails + output guardrails + error handling
-3. **Day 3:** Semantic cache + cost tracking per request
-4. **Day 4:** Streaming (SSE) + health check endpoint
-5. **Day 5:** Structured logging + request tracing + eval logging
-6. **Week 2:** A/B testing + prompt versioning + rollback
-7. **Week 3:** Fallback model chain + graceful degradation
-8. **Week 4:** Load testing + async optimization + horizontal scaling
+1. **第 1 天：** API 服务 + prompt 模板 + 带重试的单次 LLM 调用
+2. **第 2 天：** 输入护栏 + 输出护栏 + 错误处理
+3. **第 3 天：** 语义缓存 + 逐请求成本跟踪
+4. **第 4 天：** 流式输出（SSE）+ 健康检查接口
+5. **第 5 天：** 结构化日志 + 请求链路追踪 + 评估日志
+6. **第 2 周：** A/B 测试 + prompt 版本管理 + 回滚
+7. **第 3 周：** 降级模型链 + 优雅降级
+8. **第 4 周：** 压测 + 异步优化 + 水平扩展
 
-## Quick diagnostic
+## 快速诊断
 
-If something is wrong in production, check in this order:
+生产环境出问题时，按这个顺序排查：
 
-1. **Users complaining about errors?** Check health endpoint, then error rate in logs, then LLM provider status page
-2. **Responses are slow?** Check P99 latency, then cache hit rate, then LLM response times in traces
-3. **Cost spiking?** Check cost-per-request trend, then cache hit rate, then top users by cost, then look for prompt template changes that increased token count
-4. **Quality dropped?** Check if a new prompt version was deployed, check if RAG retrieval accuracy changed, check if model provider changed default model version
-5. **Security incident?** Check guardrail block rate (sudden drop = guardrails disabled), check request logs for unusual patterns, rotate API keys immediately
+1. **用户抱怨报错？** 先看健康检查接口，再看日志里的错误率，再看 LLM 供应商的状态页
+2. **响应慢？** 先看 P99 延迟，再看缓存命中率，再看追踪里的 LLM 响应时间
+3. **成本飙升？** 先看单次请求成本趋势，再看缓存命中率，再看成本最高的用户，然后找有没有让 token 数增加的 prompt 模板改动
+4. **质量下降？** 看是否部署了新的 prompt 版本，看 RAG 检索准确率是否变化，看模型供应商是否改了默认模型版本
+5. **安全事件？** 看护栏拦截率（突然下降 = 护栏被关掉了），查请求日志里的异常模式，立即轮换 API key

@@ -1,35 +1,35 @@
 ---
 name: skill-residual-block-reviewer
-description: Review a PyTorch residual block for skip-connection correctness, BN placement, activation order, and shape alignment
+description: 审查 PyTorch 残差块的跳跃连接正确性、BN 位置、激活顺序和形状对齐
 version: 1.0.0
 phase: 4
 lesson: 3
 tags: [computer-vision, resnet, code-review, pytorch]
 ---
 
-# Residual Block Reviewer
+# 残差块审查器
 
-A focused reviewer for any PyTorch `nn.Module` claiming to implement a residual block. Catches the four mistakes that account for almost every broken ResNet rewrite.
+一个专门审查 PyTorch 残差块的工具，适用于任何声称实现了残差块的 `nn.Module`。它能抓出四类错误，几乎所有写坏的 ResNet 重写都栽在这几处。
 
-## When to use
+## 何时使用
 
-- Someone wrote a custom BasicBlock or Bottleneck and loss is NaN or accuracy is stuck.
-- You are porting a block from one framework to another and want to verify equivalence.
-- You are reviewing a PR that changes ResNet internals (pre-activation, squeeze-excite, anti-alias).
-- A model ships fine on CIFAR-sized input but crashes on ImageNet resolution because the shortcut is wrong.
+- 有人写了自定义的 BasicBlock 或 Bottleneck，损失变成 NaN 或准确率卡住不动。
+- 你在把一个块从一个框架移植到另一个框架，想验证两者等价。
+- 你在审查一个改动 ResNet 内部结构的 PR（预激活、squeeze-excite、抗混叠）。
+- 模型在 CIFAR 尺寸的输入上运行正常，换到 ImageNet 分辨率就崩溃，原因是 shortcut 写错了。
 
-## Inputs
+## 输入
 
-- A PyTorch class definition, either as source text or an importable path.
-- Optional `variant`: `basic` | `bottleneck` | `preact` | `seblock`.
+- 一个 PyTorch 类定义，可以是源代码文本，也可以是可导入的路径。
+- 可选的 `variant`：`basic` | `bottleneck` | `preact` | `seblock`。
 
-## Four checks
+## 四项检查
 
-### 1. Shortcut shape alignment
+### 1. Shortcut 形状对齐
 
-For any block with `stride != 1` or `in_channels != out_channels`, the shortcut path **must** be a shape-matching module — typically a 1x1 conv plus BN. A bare `nn.Identity()` in this case is a guaranteed shape-mismatch error at forward time.
+对于任何 `stride != 1` 或 `in_channels != out_channels` 的块，shortcut 路径**必须**是一个能匹配形状的模块，通常是 1x1 卷积加 BN。这种情况下直接用 `nn.Identity()`，前向传播时必然报形状不匹配的错。
 
-Diagnostic:
+诊断：
 ```
 [shortcut]
   detected:  nn.Identity | 1x1 Conv + BN | 1x1 Conv + BN + ReLU | other
@@ -37,40 +37,40 @@ Diagnostic:
   verdict:   ok | wrong | unnecessarily heavy
 ```
 
-### 2. BN placement relative to the addition
+### 2. BN 相对于加法的位置
 
-The addition `out + shortcut(x)` must happen **before** the final ReLU (post-activation, original ResNet) or the final ReLU must be absent entirely (pre-activation ResNet v2). A block that applies ReLU in the main branch and then adds a raw shortcut produces an asymmetric activation range that hurts training.
+加法 `out + shortcut(x)` 必须发生在最后一个 ReLU **之前**（后激活，原始 ResNet），或者完全没有最后的 ReLU（预激活 ResNet v2）。如果一个块在主分支上做了 ReLU，再加上未经处理的 shortcut，激活范围就会不对称，损害训练。
 
-Diagnostic:
+诊断：
 ```
 [activation order]
   pattern:  post-act (conv-BN-ReLU-conv-BN-add-ReLU) | pre-act (BN-ReLU-conv-BN-ReLU-conv-add) | other
   verdict:  ok | suspect
 ```
 
-### 3. Bias on conv layers
+### 3. 卷积层的偏置
 
-Convs followed immediately by BatchNorm should have `bias=False`. BN's beta already parameterises the bias, so an extra conv bias wastes parameters and can slow convergence.
+紧跟 BatchNorm 的卷积应设 `bias=False`。BN 的 beta 已经承担了偏置的作用，卷积再加偏置只会浪费参数，还可能减慢收敛。
 
-Diagnostic:
+诊断：
 ```
 [bias]
   convs with BN and bias=True: <count>
   recommended fix: set bias=False on those layers
 ```
 
-### 4. In-place ReLU and autograd
+### 4. 原地 ReLU 与 autograd
 
-`nn.ReLU(inplace=True)` on the tensor that will be added to the shortcut overwrites values that may still be needed for the residual add. Flag any `inplace=True` that is not followed by a layer that produces a new tensor before the add.
+对将要与 shortcut 相加的张量使用 `nn.ReLU(inplace=True)`，会覆盖残差加法可能还要用到的值。标出所有在加法之前、后面没有接一个会产生新张量的层的 `inplace=True`。
 
-Diagnostic:
+诊断：
 ```
 [in-place]
   risky inplace ops: <list>
   fix: inplace=False before the residual add
 ```
 
-## Report
+## 报告
 
 ```
 [block-review]
@@ -82,9 +82,9 @@ Diagnostic:
   summary:       one sentence
 ```
 
-## Rules
+## 规则
 
-- Do not rewrite the block. Report only.
-- If the block is correct, say `ok` everywhere and stop. No suggestions.
-- If multiple things are wrong, list them in the order above (shortcut first because it is the most common cause of crashes).
-- Never flag a deliberate pre-activation or squeeze-excite variant as wrong when the user has specified it.
+- 不要重写这个块。只做报告。
+- 如果块是正确的，每项都写 `ok` 然后结束，不提建议。
+- 如果有多处错误，按上面的顺序列出（shortcut 排第一，因为它是崩溃最常见的原因）。
+- 用户已明确指定预激活或 squeeze-excite 变体时，绝不把这种有意为之的设计标为错误。

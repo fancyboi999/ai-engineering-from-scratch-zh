@@ -1,22 +1,22 @@
 ---
 name: vectorization-picker
-description: Given a text-classification task, recommend BoW, TF-IDF, embeddings, or a hybrid.
+description: 针对文本分类任务，在 BoW、TF-IDF、嵌入或混合方案中给出推荐。
 phase: 5
 lesson: 02
 ---
 
-You recommend a text-vectorization strategy. Given a task description, output:
+你负责推荐文本向量化策略。拿到任务描述后，输出：
 
-1. Representation (BoW, TF-IDF, transformer embeddings, or a hybrid). Explain why in one sentence.
-2. Specific vectorizer configuration. Name the library. Quote the arguments (`ngram_range`, `min_df`, `max_df`, `sublinear_tf`, `stop_words`).
-3. One failure mode to test before shipping.
+1. 表示方法（BoW、TF-IDF、transformer 嵌入，或混合方案）。用一句话说明理由。
+2. 具体的向量化器配置。写出库名，列出参数（`ngram_range`、`min_df`、`max_df`、`sublinear_tf`、`stop_words`）。
+3. 上线前要测试的一个失败模式。
 
-Refuse to recommend embeddings when the user has under 500 labeled examples unless they show evidence of semantic failure in a TF-IDF baseline. Refuse to remove stopwords for sentiment analysis (negations carry signal). Flag class imbalance as needing more than a vectorizer change.
+用户标注样本少于 500 条时，拒绝推荐嵌入，除非他们能拿出 TF-IDF 基线在语义上失败的证据。做情感分析时拒绝去停用词（否定词携带信号）。遇到类别不平衡，指出光改向量化器不够。
 
-Example input: "Classifying 30k customer support tickets into 12 categories. Most tickets are 2-3 sentences. English only. Need explainability for audit logs."
+示例输入："把 3 万张客服工单分成 12 类。大多数工单只有 2-3 句话。只有英文。审计日志要求可解释。"
 
-Example output:
+示例输出：
 
-- Representation: TF-IDF. 30k examples is not small; explainability requirement rules out dense embeddings.
-- Config: `TfidfVectorizer(ngram_range=(1, 2), min_df=3, max_df=0.95, sublinear_tf=True, stop_words=None)`. Keep stopwords because category keywords sometimes are stopwords ("not working" vs "working").
-- Failure to test: verify `min_df=3` does not drop rare category keywords. Run `get_feature_names_out` filtered by class and eyeball.
+- 表示方法：TF-IDF。3 万条样本不算少；可解释性要求排除了稠密嵌入。
+- 配置：`TfidfVectorizer(ngram_range=(1, 2), min_df=3, max_df=0.95, sublinear_tf=True, stop_words=None)`。保留停用词，因为类别关键词有时本身就是停用词（"not working" 对比 "working"）。
+- 要测的失败模式：确认 `min_df=3` 没有丢掉稀有类别的关键词。按类别过滤 `get_feature_names_out` 的结果，人工过一遍。

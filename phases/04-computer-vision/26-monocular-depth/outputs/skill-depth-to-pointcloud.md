@@ -1,38 +1,38 @@
 ---
 name: skill-depth-to-pointcloud
-description: Build point clouds from depth maps with correct intrinsics handling and export to .ply
+description: 用深度图构建点云，正确处理相机内参，并导出为 .ply
 version: 1.0.0
 phase: 4
 lesson: 26
 tags: [depth, point-cloud, 3d, intrinsics]
 ---
 
-# Depth to Point Cloud
+# 深度图转点云
 
-Turn a depth map plus a colour image into a textured point cloud, exportable for visualisation or further 3D work.
+把深度图加一张彩色图变成带颜色的点云，可导出用于可视化或后续 3D 处理。
 
-## When to use
+## 适用场景
 
-- Visualising depth predictions as an actual 3D scene.
-- Bootstrapping a sparse 3D reconstruction from a single image.
-- Producing input for 3DGS training when SfM fails.
-- Comparing predicted depth against LiDAR ground truth.
+- 把深度预测可视化成真正的 3D 场景。
+- 从单张图像起步做稀疏 3D 重建。
+- SfM 失败时，为 3DGS 训练准备输入。
+- 拿预测深度和 LiDAR 真值做对比。
 
-## Inputs
+## 输入
 
-- `depth`: `(H, W)` numpy array of depths in the same units you want in the output (metres recommended).
-- `rgb`: `(H, W, 3)` numpy array of colours (uint8 or float32 [0, 1]).
-- `intrinsics`: `(fx, fy, cx, cy)` in pixel units.
-- Optional `depth_scale`: multiplier to convert predicted depth units to metres.
+- `depth`：`(H, W)` 的 numpy 数组，深度单位与你希望输出的单位一致（推荐米）。
+- `rgb`：`(H, W, 3)` 的 numpy 颜色数组（uint8 或 float32 [0, 1]）。
+- `intrinsics`：以像素为单位的 `(fx, fy, cx, cy)`。
+- 可选 `depth_scale`：把预测深度单位换算成米的乘数。
 
-## Pipeline
+## 流程
 
-1. **Validate** — depth must be positive and finite everywhere you plan to include. Mask out invalid pixels.
-2. **Lift** — `X = (u - cx) * d / fx`, `Y = (v - cy) * d / fy`, `Z = d` per pixel.
-3. **Pair** with RGB — each 3D point gets an `(r, g, b)` triple from the matching pixel.
-4. **Export** — PLY (portable), `.xyz` (lightweight), `.pcd` (Open3D-native), `.las`/`.laz` (geospatial).
+1. **校验**：凡是要纳入的位置，深度都必须为正且有限。把无效像素屏蔽掉。
+2. **抬升**：对每个像素计算 `X = (u - cx) * d / fx`、`Y = (v - cy) * d / fy`、`Z = d`。
+3. **配色**：每个 3D 点从对应像素取一组 `(r, g, b)`。
+4. **导出**：PLY（通用）、`.xyz`（轻量）、`.pcd`（Open3D 原生）、`.las`/`.laz`（地理空间）。
 
-## Implementation template
+## 实现模板
 
 ```python
 import numpy as np
@@ -75,7 +75,7 @@ def write_ply(path, points, colors=None, valid_mask=None):
                 f.write(f"{pt[0]:.4f} {pt[1]:.4f} {pt[2]:.4f}\n")
 ```
 
-## Report
+## 报告
 
 ```
 [export]
@@ -86,10 +86,10 @@ def write_ply(path, points, colors=None, valid_mask=None):
   scale:              metres | millimetres | normalised
 ```
 
-## Rules
+## 规则
 
-- Always mask invalid depth (zero, NaN, inf, saturated); including them produces a cloud of garbage points at the origin.
-- For prediction from a relative-depth model, do NOT export as metric; prefix output filename with `relative_` to signal the convention.
-- Keep the camera coordinate convention consistent (OpenCV: +X right, +Y down, +Z forward). Swap signs if the downstream tool expects OpenGL (+Y up).
-- For dense scenes (> 1M points), offer a subsample parameter; PLY files > 500 MB are awkward to load everywhere.
-- Never silently clip depth to produce "reasonable" output; clip explicitly with warned thresholds so users know what was discarded.
+- 始终屏蔽无效深度（零、NaN、inf、饱和值）；把它们算进去，会在原点堆出一团垃圾点。
+- 来自相对深度模型的预测不要按度量单位导出；在输出文件名前加 `relative_`，标明这一约定。
+- 保持相机坐标约定一致（OpenCV：+X 向右，+Y 向下，+Z 向前）。下游工具要求 OpenGL（+Y 向上）时，翻转对应符号。
+- 稠密场景（> 1M 个点）要提供下采样参数；超过 500 MB 的 PLY 文件在哪儿加载都费劲。
+- 绝不悄悄裁剪深度来凑出"合理"的输出；要显式裁剪并对阈值给出警告，让用户知道丢掉了什么。

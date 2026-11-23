@@ -1,30 +1,30 @@
 ---
 name: inference-platform-picker
-description: Pick an inference platform (Fireworks, Together, Baseten, Modal, Replicate, Anyscale, or custom silicon) given workload, SLA, budget, and operational constraints. Normalize per-token, per-minute, and per-prediction pricing.
+description: 根据负载、SLA、预算和运维约束选择推理平台（Fireworks、Together、Baseten、Modal、Replicate、Anyscale 或专用芯片），并把按 token、按分钟、按预测次数的计价统一换算。
 version: 1.0.0
 phase: 17
 lesson: 02
 tags: [inference, fireworks, together, baseten, modal, replicate, anyscale, economics]
 ---
 
-Given a workload profile (model, tokens/day, sustained utilization, TTFT SLA, burst factor, compliance, Python vs mixed stack), produce a platform recommendation.
+给定负载画像（模型、每日 token 量、持续利用率、TTFT SLA、突发倍数、合规要求、纯 Python 还是混合技术栈），给出平台推荐。
 
-Produce:
+输出以下内容：
 
-1. Primary platform. Name the platform and the specific pricing tier (serverless vs dedicated vs batch). Justify with the workload characteristics that match — e.g., "Fireworks serverless because TTFT < 500 ms is the SLA and the traffic is bursty."
-2. Effective cost. Normalize the chosen pricing model to $/M output tokens. Compare to at least two alternatives. Call out when per-minute beats per-token (above ~30% sustained utilization) or vice versa.
-3. Cold-start plan. For serverless picks (Fireworks, Modal, Replicate), state expected cold-start latency and a mitigation (pre-warming, min_workers=1, live-migration). For dedicated picks (Baseten, Anyscale), skip this section but note the trade-off.
-4. Runner-up. Name the second platform and the explicit condition under which you would switch (e.g., "move to Baseten if we close an enterprise deal requiring HIPAA + dedicated GPUs").
-5. Gateway layer. Recommend whether to front the platform with an AI gateway (LiteLLM, Portkey, Kong AI Gateway) to isolate the product from provider churn. Default: yes, unless scale is below 500 RPS.
+1. 主平台。写出平台名称和具体计价档位（serverless、专用还是 batch）。用匹配的负载特征说明理由，例如"选 Fireworks serverless，因为 SLA 是 TTFT < 500 ms，且流量有突发性。"
+2. 实际成本。把所选计价模式统一换算成每百万输出 token 的美元价格。至少和两个备选比较。指出按分钟计费何时比按 token 计费划算（持续利用率高于约 30%），反之亦然。
+3. 冷启动方案。对 serverless 选项（Fireworks、Modal、Replicate），写明预期冷启动延迟和缓解手段（预热、min_workers=1、热迁移）。对专用选项（Baseten、Anyscale）跳过这一节，但要说明其中的取舍。
+4. 次选平台。写出第二个平台，以及明确的切换条件（例如"如果签下要求 HIPAA + 专用 GPU 的企业单子，就迁到 Baseten"）。
+5. 网关层。建议是否在平台前面加一层 AI 网关（LiteLLM、Portkey、Kong AI Gateway），把产品和供应商变动隔离开。默认要加，除非规模低于 500 RPS。
 
-Hard rejects:
-- Comparing per-token against per-minute without normalizing. Refuse and insist on effective $/M tokens.
-- Picking Fireworks because it's "fastest" without validating TTFT SLA against the published benchmarks.
-- Recommending custom silicon (Groq, Cerebras, SambaNova) for any workload not latency-bound. They are priced at a premium and only justify themselves on interactive SLAs.
+直接否决：
+- 不做换算就拿按 token 和按分钟的价格直接比较。拒绝，并坚持换算成每百万 token 的实际美元成本。
+- 因为 Fireworks "最快"就选它，却没有用公开 benchmark 核实 TTFT SLA。
+- 给不受延迟约束的负载推荐专用芯片（Groq、Cerebras、SambaNova）。它们定价偏高，只有在交互式 SLA 下才值得。
 
-Refusal rules:
-- If the workload requires a regulated framework (SOC 2 Type II, HIPAA) and the customer picked Modal or Replicate, refuse — neither has the same enterprise footprint as Baseten or Anyscale. Suggest Baseten.
-- If the expected traffic is below 100k tokens/day, refuse to recommend per-minute (Baseten, Modal, Anyscale). The economics do not work — default to a marketplace (OpenRouter, DeepInfra) or a managed hyperscaler.
-- If the customer wants "the cheapest," refuse — name the multi-dimensional cost function (token rate + cold start + attribution + gateway + DX).
+拒绝规则：
+- 如果负载需要满足监管框架（SOC 2 Type II、HIPAA），而客户选了 Modal 或 Replicate，拒绝。这两家的企业级能力都不如 Baseten 或 Anyscale。建议 Baseten。
+- 如果预期流量低于每天 10 万 token，拒绝推荐按分钟计费（Baseten、Modal、Anyscale）。经济上不划算，默认用聚合市场（OpenRouter、DeepInfra）或托管的超大规模云平台。
+- 如果客户想要"最便宜的"，拒绝，并说明成本函数是多维的（token 单价 + 冷启动 + 归因 + 网关 + 开发体验）。
 
-Output: a one-page recommendation naming primary platform, effective cost, cold-start plan, runner-up, gateway posture. End with the single metric that will reveal a mis-pick (cold-start P99, per-token rate, or utilization drift).
+输出：一页推荐文档，写明主平台、实际成本、冷启动方案、次选平台和网关策略。最后给出一个能暴露选型失误的指标（冷启动 P99、每 token 单价或利用率漂移）。

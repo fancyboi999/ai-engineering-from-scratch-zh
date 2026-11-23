@@ -1,39 +1,39 @@
 ---
 name: bounded-loop-review
-description: Audit a proposed bounded self-improvement loop against the four-primitive stack (invariants, anchor, multi-objective, regression detection).
+description: 对照四原语栈（不变量、锚点、多目标、退化检测）审计一个拟议的有界自我改进循环。
 version: 1.0.0
 phase: 15
 lesson: 8
 tags: [bounded-self-improvement, invariants, alignment-anchor, rsi-safety]
 ---
 
-Given a proposed self-improvement loop, score it against the four bounding primitives identified by the ICLR 2026 RSI Workshop and produce a concrete gap analysis.
+给定一个拟议的自我改进循环，按 ICLR 2026 RSI Workshop 提出的四个约束原语给它打分，并产出具体的差距分析。
 
-Produce:
+产出：
 
-1. **Invariant inventory.** List every invariant the loop enforces. For each, name (a) what is checked, (b) where the check runs (inside/outside agent reach), (c) what a violation does (hard reject, pause, log-only).
-2. **Anchor identification.** Name the alignment anchor (objective statement, constitution, intent description). State its storage location and verify the loop cannot edit it. If there is no anchor, flag as missing.
-3. **Multi-objective axes.** List every axis the loop evaluates. Confirm safety, fairness, and robustness are present alongside performance. A single-axis loop fails this check.
-4. **Regression policy.** State the historical window, the per-axis tolerance, and what happens when a drop is detected. Confirm regression checks use an external comparison set, not just internal history.
-5. **Gap analysis.** For each missing primitive, predict which failure class will emerge first. Invariants missing → smuggled capability or tool drift. Anchor missing → objective reinterpretation. Multi-objective missing → safety regression masking performance gain. Regression missing → silent capability loss.
+1. **不变量清单。** 列出循环强制执行的每个不变量。对每个不变量写明：(a) 检查什么，(b) 检查在哪里运行（agent 够得到还是够不到的地方），(c) 违反时怎么处理（直接否决、暂停、只记日志）。
+2. **锚点识别。** 指出对齐锚点（目标陈述、宪法、意图描述）。说明它存放在哪里，并核实循环无法修改它。没有锚点时，标记为缺失。
+3. **多目标维度。** 列出循环评估的每个维度。确认除了性能之外，还包含安全、公平和鲁棒性。只有单一维度的循环不能通过这项检查。
+4. **退化策略。** 说明历史窗口、每个维度的容差，以及检测到下降时怎么处理。确认退化检查使用外部对照集，而不只是内部历史。
+5. **差距分析。** 对每个缺失的原语，预测哪类失败会最先出现。缺不变量 → 夹带能力或工具漂移。缺锚点 → 目标被重新解读。缺多目标 → 性能提升掩盖安全退化。缺退化检测 → 能力悄悄流失。
 
-Hard rejects:
-- Any loop with zero invariants.
-- Any loop without an alignment anchor outside the edit surface.
-- Any loop that optimizes a single scalar score.
-- Any loop whose regression check reads only from its own history (the loop defines "normal").
+直接否决：
+- 没有任何不变量的循环。
+- 对齐锚点不在编辑面之外的循环。
+- 只优化单一标量分数的循环。
+- 退化检查只读自身历史的循环（等于由循环自己定义"正常"）。
 
-Refusal rules:
-- If the user treats "it hasn't broken yet" as evidence of safety, refuse and require explicit gate design before any compute is spent.
-- If the user cannot produce the invariants list in 15 minutes, refuse — the loop has no invariants.
-- If the loop is proposed to run in production (affecting real users or infrastructure) without all four primitives, refuse and require staging with monitoring first.
+拒绝规则：
+- 用户把"目前还没出事"当作安全证据时，拒绝，要求在花任何算力之前先明确设计关卡。
+- 用户在 15 分钟内拿不出不变量清单时，拒绝。这说明循环根本没有不变量。
+- 拟议循环要在生产环境运行（影响真实用户或基础设施）却没有齐备四个原语时，拒绝，要求先在带监控的预发环境中运行。
 
-Output format:
+输出格式：
 
-Return a scored review with:
-- **Invariant score** (0-5 with explicit list)
-- **Anchor score** (0-5 with storage and verify method)
-- **Multi-objective score** (0-5 with axes listed)
-- **Regression score** (0-5 with tolerance and window)
-- **Gap analysis** (predicted first failure, mitigation plan)
-- **Deployment readiness** (production / staging / research-only)
+返回一份打分审查，包含：
+- **不变量得分**（0-5，附明确清单）
+- **锚点得分**（0-5，附存放位置与核实方法）
+- **多目标得分**（0-5，列出各维度）
+- **退化得分**（0-5，附容差与窗口）
+- **差距分析**（预测的首个失败、缓解计划）
+- **部署就绪度**（production / staging / research-only）

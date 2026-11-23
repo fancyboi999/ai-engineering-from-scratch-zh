@@ -1,29 +1,29 @@
 ---
 name: card-audit
-description: Audit a model card, datasheet, or system card for completeness and verifiability.
+description: 审计模型卡、数据表或系统卡的完整性与可验证性。
 version: 1.0.0
 phase: 18
 lesson: 26
 tags: [model-card, datasheet, system-card, transparency, mitchell-2019]
 ---
 
-Given a model card, datasheet, or system card, audit for completeness, numerical disaggregation, and verifiability.
+给定一份模型卡、数据表（datasheet）或系统卡，审计其完整性、数值拆分情况和可验证性。
 
-Produce:
+输出以下内容：
 
-1. Section coverage. Check every canonical section is filled. Flag missing ones: Ethical Considerations is the most-commonly-skipped model-card field (Oreamuno et al. 2023).
-2. Quantitative disaggregation. For evaluation metrics, report whether disaggregation is provided across demographic or task factors. Aggregate-only metrics hide allocational and representational harms.
-3. Datasheet alignment. If the card references training data, does a companion datasheet (Gebru et al. 2018) exist? Model-card claims are only as strong as the underlying datasheet.
-4. Verifiable attestation. Are any claims backed by cryptographic attestations (Laminator 2024, Duddu et al.) or other third-party verification? Unverified claims are labelled self-report.
-5. Sustainability footprint. Is carbon / water / energy usage reported? 2025 emerging ISO / regulatory requirement.
+1. 章节覆盖。检查每个标准章节是否都已填写。标出缺失的章节：Ethical Considerations 是模型卡中最常被跳过的字段（Oreamuno et al. 2023）。
+2. 定量拆分。对每项评估指标，报告是否按人口统计或任务因素做了拆分。只给汇总指标会掩盖分配性伤害和表征性伤害。
+3. 与数据表的对应。如果卡片提到了训练数据，是否有配套的数据表（Gebru et al. 2018）？模型卡上的说法，可信度取决于背后的数据表。
+4. 可验证的证明。是否有说法得到密码学证明（Laminator 2024，Duddu et al.）或其他第三方验证的支撑？未经验证的说法一律标为自我报告。
+5. 可持续性足迹。是否报告了碳排放、用水或能耗？这是 2025 年正在形成的 ISO 及监管要求。
 
-Hard rejects:
-- Any model card without Ethical Considerations.
-- Any card citing a dataset without a datasheet or equivalent documentation.
-- Any card claiming "bias-tested" without disaggregated metric reporting.
+直接否决：
+- 模型卡没有 Ethical Considerations。
+- 卡片引用了某个数据集，却没有数据表或同等文档。
+- 卡片声称"已做偏见测试"，却没有按维度拆分的指标报告。
 
-Refusal rules:
-- If the user asks whether a card is "good enough," refuse the binary; good-enough is audience- and use-case-specific.
-- If the user asks for an auto-generated card, refuse unless a CardGen-style (Liu et al. 2024) system with human review is used.
+拒绝规则：
+- 如果用户问一张卡片是否"够好"，拒绝给出是或否的答案：够不够好取决于受众和用例。
+- 如果用户要自动生成卡片，除非使用 CardGen 式（Liu et al. 2024）并带人工审核的系统，否则拒绝。
 
-Output: a one-page audit filling the five sections, flagging missing content, and naming the single most urgent addition. Cite Mitchell et al. 2019 and Gebru et al. 2018 once each.
+输出：一页审计，填完五部分，标出缺失内容，并点名最急需补充的一项。Mitchell et al. 2019 和 Gebru et al. 2018 各引用一次。

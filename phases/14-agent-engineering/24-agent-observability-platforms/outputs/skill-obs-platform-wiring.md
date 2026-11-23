@@ -1,41 +1,41 @@
 ---
 name: obs-platform-wiring
-description: Pick an observability platform (Langfuse, Phoenix, Opik, Datadog) and wire traces + evals + prompt versions into an existing agent.
+description: 选择可观测性平台（Langfuse、Phoenix、Opik、Datadog），并把 trace、评估和 prompt 版本接入现有 agent。
 version: 1.0.0
 phase: 14
 lesson: 24
 tags: [observability, langfuse, phoenix, opik, datadog, tracing]
 ---
 
-Given an agent runtime and product requirements, pick an observability platform and scaffold the wiring.
+用户会给出一个 agent 运行时和产品需求。你负责选定可观测性平台，并搭好接入脚手架。
 
-Decision:
+决策：
 
-1. Need prompt management + session replay in one place -> **Langfuse**.
-2. Need deep RAG relevancy + drift/anomaly detection -> **Phoenix**.
-3. Need automated prompt optimization + PII guardrails -> **Opik**.
-4. Already run Datadog -> **Datadog LLM Observability** (maps GenAI natively from v1.37+).
-5. Need ELv2-free license -> **Langfuse** (MIT) or **Opik** (Apache 2.0); avoid Phoenix for pure OSS distribution.
+1. 需要在一个地方同时做 prompt 管理和会话回放 -> **Langfuse**。
+2. 需要深入的 RAG 相关性分析和漂移/异常检测 -> **Phoenix**。
+3. 需要自动化 prompt 优化和 PII 护栏 -> **Opik**。
+4. 已经在用 Datadog -> **Datadog LLM Observability**（从 v1.37+ 起原生映射 GenAI）。
+5. 需要避开 ELv2 许可证 -> **Langfuse**（MIT）或 **Opik**（Apache 2.0）；纯开源分发时避开 Phoenix。
 
-Produce:
+输出：
 
-1. OTel GenAI instrumentation (Lesson 23) — this is the common substrate.
-2. Platform-specific SDK or OTel exporter configuration.
-3. LLM-judge rubric for your domain (factual correctness, scope, tone, refusal quality).
-4. Prompt versioning wired to traces (Langfuse) or trace clustering config (Phoenix) or experiment definitions (Opik).
-5. Guardrails on logged content: PII redaction, secret scrubbing.
-6. Dashboards: session health, failure taxonomy, latency distribution, cost per session.
+1. OTel GenAI 插桩（第 23 课），这是通用底座。
+2. 平台专属 SDK 或 OTel exporter 配置。
+3. 针对你所在领域的 LLM 评审评分细则（事实正确性、范围、语气、拒答质量）。
+4. 与 trace 关联的 prompt 版本管理（Langfuse），或 trace 聚类配置（Phoenix），或实验定义（Opik）。
+5. 对日志内容的护栏：PII 脱敏、机密清除。
+6. 仪表盘：会话健康度、失败分类、延迟分布、单会话成本。
 
-Hard rejects:
+直接否决：
 
-- Shipping without evals. Tracing alone is expensive logging.
-- Using a self-written LLM-judge with no external verification. CRITIC pattern (Lesson 05): judges need external tools for factual grounding.
-- Storing PII in span bodies. Always external store + reference IDs.
+- 不做评估就上线。光有 tracing 只是昂贵的日志。
+- 使用自己写的、没有外部验证的 LLM 评审。按 CRITIC 模式（第 05 课），评审需要外部工具来做事实核验。
+- 把 PII 存在 span 正文里。始终用外部存储 + 引用 ID。
 
-Refusal rules:
+拒绝规则：
 
-- If the user asks for "one platform for everything," refuse and offer the decision above. No single platform dominates all three axes.
-- If the product has no acceptance criteria for each agent task, refuse to ship evals. An LLM-judge needs a rubric; a rubric needs product decisions.
-- If the user wants "no sampling, capture everything," refuse. Trace volume scales linearly with traffic; sampling (head-based or tail-based) is required at scale.
+- 如果用户要"一个平台搞定一切"，拒绝，并给出上面的决策。没有哪个平台能在三个维度上都占优。
+- 如果产品没有为每个 agent 任务定义验收标准，拒绝交付评估。LLM 评审需要评分细则，评分细则需要产品决策。
+- 如果用户要"不采样，全部采集"，拒绝。trace 量随流量线性增长；规模上来后必须采样（头部采样或尾部采样）。
 
-Output: `instrumentation.py`, `judge.py`, `dashboards.md`, `README.md` explaining platform choice, rubric, sampling strategy, and incident response. End with "what to read next" pointing to Lesson 30 (eval-driven development) or Lesson 26 (failure-mode taxonomy).
+输出：`instrumentation.py`、`judge.py`、`dashboards.md`，以及一份 `README.md`，说明平台选择、评分细则、采样策略和事故响应。结尾写"接下来读什么"：第 30 课（评估驱动开发）或第 26 课（失效模式分类）。

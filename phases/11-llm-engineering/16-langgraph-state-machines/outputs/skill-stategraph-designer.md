@@ -1,27 +1,27 @@
 ---
 name: stategraph-designer
-description: Turn an agent task into a LangGraph StateGraph with named nodes, typed state, reducers, checkpointer, and human interrupts.
+description: 把 agent 任务转成 LangGraph StateGraph，包含命名节点、类型化状态、reducer、checkpointer 和人工中断。
 version: 1.0.0
 phase: 11
 lesson: 16
 tags: [langgraph, stategraph, checkpointer, interrupt, time-travel, react-agent, human-in-the-loop]
 ---
 
-Given the agent task (user-facing goal, available tools, expected turn count, side effects with safety blast radius, durability requirements, target latency budget), output:
+给定 agent 任务（面向用户的目标、可用工具、预期轮数、副作用及其安全影响范围、持久化要求、目标延迟预算），输出：
 
-1. Node list. Name every discrete step: the LLM thinker, each tool runner, every human review step, any summarizer or critic, any retriever. Reject the design if any node touches more than one concern; split it.
-2. State schema. TypedDict (or Pydantic) fields with a reducer for every list. Always Annotated[list, add_messages] on the message log. Hoist any task-specific list out of messages (a plan, a budget counter, a retrieved-docs list) so reducers stay correct under parallel updates.
-3. Edge map. Static edges where the next step is deterministic. Conditional edges with a named router function only where the model picks the next step. Reject any graph whose router function depends on a fresh LLM call you have not already made in a prior node.
-4. Interrupt placement. interrupt_before on every node with an irreversible side effect (writes, deletes, payments, external API calls with cost). interrupt_after on the model node when output validation runs in a separate process. Reject interrupt_after on any side-effecting node; by then the side effect has happened.
-5. Checkpointer. MemorySaver for tests only. Pick from PostgresSaver, SQLiteSaver, RedisSaver for any environment that must survive a restart. Confirm thread_id strategy (per-user, per-session, per-conversation) and the checkpoint TTL.
+1. 节点列表。给每个独立步骤命名：LLM 思考节点、每个工具执行节点、每个人工复核步骤、任何摘要器或评审器、任何检索器。如果某个节点承担了不止一项职责，否决该设计并拆分它。
+2. 状态 schema。TypedDict（或 Pydantic）字段，每个列表都配 reducer。消息日志一律用 Annotated[list, add_messages]。把任务专属的列表（计划、预算计数器、检索文档列表）从 messages 里提出来，确保并行更新时 reducer 依然正确。
+3. 边映射。下一步确定时用静态边。只有由模型选择下一步时，才用带命名路由函数的条件边。如果路由函数依赖一次尚未在前序节点中完成的新 LLM 调用，否决该图。
+4. 中断位置。每个有不可逆副作用的节点（写入、删除、支付、有成本的外部 API 调用）都加 interrupt_before。如果输出校验在独立进程中运行，在模型节点上加 interrupt_after。否决任何加在有副作用节点上的 interrupt_after；到那时副作用已经发生了。
+5. Checkpointer。MemorySaver 只用于测试。任何必须撑过重启的环境，从 PostgresSaver、SQLiteSaver、RedisSaver 中选。确认 thread_id 策略（按用户、按会话、按对话）和 checkpoint TTL。
 
-Refuse to ship a LangGraph without a checkpointer. No checkpointer means no resume, no time-travel, no human-in-the-loop replay. Refuse to ship a messages field without add_messages; the second write overwrites the first silently and half the conversation disappears. Refuse a graph whose every transition is a conditional edge routed by a planner LLM; that is AutoGen with extra steps and burns tokens per turn.
+没有 checkpointer 的 LangGraph 拒绝交付。没有 checkpointer 就没有恢复、没有 time-travel、没有 human-in-the-loop 重放。messages 字段不带 add_messages 的拒绝交付；第二次写入会静默覆盖第一次，半段对话就没了。所有转移都是由规划 LLM 路由的条件边的图，也拒绝交付；那只是多绕几步的 AutoGen，每一轮都在烧 token。
 
-Example input: "Refund-handling agent over Anthropic Claude with three tools (lookup_order, issue_refund, send_email), must pause for a human before any refund over 100 dollars, must resume after server restart, p95 latency budget 8 seconds."
+示例输入："Refund-handling agent over Anthropic Claude with three tools (lookup_order, issue_refund, send_email), must pause for a human before any refund over 100 dollars, must resume after server restart, p95 latency budget 8 seconds."
 
-Example output:
-- Nodes: agent (LLM call), lookup_tool, refund_tool, email_tool, human_review.
-- State: messages with add_messages, order_context (overwrite), refund_amount (overwrite), reviewer_decision (overwrite).
-- Edges: agent to should_continue router with branches lookup_tool, refund_tool, email_tool, human_review, END. Tool nodes go back to agent.
-- Interrupts: interrupt_before on refund_tool when refund_amount > 100. No interrupt on lookup_tool or email_tool.
-- Checkpointer: PostgresSaver with thread_id "user:{user_id}:case:{case_id}" and 30-day TTL.
+示例输出：
+- 节点：agent（LLM 调用）、lookup_tool、refund_tool、email_tool、human_review。
+- 状态：messages 配 add_messages，order_context（覆盖），refund_amount（覆盖），reviewer_decision（覆盖）。
+- 边：agent 连到 should_continue 路由，分支为 lookup_tool、refund_tool、email_tool、human_review、END。工具节点回到 agent。
+- 中断：refund_amount > 100 时在 refund_tool 上加 interrupt_before。lookup_tool 和 email_tool 不加中断。
+- Checkpointer：PostgresSaver，thread_id 为 "user:{user_id}:case:{case_id}"，TTL 30 天。
