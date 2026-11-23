@@ -26,6 +26,7 @@ const {
   renderCertificationDiscovery,
   serializeFigureProviderManifest,
   sharedScriptVersion,
+  versionBuiltPages,
 } = require('./build.js');
 const {
   learningPathDestination,
@@ -479,6 +480,44 @@ test('shared script cache keys follow file content and ignore the build timestam
     const source = fs.readFileSync(path.join(__dirname, page), 'utf8');
     assert.ok(source.includes('src="data.js?v=' + sharedScriptVersion('data.js') + '"'), `${page} must load the current data.js`);
   }
+});
+
+test('built pages, nested manual sections and the lesson loader carry content cache keys', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'aieng-built-pages-'));
+  const lesson = path.join(dir, 'lesson.html');
+  const section = path.join(dir, 'manual', 'manual-demo', 'intro.html');
+  fs.writeFileSync(path.join(dir, 'data.js'), '// Last built: 2026-01-01T00:00:00.000Z\nconst PHASES = [];\n');
+  fs.writeFileSync(path.join(dir, 'certification-data.js'), 'window.CERTS = [];\n');
+  fs.writeFileSync(lesson, "<script>script.src = 'certification-data.js?v=20260831a';</script>\n<script src=\"data.js\"></script>\n");
+  fs.mkdirSync(path.dirname(section), { recursive: true });
+  fs.writeFileSync(section, '<script src="/data.js"></script>\n');
+
+  versionBuiltPages(dir);
+  const certKey = sharedScriptVersion('certification-data.js', dir);
+  const dataKey = sharedScriptVersion('data.js', dir);
+  assert.ok(fs.readFileSync(lesson, 'utf8').includes(`script.src = 'certification-data.js?v=${certKey}'`), 'the on-demand loader must use the content key');
+  assert.ok(fs.readFileSync(section, 'utf8').includes(`<script src="/data.js?v=${dataKey}">`), 'nested manual sections must use the content key');
+
+  const snapshot = [lesson, section].map(file => fs.readFileSync(file, 'utf8'));
+  versionBuiltPages(dir);
+  assert.deepEqual([lesson, section].map(file => fs.readFileSync(file, 'utf8')), snapshot, 'a second pass must not change the pages');
+
+  fs.writeFileSync(path.join(dir, 'certification-data.js'), 'window.CERTS = [1];\n');
+  fs.utimesSync(path.join(dir, 'certification-data.js'), new Date(), new Date(Date.now() + 5000));
+  versionBuiltPages(dir);
+  assert.notEqual(sharedScriptVersion('certification-data.js', dir), certKey);
+  assert.ok(fs.readFileSync(lesson, 'utf8').includes(`certification-data.js?v=${sharedScriptVersion('certification-data.js', dir)}'`), 'changed content must change the loader key');
+});
+
+test('generated manual sections and the lesson reader load the current data bundles', () => {
+  const lessonHtml = fs.readFileSync(path.join(__dirname, 'lesson.html'), 'utf8');
+  assert.ok(lessonHtml.includes(`script.src = 'certification-data.js?v=${sharedScriptVersion('certification-data.js')}'`));
+  const sectionRoot = path.join(__dirname, 'manual');
+  if (!fs.existsSync(sectionRoot)) return;
+  const pages = fs.readdirSync(sectionRoot, { recursive: true }).filter(name => name.endsWith('.html'));
+  assert.ok(pages.length > 0);
+  const expected = `src="/data.js?v=${sharedScriptVersion('data.js')}"`;
+  for (const page of pages) assert.ok(fs.readFileSync(path.join(sectionRoot, page), 'utf8').includes(expected), `manual/${page} must load the current data.js`);
 });
 
 test('shared site asset families use the expected cache keys on every page', () => {
