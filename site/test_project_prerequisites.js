@@ -32,7 +32,7 @@ test('renderProject uses the bounded prerequisite renderer for actual 74 strings
     }
   }
   assert.equal(strings, 74); assert.equal(courses, 54);
-  for (const file of ['project.html', 'projects.html']) assert.match(fs.readFileSync(path.join(__dirname, file), 'utf8'), /projects\.js\?v=20261121b/);
+  for (const file of ['project.html', 'projects.html']) assert.match(fs.readFileSync(path.join(__dirname, file), 'utf8'), /projects\.js\?v=[0-9a-f]{12}"/);
 });
 
 test('strings are escaped knowledge requirements, not fabricated links; invalid objects are explicit non-links', () => {
