@@ -1,0 +1,124 @@
+name: 提交工具到 AI 工程工具全景
+description: 申请将工具收录到 AI 工程工具全景（aieng-zh.cn/landscape）。
+title: "landscape: 添加 <工具名>"
+labels: ["landscape"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        最快的方式是使用站点上的 [提交工具表单](https://aieng-zh.cn/landscape#add)，约两分钟即可自动生成 Pull Request。
+        仅在无法提交 Pull Request 时使用本 Issue 模板。收录完全免费。
+  - type: input
+    id: name
+    attributes:
+      label: 工具名称
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 官网地址
+      placeholder: https://
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: 所属分类
+      options:
+        - 模型实验室与 API
+        - 云端 AI 平台
+        - 推理服务商
+        - LLM 网关与路由
+        - 推理引擎与本地运行时
+        - GPU 算力云
+        - 训练框架
+        - 模型微调
+        - 实验追踪与 MLOps
+        - 可解释性
+        - 编程助手与 IDE
+        - Agent 框架
+        - Agent 运行框架（Harness）
+        - Agent 编排器
+        - 规范工作流与技能包
+        - Agent 构建与自动化平台
+        - 工作流编排
+        - 协议与网关
+        - 应用构建与界面
+        - 代码评审与测试
+        - 可观测性与评测
+        - 安全与治理
+        - 数据库与向量检索
+        - 嵌入与重排模型
+        - RAG 与企业搜索
+        - 文档解析与 OCR
+        - 搜索与网页数据 API
+        - 数据集、标注与合成数据
+        - 数据平台与流水线
+        - Notebook 环境
+        - 浏览器基础设施
+        - Agent 专用电脑与手机
+        - 沙箱与代码运行时
+        - 长期记忆
+        - 上下文 API
+        - 连接器与工具市场
+        - 身份、认证与凭证
+        - 邮件、消息与电话 API
+        - 支付与计费
+        - 结账与电商 API
+        - 托管与部署
+        - 语音与音频 API
+        - 语音 Agent 平台
+        - 图像、视频与音频生成
+        - 通用对话助手
+        - 大模型厂商 Agent
+        - 个人助手
+        - 办公与效率 Agent
+        - 开源助手
+        - 邮件与日程 Agent
+        - 财务与投研 Agent
+        - 购物 Agent
+        - 旅行 Agent
+        - 家居、家庭与健康 Agent
+        - 群聊 Agent
+        - 语音与电话 Agent
+    validations:
+      required: true
+  - type: input
+    id: description
+    attributes:
+      label: 一句话介绍功能
+      description: 不超过 200 字，以句号结尾。客观说明工具做什么，不含排名与宣传语。
+    validations:
+      required: true
+  - type: dropdown
+    id: license
+    attributes:
+      label: 开源还是闭源
+      options:
+        - 开源
+        - 闭源
+    validations:
+      required: true
+  - type: input
+    id: repo
+    attributes:
+      label: 源码仓库
+      description: 仅开源工具需要填写。
+      placeholder: https://github.com/owner/name
+  - type: input
+    id: logo
+    attributes:
+      label: Logo 链接（SVG 或 PNG）
+      placeholder: https://
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认事项
+      options:
+        - label: 我参与该工具的开发或维护，并有权分享其 Logo。
+          required: true
+        - label: 我已阅读 [收录规则](https://github.com/fancyboi999/ai-engineering-from-scratch-zh/blob/main/landscape/README.md#收录规则)。
+          required: true

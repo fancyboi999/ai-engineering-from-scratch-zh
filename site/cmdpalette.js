@@ -85,7 +85,8 @@
       { kind: 'page', id: 'page:how-to-learn', name: '学习方法', summary: '如何理解课程、运行实验、交付产物并完成练习', url: '/how-to-learn.html' },
       { kind: 'page', id: 'page:skills', name: 'Agent 技能', summary: '课程导师、水平诊断和图表制作技能', url: '/skills.html' },
       { kind: 'page', id: 'page:inside-an-ai-agent', name: 'Agent 内部机制', summary: '交互探索上下文、工具调用和控制循环', url: '/inside-an-ai-agent.html' },
-      { kind: 'page', id: 'page:cheatsheets', name: '主题速查表', summary: '查看、复制和打印 AI 工程常用公式、命令与排错方法', url: '/cheatsheets' }
+      { kind: 'page', id: 'page:cheatsheets', name: '主题速查表', summary: '查看、复制和打印 AI 工程常用公式、命令与排错方法', url: '/cheatsheets' },
+      { kind: 'page', id: 'page:landscape', name: 'AI 工程工具全景', summary: '按用途分类的开源与闭源 AI 工程工具图谱，关联对应课程', url: '/landscape.html' }
     ];
 
     if (typeof LEARNING_PATHS !== 'undefined' && Array.isArray(LEARNING_PATHS)) {

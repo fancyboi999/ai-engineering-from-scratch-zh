@@ -19,12 +19,12 @@
     "api/markdown.js": {
       "maxDuration": 10,
       "includeFiles": "{site/*.html,site/hub-pages.json,site/hubs/{phase,glossary}/*.html,site/agent-pages/{*,phase/*,glossary/*}.md}",
-      "excludeFiles": "{site/manual-*.html,site/**/*.js,site/{lessons,lesson-code,manual,interviews,cheatsheets,project,practice,pagefind,anatomy,project-content,assets,figures}/**,site/agent-pages/{interviews,practice}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
+      "excludeFiles": "{landscape/**,site/manual-*.html,site/**/*.js,site/{lessons,lesson-code,manual,interviews,cheatsheets,project,practice,pagefind,anatomy,project-content,assets,figures,logos}/**,site/agent-pages/{interviews,practice}/**,site/*.{css,png,jpg,gif,svg,ico,xml,bin}}"
     },
     "api/v1/markdown.js": {
       "maxDuration": 10,
       "includeFiles": "{site/*.html,site/hub-pages.json,site/hubs/{phase,glossary}/*.html,site/agent-pages/{*,phase/*,glossary/*}.md}",
-      "excludeFiles": "{site/manual-*.html,site/**/*.js,site/{lessons,lesson-code,manual,interviews,cheatsheets,project,practice,pagefind,anatomy,project-content,assets,figures}/**,site/agent-pages/{interviews,practice}/**,site/*.{css,png,jpg,gif,svg,ico,xml}}"
+      "excludeFiles": "{landscape/**,site/manual-*.html,site/**/*.js,site/{lessons,lesson-code,manual,interviews,cheatsheets,project,practice,pagefind,anatomy,project-content,assets,figures,logos}/**,site/agent-pages/{interviews,practice}/**,site/*.{css,png,jpg,gif,svg,ico,xml,bin}}"
     },
     "api/not-found.js": {
       "maxDuration": 10,
@@ -41,7 +41,7 @@
     "api/og.js": {
       "maxDuration": 10,
       "includeFiles": "{site/og-cards.json,site/anatomy/inside-an-ai-agent-og.png,site/anatomy/inside-a-decompiler-og.png,site/anatomy/inside-an-llm-serving-gpu-og.png,site/lesson-seo.json,site/certification-seo.json,lib/og-fonts/*.json}",
-      "excludeFiles": "{phases/**,projects/**,manuals/**,certifications/**,site/{lessons,project-content,hubs,agent-pages,assets,figures}/**,site/*.{html,js,css,png,jpg,gif,svg,ico,txt,md,xml}}"
+      "excludeFiles": "{phases/**,projects/**,manuals/**,certifications/**,landscape/**,site/{lessons,project-content,hubs,agent-pages,assets,figures,logos}/**,site/*.{html,js,css,png,jpg,gif,svg,ico,txt,md,xml,bin}}"
     }
   },
   "routes": [
@@ -503,6 +503,10 @@
     {
       "source": "/highlights",
       "destination": "/highlights.html"
+    },
+    {
+      "source": "/landscape",
+      "destination": "/landscape.html"
     }
   ],
   "headers": [
@@ -525,7 +529,7 @@
       ]
     },
     {
-      "source": "/(.*)\\.(css|js|png|jpg|jpeg|svg|webp|woff2|woff|ttf|ico)",
+      "source": "/(.*)\\.(css|js|png|jpg|jpeg|svg|webp|woff2|woff|ttf|ico|bin)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -578,7 +582,7 @@
       ]
     },
     {
-      "source": "/(glossary|catalog|certifications|certification|assessment|path|roadmap|about|learning-paths|developer|docs|contact|privacy)",
+      "source": "/(glossary|catalog|certifications|certification|assessment|path|roadmap|about|learning-paths|developer|docs|contact|privacy|landscape)",
       "headers": [
         {
           "key": "Cache-Control",

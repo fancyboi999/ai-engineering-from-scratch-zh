@@ -49,8 +49,11 @@
         return href;
       }
     }
-    if (/^\/(lesson|certification|highlights)(?=[?#]|$)/.test(href)) {
-      return href.replace(/^\/(lesson|certification|highlights)(?=[?#]|$)/, '$1.html');
+    if (/^\/(lesson|certification|highlights|landscape)(?=[?#]|$)/.test(href)) {
+      return href.replace(/^\/(lesson|certification|highlights|landscape)(?=[?#]|$)/, '$1.html');
+    }
+    if (/^\/phase\/([a-z0-9-]+)(?=[?#]|$)/.test(href)) {
+      return href.replace(/^\/phase\/([a-z0-9-]+)/, '/hubs/phase/$1.html');
     }
     if (/^(?:\/|(?:\.\.?\/)*)cheatsheets(?:\/|$)/.test(href)) {
       return href.replace(/^((?:\/|(?:\.\.?\/)*)cheatsheets)(?=[?#]|$)/, '$1/index.html').replace(/^((?:\/|(?:\.\.?\/)*)cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
@@ -60,7 +63,7 @@
     }
     if (/^\/manual-[a-z0-9-]+\/[a-z0-9-]+(?=[?#]|$)/.test(href)) return href.replace(/^(\/manual-[a-z0-9-]+\/[a-z0-9-]+)/, '/manual$1.html');
     if (/^\/roadmap(?=[?#]|$)/.test(href)) return href.replace('/roadmap', '/prereqs.html');
-    return href.replace(/(^|\/)(lesson|certification|highlights)(?=[?#]|$)/, '$1$2.html');
+    return href.replace(/(^|\/)(lesson|certification|highlights|landscape)(?=[?#]|$)/, '$1$2.html');
   }
 
   function adaptRouteLink(link) {

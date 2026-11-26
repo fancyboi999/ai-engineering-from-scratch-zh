@@ -152,3 +152,5 @@ site/lesson-code/
 site/interviews/
 site/interviews.json
 site/sitemap-interviews.xml
+site/landscape-data.js
+site/landscape-logos-*.bin
