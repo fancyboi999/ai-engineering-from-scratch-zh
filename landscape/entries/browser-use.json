@@ -1,0 +1,10 @@
+{
+  "name": "Browser Use",
+  "url": "https://browser-use.com/",
+  "category": "browser-infra",
+  "description": "用于网页自动化的开源浏览器 agent 与云端浏览器。",
+  "open_source": true,
+  "repo": "https://github.com/browser-use/browser-use",
+  "x": "browser_use",
+  "logo": "browser-use.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "ExecuTorch",
+  "url": "https://executorch.ai",
+  "category": "inference",
+  "description": "在移动端与边缘设备上运行 PyTorch 模型的运行时。",
+  "open_source": true,
+  "repo": "https://github.com/pytorch/executorch",
+  "logo": "executorch.png"
+}

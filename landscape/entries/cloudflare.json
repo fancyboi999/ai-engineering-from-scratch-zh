@@ -1,0 +1,8 @@
+{
+  "name": "Cloudflare",
+  "url": "https://cloudflare.com",
+  "category": "hosting",
+  "description": "面向边缘应用与 agent 的开发者平台。",
+  "open_source": false,
+  "logo": "cloudflare.png"
+}

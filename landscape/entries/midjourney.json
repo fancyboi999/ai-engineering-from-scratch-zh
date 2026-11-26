@@ -1,0 +1,8 @@
+{
+  "name": "Midjourney",
+  "url": "https://midjourney.com",
+  "category": "media",
+  "description": "图像与视频生成工具。",
+  "open_source": false,
+  "logo": "midjourney.png"
+}

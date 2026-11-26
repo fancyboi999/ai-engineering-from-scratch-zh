@@ -1,0 +1,9 @@
+{
+  "name": "Ollama",
+  "url": "https://ollama.com",
+  "category": "inference",
+  "description": "在本地运行开放权重语言模型并提供简洁 API 的工具。",
+  "open_source": true,
+  "repo": "https://github.com/ollama/ollama",
+  "logo": "ollama.png"
+}

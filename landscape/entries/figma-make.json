@@ -1,0 +1,8 @@
+{
+  "name": "Figma Make",
+  "url": "https://figma.com/make",
+  "category": "builders",
+  "description": "将 prompt 与设计稿转化为可运行原型的工具。",
+  "open_source": false,
+  "logo": "figma-make.png"
+}

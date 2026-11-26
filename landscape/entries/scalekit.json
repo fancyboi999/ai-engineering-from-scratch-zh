@@ -1,0 +1,9 @@
+{
+  "name": "Scalekit",
+  "url": "https://www.scalekit.com/",
+  "category": "protocols",
+  "description": "支持按用户鉴权、将 agent 连接到工具的 MCP 网关。",
+  "open_source": false,
+  "x": "scalekitinc",
+  "logo": "scalekit.png"
+}

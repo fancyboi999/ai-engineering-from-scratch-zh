@@ -1,0 +1,9 @@
+{
+  "name": "Deep Lake",
+  "url": "https://deeplake.ai",
+  "category": "databases",
+  "description": "面向多模态 AI 数据的数据库。",
+  "open_source": true,
+  "repo": "https://github.com/activeloopai/deeplake",
+  "logo": "deep-lake.png"
+}

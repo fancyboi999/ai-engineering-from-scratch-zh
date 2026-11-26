@@ -1,0 +1,9 @@
+{
+  "name": "mcp-use",
+  "url": "https://mcp-use.com",
+  "category": "protocols",
+  "description": "用于将 agent 连接到 MCP 服务器的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/mcp-use/mcp-use",
+  "logo": "mcp-use.png"
+}

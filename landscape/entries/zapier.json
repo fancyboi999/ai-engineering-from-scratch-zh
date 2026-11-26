@@ -1,0 +1,8 @@
+{
+  "name": "Zapier",
+  "url": "https://zapier.com",
+  "category": "agent-platforms",
+  "description": "集成 agent 与 AI 步骤的跨应用自动化平台。",
+  "open_source": false,
+  "logo": "zapier.png"
+}

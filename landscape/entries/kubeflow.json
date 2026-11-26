@@ -1,0 +1,9 @@
+{
+  "name": "Kubeflow",
+  "url": "https://kubeflow.org",
+  "category": "tracking",
+  "description": "面向 Kubernetes 的机器学习工具套件。",
+  "open_source": true,
+  "repo": "https://github.com/kubeflow/kubeflow",
+  "logo": "kubeflow.png"
+}

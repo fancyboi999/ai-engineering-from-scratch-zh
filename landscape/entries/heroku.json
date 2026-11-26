@@ -1,0 +1,8 @@
+{
+  "name": "Heroku",
+  "url": "https://heroku.com",
+  "category": "hosting",
+  "description": "用于部署应用程序的云平台。",
+  "open_source": false,
+  "logo": "heroku.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "tinygrad",
+  "url": "https://tinygrad.org",
+  "category": "training",
+  "description": "支持多种后端的轻量级深度学习框架。",
+  "open_source": true,
+  "repo": "https://github.com/tinygrad/tinygrad",
+  "logo": "tinygrad.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Ubicloud",
+  "url": "https://ubicloud.com",
+  "category": "hosting",
+  "description": "运行在裸金属服务器上的开源云平台。",
+  "open_source": true,
+  "repo": "https://github.com/ubicloud/ubicloud",
+  "logo": "ubicloud.png"
+}

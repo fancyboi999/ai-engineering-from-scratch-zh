@@ -1,0 +1,9 @@
+{
+  "name": "Opik",
+  "url": "https://comet.com/site/products/opik",
+  "category": "evaluation",
+  "description": "面向模型应用的链路追踪与评测平台。",
+  "open_source": true,
+  "repo": "https://github.com/comet-ml/opik",
+  "logo": "opik.png"
+}

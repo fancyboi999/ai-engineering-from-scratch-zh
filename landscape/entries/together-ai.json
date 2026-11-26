@@ -1,0 +1,8 @@
+{
+  "name": "Together AI",
+  "url": "https://together.ai",
+  "category": "inference-providers",
+  "description": "面向开源模型的托管推理与微调平台。",
+  "open_source": false,
+  "logo": "together-ai.png"
+}

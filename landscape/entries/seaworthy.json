@@ -1,0 +1,9 @@
+{
+  "name": "Seaworthy",
+  "url": "https://getseaworthy.ai/",
+  "category": "connectors",
+  "description": "让 agent 通过单一 API 完成打电话、支付及现实世界代办事项的接口服务。",
+  "open_source": false,
+  "x": "getseaworthy",
+  "logo": "seaworthy.png"
+}

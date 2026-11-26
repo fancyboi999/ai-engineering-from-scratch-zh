@@ -1,0 +1,9 @@
+{
+  "name": "Dask",
+  "url": "https://dask.org",
+  "category": "data-platforms",
+  "description": "Python 并行计算库。",
+  "open_source": true,
+  "repo": "https://github.com/dask/dask",
+  "logo": "dask.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Aembit",
+  "url": "https://aembit.io",
+  "category": "identity",
+  "description": "面向工作负载与 agent 的身份及访问管理平台。",
+  "open_source": false,
+  "logo": "aembit.png"
+}

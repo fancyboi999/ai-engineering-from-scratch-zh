@@ -1,0 +1,8 @@
+{
+  "name": "Amazon Textract",
+  "url": "https://aws.amazon.com/textract",
+  "category": "docs",
+  "description": "AWS 上用于从文档提取文本与表格的服务。",
+  "open_source": false,
+  "logo": "amazon-textract.png"
+}

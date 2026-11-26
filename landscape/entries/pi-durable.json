@@ -1,0 +1,9 @@
+{
+  "name": "Pi Durable",
+  "url": "https://earendil.com/posts/pi-durable/",
+  "category": "harnesses",
+  "description": "支持故障与重启后保持状态的长时 agent 运行框架库。",
+  "open_source": true,
+  "repo": "https://github.com/earendil-works/pi",
+  "logo": "pi-durable.png"
+}

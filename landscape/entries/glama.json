@@ -1,0 +1,8 @@
+{
+  "name": "Glama",
+  "url": "https://glama.ai",
+  "category": "protocols",
+  "description": "MCP 服务器的目录与网关。",
+  "open_source": false,
+  "logo": "glama.png"
+}

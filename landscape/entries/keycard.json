@@ -1,0 +1,9 @@
+{
+  "name": "Keycard",
+  "url": "https://www.keycard.ai/",
+  "category": "identity",
+  "description": "面向 agent 的运行时授权系统，提供身份认证、权限与策略范围控制。",
+  "open_source": false,
+  "x": "keycardai",
+  "logo": "keycard.png"
+}

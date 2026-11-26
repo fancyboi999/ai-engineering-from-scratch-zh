@@ -1,0 +1,12 @@
+{
+  "name": "Claude Agent SDK",
+  "url": "https://docs.claude.com/en/api/agent-sdk/overview",
+  "category": "agents",
+  "also": [
+    "harnesses"
+  ],
+  "description": "基于 Claude Code 运行框架构建 agent 的 SDK。",
+  "open_source": true,
+  "repo": "https://github.com/anthropics/claude-agent-sdk-python",
+  "logo": "claude-agent-sdk.png"
+}

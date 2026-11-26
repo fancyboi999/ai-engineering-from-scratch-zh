@@ -1,0 +1,8 @@
+{
+  "name": "Rork",
+  "url": "https://rork.com",
+  "category": "builders",
+  "description": "通过 prompt 生成移动应用的构建工具。",
+  "open_source": false,
+  "logo": "rork.png"
+}

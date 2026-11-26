@@ -1,0 +1,9 @@
+{
+  "name": "Anchor Browser",
+  "url": "https://anchorbrowser.io/",
+  "category": "browser-infra",
+  "description": "面向 AI agent 的云端浏览器基础设施，提供托管身份认证与隔离的浏览器会话。",
+  "open_source": false,
+  "x": "AnchorBrowser",
+  "logo": "anchor-browser.png"
+}

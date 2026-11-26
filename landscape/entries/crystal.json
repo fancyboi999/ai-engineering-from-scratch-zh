@@ -1,0 +1,9 @@
+{
+  "name": "Crystal",
+  "url": "https://github.com/stravu/crystal",
+  "category": "orchestrators",
+  "description": "在并行 worktree 中运行编程 agent 会话的桌面应用。",
+  "open_source": true,
+  "repo": "https://github.com/stravu/crystal",
+  "logo": "crystal.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "FriendliAI",
+  "url": "https://friendli.ai",
+  "category": "inference-providers",
+  "description": "面向生成式模型的推理引擎与服务端点。",
+  "open_source": false,
+  "logo": "friendliai.png"
+}

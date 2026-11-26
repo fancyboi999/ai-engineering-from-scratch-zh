@@ -1,0 +1,9 @@
+{
+  "name": "oh-my-openagent",
+  "url": "https://omo.dev",
+  "category": "harnesses",
+  "description": "面向 OpenCode 的 agent 运行框架与插件包。",
+  "open_source": true,
+  "repo": "https://github.com/code-yeongyu/oh-my-openagent",
+  "logo": "oh-my-openagent.png"
+}

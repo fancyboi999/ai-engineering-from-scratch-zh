@@ -1,0 +1,9 @@
+{
+  "name": "Accelerate",
+  "url": "https://huggingface.co/docs/accelerate",
+  "category": "training",
+  "description": "可在任意设备配置上运行 PyTorch 训练代码的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/accelerate",
+  "logo": "accelerate.png"
+}

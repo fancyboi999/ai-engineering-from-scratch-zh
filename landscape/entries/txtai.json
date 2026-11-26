@@ -1,0 +1,9 @@
+{
+  "name": "txtai",
+  "url": "https://neuml.github.io/txtai",
+  "category": "rag",
+  "description": "用于检索与工作流的嵌入向量数据库。",
+  "open_source": true,
+  "repo": "https://github.com/neuml/txtai",
+  "logo": "txtai.png"
+}

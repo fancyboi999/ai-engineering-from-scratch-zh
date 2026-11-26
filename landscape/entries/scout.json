@@ -1,0 +1,9 @@
+{
+  "name": "Scout",
+  "url": "https://shoponscout.com/",
+  "category": "shopping-agents",
+  "description": "基于语音交互的购物助手。",
+  "open_source": false,
+  "x": "ShopOnScout",
+  "logo": "scout.png"
+}

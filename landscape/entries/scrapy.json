@@ -1,0 +1,9 @@
+{
+  "name": "Scrapy",
+  "url": "https://scrapy.org",
+  "category": "search",
+  "description": "面向 Python 的网页爬虫框架。",
+  "open_source": true,
+  "repo": "https://github.com/scrapy/scrapy",
+  "logo": "scrapy.png"
+}

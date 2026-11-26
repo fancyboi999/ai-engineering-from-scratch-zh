@@ -1,0 +1,8 @@
+{
+  "name": "NotebookLM",
+  "url": "https://notebooklm.google.com",
+  "category": "notebooks",
+  "description": "基于用户自有来源资料的研究助手。",
+  "open_source": false,
+  "logo": "notebooklm.png"
+}

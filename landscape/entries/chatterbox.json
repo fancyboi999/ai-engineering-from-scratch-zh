@@ -1,0 +1,9 @@
+{
+  "name": "Chatterbox",
+  "url": "https://resemble.ai/chatterbox",
+  "category": "voice-apis",
+  "description": "开放权重的文本转语音模型。",
+  "open_source": true,
+  "repo": "https://github.com/resemble-ai/chatterbox",
+  "logo": "chatterbox.png"
+}

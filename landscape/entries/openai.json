@@ -1,0 +1,8 @@
+{
+  "name": "OpenAI",
+  "url": "https://openai.com",
+  "category": "models",
+  "description": "提供文本、图像、音频与向量嵌入模型 API 的模型厂商。",
+  "open_source": false,
+  "logo": "openai.png"
+}

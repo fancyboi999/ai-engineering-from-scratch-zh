@@ -1,0 +1,9 @@
+{
+  "name": "Tesseract",
+  "url": "https://github.com/tesseract-ocr/tesseract",
+  "category": "docs",
+  "description": "光学字符识别（OCR）引擎。",
+  "open_source": true,
+  "repo": "https://github.com/tesseract-ocr/tesseract",
+  "logo": "tesseract.png"
+}

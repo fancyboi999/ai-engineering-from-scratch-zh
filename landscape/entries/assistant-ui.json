@@ -1,0 +1,9 @@
+{
+  "name": "assistant-ui",
+  "url": "https://assistant-ui.com",
+  "category": "builders",
+  "description": "用于构建 AI 对话界面的 React 组件库。",
+  "open_source": true,
+  "repo": "https://github.com/assistant-ui/assistant-ui",
+  "logo": "assistant-ui.png"
+}

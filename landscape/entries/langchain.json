@@ -1,0 +1,9 @@
+{
+  "name": "LangChain",
+  "url": "https://www.langchain.com",
+  "category": "agents",
+  "description": "基于语言模型构建应用与 agent 的开发框架。",
+  "open_source": true,
+  "repo": "https://github.com/langchain-ai/langchain",
+  "logo": "langchain.png"
+}

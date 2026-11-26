@@ -1,0 +1,8 @@
+{
+  "name": "Vercel",
+  "url": "https://vercel.com",
+  "category": "hosting",
+  "description": "面向网页应用与 agent 的云托管平台。",
+  "open_source": false,
+  "logo": "vercel.png"
+}

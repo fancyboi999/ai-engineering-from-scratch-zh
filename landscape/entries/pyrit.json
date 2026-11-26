@@ -1,0 +1,9 @@
+{
+  "name": "PyRIT",
+  "url": "https://azure.github.io/PyRIT",
+  "category": "security",
+  "description": "面向生成式 AI 的红队测试框架。",
+  "open_source": true,
+  "repo": "https://github.com/microsoft/PyRIT",
+  "logo": "pyrit.png"
+}

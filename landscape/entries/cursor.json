@@ -1,0 +1,11 @@
+{
+  "name": "Cursor",
+  "url": "https://cursor.com",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "内置模型对话、代码补全与编程 agent 的代码编辑器。",
+  "open_source": false,
+  "logo": "cursor.png"
+}

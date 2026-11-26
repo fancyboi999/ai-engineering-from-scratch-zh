@@ -1,0 +1,9 @@
+{
+  "name": "Reflex",
+  "url": "https://reflex.dev",
+  "category": "builders",
+  "description": "使用纯 Python 构建 Web 应用的框架。",
+  "open_source": true,
+  "repo": "https://github.com/reflex-dev/reflex",
+  "logo": "reflex.png"
+}

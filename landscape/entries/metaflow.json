@@ -1,0 +1,9 @@
+{
+  "name": "Metaflow",
+  "url": "https://metaflow.org",
+  "category": "tracking",
+  "description": "用于构建和管理机器学习项目的框架。",
+  "open_source": true,
+  "repo": "https://github.com/Netflix/metaflow",
+  "logo": "metaflow.png"
+}

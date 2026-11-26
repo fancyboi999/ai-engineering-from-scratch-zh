@@ -1,0 +1,11 @@
+{
+  "name": "Claude Code",
+  "url": "https://claude.com/product/claude-code",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "Anthropic 推出、运行于终端与 IDE 的编程 agent。",
+  "open_source": false,
+  "logo": "claude-code.png"
+}

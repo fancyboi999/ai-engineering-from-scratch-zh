@@ -1,0 +1,8 @@
+{
+  "name": "Jina AI",
+  "url": "https://jina.ai",
+  "category": "embeddings",
+  "description": "面向搜索场景的嵌入、重排与网页读取 API。",
+  "open_source": false,
+  "logo": "jina-ai.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Doti",
+  "url": "https://heydoti.co/",
+  "category": "personal-assistants",
+  "description": "在 iMessage 与 RCS 中通过短信交互的 AI 助手。",
+  "open_source": false,
+  "x": "heydoti",
+  "logo": "doti.png"
+}

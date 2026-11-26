@@ -1,0 +1,8 @@
+{
+  "name": "Railway",
+  "url": "https://railway.com",
+  "category": "hosting",
+  "description": "直接从代码仓库部署应用与数据库的托管平台。",
+  "open_source": false,
+  "logo": "railway.png"
+}

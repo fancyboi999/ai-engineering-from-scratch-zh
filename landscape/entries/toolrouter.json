@@ -1,0 +1,9 @@
+{
+  "name": "ToolRouter",
+  "url": "https://toolrouter.com/",
+  "category": "protocols",
+  "description": "通过单一 MCP 连接接入托管 agent 工具的路由服务。",
+  "open_source": false,
+  "x": "tool_router",
+  "logo": "toolrouter.png"
+}

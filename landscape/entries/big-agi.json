@@ -1,0 +1,9 @@
+{
+  "name": "big-AGI",
+  "url": "https://big-agi.com",
+  "category": "builders",
+  "description": "支持多模型的网页对话客户端。",
+  "open_source": true,
+  "repo": "https://github.com/enricoros/big-AGI",
+  "logo": "big-agi.png"
+}

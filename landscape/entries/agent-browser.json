@@ -1,0 +1,9 @@
+{
+  "name": "agent-browser",
+  "url": "https://agent-browser.dev",
+  "category": "browser-infra",
+  "description": "面向 agent 的浏览器自动化命令行工具。",
+  "open_source": true,
+  "repo": "https://github.com/vercel-labs/agent-browser",
+  "logo": "agent-browser.png"
+}

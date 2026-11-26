@@ -1,0 +1,9 @@
+{
+  "name": "Dex",
+  "url": "https://meetdex.ai/",
+  "category": "work-assistants",
+  "description": "为资深软件工程师匹配头部科技公司的 AI 招聘 agent。",
+  "open_source": false,
+  "x": "meetdexai",
+  "logo": "dex.png"
+}

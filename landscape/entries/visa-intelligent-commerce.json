@@ -1,0 +1,9 @@
+{
+  "name": "Visa Intelligent Commerce",
+  "url": "https://www.visa.com/en-us/solutions/intelligent-commerce",
+  "category": "payments",
+  "description": "Visa 推出的面向 agent 发起交易的商业基础设施。",
+  "open_source": false,
+  "x": "Visa",
+  "logo": "visa-intelligent-commerce.png"
+}

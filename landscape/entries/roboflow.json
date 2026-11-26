@@ -1,0 +1,8 @@
+{
+  "name": "Roboflow",
+  "url": "https://roboflow.com",
+  "category": "data",
+  "description": "计算机视觉数据集管理、标注与部署平台。",
+  "open_source": false,
+  "logo": "roboflow.png"
+}

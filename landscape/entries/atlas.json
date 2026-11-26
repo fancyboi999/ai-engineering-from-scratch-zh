@@ -1,0 +1,9 @@
+{
+  "name": "Atlas",
+  "url": "https://atlas.voyagelabs.ai/",
+  "category": "travel-agents",
+  "description": "Voyage Labs 推出的个人 agent，用于规划旅行、餐饮与体验活动。",
+  "open_source": false,
+  "x": "voyagelabshq",
+  "logo": "atlas.png"
+}

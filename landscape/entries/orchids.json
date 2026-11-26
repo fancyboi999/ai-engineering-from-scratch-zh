@@ -1,0 +1,8 @@
+{
+  "name": "Orchids",
+  "url": "https://orchids.app",
+  "category": "builders",
+  "description": "根据 prompt 构建全栈应用的工具。",
+  "open_source": false,
+  "logo": "orchids.png"
+}

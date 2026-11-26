@@ -1,0 +1,8 @@
+{
+  "name": "Cekura",
+  "url": "https://cekura.ai",
+  "category": "voice-platforms",
+  "description": "面向语音 agent 的测试与监控平台。",
+  "open_source": false,
+  "logo": "cekura.png"
+}

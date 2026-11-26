@@ -1,0 +1,10 @@
+{
+  "name": "Cua",
+  "url": "https://www.trycua.com/",
+  "category": "computers",
+  "description": "面向 AI agent 的计算机基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/trycua/cua",
+  "x": "trycua",
+  "logo": "cua.png"
+}

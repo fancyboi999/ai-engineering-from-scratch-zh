@@ -1,0 +1,9 @@
+{
+  "name": "microsandbox",
+  "url": "https://microsandbox.dev",
+  "category": "sandboxes",
+  "description": "可自托管的 microVM 沙箱环境。",
+  "open_source": true,
+  "repo": "https://github.com/microsandbox/microsandbox",
+  "logo": "microsandbox.png"
+}

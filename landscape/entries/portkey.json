@@ -1,0 +1,9 @@
+{
+  "name": "Portkey",
+  "url": "https://portkey.ai",
+  "category": "gateways",
+  "description": "支持模型调用路由、缓存与安全护栏的网关。",
+  "open_source": true,
+  "repo": "https://github.com/Portkey-AI/gateway",
+  "logo": "portkey.png"
+}

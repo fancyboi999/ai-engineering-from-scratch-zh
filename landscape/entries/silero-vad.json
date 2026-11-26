@@ -1,0 +1,9 @@
+{
+  "name": "Silero VAD",
+  "url": "https://github.com/snakers4/silero-vad",
+  "category": "voice-apis",
+  "description": "语音活动检测模型。",
+  "open_source": true,
+  "repo": "https://github.com/snakers4/silero-vad",
+  "logo": "silero-vad.png"
+}

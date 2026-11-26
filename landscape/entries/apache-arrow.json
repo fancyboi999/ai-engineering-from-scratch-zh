@@ -1,0 +1,9 @@
+{
+  "name": "Apache Arrow",
+  "url": "https://arrow.apache.org",
+  "category": "data-platforms",
+  "description": "列式内存数据格式及相关开发库。",
+  "open_source": true,
+  "repo": "https://github.com/apache/arrow",
+  "logo": "apache-arrow.png"
+}

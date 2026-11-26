@@ -1,0 +1,8 @@
+{
+  "name": "Mailgun",
+  "url": "https://mailgun.com",
+  "category": "messaging",
+  "description": "邮件发送与校验 API。",
+  "open_source": false,
+  "logo": "mailgun.png"
+}

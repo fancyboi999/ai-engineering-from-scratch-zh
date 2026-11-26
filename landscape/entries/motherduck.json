@@ -1,0 +1,8 @@
+{
+  "name": "MotherDuck",
+  "url": "https://motherduck.com",
+  "category": "databases",
+  "description": "基于 DuckDB 构建的云数据仓库。",
+  "open_source": false,
+  "logo": "motherduck.png"
+}

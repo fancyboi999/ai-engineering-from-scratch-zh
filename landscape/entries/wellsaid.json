@@ -1,0 +1,8 @@
+{
+  "name": "WellSaid",
+  "url": "https://wellsaid.io",
+  "category": "voice-apis",
+  "description": "提供演播室级音质的文本转语音服务。",
+  "open_source": false,
+  "logo": "wellsaid.png"
+}

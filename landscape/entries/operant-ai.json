@@ -1,0 +1,8 @@
+{
+  "name": "Operant AI",
+  "url": "https://operant.ai",
+  "category": "security",
+  "description": "面向 AI 应用与 agent 的运行时安全防护系统。",
+  "open_source": false,
+  "logo": "operant-ai.png"
+}

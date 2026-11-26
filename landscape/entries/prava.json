@@ -1,0 +1,9 @@
+{
+  "name": "Prava",
+  "url": "https://prava.space/",
+  "category": "payments",
+  "description": "面向 AI agent 的支付 API。",
+  "open_source": false,
+  "x": "pravapayments",
+  "logo": "prava.png"
+}

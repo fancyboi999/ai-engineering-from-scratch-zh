@@ -1,0 +1,9 @@
+{
+  "name": "NeMo Guardrails",
+  "url": "https://github.com/NVIDIA/NeMo-Guardrails",
+  "category": "security",
+  "description": "用于构建可编程安全护栏的工具包。",
+  "open_source": true,
+  "repo": "https://github.com/NVIDIA/NeMo-Guardrails",
+  "logo": "nemo-guardrails.png"
+}

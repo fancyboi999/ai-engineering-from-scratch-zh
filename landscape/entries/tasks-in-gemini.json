@@ -1,0 +1,9 @@
+{
+  "name": "Tasks in Gemini",
+  "url": "https://gemini.google/overview/productivity/",
+  "category": "lab-assistants",
+  "description": "Gemini 中用于委派并处理日常事务的任务功能。",
+  "open_source": false,
+  "x": "GeminiApp",
+  "logo": "tasks-in-gemini.png"
+}

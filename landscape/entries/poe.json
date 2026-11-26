@@ -1,0 +1,8 @@
+{
+  "name": "Poe",
+  "url": "https://poe.com",
+  "category": "chat-assistants",
+  "description": "集成多种模型与机器人的对话应用。",
+  "open_source": false,
+  "logo": "poe.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Lambda",
+  "url": "https://lambda.ai",
+  "category": "gpu-clouds",
+  "description": "面向训练与推理的 GPU 云及算力集群服务。",
+  "open_source": false,
+  "logo": "lambda.png"
+}

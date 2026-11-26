@@ -1,0 +1,8 @@
+{
+  "name": "Deepgram",
+  "url": "https://deepgram.com",
+  "category": "voice-apis",
+  "description": "语音转文字、文字转语音与语音 agent API。",
+  "open_source": false,
+  "logo": "deepgram.png"
+}

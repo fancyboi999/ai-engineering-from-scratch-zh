@@ -1,0 +1,9 @@
+{
+  "name": "Feast",
+  "url": "https://feast.dev",
+  "category": "data-platforms",
+  "description": "面向机器学习的特征存储系统。",
+  "open_source": true,
+  "repo": "https://github.com/feast-dev/feast",
+  "logo": "feast.png"
+}

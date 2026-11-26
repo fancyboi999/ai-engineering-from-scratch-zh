@@ -1,0 +1,9 @@
+{
+  "name": "torchtune",
+  "url": "https://pytorch.org/torchtune",
+  "category": "finetuning",
+  "description": "基于 PyTorch 的语言模型微调库。",
+  "open_source": true,
+  "repo": "https://github.com/pytorch/torchtune",
+  "logo": "torchtune.png"
+}

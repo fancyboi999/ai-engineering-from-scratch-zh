@@ -1,0 +1,9 @@
+{
+  "name": "Prefect",
+  "url": "https://prefect.io",
+  "category": "orchestration",
+  "description": "面向数据流水线的工作流编排平台。",
+  "open_source": true,
+  "repo": "https://github.com/PrefectHQ/prefect",
+  "logo": "prefect.png"
+}

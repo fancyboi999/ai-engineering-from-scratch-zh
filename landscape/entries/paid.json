@@ -1,0 +1,8 @@
+{
+  "name": "Paid",
+  "url": "https://paid.ai",
+  "category": "payments",
+  "description": "面向 AI agent 的计费与毛利追踪平台。",
+  "open_source": false,
+  "logo": "paid.png"
+}

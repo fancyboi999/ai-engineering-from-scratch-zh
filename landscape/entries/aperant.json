@@ -1,0 +1,9 @@
+{
+  "name": "Aperant",
+  "url": "https://github.com/AndyMik90/Aperant",
+  "category": "orchestrators",
+  "description": "通过并行编程 agent 完成规划、开发与检查的桌面应用。",
+  "open_source": true,
+  "repo": "https://github.com/AndyMik90/Aperant",
+  "logo": "aperant.png"
+}

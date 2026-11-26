@@ -1,0 +1,8 @@
+{
+  "name": "NVIDIA Riva",
+  "url": "https://nvidia.com/en-us/ai-data-science/products/riva",
+  "category": "voice-apis",
+  "description": "语音处理与翻译微服务套件。",
+  "open_source": false,
+  "logo": "nvidia-riva.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Kotaemon",
+  "url": "https://github.com/Cinnamon/kotaemon",
+  "category": "rag",
+  "description": "用于与文档对话的交互界面。",
+  "open_source": true,
+  "repo": "https://github.com/Cinnamon/kotaemon",
+  "logo": "kotaemon.png"
+}

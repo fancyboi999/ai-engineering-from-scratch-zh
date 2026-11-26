@@ -1,0 +1,8 @@
+{
+  "name": "DigitalOcean",
+  "url": "https://digitalocean.com",
+  "category": "hosting",
+  "description": "提供 GPU 云主机与 agent 平台的云服务商。",
+  "open_source": false,
+  "logo": "digitalocean.png"
+}

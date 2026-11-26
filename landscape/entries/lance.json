@@ -1,0 +1,9 @@
+{
+  "name": "Lance",
+  "url": "https://github.com/lancedb/lance",
+  "category": "data-platforms",
+  "description": "面向 AI 负载的列式数据格式。",
+  "open_source": true,
+  "repo": "https://github.com/lancedb/lance",
+  "logo": "lance.png"
+}

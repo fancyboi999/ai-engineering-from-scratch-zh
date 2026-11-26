@@ -1,0 +1,9 @@
+{
+  "name": "Burr",
+  "url": "https://burr.apache.org",
+  "category": "agents",
+  "description": "面向 agent 与应用的状态机框架。",
+  "open_source": true,
+  "repo": "https://github.com/apache/burr",
+  "logo": "burr.png"
+}

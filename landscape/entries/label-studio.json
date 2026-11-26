@@ -1,0 +1,9 @@
+{
+  "name": "Label Studio",
+  "url": "https://labelstud.io",
+  "category": "data",
+  "description": "支持多种数据类型的数据标注工具。",
+  "open_source": true,
+  "repo": "https://github.com/HumanSignal/label-studio",
+  "logo": "label-studio.png"
+}

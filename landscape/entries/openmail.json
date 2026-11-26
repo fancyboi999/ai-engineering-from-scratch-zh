@@ -1,0 +1,9 @@
+{
+  "name": "OpenMail",
+  "url": "https://openmail.sh/",
+  "category": "messaging",
+  "description": "面向 AI agent 的邮件 API，提供收件箱、Webhook 与邮件投递。",
+  "open_source": false,
+  "x": "openmailsh",
+  "logo": "openmail.png"
+}

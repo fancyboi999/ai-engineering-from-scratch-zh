@@ -1,0 +1,9 @@
+{
+  "name": "Keras",
+  "url": "https://keras.io",
+  "category": "training",
+  "description": "支持多种后端的高层深度学习 API。",
+  "open_source": true,
+  "repo": "https://github.com/keras-team/keras",
+  "logo": "keras.png"
+}

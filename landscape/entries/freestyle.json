@@ -1,0 +1,8 @@
+{
+  "name": "Freestyle",
+  "url": "https://freestyle.sh",
+  "category": "sandboxes",
+  "description": "用于运行 agent 所编写代码的基础设施。",
+  "open_source": false,
+  "logo": "freestyle.png"
+}

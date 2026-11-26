@@ -1,0 +1,8 @@
+{
+  "name": "Windsurf",
+  "url": "https://windsurf.com",
+  "category": "coding",
+  "description": "集成编程 agent 的代码编辑器。",
+  "open_source": false,
+  "logo": "windsurf.png"
+}

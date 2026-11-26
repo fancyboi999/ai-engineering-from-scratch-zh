@@ -1,0 +1,9 @@
+{
+  "name": "Polar",
+  "url": "https://polar.sh",
+  "category": "payments",
+  "description": "面向软件产品的支付与计费平台。",
+  "open_source": true,
+  "repo": "https://github.com/polarsource/polar",
+  "logo": "polar.png"
+}

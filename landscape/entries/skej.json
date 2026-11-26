@@ -1,0 +1,9 @@
+{
+  "name": "Skej",
+  "url": "https://skej.com/",
+  "category": "email-calendar-agents",
+  "description": "集成于邮件、SMS 与 Slack 中的助手，负责日程安排、内容起草与跟进。",
+  "open_source": false,
+  "x": "ccskej",
+  "logo": "skej.png"
+}

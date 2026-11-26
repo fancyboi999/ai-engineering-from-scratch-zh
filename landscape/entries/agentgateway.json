@@ -1,0 +1,9 @@
+{
+  "name": "agentgateway",
+  "url": "https://agentgateway.dev",
+  "category": "protocols",
+  "description": "面向 agent 与 MCP 流量的数据平面。",
+  "open_source": true,
+  "repo": "https://github.com/agentgateway/agentgateway",
+  "logo": "agentgateway.png"
+}

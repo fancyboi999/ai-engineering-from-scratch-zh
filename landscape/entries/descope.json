@@ -1,0 +1,9 @@
+{
+  "name": "Descope",
+  "url": "https://www.descope.com/",
+  "category": "identity",
+  "description": "面向用户与 AI agent 的身份认证平台，支持出站应用访问。",
+  "open_source": false,
+  "x": "descopeinc",
+  "logo": "descope.png"
+}

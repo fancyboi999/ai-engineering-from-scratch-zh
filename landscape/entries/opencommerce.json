@@ -1,0 +1,9 @@
+{
+  "name": "opencommerce",
+  "url": "https://opencommerce.sh/",
+  "category": "commerce",
+  "description": "支持跨商家购买的统一 API。",
+  "open_source": false,
+  "x": "agentcardhq",
+  "logo": "opencommerce.png"
+}

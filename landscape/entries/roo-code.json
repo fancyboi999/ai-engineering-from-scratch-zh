@@ -1,0 +1,12 @@
+{
+  "name": "Roo Code",
+  "url": "https://roocode.com",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "支持自定义模式的编辑器编程 agent。",
+  "open_source": true,
+  "repo": "https://github.com/RooCodeInc/Roo-Code",
+  "logo": "roo-code.png"
+}

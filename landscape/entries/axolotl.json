@@ -1,0 +1,9 @@
+{
+  "name": "Axolotl",
+  "url": "https://axolotl.ai",
+  "category": "finetuning",
+  "description": "配置驱动的语言模型微调工具。",
+  "open_source": true,
+  "repo": "https://github.com/axolotl-ai-cloud/axolotl",
+  "logo": "axolotl.png"
+}

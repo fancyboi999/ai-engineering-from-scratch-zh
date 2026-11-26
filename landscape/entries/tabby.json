@@ -1,0 +1,9 @@
+{
+  "name": "Tabby",
+  "url": "https://tabbyml.com",
+  "category": "coding",
+  "description": "可自托管的编程助手。",
+  "open_source": true,
+  "repo": "https://github.com/TabbyML/tabby",
+  "logo": "tabby.png"
+}

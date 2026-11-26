@@ -1,0 +1,10 @@
+{
+  "name": "Hermes Agent",
+  "url": "https://hermes-agent.nousresearch.com/",
+  "category": "open-assistants",
+  "description": "Nous Research 推出的自适应 AI agent。",
+  "open_source": true,
+  "repo": "https://github.com/NousResearch/hermes-agent",
+  "x": "NousResearch",
+  "logo": "hermes-agent.png"
+}

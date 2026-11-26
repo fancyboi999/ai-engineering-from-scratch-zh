@@ -27,6 +27,7 @@ on:
       - "scripts/build-og-fonts.js"
       - "projects/**"
       - "manuals/**"
+      - "landscape/**"
       - "site/**"
       - "api/**"
       - "lib/**"

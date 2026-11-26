@@ -1,0 +1,12 @@
+{
+  "name": "Aider",
+  "url": "https://aider.chat",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "在终端中与语言模型结对编程的工具。",
+  "open_source": true,
+  "repo": "https://github.com/Aider-AI/aider",
+  "logo": "aider.png"
+}

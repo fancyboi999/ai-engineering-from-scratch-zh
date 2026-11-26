@@ -1,0 +1,9 @@
+{
+  "name": "TiDB",
+  "url": "https://pingcap.com",
+  "category": "databases",
+  "description": "支持向量检索的分布式 SQL 数据库。",
+  "open_source": true,
+  "repo": "https://github.com/pingcap/tidb",
+  "logo": "tidb.png"
+}

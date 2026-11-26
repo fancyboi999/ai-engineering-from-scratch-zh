@@ -1,0 +1,9 @@
+{
+  "name": "Candle",
+  "url": "https://github.com/huggingface/candle",
+  "category": "training",
+  "description": "面向 Rust 的极简机器学习框架。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/candle",
+  "logo": "candle.png"
+}

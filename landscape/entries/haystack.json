@@ -1,0 +1,9 @@
+{
+  "name": "Haystack",
+  "url": "https://haystack.deepset.ai",
+  "category": "agents",
+  "description": "用于构建检索与 agent 流水线的框架。",
+  "open_source": true,
+  "repo": "https://github.com/deepset-ai/haystack",
+  "logo": "haystack.png"
+}

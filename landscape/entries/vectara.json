@@ -1,0 +1,8 @@
+{
+  "name": "Vectara",
+  "url": "https://vectara.com",
+  "category": "rag",
+  "description": "托管式检索与有据生成平台。",
+  "open_source": false,
+  "logo": "vectara.png"
+}

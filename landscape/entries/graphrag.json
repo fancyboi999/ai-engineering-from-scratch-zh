@@ -1,0 +1,9 @@
+{
+  "name": "GraphRAG",
+  "url": "https://microsoft.github.io/graphrag",
+  "category": "rag",
+  "description": "基于图结构的私有文本检索方案。",
+  "open_source": true,
+  "repo": "https://github.com/microsoft/graphrag",
+  "logo": "graphrag.png"
+}

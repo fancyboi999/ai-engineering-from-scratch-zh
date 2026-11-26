@@ -1,0 +1,8 @@
+{
+  "name": "Galileo",
+  "url": "https://galileo.ai",
+  "category": "evaluation",
+  "description": "面向 agent 的评测与可观测性平台。",
+  "open_source": false,
+  "logo": "galileo.png"
+}

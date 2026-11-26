@@ -1,0 +1,9 @@
+{
+  "name": "Crawlee",
+  "url": "https://crawlee.dev",
+  "category": "search",
+  "description": "网页抓取与浏览器自动化库。",
+  "open_source": true,
+  "repo": "https://github.com/apify/crawlee",
+  "logo": "crawlee.png"
+}

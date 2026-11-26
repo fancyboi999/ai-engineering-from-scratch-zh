@@ -1,0 +1,9 @@
+{
+  "name": "Chert",
+  "url": "https://trychert.com/",
+  "category": "messaging",
+  "description": "面向 AI agent 的 iMessage 与 FaceTime API。",
+  "open_source": false,
+  "x": "Cherthq",
+  "logo": "chert.png"
+}

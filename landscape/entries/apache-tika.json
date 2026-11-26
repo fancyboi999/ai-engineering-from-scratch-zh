@@ -1,0 +1,9 @@
+{
+  "name": "Apache Tika",
+  "url": "https://tika.apache.org",
+  "category": "docs",
+  "description": "可识别并从多种文件类型中提取文本的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/apache/tika",
+  "logo": "apache-tika.png"
+}

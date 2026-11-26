@@ -1,0 +1,8 @@
+{
+  "name": "ByteRover",
+  "url": "https://byterover.dev",
+  "category": "memory",
+  "description": "面向编程 agent 的共享记忆层。",
+  "open_source": false,
+  "logo": "byterover.png"
+}

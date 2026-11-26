@@ -1,0 +1,9 @@
+{
+  "name": "Burn",
+  "url": "https://burn.dev",
+  "category": "training",
+  "description": "使用 Rust 编写的深度学习框架。",
+  "open_source": true,
+  "repo": "https://github.com/tracel-ai/burn",
+  "logo": "burn.png"
+}

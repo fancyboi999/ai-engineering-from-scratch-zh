@@ -1,0 +1,9 @@
+{
+  "name": "Catch",
+  "url": "https://catchagent.ai/",
+  "category": "personal-assistants",
+  "description": "用于日程安排、邮件处理与通话的个人助手。",
+  "open_source": false,
+  "x": "catchagent",
+  "logo": "catch.png"
+}

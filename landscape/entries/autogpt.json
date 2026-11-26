@@ -1,0 +1,10 @@
+{
+  "name": "AutoGPT",
+  "url": "https://agpt.co/",
+  "category": "open-assistants",
+  "description": "用于构建和运行 agent 的开源平台。",
+  "open_source": true,
+  "repo": "https://github.com/Significant-Gravitas/AutoGPT",
+  "x": "Auto_GPT",
+  "logo": "autogpt.png"
+}

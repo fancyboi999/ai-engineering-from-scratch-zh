@@ -1,0 +1,9 @@
+{
+  "name": "Orbit",
+  "url": "https://developer.orbitsearch.com/",
+  "category": "context",
+  "description": "提供 agent 登录与用户上下文，使产品从首次会话起即可实现个性化。",
+  "open_source": false,
+  "x": "orbitai",
+  "logo": "orbit.png"
+}

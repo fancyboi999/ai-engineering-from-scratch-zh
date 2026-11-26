@@ -1,0 +1,9 @@
+{
+  "name": "Diffusers",
+  "url": "https://huggingface.co/docs/diffusers",
+  "category": "media",
+  "description": "扩散模型开发库。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/diffusers",
+  "logo": "diffusers.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Netlify",
+  "url": "https://netlify.com",
+  "category": "hosting",
+  "description": "面向 Web 项目与 agent 工作流的部署平台。",
+  "open_source": false,
+  "logo": "netlify.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Segment Anything",
+  "url": "https://segment-anything.com",
+  "category": "media",
+  "description": "支持 prompt 引导的图像与视频分割模型。",
+  "open_source": true,
+  "repo": "https://github.com/facebookresearch/sam2",
+  "logo": "segment-anything.png"
+}

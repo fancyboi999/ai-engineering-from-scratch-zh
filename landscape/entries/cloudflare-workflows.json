@@ -1,0 +1,8 @@
+{
+  "name": "Cloudflare Workflows",
+  "url": "https://developers.cloudflare.com/workflows",
+  "category": "orchestration",
+  "description": "基于 Cloudflare Workers 的持久化多步骤执行引擎。",
+  "open_source": false,
+  "logo": "cloudflare-workflows.png"
+}

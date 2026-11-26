@@ -1,0 +1,9 @@
+{
+  "name": "FastMCP",
+  "url": "https://gofastmcp.com",
+  "category": "protocols",
+  "description": "用于构建 MCP 服务器与客户端的 Python 框架。",
+  "open_source": true,
+  "repo": "https://github.com/jlowin/fastmcp",
+  "logo": "fastmcp.png"
+}

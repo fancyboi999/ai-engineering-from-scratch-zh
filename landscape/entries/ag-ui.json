@@ -1,0 +1,9 @@
+{
+  "name": "AG-UI",
+  "url": "https://ag-ui.com",
+  "category": "protocols",
+  "description": "用于连接 agent 与用户界面的协议。",
+  "open_source": true,
+  "repo": "https://github.com/ag-ui-protocol/ag-ui",
+  "logo": "ag-ui.png"
+}

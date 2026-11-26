@@ -1,0 +1,9 @@
+{
+  "name": "Laminar",
+  "url": "https://laminar.sh",
+  "category": "evaluation",
+  "description": "面向 agent 的链路追踪与评测平台。",
+  "open_source": true,
+  "repo": "https://github.com/lmnr-ai/lmnr",
+  "logo": "laminar.png"
+}

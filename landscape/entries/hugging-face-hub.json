@@ -1,0 +1,8 @@
+{
+  "name": "Hugging Face Hub",
+  "url": "https://huggingface.co/docs/hub",
+  "category": "tracking",
+  "description": "用于托管模型、数据集与演示应用的仓库平台。",
+  "open_source": false,
+  "logo": "hugging-face-hub.png"
+}

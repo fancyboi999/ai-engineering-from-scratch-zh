@@ -1,0 +1,8 @@
+{
+  "name": "Brave Search API",
+  "url": "https://brave.com/search/api",
+  "category": "search",
+  "description": "基于独立网页索引的网络搜索 API。",
+  "open_source": false,
+  "logo": "brave-search-api.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Tensorlake",
+  "url": "https://tensorlake.ai/",
+  "category": "sandboxes",
+  "description": "面向 AI agent 的沙箱运行环境。",
+  "open_source": false,
+  "x": "tensorlake",
+  "logo": "tensorlake.png"
+}

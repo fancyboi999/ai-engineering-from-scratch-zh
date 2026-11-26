@@ -1,0 +1,9 @@
+{
+  "name": "Trieve",
+  "url": "https://github.com/devflowinc/trieve",
+  "category": "rag",
+  "description": "搜索、推荐与 RAG 基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/devflowinc/trieve",
+  "logo": "trieve.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Deep Agents",
+  "url": "https://docs.langchain.com/deepagents",
+  "category": "harnesses",
+  "description": "具备规划、子 agent 与文件系统的 agent 运行框架。",
+  "open_source": true,
+  "repo": "https://github.com/langchain-ai/deepagents",
+  "logo": "deep-agents.png"
+}

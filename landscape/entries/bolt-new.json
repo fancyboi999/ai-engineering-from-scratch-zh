@@ -1,0 +1,9 @@
+{
+  "name": "Bolt.new",
+  "url": "https://bolt.new",
+  "category": "builders",
+  "description": "在浏览器中通过 prompt 构建并部署 Web 应用的工具。",
+  "open_source": true,
+  "repo": "https://github.com/stackblitz/bolt.new",
+  "logo": "bolt-new.png"
+}

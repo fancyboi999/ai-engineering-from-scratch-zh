@@ -1,0 +1,9 @@
+{
+  "name": "Neo4j",
+  "url": "https://neo4j.com",
+  "category": "databases",
+  "description": "支持向量检索的图数据库。",
+  "open_source": true,
+  "repo": "https://github.com/neo4j/neo4j",
+  "logo": "neo4j.png"
+}

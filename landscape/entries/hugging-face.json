@@ -1,0 +1,9 @@
+{
+  "name": "Hugging Face",
+  "url": "https://huggingface.co",
+  "category": "models",
+  "description": "模型托管社区及用于训练和运行预训练模型的开源库。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/transformers",
+  "logo": "hugging-face.png"
+}

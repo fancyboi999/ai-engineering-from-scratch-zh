@@ -1,0 +1,8 @@
+{
+  "name": "Weights & Biases",
+  "url": "https://wandb.ai",
+  "category": "tracking",
+  "description": "托管式实验追踪、模型注册表与评测工具。",
+  "open_source": false,
+  "logo": "weights-and-biases.png"
+}

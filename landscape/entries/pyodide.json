@@ -1,0 +1,9 @@
+{
+  "name": "Pyodide",
+  "url": "https://pyodide.org",
+  "category": "sandboxes",
+  "description": "运行在浏览器中的 Python 运行时。",
+  "open_source": true,
+  "repo": "https://github.com/pyodide/pyodide",
+  "logo": "pyodide.png"
+}

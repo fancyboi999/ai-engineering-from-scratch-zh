@@ -1,0 +1,9 @@
+{
+  "name": "DeepSpeed",
+  "url": "https://deepspeed.ai",
+  "category": "training",
+  "description": "面向大规模模型训练的优化库。",
+  "open_source": true,
+  "repo": "https://github.com/deepspeedai/DeepSpeed",
+  "logo": "deepspeed.png"
+}

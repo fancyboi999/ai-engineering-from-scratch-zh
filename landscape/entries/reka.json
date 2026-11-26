@@ -1,0 +1,8 @@
+{
+  "name": "Reka",
+  "url": "https://reka.ai",
+  "category": "models",
+  "description": "覆盖文本、图像、视频与音频的多模态模型系列。",
+  "open_source": false,
+  "logo": "reka.png"
+}

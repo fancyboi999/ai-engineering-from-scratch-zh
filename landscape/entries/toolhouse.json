@@ -1,0 +1,8 @@
+{
+  "name": "Toolhouse",
+  "url": "https://toolhouse.ai",
+  "category": "connectors",
+  "description": "用于部署 agent 的后端服务与工具集。",
+  "open_source": false,
+  "logo": "toolhouse.png"
+}

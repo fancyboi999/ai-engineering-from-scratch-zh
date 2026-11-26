@@ -1,0 +1,9 @@
+{
+  "name": "RAGatouille",
+  "url": "https://github.com/AnswerDotAI/RAGatouille",
+  "category": "embeddings",
+  "description": "基于 ColBERT 模型实现延迟交互检索的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/AnswerDotAI/RAGatouille",
+  "logo": "ragatouille.png"
+}

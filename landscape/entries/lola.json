@@ -1,0 +1,9 @@
+{
+  "name": "Lola",
+  "url": "https://lola.com/",
+  "category": "travel-agents",
+  "description": "面向旅行体验的 AI 助手，可查找并预订酒店和餐厅。",
+  "open_source": false,
+  "x": "lolainsiders",
+  "logo": "lola.png"
+}

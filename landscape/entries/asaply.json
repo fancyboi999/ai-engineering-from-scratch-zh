@@ -1,0 +1,9 @@
+{
+  "name": "asaply",
+  "url": "https://asaply.ai/",
+  "category": "personal-assistants",
+  "description": "基于短信的跑腿助手，可代办买咖啡、订票、打车与取件。",
+  "open_source": false,
+  "x": "AsaplyAi",
+  "logo": "asaply.png"
+}

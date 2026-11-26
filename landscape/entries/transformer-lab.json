@@ -1,0 +1,9 @@
+{
+  "name": "Transformer Lab",
+  "url": "https://lab.cloud",
+  "category": "finetuning",
+  "description": "用于模型训练、微调与评测的桌面工作台。",
+  "open_source": true,
+  "repo": "https://github.com/transformerlab/transformerlab-app",
+  "logo": "transformer-lab.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Frida",
+  "url": "https://frida.chat/",
+  "category": "personal-assistants",
+  "description": "通过聊天界面访问的个人 AI agent。",
+  "open_source": false,
+  "logo": "frida.png"
+}

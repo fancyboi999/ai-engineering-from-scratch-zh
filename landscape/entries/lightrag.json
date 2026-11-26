@@ -1,0 +1,9 @@
+{
+  "name": "LightRAG",
+  "url": "https://github.com/HKUDS/LightRAG",
+  "category": "rag",
+  "description": "基于知识图谱的检索框架。",
+  "open_source": true,
+  "repo": "https://github.com/HKUDS/LightRAG",
+  "logo": "lightrag.png"
+}

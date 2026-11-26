@@ -1,0 +1,9 @@
+{
+  "name": "LiveKit",
+  "url": "https://livekit.io",
+  "category": "voice-platforms",
+  "description": "面向 agent 的实时音视频基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/livekit/livekit",
+  "logo": "livekit.png"
+}

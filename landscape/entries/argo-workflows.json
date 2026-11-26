@@ -1,0 +1,9 @@
+{
+  "name": "Argo Workflows",
+  "url": "https://argoproj.github.io/workflows",
+  "category": "orchestration",
+  "description": "面向 Kubernetes 的工作流引擎。",
+  "open_source": true,
+  "repo": "https://github.com/argoproj/argo-workflows",
+  "logo": "argo-workflows.png"
+}

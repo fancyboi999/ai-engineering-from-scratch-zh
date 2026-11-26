@@ -1,0 +1,9 @@
+{
+  "name": "Vibe Kanban",
+  "url": "https://www.vibekanban.com",
+  "category": "orchestrators",
+  "description": "用于运行与审阅编程 agent 任务的看板工具。",
+  "open_source": true,
+  "repo": "https://github.com/BloopAI/vibe-kanban",
+  "logo": "vibe-kanban.png"
+}

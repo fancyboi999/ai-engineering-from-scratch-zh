@@ -1,0 +1,9 @@
+{
+  "name": "dbt",
+  "url": "https://getdbt.com",
+  "category": "data-platforms",
+  "description": "使用 SQL 在数据仓库中执行数据转换的工具。",
+  "open_source": true,
+  "repo": "https://github.com/dbt-labs/dbt-core",
+  "logo": "dbt.png"
+}

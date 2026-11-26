@@ -1,0 +1,8 @@
+{
+  "name": "Parasail",
+  "url": "https://parasail.io",
+  "category": "inference-providers",
+  "description": "基于租用 GPU 运行开源模型的推理网络。",
+  "open_source": false,
+  "logo": "parasail.png"
+}

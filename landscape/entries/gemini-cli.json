@@ -1,0 +1,12 @@
+{
+  "name": "Gemini CLI",
+  "url": "https://github.com/google-gemini/gemini-cli",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "Google 推出的终端编程 agent。",
+  "open_source": true,
+  "repo": "https://github.com/google-gemini/gemini-cli",
+  "logo": "gemini-cli.png"
+}

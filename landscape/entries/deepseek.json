@@ -1,0 +1,8 @@
+{
+  "name": "DeepSeek",
+  "url": "https://deepseek.com",
+  "category": "models",
+  "description": "提供推理与对话模型，附带兼容 OpenAI 的 API。",
+  "open_source": false,
+  "logo": "deepseek.png"
+}

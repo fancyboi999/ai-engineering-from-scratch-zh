@@ -1,0 +1,9 @@
+{
+  "name": "Observable",
+  "url": "https://observablehq.com",
+  "category": "notebooks",
+  "description": "用于数据可视化的 Notebook 与工具平台。",
+  "open_source": true,
+  "repo": "https://github.com/observablehq/framework",
+  "logo": "observable.png"
+}

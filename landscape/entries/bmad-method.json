@@ -1,0 +1,9 @@
+{
+  "name": "BMAD Method",
+  "url": "https://github.com/bmad-code-org/BMAD-METHOD",
+  "category": "agent-workflows",
+  "description": "面向敏捷开发的 agent 角色与工作流方法。",
+  "open_source": true,
+  "repo": "https://github.com/bmad-code-org/BMAD-METHOD",
+  "logo": "bmad-method.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Pinecone",
+  "url": "https://pinecone.io",
+  "category": "databases",
+  "description": "全托管向量数据库。",
+  "open_source": false,
+  "logo": "pinecone.png"
+}

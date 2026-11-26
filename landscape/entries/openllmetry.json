@@ -1,0 +1,9 @@
+{
+  "name": "OpenLLMetry",
+  "url": "https://traceloop.com",
+  "category": "evaluation",
+  "description": "面向模型应用的 OpenTelemetry 埋点观测工具。",
+  "open_source": true,
+  "repo": "https://github.com/traceloop/openllmetry",
+  "logo": "openllmetry.png"
+}

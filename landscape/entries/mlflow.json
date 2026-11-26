@@ -1,0 +1,9 @@
+{
+  "name": "MLflow",
+  "url": "https://mlflow.org",
+  "category": "tracking",
+  "description": "覆盖机器学习全生命周期的实验、模型与评测追踪平台。",
+  "open_source": true,
+  "repo": "https://github.com/mlflow/mlflow",
+  "logo": "mlflow.svg"
+}

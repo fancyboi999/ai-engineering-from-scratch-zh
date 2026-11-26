@@ -1,0 +1,9 @@
+{
+  "name": "Alfi",
+  "url": "https://www.text.ai/",
+  "category": "group-chat-agents",
+  "description": "Text.ai 推出的群聊助手，可将 Alfi 接入各类群聊。",
+  "open_source": false,
+  "x": "textdotai",
+  "logo": "alfi.png"
+}

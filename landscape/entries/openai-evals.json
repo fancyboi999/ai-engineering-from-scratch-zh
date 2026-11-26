@@ -1,0 +1,9 @@
+{
+  "name": "OpenAI Evals",
+  "url": "https://github.com/openai/evals",
+  "category": "evaluation",
+  "description": "模型评测框架与评测基准库。",
+  "open_source": true,
+  "repo": "https://github.com/openai/evals",
+  "logo": "openai-evals.png"
+}

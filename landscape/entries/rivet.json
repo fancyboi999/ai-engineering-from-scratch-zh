@@ -1,0 +1,9 @@
+{
+  "name": "Rivet",
+  "url": "https://rivet.ironcladapp.com",
+  "category": "agent-platforms",
+  "description": "用于构建模型计算图的可视化开发环境。",
+  "open_source": true,
+  "repo": "https://github.com/Ironclad/rivet",
+  "logo": "rivet.png"
+}

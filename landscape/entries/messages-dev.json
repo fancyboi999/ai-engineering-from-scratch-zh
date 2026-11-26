@@ -1,0 +1,8 @@
+{
+  "name": "messages.dev",
+  "url": "https://messages.dev/",
+  "category": "messaging",
+  "description": "面向 AI agent 的 iMessage API。",
+  "open_source": false,
+  "logo": "messages-dev.png"
+}

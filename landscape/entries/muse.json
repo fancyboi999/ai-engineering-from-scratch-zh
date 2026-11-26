@@ -1,0 +1,9 @@
+{
+  "name": "Muse",
+  "url": "https://muse.ai/",
+  "category": "lab-assistants",
+  "description": "Meta 推出的用于处理日常事务的个人 AI agent。",
+  "open_source": false,
+  "x": "Muse",
+  "logo": "muse.png"
+}

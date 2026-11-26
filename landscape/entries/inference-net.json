@@ -1,0 +1,8 @@
+{
+  "name": "Inference.net",
+  "url": "https://inference.net",
+  "category": "inference-providers",
+  "description": "提供批量计费的开源模型托管推理服务。",
+  "open_source": false,
+  "logo": "inference-net.png"
+}

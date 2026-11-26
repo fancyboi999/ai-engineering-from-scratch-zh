@@ -1,0 +1,9 @@
+{
+  "name": "Sentry",
+  "url": "https://sentry.io",
+  "category": "evaluation",
+  "description": "错误追踪与 agent 监控平台。",
+  "open_source": true,
+  "repo": "https://github.com/getsentry/sentry",
+  "logo": "sentry.png"
+}

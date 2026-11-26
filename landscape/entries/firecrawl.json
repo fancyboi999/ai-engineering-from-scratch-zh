@@ -1,0 +1,10 @@
+{
+  "name": "Firecrawl",
+  "url": "https://www.firecrawl.dev/",
+  "category": "search",
+  "description": "供 AI agent 读取网页内容的知识基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/firecrawl/firecrawl",
+  "x": "firecrawl",
+  "logo": "firecrawl.png"
+}

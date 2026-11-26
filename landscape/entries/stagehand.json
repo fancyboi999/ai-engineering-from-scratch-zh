@@ -1,0 +1,9 @@
+{
+  "name": "Stagehand",
+  "url": "https://stagehand.dev",
+  "category": "browser-infra",
+  "description": "面向 agent 的浏览器自动化框架。",
+  "open_source": true,
+  "repo": "https://github.com/browserbase/stagehand",
+  "logo": "stagehand.png"
+}

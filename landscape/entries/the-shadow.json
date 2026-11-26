@@ -1,0 +1,9 @@
+{
+  "name": "The Shadow",
+  "url": "https://theshadow.io/",
+  "category": "personal-assistants",
+  "description": "处理现实生活事务的个人助手，涵盖预订、购物与日常待办。",
+  "open_source": false,
+  "x": "get_shadow_ai",
+  "logo": "the-shadow.png"
+}

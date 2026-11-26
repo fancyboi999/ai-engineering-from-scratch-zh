@@ -1,0 +1,9 @@
+{
+  "name": "Ultralytics",
+  "url": "https://ultralytics.com",
+  "category": "media",
+  "description": "用于目标检测与图像分割的 YOLO 系列模型。",
+  "open_source": true,
+  "repo": "https://github.com/ultralytics/ultralytics",
+  "logo": "ultralytics.png"
+}

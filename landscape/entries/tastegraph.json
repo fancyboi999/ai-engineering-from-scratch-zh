@@ -1,0 +1,8 @@
+{
+  "name": "TasteGraph",
+  "url": "https://tastegraph.ai/",
+  "category": "context",
+  "description": "为购物 agent 推荐提供用户偏好数据的服务。",
+  "open_source": false,
+  "logo": "tastegraph.png"
+}

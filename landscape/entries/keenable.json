@@ -1,0 +1,9 @@
+{
+  "name": "Keenable",
+  "url": "https://keenable.ai/",
+  "category": "search",
+  "description": "面向 AI 的独立网页搜索 API。",
+  "open_source": false,
+  "x": "keenableai",
+  "logo": "keenable.png"
+}

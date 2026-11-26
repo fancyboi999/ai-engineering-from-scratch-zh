@@ -1,0 +1,9 @@
+{
+  "name": "Agno",
+  "url": "https://agno.com",
+  "category": "agents",
+  "description": "面向多 agent 系统的开发框架与运行时。",
+  "open_source": true,
+  "repo": "https://github.com/agno-agi/agno",
+  "logo": "agno.png"
+}

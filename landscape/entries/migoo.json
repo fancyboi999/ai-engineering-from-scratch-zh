@@ -1,0 +1,9 @@
+{
+  "name": "Migoo",
+  "url": "https://migoo.ai/",
+  "category": "work-assistants",
+  "description": "面向视频任务的 AI agent。",
+  "open_source": false,
+  "x": "MigooAI",
+  "logo": "migoo.png"
+}

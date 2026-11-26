@@ -1,0 +1,8 @@
+{
+  "name": "Groq",
+  "url": "https://groq.com",
+  "category": "inference-providers",
+  "description": "基于定制语言处理硬件的模型推理服务。",
+  "open_source": false,
+  "logo": "groq.png"
+}

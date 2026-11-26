@@ -1,0 +1,8 @@
+{
+  "name": "Le Chat",
+  "url": "https://chat.mistral.ai",
+  "category": "chat-assistants",
+  "description": "Mistral AI 推出的对话助手。",
+  "open_source": false,
+  "logo": "le-chat.png"
+}

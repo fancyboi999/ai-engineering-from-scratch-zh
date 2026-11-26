@@ -1,0 +1,9 @@
+{
+  "name": "Langfuse",
+  "url": "https://langfuse.com",
+  "category": "evaluation",
+  "description": "面向模型应用的链路追踪、评测与 prompt 管理平台。",
+  "open_source": true,
+  "repo": "https://github.com/langfuse/langfuse",
+  "logo": "langfuse.png"
+}

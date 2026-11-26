@@ -1,0 +1,9 @@
+{
+  "name": "Marqo",
+  "url": "https://marqo.ai",
+  "category": "databases",
+  "description": "支持文本与图像的向量搜索引擎。",
+  "open_source": true,
+  "repo": "https://github.com/marqo-ai/marqo",
+  "logo": "marqo.png"
+}

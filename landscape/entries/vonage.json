@@ -1,0 +1,8 @@
+{
+  "name": "Vonage",
+  "url": "https://vonage.com",
+  "category": "voice-platforms",
+  "description": "提供语音、视频与消息通信的 API。",
+  "open_source": false,
+  "logo": "vonage.png"
+}

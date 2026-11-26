@@ -1,0 +1,8 @@
+{
+  "name": "Twilio",
+  "url": "https://twilio.com",
+  "category": "voice-platforms",
+  "description": "提供语音、消息与视频通信的 API。",
+  "open_source": false,
+  "logo": "twilio.png"
+}

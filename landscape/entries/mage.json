@@ -1,0 +1,9 @@
+{
+  "name": "Mage",
+  "url": "https://mage.ai",
+  "category": "orchestration",
+  "description": "用于构建和运行数据流水线的工具。",
+  "open_source": true,
+  "repo": "https://github.com/mage-ai/mage-ai",
+  "logo": "mage.png"
+}

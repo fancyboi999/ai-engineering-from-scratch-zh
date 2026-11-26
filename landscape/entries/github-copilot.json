@@ -1,0 +1,8 @@
+{
+  "name": "GitHub Copilot",
+  "url": "https://github.com/features/copilot",
+  "category": "coding",
+  "description": "集成于编辑器与 GitHub 中的代码补全、对话及编程 agent。",
+  "open_source": false,
+  "logo": "github-copilot.svg"
+}

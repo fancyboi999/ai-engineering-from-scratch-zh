@@ -1,0 +1,9 @@
+{
+  "name": "Convex",
+  "url": "https://convex.dev",
+  "category": "databases",
+  "description": "内置服务端函数的响应式数据库。",
+  "open_source": true,
+  "repo": "https://github.com/get-convex/convex-backend",
+  "logo": "convex.png"
+}

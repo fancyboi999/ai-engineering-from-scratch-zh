@@ -1,0 +1,8 @@
+{
+  "name": "NVIDIA NIM",
+  "url": "https://build.nvidia.com",
+  "category": "model-clouds",
+  "description": "面向 NVIDIA 硬件封装的模型推理微服务。",
+  "open_source": false,
+  "logo": "nvidia-nim.png"
+}

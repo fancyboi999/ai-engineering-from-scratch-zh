@@ -1,0 +1,9 @@
+{
+  "name": "Rocker",
+  "url": "https://www.rocker.ai/",
+  "category": "work-assistants",
+  "description": "利用公司上下文处理工作的办公助手。",
+  "open_source": false,
+  "x": "rocker_hq",
+  "logo": "rocker.png"
+}

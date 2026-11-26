@@ -1,0 +1,9 @@
+{
+  "name": "Pipedream",
+  "url": "https://pipedream.com/",
+  "category": "connectors",
+  "description": "面向 AI agent 的集成层。",
+  "open_source": false,
+  "x": "pipedream",
+  "logo": "pipedream.png"
+}

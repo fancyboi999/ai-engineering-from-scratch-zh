@@ -1,0 +1,8 @@
+{
+  "name": "Blaxel",
+  "url": "https://blaxel.ai",
+  "category": "sandboxes",
+  "description": "提供快速沙箱环境的 agent 计算平台。",
+  "open_source": false,
+  "logo": "blaxel.png"
+}

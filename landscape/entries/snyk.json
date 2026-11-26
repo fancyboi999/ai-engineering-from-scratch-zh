@@ -1,0 +1,8 @@
+{
+  "name": "Snyk",
+  "url": "https://snyk.io",
+  "category": "security",
+  "description": "覆盖代码、依赖项与 AI 组件的开发者安全平台。",
+  "open_source": false,
+  "logo": "snyk.png"
+}

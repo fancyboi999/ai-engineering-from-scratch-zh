@@ -1,0 +1,9 @@
+{
+  "name": "Chainlit",
+  "url": "https://chainlit.io",
+  "category": "builders",
+  "description": "用于构建对话式应用的 Python 框架。",
+  "open_source": true,
+  "repo": "https://github.com/Chainlit/chainlit",
+  "logo": "chainlit.png"
+}

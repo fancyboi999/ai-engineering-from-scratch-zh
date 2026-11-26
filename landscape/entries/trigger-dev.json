@@ -1,0 +1,9 @@
+{
+  "name": "Trigger.dev",
+  "url": "https://trigger.dev",
+  "category": "orchestration",
+  "description": "基于 TypeScript 的后台任务与持久化工作流平台。",
+  "open_source": true,
+  "repo": "https://github.com/triggerdotdev/trigger.dev",
+  "logo": "trigger-dev.png"
+}

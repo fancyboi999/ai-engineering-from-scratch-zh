@@ -1,0 +1,9 @@
+{
+  "name": "Pro Workflow",
+  "url": "https://github.com/rohitg00/pro-workflow",
+  "category": "agent-workflows",
+  "description": "面向编程 agent 的工作流插件，内置 hook、agent 与技能。",
+  "open_source": true,
+  "repo": "https://github.com/rohitg00/pro-workflow",
+  "logo": "pro-workflow.png"
+}

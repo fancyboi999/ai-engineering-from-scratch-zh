@@ -1,0 +1,9 @@
+{
+  "name": "Mastra",
+  "url": "https://mastra.ai",
+  "category": "agents",
+  "description": "用于构建 agent 与工作流的 TypeScript 框架。",
+  "open_source": true,
+  "repo": "https://github.com/mastra-ai/mastra",
+  "logo": "mastra.png"
+}

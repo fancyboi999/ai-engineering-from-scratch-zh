@@ -1,0 +1,8 @@
+{
+  "name": "Couchbase",
+  "url": "https://couchbase.com",
+  "category": "databases",
+  "description": "支持向量检索的分布式文档数据库。",
+  "open_source": false,
+  "logo": "couchbase.png"
+}

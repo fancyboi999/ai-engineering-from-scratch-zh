@@ -1,0 +1,8 @@
+{
+  "name": "Nomic",
+  "url": "https://nomic.ai",
+  "category": "embeddings",
+  "description": "提供向量嵌入模型与数据集探索工具的平台。",
+  "open_source": false,
+  "logo": "nomic.png"
+}

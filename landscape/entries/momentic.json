@@ -1,0 +1,8 @@
+{
+  "name": "Momentic",
+  "url": "https://momentic.ai",
+  "category": "review",
+  "description": "支持用自然语言编写的端到端测试工具。",
+  "open_source": false,
+  "logo": "momentic.png"
+}

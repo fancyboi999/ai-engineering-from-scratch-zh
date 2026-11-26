@@ -1,0 +1,8 @@
+{
+  "name": "Macroscope",
+  "url": "https://macroscope.com",
+  "category": "review",
+  "description": "代码评审与代码库理解工具。",
+  "open_source": false,
+  "logo": "macroscope.png"
+}

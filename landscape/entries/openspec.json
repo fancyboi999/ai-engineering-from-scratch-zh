@@ -1,0 +1,9 @@
+{
+  "name": "OpenSpec",
+  "url": "https://openspec.dev",
+  "category": "agent-workflows",
+  "description": "面向编程 agent 的规范驱动开发工作流。",
+  "open_source": true,
+  "repo": "https://github.com/Fission-AI/OpenSpec",
+  "logo": "openspec.png"
+}

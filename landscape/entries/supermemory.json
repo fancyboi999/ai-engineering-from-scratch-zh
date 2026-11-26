@@ -1,0 +1,10 @@
+{
+  "name": "supermemory",
+  "url": "https://supermemory.ai/",
+  "category": "memory",
+  "description": "面向 AI agent 的记忆与持续学习系统。",
+  "open_source": true,
+  "repo": "https://github.com/supermemoryai/supermemory",
+  "x": "supermemory",
+  "logo": "supermemory.png"
+}

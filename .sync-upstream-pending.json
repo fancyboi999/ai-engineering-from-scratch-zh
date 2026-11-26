@@ -1,7 +1,12 @@
 {
-  "base": "8afa245ebc2e8861480edf8c4911a2b6d9769688",
-  "target": "9712e323fde8cb2ec933310ac619e920e8e31017",
-  "pending": [],
+  "base": "9712e323fde8cb2ec933310ac619e920e8e31017",
+  "target": "5db6280251f9f24123c972a358baf4b5e977277a",
+  "pending": [
+    {
+      "batch": "landscape-821-823",
+      "summary": "AI 工程工具全景（/landscape）：56 分类、1036 条中文简介、表单与 CI 校验及 OG 卡片（#821 #822 #823）线上部署验收"
+    }
+  ],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -332,6 +337,36 @@
         "manuals/langchain-101/README.md",
         "manuals/langchain-101/sections/r-8-sources-and-conflicts.md",
         "manuals/langchain-101/sections/5-4-stores-and-long-term-memory.md"
+      ]
+    },
+    {
+      "scope": "上游 9712e32..5db6280 AI 工程工具全景（2026-11-26）",
+      "decision": "全量同步并汉化 AI Engineering Landscape（#821 #822 #823 及 5db628025 logo 提交）：landscape/categories.json 的 6 个分组与 56 个分类全部汉化并补充 ASCII group_id 保证中文分组锚点唯一；按中文站政策移除上游赞助商 serpapi 的 sponsors 标记以及全部 pinned/featured 偏置，所有工具按字母公平排序，并移除页面与文档中指向不存在的 sponsors.html 死链。全部 1,036 条 landscape/entries/*.json 简介均由本轮 agent 译为简体中文并保留专有名词与核心英文术语，landscape-rules.js 兼容中文句号（。）与英文句点（.）并补充中文宣传词与加密词过滤；1,036 个本地 logo（含 currents.svg）原样同步。工具提交表单、编辑链接、Issue 模板（landscape_tool.yml）、landscape.yml 与 README 均指向中文仓 fancyboi999/ai-engineering-from-scratch-zh 及 aieng-zh.cn。CSS 修正中文竖排分组栏（去掉 rotate(180deg) 防倒置、--ls-label 置 0）并以显式类 .ls-segment-license/.ls-segment-view 替代按英文 aria-label 匹配的移动端选择器。接入 lib/site-navigation.js（工具全景）、site/cmdpalette.js、lib/og-cards.js（已有 CJK 字集全覆盖）、site/build.js（构建产物、内容哈希缓存键、sitemap 与 llms.txt）以及 vercel.json（/landscape 重写、缓存头与 serverless excludeFiles 排除 logos/landscape 与 .bin 包）。同步基准推进至 5db628025，待合并部署后完成线上验收再关闭 pending。",
+      "paths": [
+        "landscape/",
+        "site/logos/landscape/",
+        "site/build-landscape.js",
+        "site/landscape-rules.js",
+        "site/landscape.css",
+        "site/landscape.html",
+        "site/landscape.js",
+        "site/test_landscape.js",
+        "site/build.js",
+        "site/header.js",
+        "site/cmdpalette.js",
+        "site/data.js",
+        "site/test_build_artifacts.js",
+        "lib/site-navigation.js",
+        "lib/test_site-navigation.js",
+        "lib/og-cards.js",
+        "scripts/test_ui_display.js",
+        "vercel.json",
+        ".gitignore",
+        ".github/ISSUE_TEMPLATE/landscape_tool.yml",
+        ".github/workflows/landscape.yml",
+        ".github/workflows/build.yml",
+        ".sync-upstream-base",
+        ".sync-upstream-pending.json"
       ]
     }
   ]

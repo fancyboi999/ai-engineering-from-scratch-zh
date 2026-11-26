@@ -1,0 +1,9 @@
+{
+  "name": "Milvus",
+  "url": "https://milvus.io",
+  "category": "databases",
+  "description": "面向大规模相似度检索的向量数据库。",
+  "open_source": true,
+  "repo": "https://github.com/milvus-io/milvus",
+  "logo": "milvus.svg"
+}

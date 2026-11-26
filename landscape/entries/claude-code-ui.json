@@ -1,0 +1,9 @@
+{
+  "name": "Claude Code UI",
+  "url": "https://github.com/siteboon/claudecodeui",
+  "category": "orchestrators",
+  "description": "用于管理编程 agent 会话的网页与移动端界面。",
+  "open_source": true,
+  "repo": "https://github.com/siteboon/claudecodeui",
+  "logo": "claude-code-ui.png"
+}

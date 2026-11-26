@@ -1,0 +1,11 @@
+{
+  "name": "Amp",
+  "url": "https://ampcode.com",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "适用于终端与编辑器的编程 agent。",
+  "open_source": false,
+  "logo": "amp.png"
+}

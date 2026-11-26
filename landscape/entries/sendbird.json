@@ -1,0 +1,8 @@
+{
+  "name": "Sendbird",
+  "url": "https://sendbird.com",
+  "category": "messaging",
+  "description": "为应用提供聊天、通话与 AI agent 能力的通信平台。",
+  "open_source": false,
+  "logo": "sendbird.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Boski",
+  "url": "https://boski.com/",
+  "category": "personal-assistants",
+  "description": "通过短信交互的个人助手。",
+  "open_source": false,
+  "x": "boski",
+  "logo": "boski.png"
+}

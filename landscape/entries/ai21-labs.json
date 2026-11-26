@@ -1,0 +1,8 @@
+{
+  "name": "AI21 Labs",
+  "url": "https://ai21.com",
+  "category": "models",
+  "description": "面向企业文本任务的 Jamba 语言模型。",
+  "open_source": false,
+  "logo": "ai21-labs.png"
+}

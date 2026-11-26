@@ -1,0 +1,9 @@
+{
+  "name": "Ibis",
+  "url": "https://ibis-project.org",
+  "category": "data-platforms",
+  "description": "支持多种后端的可移植 DataFrame API。",
+  "open_source": true,
+  "repo": "https://github.com/ibis-project/ibis",
+  "logo": "ibis.png"
+}

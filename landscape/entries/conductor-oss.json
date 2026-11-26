@@ -1,0 +1,9 @@
+{
+  "name": "Conductor OSS",
+  "url": "https://conductor-oss.org",
+  "category": "orchestration",
+  "description": "面向微服务与 agent 的工作流引擎。",
+  "open_source": true,
+  "repo": "https://github.com/conductor-oss/conductor",
+  "logo": "conductor-oss.png"
+}

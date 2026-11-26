@@ -1,0 +1,9 @@
+{
+  "name": "Oumi",
+  "url": "https://oumi.ai",
+  "category": "finetuning",
+  "description": "用于训练、评测与部署基础模型的平台。",
+  "open_source": true,
+  "repo": "https://github.com/oumi-ai/oumi",
+  "logo": "oumi.png"
+}

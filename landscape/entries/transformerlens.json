@@ -1,0 +1,9 @@
+{
+  "name": "TransformerLens",
+  "url": "https://transformerlensorg.github.io/TransformerLens",
+  "category": "interpretability",
+  "description": "用于语言模型机制可解释性研究的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/TransformerLensOrg/TransformerLens",
+  "logo": "transformerlens.png"
+}

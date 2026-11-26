@@ -1,0 +1,9 @@
+{
+  "name": "Khoj",
+  "url": "https://khoj.dev",
+  "category": "builders",
+  "description": "支持自托管的个人搜索与对话 AI 应用。",
+  "open_source": true,
+  "repo": "https://github.com/khoj-ai/khoj",
+  "logo": "khoj.png"
+}

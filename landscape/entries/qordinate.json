@@ -1,0 +1,9 @@
+{
+  "name": "Qordinate",
+  "url": "https://www.qordinate.ai/",
+  "category": "group-chat-agents",
+  "description": "面向协作办公场景的 AI 助手。",
+  "open_source": false,
+  "x": "qordinate_ai",
+  "logo": "qordinate.png"
+}

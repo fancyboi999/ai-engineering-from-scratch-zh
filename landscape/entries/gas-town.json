@@ -1,0 +1,9 @@
+{
+  "name": "Gas Town",
+  "url": "https://github.com/gastownhall/gastown",
+  "category": "orchestrators",
+  "description": "用于协调多个编程 agent 的工作区管理工具。",
+  "open_source": true,
+  "repo": "https://github.com/gastownhall/gastown",
+  "logo": "gas-town.png"
+}

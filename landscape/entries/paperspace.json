@@ -1,0 +1,8 @@
+{
+  "name": "Paperspace",
+  "url": "https://paperspace.com",
+  "category": "gpu-clouds",
+  "description": "DigitalOcean 提供的 GPU 云主机与 Notebook 服务。",
+  "open_source": false,
+  "logo": "paperspace.png"
+}

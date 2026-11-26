@@ -1,0 +1,9 @@
+{
+  "name": "Kubernetes",
+  "url": "https://kubernetes.io",
+  "category": "hosting",
+  "description": "容器编排系统。",
+  "open_source": true,
+  "repo": "https://github.com/kubernetes/kubernetes",
+  "logo": "kubernetes.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Distilabel",
+  "url": "https://distilabel.argilla.io",
+  "category": "data",
+  "description": "用于生成合成数据与 AI 反馈的框架。",
+  "open_source": true,
+  "repo": "https://github.com/argilla-io/distilabel",
+  "logo": "distilabel.png"
+}

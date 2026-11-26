@@ -1,0 +1,9 @@
+{
+  "name": "Pydantic Logfire",
+  "url": "https://pydantic.dev/logfire",
+  "category": "evaluation",
+  "description": "基于 OpenTelemetry 构建的可观测性平台。",
+  "open_source": true,
+  "repo": "https://github.com/pydantic/logfire",
+  "logo": "pydantic-logfire.png"
+}

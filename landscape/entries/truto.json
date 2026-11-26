@@ -1,0 +1,8 @@
+{
+  "name": "Truto",
+  "url": "https://truto.one",
+  "category": "connectors",
+  "description": "提供统一 API 与 MCP 服务的集成平台。",
+  "open_source": false,
+  "logo": "truto.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Airtop",
+  "url": "https://airtop.ai",
+  "category": "browser-infra",
+  "description": "可供 agent 通过自然语言操控的云端浏览器。",
+  "open_source": false,
+  "logo": "airtop.png"
+}

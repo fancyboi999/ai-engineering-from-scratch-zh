@@ -1,0 +1,9 @@
+{
+  "name": "Weaviate",
+  "url": "https://weaviate.io",
+  "category": "databases",
+  "description": "支持混合检索的向量数据库。",
+  "open_source": true,
+  "repo": "https://github.com/weaviate/weaviate",
+  "logo": "weaviate.png"
+}

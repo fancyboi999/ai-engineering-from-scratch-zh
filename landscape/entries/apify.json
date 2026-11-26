@@ -1,0 +1,9 @@
+{
+  "name": "Apify",
+  "url": "https://apify.com/",
+  "category": "search",
+  "description": "面向 AI agent 的即用型工具与网页数据市场。",
+  "open_source": false,
+  "x": "apify",
+  "logo": "apify.png"
+}

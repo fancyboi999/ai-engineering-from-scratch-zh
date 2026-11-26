@@ -1,0 +1,9 @@
+{
+  "name": "Ruflo",
+  "url": "https://github.com/ruvnet/ruflo",
+  "category": "orchestrators",
+  "description": "面向编程 agent 集群的编排平台。",
+  "open_source": true,
+  "repo": "https://github.com/ruvnet/ruflo",
+  "logo": "ruflo.png"
+}

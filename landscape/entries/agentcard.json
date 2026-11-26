@@ -1,0 +1,9 @@
+{
+  "name": "Agentcard",
+  "url": "https://agentcard.com/",
+  "category": "payments",
+  "description": "支持 agent 完成在线购买的支付工具。",
+  "open_source": false,
+  "x": "agentcardhq",
+  "logo": "agentcard.png"
+}

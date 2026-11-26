@@ -1,0 +1,9 @@
+{
+  "name": "Lindy",
+  "url": "https://www.lindy.ai/",
+  "category": "work-assistants",
+  "description": "可接入常用工具并替团队完成实际工作的 AI 员工。",
+  "open_source": false,
+  "x": "getlindy",
+  "logo": "lindy.png"
+}

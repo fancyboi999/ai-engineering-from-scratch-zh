@@ -1,0 +1,9 @@
+{
+  "name": "Determined AI",
+  "url": "https://github.com/determined-ai/determined",
+  "category": "tracking",
+  "description": "内置超参数搜索功能的模型训练平台。",
+  "open_source": true,
+  "repo": "https://github.com/determined-ai/determined",
+  "logo": "determined-ai.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "SF Compute",
+  "url": "https://sfcompute.com",
+  "category": "gpu-clouds",
+  "description": "用于买卖 GPU 集群算力时长的交易市场。",
+  "open_source": false,
+  "logo": "sf-compute.png"
+}

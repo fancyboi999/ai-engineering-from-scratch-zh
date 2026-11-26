@@ -1,0 +1,9 @@
+{
+  "name": "Dial",
+  "url": "https://getdial.ai/",
+  "category": "messaging",
+  "description": "为 AI agent 提供电话号码的服务。",
+  "open_source": false,
+  "x": "dialagent",
+  "logo": "dial.png"
+}

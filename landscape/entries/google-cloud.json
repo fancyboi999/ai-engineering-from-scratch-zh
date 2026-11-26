@@ -1,0 +1,8 @@
+{
+  "name": "Google Cloud",
+  "url": "https://cloud.google.com",
+  "category": "hosting",
+  "description": "提供计算、数据与 AI 服务的云平台。",
+  "open_source": false,
+  "logo": "google-cloud.png"
+}

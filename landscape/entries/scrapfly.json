@@ -1,0 +1,8 @@
+{
+  "name": "Scrapfly",
+  "url": "https://scrapfly.io",
+  "category": "search",
+  "description": "具备反爬虫处理能力的网页抓取 API。",
+  "open_source": false,
+  "logo": "scrapfly.png"
+}

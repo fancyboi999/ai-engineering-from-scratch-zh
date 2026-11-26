@@ -1,0 +1,8 @@
+{
+  "name": "OpenRouter",
+  "url": "https://openrouter.ai",
+  "category": "gateways",
+  "description": "通过单一 API 将请求路由至多家厂商模型的网关。",
+  "open_source": false,
+  "logo": "openrouter.png"
+}

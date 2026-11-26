@@ -1,0 +1,9 @@
+{
+  "name": "SWE-agent",
+  "url": "https://swe-agent.com",
+  "category": "coding",
+  "description": "可在真实代码仓库中修复问题的 agent。",
+  "open_source": true,
+  "repo": "https://github.com/SWE-agent/SWE-agent",
+  "logo": "swe-agent.png"
+}

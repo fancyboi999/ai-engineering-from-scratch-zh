@@ -1,0 +1,8 @@
+{
+  "name": "Roark",
+  "url": "https://roark.ai",
+  "category": "voice-platforms",
+  "description": "面向语音 agent 的分析与测试平台。",
+  "open_source": false,
+  "logo": "roark.png"
+}

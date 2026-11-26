@@ -1,0 +1,8 @@
+{
+  "name": "Encord",
+  "url": "https://encord.com",
+  "category": "data",
+  "description": "用于标注与筛选多模态数据的数据平台。",
+  "open_source": false,
+  "logo": "encord.png"
+}

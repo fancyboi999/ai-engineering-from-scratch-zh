@@ -1,0 +1,8 @@
+{
+  "name": "RunPod",
+  "url": "https://runpod.io",
+  "category": "gpu-clouds",
+  "description": "面向 AI 工作负载的 GPU 实例与无服务器推理端点平台。",
+  "open_source": false,
+  "logo": "runpod.png"
+}

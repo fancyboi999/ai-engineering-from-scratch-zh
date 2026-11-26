@@ -1,0 +1,8 @@
+{
+  "name": "Agora",
+  "url": "https://agora.io",
+  "category": "voice-platforms",
+  "description": "实时语音与视频互动 API。",
+  "open_source": false,
+  "logo": "agora.png"
+}

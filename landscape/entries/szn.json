@@ -1,0 +1,9 @@
+{
+  "name": "szn",
+  "url": "https://theszn.ai/",
+  "category": "personal-assistants",
+  "description": "处理电话、邮件、预订及跟进事务的助手。",
+  "open_source": false,
+  "x": "thesznai",
+  "logo": "szn.png"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Factory",
+  "url": "https://factory.ai",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "可在终端、IDE 与 CI 环境中运行的编程 agent。",
+  "open_source": false,
+  "logo": "factory.png"
+}

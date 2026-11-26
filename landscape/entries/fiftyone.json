@@ -1,0 +1,9 @@
+{
+  "name": "FiftyOne",
+  "url": "https://voxel51.com",
+  "category": "data",
+  "description": "用于探索与筛选视觉数据集的工具。",
+  "open_source": true,
+  "repo": "https://github.com/voxel51/fiftyone",
+  "logo": "fiftyone.png"
+}

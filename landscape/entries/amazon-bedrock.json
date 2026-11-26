@@ -1,0 +1,8 @@
+{
+  "name": "Amazon Bedrock",
+  "url": "https://aws.amazon.com/bedrock",
+  "category": "model-clouds",
+  "description": "AWS 上用于访问基础模型的托管服务。",
+  "open_source": false,
+  "logo": "amazon-bedrock.png"
+}

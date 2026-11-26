@@ -1,0 +1,9 @@
+{
+  "name": "Neon",
+  "url": "https://neon.com",
+  "category": "databases",
+  "description": "支持分支管理的无服务器 Postgres 数据库。",
+  "open_source": true,
+  "repo": "https://github.com/neondatabase/neon",
+  "logo": "neon.png"
+}

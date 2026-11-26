@@ -1,0 +1,8 @@
+{
+  "name": "Toloka",
+  "url": "https://toloka.ai",
+  "category": "data",
+  "description": "用于模型训练与评测的人工标注数据服务。",
+  "open_source": false,
+  "logo": "toloka.png"
+}

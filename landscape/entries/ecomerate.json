@@ -1,0 +1,9 @@
+{
+  "name": "Ecomerate",
+  "url": "https://ecomerate.com/",
+  "category": "finance-agents",
+  "description": "通过 iMessage 短信交互的 AI 股票研究分析师。",
+  "open_source": false,
+  "x": "ecomerateHQ",
+  "logo": "ecomerate.png"
+}

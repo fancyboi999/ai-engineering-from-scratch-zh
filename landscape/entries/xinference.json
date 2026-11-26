@@ -1,0 +1,9 @@
+{
+  "name": "Xinference",
+  "url": "https://inference.readthedocs.io",
+  "category": "inference",
+  "description": "支持语言、语音与多模态模型的推理服务。",
+  "open_source": true,
+  "repo": "https://github.com/xorbitsai/inference",
+  "logo": "xinference.png"
+}

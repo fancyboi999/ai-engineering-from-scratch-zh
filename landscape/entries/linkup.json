@@ -1,0 +1,8 @@
+{
+  "name": "Linkup",
+  "url": "https://linkup.so",
+  "category": "search",
+  "description": "面向 AI 应用的网页搜索 API。",
+  "open_source": false,
+  "logo": "linkup.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "LitServe",
+  "url": "https://lightning.ai/litserve",
+  "category": "inference",
+  "description": "基于 FastAPI 构建的模型推理服务引擎。",
+  "open_source": true,
+  "repo": "https://github.com/Lightning-AI/LitServe",
+  "logo": "litserve.png"
+}

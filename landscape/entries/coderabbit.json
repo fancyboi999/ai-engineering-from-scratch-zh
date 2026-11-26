@@ -1,0 +1,8 @@
+{
+  "name": "CodeRabbit",
+  "url": "https://www.coderabbit.ai",
+  "category": "review",
+  "description": "针对 pull request 的自动化代码评审工具。",
+  "open_source": false,
+  "logo": "coderabbit.png"
+}

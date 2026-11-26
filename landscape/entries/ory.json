@@ -1,0 +1,9 @@
+{
+  "name": "Ory",
+  "url": "https://ory.com",
+  "category": "identity",
+  "description": "身份认证、OAuth2 与权限管理服务。",
+  "open_source": true,
+  "repo": "https://github.com/ory/kratos",
+  "logo": "ory.png"
+}

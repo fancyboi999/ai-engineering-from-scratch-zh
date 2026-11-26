@@ -1,0 +1,9 @@
+{
+  "name": "Inkbox",
+  "url": "https://inkbox.ai/",
+  "category": "computers",
+  "description": "面向 agent 的专用电脑，配备邮箱、电话、iMessage 和 WhatsApp。",
+  "open_source": false,
+  "x": "inkbox_ai",
+  "logo": "inkbox.png"
+}

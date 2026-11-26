@@ -1,0 +1,9 @@
+{
+  "name": "JAX",
+  "url": "https://docs.jax.dev",
+  "category": "training",
+  "description": "面向加速器数值计算的可组合变换框架。",
+  "open_source": true,
+  "repo": "https://github.com/jax-ml/jax",
+  "logo": "jax.png"
+}

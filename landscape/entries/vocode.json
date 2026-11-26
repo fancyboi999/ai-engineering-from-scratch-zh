@@ -1,0 +1,9 @@
+{
+  "name": "Vocode",
+  "url": "https://vocode.dev",
+  "category": "voice-platforms",
+  "description": "用于构建语音 agent 的开发库。",
+  "open_source": true,
+  "repo": "https://github.com/vocodedev/vocode-core",
+  "logo": "vocode.png"
+}

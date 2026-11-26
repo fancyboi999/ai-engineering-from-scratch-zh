@@ -1,0 +1,9 @@
+{
+  "name": "Agency Swarm",
+  "url": "https://agency-swarm.ai",
+  "category": "agents",
+  "description": "用于构建具备明确角色分工的 agent 团队的框架。",
+  "open_source": true,
+  "repo": "https://github.com/VRSEN/agency-swarm",
+  "logo": "agency-swarm.png"
+}

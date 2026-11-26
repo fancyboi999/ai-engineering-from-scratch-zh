@@ -1,0 +1,9 @@
+{
+  "name": "NVIDIA Triton",
+  "url": "https://developer.nvidia.com/triton-inference-server",
+  "category": "inference",
+  "description": "支持多种框架与硬件的模型推理服务器。",
+  "open_source": true,
+  "repo": "https://github.com/triton-inference-server/server",
+  "logo": "nvidia-triton.png"
+}

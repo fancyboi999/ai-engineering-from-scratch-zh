@@ -1,0 +1,9 @@
+{
+  "name": "Miso",
+  "url": "https://miso.com/",
+  "category": "travel-agents",
+  "description": "通过 iMessage 预订机票与酒店的个人 AI 旅行 agent。",
+  "open_source": false,
+  "x": "bookwithmiso",
+  "logo": "miso.png"
+}

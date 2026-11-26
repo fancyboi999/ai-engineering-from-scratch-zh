@@ -1,0 +1,8 @@
+{
+  "name": "Stripe",
+  "url": "https://stripe.com",
+  "category": "payments",
+  "description": "提供支付、计费与 agent 商业交易工具。",
+  "open_source": false,
+  "logo": "stripe.png"
+}

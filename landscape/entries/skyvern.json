@@ -1,0 +1,9 @@
+{
+  "name": "Skyvern",
+  "url": "https://skyvern.com",
+  "category": "browser-infra",
+  "description": "基于视觉模型自动化执行浏览器工作流的工具。",
+  "open_source": true,
+  "repo": "https://github.com/Skyvern-AI/skyvern",
+  "logo": "skyvern.png"
+}

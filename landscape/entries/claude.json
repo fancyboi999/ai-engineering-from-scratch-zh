@@ -1,0 +1,8 @@
+{
+  "name": "Claude",
+  "url": "https://claude.ai",
+  "category": "chat-assistants",
+  "description": "Anthropic 推出的对话助手，擅长写作、分析与编程。",
+  "open_source": false,
+  "logo": "claude.png"
+}

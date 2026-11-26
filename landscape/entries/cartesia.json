@@ -1,0 +1,8 @@
+{
+  "name": "Cartesia",
+  "url": "https://cartesia.ai",
+  "category": "voice-apis",
+  "description": "低延迟语音合成与语音转写平台。",
+  "open_source": false,
+  "logo": "cartesia.png"
+}

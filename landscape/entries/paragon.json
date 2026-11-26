@@ -1,0 +1,8 @@
+{
+  "name": "Paragon",
+  "url": "https://useparagon.com",
+  "category": "connectors",
+  "description": "嵌入式集成与 agent 动作平台。",
+  "open_source": false,
+  "logo": "paragon.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Sai",
+  "url": "https://www.sai.work/",
+  "category": "work-assistants",
+  "description": "由 Simular 推出的智能秘书，可在自主计算机集群上执行工作任务。",
+  "open_source": false,
+  "x": "sai_borg",
+  "logo": "sai.png"
+}

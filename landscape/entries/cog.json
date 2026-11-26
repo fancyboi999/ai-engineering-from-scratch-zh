@@ -1,0 +1,9 @@
+{
+  "name": "Cog",
+  "url": "https://cog.run",
+  "category": "inference",
+  "description": "将模型打包为带标准 API 的容器。",
+  "open_source": true,
+  "repo": "https://github.com/replicate/cog",
+  "logo": "cog.png"
+}

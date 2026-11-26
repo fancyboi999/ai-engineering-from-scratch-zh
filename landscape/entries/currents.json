@@ -1,0 +1,9 @@
+{
+  "name": "Currents",
+  "url": "https://currents.dev",
+  "category": "review",
+  "description": "Playwright 测试报告、不稳定测试检测与 CI 编排平台，提供 MCP 服务器供 agent 读取测试历史。",
+  "open_source": false,
+  "x": "currents_dev",
+  "logo_url": "https://currents.dev/icon.svg"
+}

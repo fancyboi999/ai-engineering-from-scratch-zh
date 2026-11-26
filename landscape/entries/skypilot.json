@@ -1,0 +1,9 @@
+{
+  "name": "SkyPilot",
+  "url": "https://skypilot.co",
+  "category": "gpu-clouds",
+  "description": "在任意云平台或集群上运行 AI 工作负载的调度框架。",
+  "open_source": true,
+  "repo": "https://github.com/skypilot-org/skypilot",
+  "logo": "skypilot.png"
+}

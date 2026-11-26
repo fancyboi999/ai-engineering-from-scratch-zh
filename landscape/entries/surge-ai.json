@@ -1,0 +1,8 @@
+{
+  "name": "Surge AI",
+  "url": "https://surgehq.ai",
+  "category": "data",
+  "description": "面向语言模型的人工数据标注服务。",
+  "open_source": false,
+  "logo": "surge-ai.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Motia",
+  "url": "https://motia.dev",
+  "category": "agents",
+  "description": "统一管理 API、任务与 agent 的开发框架。",
+  "open_source": true,
+  "repo": "https://github.com/MotiaDev/motia",
+  "logo": "motia.png"
+}

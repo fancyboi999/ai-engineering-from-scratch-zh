@@ -1,0 +1,8 @@
+{
+  "name": "Meticulous",
+  "url": "https://meticulous.ai",
+  "category": "review",
+  "description": "根据录制会话自动生成视觉测试的工具。",
+  "open_source": false,
+  "logo": "meticulous.png"
+}

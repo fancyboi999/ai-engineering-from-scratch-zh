@@ -1,0 +1,9 @@
+{
+  "name": "T3 Code",
+  "url": "https://github.com/pingdotgg/t3code",
+  "category": "orchestrators",
+  "description": "用于运行编程 agent 的桌面与网页端界面。",
+  "open_source": true,
+  "repo": "https://github.com/pingdotgg/t3code",
+  "logo": "t3-code.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "llama.cpp",
+  "url": "https://github.com/ggml-org/llama.cpp",
+  "category": "inference",
+  "description": "在消费级硬件上用 C++ 运行语言模型推理的引擎。",
+  "open_source": true,
+  "repo": "https://github.com/ggml-org/llama.cpp",
+  "logo": "llama-cpp.png"
+}

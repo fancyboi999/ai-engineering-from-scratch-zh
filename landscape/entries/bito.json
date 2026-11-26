@@ -1,0 +1,8 @@
+{
+  "name": "Bito",
+  "url": "https://bito.ai",
+  "category": "review",
+  "description": "用于审查 pull request 的代码评审 agent。",
+  "open_source": false,
+  "logo": "bito.png"
+}

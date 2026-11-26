@@ -1,0 +1,9 @@
+{
+  "name": "MCP Registry",
+  "url": "https://registry.modelcontextprotocol.io",
+  "category": "protocols",
+  "description": "公开 MCP 服务器的社区注册中心。",
+  "open_source": true,
+  "repo": "https://github.com/modelcontextprotocol/registry",
+  "logo": "mcp-registry.png"
+}

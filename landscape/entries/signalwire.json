@@ -1,0 +1,8 @@
+{
+  "name": "SignalWire",
+  "url": "https://signalwire.com",
+  "category": "voice-platforms",
+  "description": "支持 AI agent 的可编程语音与视频通信平台。",
+  "open_source": false,
+  "logo": "signalwire.png"
+}

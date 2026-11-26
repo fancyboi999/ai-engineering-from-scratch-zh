@@ -1,0 +1,9 @@
+{
+  "name": "Lightpanda",
+  "url": "https://lightpanda.io",
+  "category": "browser-infra",
+  "description": "专为自动化场景设计的无头浏览器。",
+  "open_source": true,
+  "repo": "https://github.com/lightpanda-io/browser",
+  "logo": "lightpanda.png"
+}

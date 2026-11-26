@@ -1,0 +1,9 @@
+{
+  "name": "Continue",
+  "url": "https://continue.dev",
+  "category": "coding",
+  "description": "适用于编辑器与持续 AI 工作流的编程助手。",
+  "open_source": true,
+  "repo": "https://github.com/continuedev/continue",
+  "logo": "continue.png"
+}

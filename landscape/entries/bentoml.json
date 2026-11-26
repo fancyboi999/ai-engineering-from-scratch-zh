@@ -1,0 +1,9 @@
+{
+  "name": "BentoML",
+  "url": "https://github.com/bentoml/BentoML",
+  "category": "inference",
+  "description": "用于模型打包与服务化部署的框架。",
+  "open_source": true,
+  "repo": "https://github.com/bentoml/BentoML",
+  "logo": "bentoml.png"
+}

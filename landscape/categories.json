@@ -1,0 +1,450 @@
+[
+  {
+    "id": "models",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "模型实验室与 API",
+    "summary": "基础模型、模型中心以及负责请求路由的入口服务。",
+    "phase": "10-llms-from-scratch"
+  },
+  {
+    "id": "model-clouds",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "云端 AI 平台",
+    "summary": "托管多类模型并提供微调与部署能力的云平台。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "inference-providers",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "推理服务商",
+    "summary": "托管运行开源模型的在线推理 API。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "gateways",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "LLM 网关与路由",
+    "summary": "用统一端点路由、缓存并追踪多个模型调用。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "inference",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "推理引擎与本地运行时",
+    "summary": "在笔记本或集群上加载模型并响应请求的推理引擎。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "gpu-clouds",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "GPU 算力云",
+    "summary": "面向训练与推理的按需 GPU 与算力集群。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "training",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "训练框架",
+    "summary": "用于训练模型及记录训练过程的框架与工具。",
+    "phase": "03-deep-learning-core"
+  },
+  {
+    "id": "finetuning",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "模型微调",
+    "summary": "用自有数据微调预训练模型的工具。",
+    "phase": "10-llms-from-scratch"
+  },
+  {
+    "id": "tracking",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "实验追踪与 MLOps",
+    "summary": "记录实验运行、管理模型版本与流水线的工具。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "interpretability",
+    "group_id": "models-and-compute",
+    "group": "模型与算力",
+    "name": "可解释性",
+    "summary": "观察并分析模型内部机制的工具库。",
+    "phase": "18-ethics-safety-alignment"
+  },
+  {
+    "id": "coding",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "编程助手与 IDE",
+    "summary": "结合模型编写、修改并运行代码的编辑器与编程 agent。",
+    "phase": "15-autonomous-systems"
+  },
+  {
+    "id": "agents",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "Agent 框架",
+    "summary": "管理 agent 循环、状态与多 agent 协作的开发库。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "harnesses",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "Agent 运行框架（Harness）",
+    "summary": "把模型封装成可用 agent 的执行循环、工具与上下文管理层。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "orchestrators",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "Agent 编排器",
+    "summary": "并行运行多个 agent 并协调其任务分工的工具。",
+    "phase": "16-multi-agent-and-swarms"
+  },
+  {
+    "id": "agent-workflows",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "规范工作流与技能包",
+    "summary": "约束并引导编程 agent 工作方式的规范、任务系统与技能包。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "agent-platforms",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "Agent 构建与自动化平台",
+    "summary": "用于搭建 agent 与工作流的可视化及低代码平台。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "orchestration",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "工作流编排",
+    "summary": "支持长周期、多步骤任务与故障恢复的编排引擎。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "protocols",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "协议与网关",
+    "summary": "连接模型、工具及其他 agent 的开放标准与网关。",
+    "phase": "13-tools-and-protocols"
+  },
+  {
+    "id": "builders",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "应用构建与界面",
+    "summary": "把 prompt 或模型快速转化为可用界面的工具。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "review",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "代码评审与测试",
+    "summary": "面向生成代码的自动评审、测试生成与验证工具。",
+    "phase": "15-autonomous-systems"
+  },
+  {
+    "id": "evaluation",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "可观测性与评测",
+    "summary": "针对模型与 agent 行为的链路追踪、评测与监控工具。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "security",
+    "group_id": "developer-tools",
+    "group": "开发者工具",
+    "name": "安全与治理",
+    "summary": "面向模型与 agent 的护栏、策略控制与红队测试工具。",
+    "phase": "18-ethics-safety-alignment"
+  },
+  {
+    "id": "databases",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "数据库与向量检索",
+    "summary": "用于索引嵌入向量与业务记录以供检索的存储系统。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "embeddings",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "嵌入与重排模型",
+    "summary": "将文本编码为向量并对检索结果重排序的模型与服务。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "rag",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "RAG 与企业搜索",
+    "summary": "从自有文档中检索依据并生成可溯源回答的系统。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "docs",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "文档解析与 OCR",
+    "summary": "将各类文档与扫描件转化为模型可读文本的工具。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "search",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "搜索与网页数据 API",
+    "summary": "为 agent 提供实时网页数据的搜索、抓取与抽取 API。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "data",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "数据集、标注与合成数据",
+    "summary": "用于构建、标注与清洗训练数据的工具和服务。",
+    "phase": "02-ml-fundamentals"
+  },
+  {
+    "id": "data-platforms",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "数据平台与流水线",
+    "summary": "负责数据搬运、转换与治理的计算引擎和存储格式。",
+    "phase": "02-ml-fundamentals"
+  },
+  {
+    "id": "notebooks",
+    "group_id": "data-and-retrieval",
+    "group": "数据与检索",
+    "name": "Notebook 环境",
+    "summary": "用于编写代码、分析数据与做研究的交互式环境。",
+    "phase": "00-setup-and-tooling"
+  },
+  {
+    "id": "browser-infra",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "浏览器基础设施",
+    "summary": "让 agent 访问和操作网页的云端浏览器与浏览器 agent。",
+    "phase": "15-autonomous-systems"
+  },
+  {
+    "id": "computers",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "Agent 专用电脑与手机",
+    "summary": "供 agent 直接操作的桌面环境、云主机与真机设备。",
+    "phase": "15-autonomous-systems"
+  },
+  {
+    "id": "sandboxes",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "沙箱与代码运行时",
+    "summary": "让 agent 安全执行生成代码的隔离运行环境。",
+    "phase": "15-autonomous-systems"
+  },
+  {
+    "id": "memory",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "长期记忆",
+    "summary": "保存 agent 经验并在后续会话中召回的记忆层。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "context",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "上下文 API",
+    "summary": "供 agent 读取的外部上下文、用户偏好与个人数据接口。",
+    "phase": "11-llm-engineering"
+  },
+  {
+    "id": "connectors",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "连接器与工具市场",
+    "summary": "让 agent 跨应用执行操作的集成连接器与托管工具。",
+    "phase": "13-tools-and-protocols"
+  },
+  {
+    "id": "identity",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "身份、认证与凭证",
+    "summary": "专为 agent 设计的登录、令牌与授权管理服务。",
+    "phase": "13-tools-and-protocols"
+  },
+  {
+    "id": "messaging",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "邮件、消息与电话 API",
+    "summary": "供 agent 使用的收件箱、聊天通道与电话号码接口。",
+    "phase": "13-tools-and-protocols"
+  },
+  {
+    "id": "payments",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "支付与计费",
+    "summary": "支撑 agent 发起消费的虚拟卡、计费与支付通道。",
+    "phase": "13-tools-and-protocols"
+  },
+  {
+    "id": "commerce",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "结账与电商 API",
+    "summary": "面向购物 agent 的商品目录与下单结账接口。",
+    "phase": "13-tools-and-protocols"
+  },
+  {
+    "id": "hosting",
+    "group_id": "agent-infrastructure",
+    "group": "Agent 基础设施",
+    "name": "托管与部署",
+    "summary": "用于运行应用与 agent 服务的云平台与部署设施。",
+    "phase": "17-infrastructure-and-production"
+  },
+  {
+    "id": "voice-apis",
+    "group_id": "voice-and-media",
+    "group": "语音与多媒体",
+    "name": "语音与音频 API",
+    "summary": "语音识别与语音合成模型及相关接口服务。",
+    "phase": "06-speech-and-audio"
+  },
+  {
+    "id": "voice-platforms",
+    "group_id": "voice-and-media",
+    "group": "语音与多媒体",
+    "name": "语音 Agent 平台",
+    "summary": "支撑实时对话语音 agent 的基础设施与平台。",
+    "phase": "06-speech-and-audio"
+  },
+  {
+    "id": "media",
+    "group_id": "voice-and-media",
+    "group": "语音与多媒体",
+    "name": "图像、视频与音频生成",
+    "summary": "用于生成和编辑图像、视频与音频的模型和工具。",
+    "phase": "08-generative-ai"
+  },
+  {
+    "id": "chat-assistants",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "通用对话助手",
+    "summary": "用于问答、写作与搜索的通用 AI 对话应用。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "lab-assistants",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "大模型厂商 Agent",
+    "summary": "由大型模型实验室推出的任务委派型 agent 产品。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "personal-assistants",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "个人助手",
+    "summary": "面向个人处理日常事务的消费级 agent。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "work-assistants",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "办公与效率 Agent",
+    "summary": "承担调研、运营等知识型工作的 agent 产品。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "open-assistants",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "开源助手",
+    "summary": "可阅读源码、自行运行与自托管的开源助手。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "email-calendar-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "邮件与日程 Agent",
+    "summary": "负责分拣邮件与安排日程的专用 agent。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "finance-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "财务与投研 Agent",
+    "summary": "用于预算管理、投资分析与金融研究的 agent。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "shopping-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "购物 Agent",
+    "summary": "负责选品、比价与下单购买商品的 agent。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "travel-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "旅行 Agent",
+    "summary": "负责规划并预订旅行行程的 agent。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "home-health-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "家居、家庭与健康 Agent",
+    "summary": "服务家居事务、家庭日程与个人健康的 agent。",
+    "phase": "14-agent-engineering"
+  },
+  {
+    "id": "group-chat-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "群聊 Agent",
+    "summary": "直接参与多人协作与共享对话的 agent。",
+    "phase": "16-multi-agent-and-swarms"
+  },
+  {
+    "id": "voice-agents",
+    "group_id": "agent-products",
+    "group": "Agent 产品",
+    "name": "语音与电话 Agent",
+    "summary": "支持语音对话或代打、代接电话的 agent。",
+    "phase": "14-agent-engineering"
+  }
+]

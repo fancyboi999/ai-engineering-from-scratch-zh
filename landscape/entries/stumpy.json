@@ -1,0 +1,8 @@
+{
+  "name": "Stumpy",
+  "url": "https://stumpy.ai/",
+  "category": "personal-assistants",
+  "description": "可在 Telegram、短信与邮件中持续运行的 AI agent。",
+  "open_source": false,
+  "logo": "stumpy.png"
+}

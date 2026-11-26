@@ -1,0 +1,8 @@
+{
+  "name": "Lasso Security",
+  "url": "https://lasso.security",
+  "category": "security",
+  "description": "面向模型应用与 agent 的安全防护方案。",
+  "open_source": false,
+  "logo": "lasso-security.png"
+}

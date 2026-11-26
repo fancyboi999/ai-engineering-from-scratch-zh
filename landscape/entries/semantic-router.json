@@ -1,0 +1,9 @@
+{
+  "name": "Semantic Router",
+  "url": "https://github.com/aurelio-labs/semantic-router",
+  "category": "agents",
+  "description": "按语义路由请求的决策层组件。",
+  "open_source": true,
+  "repo": "https://github.com/aurelio-labs/semantic-router",
+  "logo": "semantic-router.png"
+}

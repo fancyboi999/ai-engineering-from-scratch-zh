@@ -1,0 +1,9 @@
+{
+  "name": "Perplexity Computer",
+  "url": "https://www.perplexity.ai/products/computer",
+  "category": "lab-assistants",
+  "description": "Perplexity 推出的用于研究与实际任务的通用数字员工。",
+  "open_source": false,
+  "x": "perplexity_ai",
+  "logo": "perplexity-computer.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "LiteLLM",
+  "url": "https://litellm.ai",
+  "category": "gateways",
+  "description": "用统一格式调用多种模型 API 的代理与 SDK。",
+  "open_source": true,
+  "repo": "https://github.com/BerriAI/litellm",
+  "logo": "litellm.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Apache Airflow",
+  "url": "https://airflow.apache.org",
+  "category": "orchestration",
+  "description": "面向数据与机器学习流水线的任务调度器。",
+  "open_source": true,
+  "repo": "https://github.com/apache/airflow",
+  "logo": "apache-airflow.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Ably",
+  "url": "https://ably.com",
+  "category": "messaging",
+  "description": "实时消息传输基础设施。",
+  "open_source": false,
+  "logo": "ably.png"
+}

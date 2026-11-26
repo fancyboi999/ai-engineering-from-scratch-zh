@@ -1,0 +1,8 @@
+{
+  "name": "Sourcery",
+  "url": "https://sourcery.ai",
+  "category": "review",
+  "description": "面向 pull request 的自动化代码评审工具。",
+  "open_source": false,
+  "logo": "sourcery.png"
+}

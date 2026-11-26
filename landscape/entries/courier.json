@@ -1,0 +1,8 @@
+{
+  "name": "Courier",
+  "url": "https://courier.com",
+  "category": "messaging",
+  "description": "跨渠道消息通知 API。",
+  "open_source": false,
+  "logo": "courier.png"
+}

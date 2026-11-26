@@ -1,0 +1,8 @@
+{
+  "name": "Orkes",
+  "url": "https://orkes.io",
+  "category": "orchestration",
+  "description": "用于工作流与 agent 编排的托管版 Conductor 服务。",
+  "open_source": false,
+  "logo": "orkes.png"
+}

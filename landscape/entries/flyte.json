@@ -1,0 +1,9 @@
+{
+  "name": "Flyte",
+  "url": "https://flyte.org",
+  "category": "orchestration",
+  "description": "面向数据与机器学习的工作流编排器。",
+  "open_source": true,
+  "repo": "https://github.com/flyteorg/flyte",
+  "logo": "flyte.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Valyu",
+  "url": "https://valyu.ai",
+  "category": "search",
+  "description": "面向网页与专有数据源的搜索 API。",
+  "open_source": false,
+  "logo": "valyu.png"
+}

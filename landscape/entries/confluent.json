@@ -1,0 +1,8 @@
+{
+  "name": "Confluent",
+  "url": "https://confluent.io",
+  "category": "data-platforms",
+  "description": "托管式数据流平台。",
+  "open_source": false,
+  "logo": "confluent.png"
+}

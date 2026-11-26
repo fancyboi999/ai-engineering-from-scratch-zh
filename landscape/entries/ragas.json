@@ -1,0 +1,9 @@
+{
+  "name": "Ragas",
+  "url": "https://ragas.io",
+  "category": "evaluation",
+  "description": "面向 RAG 与 agent 的评测工具包。",
+  "open_source": true,
+  "repo": "https://github.com/explodinggradients/ragas",
+  "logo": "ragas.png"
+}

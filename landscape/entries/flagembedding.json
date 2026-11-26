@@ -1,0 +1,9 @@
+{
+  "name": "FlagEmbedding",
+  "url": "https://bge-model.com",
+  "category": "embeddings",
+  "description": "BGE 系列嵌入与重排模型库。",
+  "open_source": true,
+  "repo": "https://github.com/FlagOpen/FlagEmbedding",
+  "logo": "flagembedding.png"
+}

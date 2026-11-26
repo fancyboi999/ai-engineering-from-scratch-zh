@@ -1,0 +1,9 @@
+{
+  "name": "OpenAPI",
+  "url": "https://openapis.org",
+  "category": "protocols",
+  "description": "HTTP API 的标准描述规范格式。",
+  "open_source": true,
+  "repo": "https://github.com/OAI/OpenAPI-Specification",
+  "logo": "openapi.png"
+}

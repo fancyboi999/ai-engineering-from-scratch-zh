@@ -1,0 +1,9 @@
+{
+  "name": "Grok",
+  "url": "https://grok.com/",
+  "category": "chat-assistants",
+  "description": "可访问网页和 X 平台信息的 AI 助手。",
+  "open_source": false,
+  "x": "grok",
+  "logo": "grok.png"
+}

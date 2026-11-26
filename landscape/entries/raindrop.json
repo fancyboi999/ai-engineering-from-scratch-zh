@@ -1,0 +1,8 @@
+{
+  "name": "Raindrop",
+  "url": "https://raindrop.ai",
+  "category": "evaluation",
+  "description": "用于发现 agent 行为异常与失败的监控平台。",
+  "open_source": false,
+  "logo": "raindrop.png"
+}

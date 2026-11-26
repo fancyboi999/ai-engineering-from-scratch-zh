@@ -1,0 +1,8 @@
+{
+  "name": "Baseten",
+  "url": "https://baseten.co",
+  "category": "inference-providers",
+  "description": "面向生产负载的模型部署与推理平台。",
+  "open_source": false,
+  "logo": "baseten.png"
+}

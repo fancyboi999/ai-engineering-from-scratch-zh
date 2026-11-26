@@ -1,0 +1,9 @@
+{
+  "name": "Righthand",
+  "url": "https://www.righthand.ai/",
+  "category": "work-assistants",
+  "description": "用于承接委派工作的 AI agent。",
+  "open_source": false,
+  "x": "righthanddotai",
+  "logo": "righthand.png"
+}

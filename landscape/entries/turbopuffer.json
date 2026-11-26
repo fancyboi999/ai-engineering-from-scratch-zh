@@ -1,0 +1,8 @@
+{
+  "name": "turbopuffer",
+  "url": "https://turbopuffer.com",
+  "category": "databases",
+  "description": "构建在对象存储之上的无服务器向量与全文搜索引擎。",
+  "open_source": false,
+  "logo": "turbopuffer.png"
+}

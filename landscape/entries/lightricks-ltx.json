@@ -1,0 +1,9 @@
+{
+  "name": "Lightricks LTX",
+  "url": "https://ltx.io",
+  "category": "media",
+  "description": "开放权重视频生成模型。",
+  "open_source": true,
+  "repo": "https://github.com/Lightricks/LTX-Video",
+  "logo": "lightricks-ltx.png"
+}

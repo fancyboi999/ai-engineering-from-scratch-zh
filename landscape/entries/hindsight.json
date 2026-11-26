@@ -1,0 +1,9 @@
+{
+  "name": "Hindsight",
+  "url": "https://hindsight.vectorize.io/",
+  "category": "memory",
+  "description": "支持跨会话学习的 AI agent 长期记忆系统。",
+  "open_source": false,
+  "x": "vectorizeio",
+  "logo": "hindsight.png"
+}

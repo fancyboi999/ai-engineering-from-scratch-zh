@@ -1,0 +1,8 @@
+{
+  "name": "PayPal",
+  "url": "https://paypal.ai",
+  "category": "payments",
+  "description": "面向 agent 的工具包与商业 API。",
+  "open_source": false,
+  "logo": "paypal.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Voyage AI",
+  "url": "https://voyageai.com",
+  "category": "embeddings",
+  "description": "面向信息检索的嵌入与重排模型。",
+  "open_source": false,
+  "logo": "voyage-ai.png"
+}

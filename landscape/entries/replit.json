@@ -1,0 +1,8 @@
+{
+  "name": "Replit",
+  "url": "https://replit.com",
+  "category": "coding",
+  "description": "内置应用构建与部署 agent 的在线 IDE。",
+  "open_source": false,
+  "logo": "replit.png"
+}

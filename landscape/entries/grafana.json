@@ -1,0 +1,9 @@
+{
+  "name": "Grafana",
+  "url": "https://grafana.com",
+  "category": "evaluation",
+  "description": "面向系统与 AI 的仪表盘和可观测性平台。",
+  "open_source": true,
+  "repo": "https://github.com/grafana/grafana",
+  "logo": "grafana.png"
+}

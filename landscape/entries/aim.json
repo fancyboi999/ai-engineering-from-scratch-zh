@@ -1,0 +1,9 @@
+{
+  "name": "Aim",
+  "url": "https://aimstack.io",
+  "category": "tracking",
+  "description": "可自托管的实验追踪工具。",
+  "open_source": true,
+  "repo": "https://github.com/aimhubio/aim",
+  "logo": "aim.png"
+}

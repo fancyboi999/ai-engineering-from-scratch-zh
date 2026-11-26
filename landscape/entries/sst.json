@@ -1,0 +1,9 @@
+{
+  "name": "SST",
+  "url": "https://sst.dev",
+  "category": "hosting",
+  "description": "在自有云账号上构建应用的框架。",
+  "open_source": true,
+  "repo": "https://github.com/sst/sst",
+  "logo": "sst.png"
+}

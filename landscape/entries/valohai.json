@@ -1,0 +1,8 @@
+{
+  "name": "Valohai",
+  "url": "https://valohai.com",
+  "category": "tracking",
+  "description": "支持流水线编排与版本管理的 MLOps 平台。",
+  "open_source": false,
+  "logo": "valohai.png"
+}

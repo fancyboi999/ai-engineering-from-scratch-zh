@@ -1,0 +1,8 @@
+{
+  "name": "Predibase",
+  "url": "https://predibase.com",
+  "category": "inference-providers",
+  "description": "支持通过适配器微调与部署开源模型的服务平台。",
+  "open_source": false,
+  "logo": "predibase.png"
+}

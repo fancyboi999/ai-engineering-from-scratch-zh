@@ -1,0 +1,9 @@
+{
+  "name": "Autohive",
+  "url": "https://www.autohive.com/",
+  "category": "work-assistants",
+  "description": "用于自动化团队重复性任务的 agent 平台。",
+  "open_source": false,
+  "x": "autohiveai",
+  "logo": "autohive.png"
+}

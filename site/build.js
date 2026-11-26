@@ -12,6 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { normalizeHeaderNavigation, HEADER_ASSET_VERSION } = require('../lib/site-navigation');
+const { writeLandscape } = require('./build-landscape.js');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const README_PATH = path.join(REPO_ROOT, 'README.md');
@@ -2101,11 +2102,11 @@ function sharedScriptVersion(name, siteDir = __dirname) {
 
 // src 允许等号两侧有空格，使 lesson.html 里按需加载的 `script.src = 'certification-data.js'` 与标签共用同一缓存键。
 function versionSharedAssets(html, siteDir = __dirname) {
-  return normalizeHeaderNavigation(html).replace(/(\bsrc\s*=\s*["']\/?((?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor)\.js))(?:\?[^"']*)?(["'])/g,
+  return normalizeHeaderNavigation(html).replace(/(\bsrc\s*=\s*["']\/?((?:app|cmdpalette|certifications|projects|project-markdown|projects-data|data|certification-data|langs|md-render|skills-demo|progress|catalog|lesson-walkthrough|practice|practice-store|practice-worker|highlights|highlights-store|highlights-anchor|landscape-data|landscape-rules|landscape)\.js))(?:\?[^"']*)?(["'])/g,
     (_, prefix, name, quote) => `${prefix}?v=${sharedScriptVersion(name, siteDir)}${quote}`)
     .replace(/(\bsrc=["']\/?header\.js)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
     .replace(/((?<![\w-])href=["']\/?style\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + HEADER_ASSET_VERSION + '$2')
-    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + SHARED_STYLE_VERSION + '$2')
+    .replace(/((?<![\w-])href=["']\/?(?:learning-paths|roadmap|intelligence-check|certifications|projects|hubs|skills|landscape)\.css)(?:\?[^"']*)?(["'])/g, '$1?v=' + SHARED_STYLE_VERSION + '$2')
     .replace(/(\bsrc=["']\/?roadmap\.js)(?:\?[^"']*)?(["'])/g, '$1?v=20261026a$2');
 }
 
@@ -2301,6 +2302,7 @@ const ARTIFACTS = ${JSON.stringify(artifacts, null, 2)};
       lessons: phase.lessons.length, description: phase.lede })),
   });
   fs.writeFileSync(path.join(__dirname, 'og-cards.json'), JSON.stringify(ogCards, null, 2) + '\n');
+  writeLandscape();
   stampSiteCards(ogCards.cards);
   versionBuiltPages();
   syncCounts(totalLessons, artifacts.length);
@@ -2382,6 +2384,7 @@ function writeSitemap(phases, glossaryCount, certifications, learningPaths, addi
     { loc: '/developer.html', priority: '0.5', freq: 'monthly' },
     { loc: '/contact.html', priority: '0.4', freq: 'monthly' },
     { loc: '/privacy.html', priority: '0.3', freq: 'yearly' },
+    { loc: '/landscape.html', priority: '0.7', freq: 'weekly' },
     { loc: '/openapi.json', priority: '0.3', freq: 'monthly' },
   ];
   if (glossaryCount > 0) urls.push({ loc: '/glossary.html', priority: '0.6', freq: 'monthly' });
@@ -2454,6 +2457,7 @@ function writeLlms(phases, glossaryCount, artifactCount, certifications, learnin
   out += `- [路线图](${SITE_ORIGIN}/prereqs.html) — 跨阶段的前置依赖顺序\n`;
   if (learningPaths && learningPaths.length) out += `- [AI 工程学习路径](${SITE_ORIGIN}/learning-paths.html) — ${learningPaths.length} 条按目标组织的学习路线\n`;
   if (glossaryCount > 0) out += `- [术语表](${SITE_ORIGIN}/glossary.html) — ${glossaryCount} 个术语的通俗定义\n`;
+  out += `- [AI 工程工具全景](${SITE_ORIGIN}/landscape.html) — 按用途分类的开源与闭源 AI 工程工具图谱，数据位于 landscape/entries\n`;
   out += `- [开发者资源](${SITE_ORIGIN}/developer.html) — 机器可读入口和内容协商说明\n`;
   out += `- [OpenAPI 描述](${SITE_ORIGIN}/openapi.json) — 公开只读资源接口\n`;
   if (certifications && certifications.programs && certifications.programs.length) {

@@ -1,0 +1,9 @@
+{
+  "name": "smolagents",
+  "url": "https://huggingface.co/docs/smolagents",
+  "category": "agents",
+  "description": "用于构建代码编写型 agent 的轻量级工具库。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/smolagents",
+  "logo": "smolagents.png"
+}

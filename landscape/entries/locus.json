@@ -1,0 +1,9 @@
+{
+  "name": "Locus",
+  "url": "https://paywithlocus.com/",
+  "category": "connectors",
+  "description": "面向 agent 的付费 API 与工具平台，按用户计量并计费。",
+  "open_source": false,
+  "x": "paywithlocus",
+  "logo": "locus.png"
+}

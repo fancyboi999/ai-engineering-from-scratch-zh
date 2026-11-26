@@ -1,0 +1,10 @@
+{
+  "name": "Nango",
+  "url": "https://www.nango.dev/",
+  "category": "connectors",
+  "description": "面向 AI agent 的 API 集成平台。",
+  "open_source": true,
+  "repo": "https://github.com/NangoHQ/nango",
+  "x": "nangohq",
+  "logo": "nango.png"
+}

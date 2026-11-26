@@ -1,0 +1,9 @@
+{
+  "name": "Linq",
+  "url": "https://linqapp.com/",
+  "category": "messaging",
+  "description": "为 Poke 等 agent 提供支持的短信与通话基础设施。",
+  "open_source": false,
+  "x": "thelinqapp",
+  "logo": "linq.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "ACI.dev",
+  "url": "https://aci.dev",
+  "category": "connectors",
+  "description": "面向 agent 的工具调用平台。",
+  "open_source": true,
+  "repo": "https://github.com/aipotheosis-labs/aci",
+  "logo": "aci-dev.png"
+}

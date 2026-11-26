@@ -1,0 +1,8 @@
+{
+  "name": "Cloudflare AI Gateway",
+  "url": "https://developers.cloudflare.com/ai-gateway",
+  "category": "gateways",
+  "description": "为模型请求提供缓存、限流与日志能力的 AI 网关。",
+  "open_source": false,
+  "logo": "cloudflare-ai-gateway.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Town",
+  "url": "https://www.town.com/",
+  "category": "work-assistants",
+  "description": "学习你的工作方式并代为执行任务的助手。",
+  "open_source": false,
+  "x": "TownAI",
+  "logo": "town.png"
+}

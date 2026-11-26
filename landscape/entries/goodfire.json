@@ -1,0 +1,8 @@
+{
+  "name": "Goodfire",
+  "url": "https://goodfire.ai",
+  "category": "interpretability",
+  "description": "面向模型内部机制的可解释性研究与工具。",
+  "open_source": false,
+  "logo": "goodfire.png"
+}

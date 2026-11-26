@@ -1,0 +1,9 @@
+{
+  "name": "Jupyter",
+  "url": "https://jupyter.org",
+  "category": "notebooks",
+  "description": "用于代码编写与数据分析的交互式 Notebook 环境。",
+  "open_source": true,
+  "repo": "https://github.com/jupyter/notebook",
+  "logo": "jupyter.png"
+}

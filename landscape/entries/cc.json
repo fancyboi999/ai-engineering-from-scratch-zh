@@ -1,0 +1,8 @@
+{
+  "name": "CC",
+  "url": "https://labs.google.com/cc/landing",
+  "category": "home-health-agents",
+  "description": "Google Labs 推出的家庭 AI agent，用于管理共享日历、邮件与家务琐事。",
+  "open_source": false,
+  "logo": "cc.png"
+}

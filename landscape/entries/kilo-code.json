@@ -1,0 +1,12 @@
+{
+  "name": "Kilo Code",
+  "url": "https://kilo.ai",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "适用于代码编辑器的编程 agent 扩展。",
+  "open_source": true,
+  "repo": "https://github.com/Kilo-Org/kilocode",
+  "logo": "kilo-code.png"
+}

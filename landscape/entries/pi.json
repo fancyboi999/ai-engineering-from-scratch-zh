@@ -1,0 +1,12 @@
+{
+  "name": "Pi",
+  "url": "https://pi.dev",
+  "category": "harnesses",
+  "also": [
+    "coding"
+  ],
+  "description": "极简终端编程 agent。",
+  "open_source": true,
+  "repo": "https://github.com/earendil-works/pi",
+  "logo": "pi.png"
+}

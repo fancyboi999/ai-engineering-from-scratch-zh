@@ -1,0 +1,9 @@
+{
+  "name": "Volaren",
+  "url": "https://www.volaren.ai/",
+  "category": "finance-agents",
+  "description": "可解读投资组合并代为执行交易的个人投资 agent。",
+  "open_source": false,
+  "x": "volaren_ai",
+  "logo": "volaren.png"
+}

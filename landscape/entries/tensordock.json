@@ -1,0 +1,8 @@
+{
+  "name": "TensorDock",
+  "url": "https://tensordock.com",
+  "category": "gpu-clouds",
+  "description": "按需租用 GPU 服务器的算力市场。",
+  "open_source": false,
+  "logo": "tensordock.png"
+}

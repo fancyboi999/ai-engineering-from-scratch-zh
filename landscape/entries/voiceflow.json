@@ -1,0 +1,8 @@
+{
+  "name": "Voiceflow",
+  "url": "https://voiceflow.com",
+  "category": "agent-platforms",
+  "description": "对话与语音 agent 构建平台。",
+  "open_source": false,
+  "logo": "voiceflow.png"
+}

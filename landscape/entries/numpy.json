@@ -1,0 +1,9 @@
+{
+  "name": "NumPy",
+  "url": "https://numpy.org",
+  "category": "data-platforms",
+  "description": "Python 数组计算基础库。",
+  "open_source": true,
+  "repo": "https://github.com/numpy/numpy",
+  "logo": "numpy.png"
+}

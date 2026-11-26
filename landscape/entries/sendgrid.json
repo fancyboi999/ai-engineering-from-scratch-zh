@@ -1,0 +1,8 @@
+{
+  "name": "SendGrid",
+  "url": "https://sendgrid.com",
+  "category": "messaging",
+  "description": "邮件投递 API。",
+  "open_source": false,
+  "logo": "sendgrid.png"
+}

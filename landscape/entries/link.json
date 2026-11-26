@@ -1,0 +1,9 @@
+{
+  "name": "Link",
+  "url": "https://docs.stripe.com/agentic-commerce/agents/link-agent-wallet",
+  "category": "payments",
+  "description": "Stripe 推出的 Link Agent Wallet，支持由 agent 发起支付请求、用户审批确认。",
+  "open_source": false,
+  "x": "link",
+  "logo": "link.png"
+}

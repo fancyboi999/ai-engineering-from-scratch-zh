@@ -1,0 +1,9 @@
+{
+  "name": "ComfyUI",
+  "url": "https://comfy.org",
+  "category": "media",
+  "description": "面向扩散模型的节点式界面。",
+  "open_source": true,
+  "repo": "https://github.com/comfyanonymous/ComfyUI",
+  "logo": "comfyui.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Mesop",
+  "url": "https://mesop-dev.github.io/mesop",
+  "category": "builders",
+  "description": "用于构建 Web 界面的 Python 框架。",
+  "open_source": true,
+  "repo": "https://github.com/mesop-dev/mesop",
+  "logo": "mesop.png"
+}

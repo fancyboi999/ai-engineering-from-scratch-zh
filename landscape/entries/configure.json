@@ -1,0 +1,9 @@
+{
+  "name": "Configure",
+  "url": "https://configure.dev/",
+  "category": "context",
+  "description": "类似 Plaid 的基础设施，让用户跨 agent 连接记忆与应用。",
+  "open_source": false,
+  "x": "configuredotdev",
+  "logo": "configure.png"
+}

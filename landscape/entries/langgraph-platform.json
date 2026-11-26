@@ -1,0 +1,8 @@
+{
+  "name": "LangGraph Platform",
+  "url": "https://langchain.com/langgraph-platform",
+  "category": "agent-platforms",
+  "description": "用于部署与管理长时运行 agent 的平台。",
+  "open_source": false,
+  "logo": "langgraph-platform.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Gemini",
+  "url": "https://gemini.google.com",
+  "category": "chat-assistants",
+  "description": "Google 推出的对话助手，覆盖网页端与 Android 平台。",
+  "open_source": false,
+  "logo": "gemini.png"
+}

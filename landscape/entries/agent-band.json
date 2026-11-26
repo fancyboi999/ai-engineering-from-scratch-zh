@@ -1,0 +1,8 @@
+{
+  "name": "Agent Band",
+  "url": "https://meetagent.com/",
+  "category": "voice-agents",
+  "description": "支持语音控制的预订与通话助手。",
+  "open_source": false,
+  "logo": "agent-band.png"
+}

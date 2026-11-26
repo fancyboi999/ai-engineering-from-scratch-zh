@@ -1,0 +1,9 @@
+{
+  "name": "MarkItDown",
+  "url": "https://github.com/microsoft/markitdown",
+  "category": "docs",
+  "description": "将各类文件与办公文档转换为 Markdown 的工具。",
+  "open_source": true,
+  "repo": "https://github.com/microsoft/markitdown",
+  "logo": "markitdown.png"
+}

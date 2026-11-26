@@ -1,0 +1,8 @@
+{
+  "name": "Okta",
+  "url": "https://okta.com",
+  "category": "identity",
+  "description": "面向企业员工与客户的身份认证平台。",
+  "open_source": false,
+  "logo": "okta.png"
+}

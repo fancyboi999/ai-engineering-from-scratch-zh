@@ -1,0 +1,9 @@
+{
+  "name": "LangChain4j",
+  "url": "https://docs.langchain4j.dev",
+  "category": "agents",
+  "description": "用于构建模型应用的 Java 库。",
+  "open_source": true,
+  "repo": "https://github.com/langchain4j/langchain4j",
+  "logo": "langchain4j.png"
+}

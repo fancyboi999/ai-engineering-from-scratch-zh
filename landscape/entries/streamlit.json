@@ -1,0 +1,9 @@
+{
+  "name": "Streamlit",
+  "url": "https://streamlit.io",
+  "category": "builders",
+  "description": "将 Python 脚本转化为数据应用。",
+  "open_source": true,
+  "repo": "https://github.com/streamlit/streamlit",
+  "logo": "streamlit.png"
+}

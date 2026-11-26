@@ -1,0 +1,9 @@
+{
+  "name": "ClickHouse",
+  "url": "https://clickhouse.com",
+  "category": "databases",
+  "description": "面向实时分析的列式数据库。",
+  "open_source": true,
+  "repo": "https://github.com/ClickHouse/ClickHouse",
+  "logo": "clickhouse.png"
+}

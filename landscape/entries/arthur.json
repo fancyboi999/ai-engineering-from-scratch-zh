@@ -1,0 +1,8 @@
+{
+  "name": "Arthur",
+  "url": "https://arthur.ai",
+  "category": "evaluation",
+  "description": "面向 AI 系统的监控与评测平台。",
+  "open_source": false,
+  "logo": "arthur.png"
+}

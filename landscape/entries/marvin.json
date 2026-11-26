@@ -1,0 +1,9 @@
+{
+  "name": "Marvin",
+  "url": "https://askmarvin.ai",
+  "category": "agents",
+  "description": "用于结构化输出与构建 agent 的 Python 工具包。",
+  "open_source": true,
+  "repo": "https://github.com/PrefectHQ/marvin",
+  "logo": "marvin.png"
+}

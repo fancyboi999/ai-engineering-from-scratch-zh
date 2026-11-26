@@ -1,0 +1,9 @@
+{
+  "name": "ArangoDB",
+  "url": "https://arangodb.com",
+  "category": "databases",
+  "description": "支持图、文档与向量的多模数据库。",
+  "open_source": true,
+  "repo": "https://github.com/arangodb/arangodb",
+  "logo": "arangodb.png"
+}

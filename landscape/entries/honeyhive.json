@@ -1,0 +1,8 @@
+{
+  "name": "HoneyHive",
+  "url": "https://honeyhive.ai",
+  "category": "evaluation",
+  "description": "面向 agent 的可观测性与评测平台。",
+  "open_source": false,
+  "logo": "honeyhive.png"
+}

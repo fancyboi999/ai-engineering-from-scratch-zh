@@ -1,0 +1,8 @@
+{
+  "name": "Docker",
+  "url": "https://docker.com",
+  "category": "sandboxes",
+  "description": "用于构建和运行应用的容器引擎与工具集。",
+  "open_source": false,
+  "logo": "docker.png"
+}

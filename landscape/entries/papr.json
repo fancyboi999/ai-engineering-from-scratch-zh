@@ -1,0 +1,8 @@
+{
+  "name": "Papr",
+  "url": "https://papr.ai",
+  "category": "memory",
+  "description": "面向 agent 的预测式记忆层。",
+  "open_source": false,
+  "logo": "papr.png"
+}

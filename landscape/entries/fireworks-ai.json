@@ -1,0 +1,8 @@
+{
+  "name": "Fireworks AI",
+  "url": "https://fireworks.ai",
+  "category": "inference-providers",
+  "description": "低延迟开源模型托管推理服务。",
+  "open_source": false,
+  "logo": "fireworks-ai.png"
+}

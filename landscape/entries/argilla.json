@@ -1,0 +1,9 @@
+{
+  "name": "Argilla",
+  "url": "https://argilla.io",
+  "category": "data",
+  "description": "支持人工协作构建与审核数据集的工具。",
+  "open_source": true,
+  "repo": "https://github.com/argilla-io/argilla",
+  "logo": "argilla.png"
+}

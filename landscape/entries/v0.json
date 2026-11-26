@@ -1,0 +1,8 @@
+{
+  "name": "v0",
+  "url": "https://v0.app",
+  "category": "builders",
+  "description": "根据文本 prompt 生成网页界面与应用的工具。",
+  "open_source": false,
+  "logo": "v0.png"
+}

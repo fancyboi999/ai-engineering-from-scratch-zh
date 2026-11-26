@@ -1,0 +1,9 @@
+{
+  "name": "PyTorch",
+  "url": "https://pytorch.org",
+  "category": "training",
+  "description": "具备自动微分能力的张量库，用于构建和训练神经网络。",
+  "open_source": true,
+  "repo": "https://github.com/pytorch/pytorch",
+  "logo": "pytorch.png"
+}

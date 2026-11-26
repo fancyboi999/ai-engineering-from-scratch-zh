@@ -1,0 +1,9 @@
+{
+  "name": "Fish Audio",
+  "url": "https://fish.audio",
+  "category": "voice-apis",
+  "description": "文字转语音与声音克隆平台。",
+  "open_source": true,
+  "repo": "https://github.com/fishaudio/fish-speech",
+  "logo": "fish-audio.png"
+}

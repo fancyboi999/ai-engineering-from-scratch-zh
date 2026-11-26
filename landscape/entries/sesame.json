@@ -1,0 +1,9 @@
+{
+  "name": "Sesame",
+  "url": "https://www.sesame.com/",
+  "category": "voice-agents",
+  "description": "用于对话、调研、规划和日常任务的语音 agent。",
+  "open_source": false,
+  "x": "sesame",
+  "logo": "sesame.png"
+}

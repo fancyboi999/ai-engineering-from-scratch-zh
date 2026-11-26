@@ -1,0 +1,9 @@
+{
+  "name": "Unstructured",
+  "url": "https://unstructured.io",
+  "category": "docs",
+  "description": "将文档转换为可供模型直接使用的数据。",
+  "open_source": true,
+  "repo": "https://github.com/Unstructured-IO/unstructured",
+  "logo": "unstructured.png"
+}

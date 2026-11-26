@@ -2761,7 +2761,7 @@ test('all shared headers render one complete menu before JavaScript runs', () =>
     ['index.html#contents', '课程目录'], ['prereqs.html', '路线图'],
     ['projects.html', '实战项目'], ['practice', '编程练习'], ['interviews', '面试题库'], ['manuals.html', '技术手册'],
     ['cheatsheets', '速查表'], ['inside-an-ai-agent.html', 'Agent 内部机制'], ['highlights.html', '我的高亮'], ['glossary.html', '术语表'],
-    ['certifications.html', '认证'], ['about.html', '关于'],
+    ['landscape.html', '工具全景'], ['certifications.html', '认证'], ['about.html', '关于'],
   ];
   const files = fs.readdirSync(__dirname).filter(name => name.endsWith('.html') && !name.endsWith('-print.html')).concat([
     'hubs/phase/tools-and-protocols.html', 'hubs/glossary/activation-checkpointing.html',

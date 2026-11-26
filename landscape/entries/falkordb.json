@@ -1,0 +1,9 @@
+{
+  "name": "FalkorDB",
+  "url": "https://falkordb.com",
+  "category": "databases",
+  "description": "专为 GraphRAG 构建的图数据库。",
+  "open_source": true,
+  "repo": "https://github.com/FalkorDB/FalkorDB",
+  "logo": "falkordb.png"
+}

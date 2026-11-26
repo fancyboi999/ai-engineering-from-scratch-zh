@@ -1,0 +1,8 @@
+{
+  "name": "Postman",
+  "url": "https://postman.com",
+  "category": "connectors",
+  "description": "内置 agent 构建工具的 API 平台。",
+  "open_source": false,
+  "logo": "postman.png"
+}

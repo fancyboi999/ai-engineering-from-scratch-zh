@@ -1,0 +1,9 @@
+{
+  "name": "pandas",
+  "url": "https://pandas.pydata.org",
+  "category": "data-platforms",
+  "description": "Python 数据分析库。",
+  "open_source": true,
+  "repo": "https://github.com/pandas-dev/pandas",
+  "logo": "pandas.png"
+}

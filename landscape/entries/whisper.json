@@ -1,0 +1,9 @@
+{
+  "name": "Whisper",
+  "url": "https://github.com/openai/whisper",
+  "category": "voice-apis",
+  "description": "OpenAI 推出的语音识别模型。",
+  "open_source": true,
+  "repo": "https://github.com/openai/whisper",
+  "logo": "whisper.png"
+}

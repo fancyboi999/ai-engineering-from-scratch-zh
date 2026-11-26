@@ -1,0 +1,8 @@
+{
+  "name": "Amazon Nova Act",
+  "url": "https://nova.amazon.com/act",
+  "category": "browser-infra",
+  "description": "用于在网页浏览器中执行操作的 agent SDK。",
+  "open_source": false,
+  "logo": "amazon-nova-act.png"
+}

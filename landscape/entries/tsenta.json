@@ -1,0 +1,9 @@
+{
+  "name": "Tsenta",
+  "url": "https://tsenta.com/",
+  "category": "work-assistants",
+  "description": "在企业招聘官网自动投递职位的 AI agent。",
+  "open_source": false,
+  "x": "tsentaai",
+  "logo": "tsenta.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Wordware",
+  "url": "https://wordware.ai",
+  "category": "agent-platforms",
+  "description": "使用自然语言程序构建 agent 的平台。",
+  "open_source": false,
+  "logo": "wordware.png"
+}

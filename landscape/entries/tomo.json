@@ -1,0 +1,9 @@
+{
+  "name": "Tomo",
+  "url": "https://tomo.ai/",
+  "category": "personal-assistants",
+  "description": "通过短信交互的个人 AI 助手。",
+  "open_source": false,
+  "x": "tomo",
+  "logo": "tomo.png"
+}

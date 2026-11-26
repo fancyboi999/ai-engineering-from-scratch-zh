@@ -1,0 +1,8 @@
+{
+  "name": "Serper",
+  "url": "https://serper.dev",
+  "category": "search",
+  "description": "获取 Google 搜索结果的 API。",
+  "open_source": false,
+  "logo": "serper.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Buddy",
+  "url": "https://vxbe.space/",
+  "category": "personal-assistants",
+  "description": "VXBE 推出的个人 agent，支持通过 iMessage、邮件与 Windows 交互。",
+  "open_source": false,
+  "logo": "buddy.png"
+}

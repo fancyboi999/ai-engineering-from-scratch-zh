@@ -1,0 +1,9 @@
+{
+  "name": "Gigi",
+  "url": "https://gigi.co/",
+  "category": "connectors",
+  "description": "用于寻找人脉与关系引荐的 agent 网络。",
+  "open_source": false,
+  "x": "gigi_network",
+  "logo": "gigi.png"
+}

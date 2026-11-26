@@ -1,0 +1,9 @@
+{
+  "name": "SWE-bench",
+  "url": "https://swebench.com",
+  "category": "evaluation",
+  "description": "基于真实软件工程任务的评测基准。",
+  "open_source": true,
+  "repo": "https://github.com/SWE-bench/SWE-bench",
+  "logo": "swe-bench.png"
+}

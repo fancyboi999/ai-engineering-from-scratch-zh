@@ -1,0 +1,8 @@
+{
+  "name": "Tusk",
+  "url": "https://usetusk.ai",
+  "category": "review",
+  "description": "为 pull request 自动生成单元测试与集成测试的工具。",
+  "open_source": false,
+  "logo": "tusk.png"
+}

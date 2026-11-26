@@ -1,0 +1,8 @@
+{
+  "name": "Lakera",
+  "url": "https://lakera.ai",
+  "category": "security",
+  "description": "抵御 prompt 攻击的运行时安全防护服务。",
+  "open_source": false,
+  "logo": "lakera.png"
+}

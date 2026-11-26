@@ -1,0 +1,9 @@
+{
+  "name": "Paradev",
+  "url": "https://paradev.com",
+  "category": "orchestrators",
+  "description": "用于并行运行多个编程 agent 的终端工具。",
+  "open_source": true,
+  "repo": "https://github.com/ParadevAI/Paradev",
+  "logo": "paradev.png"
+}

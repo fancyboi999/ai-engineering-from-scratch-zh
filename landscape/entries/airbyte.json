@@ -1,0 +1,9 @@
+{
+  "name": "Airbyte",
+  "url": "https://airbyte.com",
+  "category": "connectors",
+  "description": "提供丰富连接器的数据集成平台。",
+  "open_source": true,
+  "repo": "https://github.com/airbytehq/airbyte",
+  "logo": "airbyte.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Oz",
+  "url": "https://oz.anyreach.ai/",
+  "category": "personal-assistants",
+  "description": "通过短信处理报价、客户跟进与文书工作的助手。",
+  "open_source": false,
+  "x": "Anyreach_Oz",
+  "logo": "oz.png"
+}

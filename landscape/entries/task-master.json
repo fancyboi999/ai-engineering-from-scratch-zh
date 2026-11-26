@@ -1,0 +1,9 @@
+{
+  "name": "Task Master",
+  "url": "https://github.com/eyaltoledano/claude-task-master",
+  "category": "agent-workflows",
+  "description": "驱动编程 agent 执行开发的任务管理系统。",
+  "open_source": true,
+  "repo": "https://github.com/eyaltoledano/claude-task-master",
+  "logo": "task-master.png"
+}

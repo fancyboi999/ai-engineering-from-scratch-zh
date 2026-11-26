@@ -1,0 +1,9 @@
+{
+  "name": "Espa",
+  "url": "https://espa.ai/",
+  "category": "work-assistants",
+  "description": "负责安排会议、整理邮件并跟进待办事项的 AI 助手。",
+  "open_source": false,
+  "x": "EspaLabs",
+  "logo": "espa.png"
+}

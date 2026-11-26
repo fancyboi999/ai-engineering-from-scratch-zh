@@ -1,0 +1,9 @@
+{
+  "name": "GPT4All",
+  "url": "https://nomic.ai/gpt4all",
+  "category": "inference",
+  "description": "用于本地模型对话的桌面应用与开发库。",
+  "open_source": true,
+  "repo": "https://github.com/nomic-ai/gpt4all",
+  "logo": "gpt4all.png"
+}

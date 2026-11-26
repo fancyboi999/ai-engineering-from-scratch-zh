@@ -1,0 +1,9 @@
+{
+  "name": "Orchid",
+  "url": "https://orchid.ai/",
+  "category": "personal-assistants",
+  "description": "嵌入消息应用中的个人助手。",
+  "open_source": false,
+  "x": "orchid_hq",
+  "logo": "orchid.png"
+}

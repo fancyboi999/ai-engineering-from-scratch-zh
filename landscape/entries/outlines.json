@@ -1,0 +1,9 @@
+{
+  "name": "Outlines",
+  "url": "https://dottxt.co",
+  "category": "agents",
+  "description": "严格保证输出格式的结构化文本生成库。",
+  "open_source": true,
+  "repo": "https://github.com/dottxt-ai/outlines",
+  "logo": "outlines.png"
+}

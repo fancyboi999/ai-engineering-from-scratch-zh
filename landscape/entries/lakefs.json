@@ -1,0 +1,9 @@
+{
+  "name": "lakeFS",
+  "url": "https://lakefs.io",
+  "category": "data-platforms",
+  "description": "面向数据湖的版本控制工具。",
+  "open_source": true,
+  "repo": "https://github.com/treeverse/lakeFS",
+  "logo": "lakefs.png"
+}

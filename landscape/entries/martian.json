@@ -1,0 +1,8 @@
+{
+  "name": "Martian",
+  "url": "https://withmartian.com",
+  "category": "gateways",
+  "description": "按单次请求自动选择合适模型的路由器。",
+  "open_source": false,
+  "logo": "martian.png"
+}

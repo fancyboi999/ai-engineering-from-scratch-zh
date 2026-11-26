@@ -1,0 +1,8 @@
+{
+  "name": "DataStax Astra DB",
+  "url": "https://datastax.com",
+  "category": "databases",
+  "description": "支持向量检索的托管 Cassandra 数据库。",
+  "open_source": false,
+  "logo": "datastax-astra-db.png"
+}

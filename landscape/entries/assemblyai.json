@@ -1,0 +1,8 @@
+{
+  "name": "AssemblyAI",
+  "url": "https://assemblyai.com",
+  "category": "voice-apis",
+  "description": "语音转文字与音频理解 API。",
+  "open_source": false,
+  "logo": "assemblyai.png"
+}

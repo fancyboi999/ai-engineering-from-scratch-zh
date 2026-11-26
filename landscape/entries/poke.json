@@ -1,0 +1,9 @@
+{
+  "name": "Poke",
+  "url": "https://poke.com/",
+  "category": "personal-assistants",
+  "description": "可通过 Messages、WhatsApp 和 Telegram 使用的主动式个人助手。",
+  "open_source": false,
+  "x": "interaction",
+  "logo": "poke.png"
+}

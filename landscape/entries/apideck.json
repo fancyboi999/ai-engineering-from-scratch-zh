@@ -1,0 +1,8 @@
+{
+  "name": "Apideck",
+  "url": "https://apideck.com",
+  "category": "connectors",
+  "description": "面向商业软件的统一 API 平台。",
+  "open_source": false,
+  "logo": "apideck.png"
+}

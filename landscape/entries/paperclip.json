@@ -1,0 +1,9 @@
+{
+  "name": "Paperclip",
+  "url": "https://paperclip.ing",
+  "category": "orchestrators",
+  "description": "编排多 agent 团队协同运营公司的平台。",
+  "open_source": true,
+  "repo": "https://github.com/paperclipai/paperclip",
+  "logo": "paperclip.png"
+}

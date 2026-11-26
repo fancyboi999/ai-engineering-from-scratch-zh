@@ -1,0 +1,8 @@
+{
+  "name": "Jules",
+  "url": "https://jules.google",
+  "category": "coding",
+  "description": "Google 推出的异步编程 agent。",
+  "open_source": false,
+  "logo": "jules.png"
+}

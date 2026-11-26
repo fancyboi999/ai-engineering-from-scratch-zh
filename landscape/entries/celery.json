@@ -1,0 +1,9 @@
+{
+  "name": "Celery",
+  "url": "https://docs.celeryq.dev",
+  "category": "orchestration",
+  "description": "面向 Python 的分布式任务队列。",
+  "open_source": true,
+  "repo": "https://github.com/celery/celery",
+  "logo": "celery.png"
+}

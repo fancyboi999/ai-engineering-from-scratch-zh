@@ -1,0 +1,9 @@
+{
+  "name": "Daft",
+  "url": "https://daft.ai",
+  "category": "data-platforms",
+  "description": "面向多模态数据的分布式查询引擎。",
+  "open_source": true,
+  "repo": "https://github.com/Eventual-Inc/Daft",
+  "logo": "daft.png"
+}

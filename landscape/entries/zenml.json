@@ -1,0 +1,9 @@
+{
+  "name": "ZenML",
+  "url": "https://zenml.io",
+  "category": "tracking",
+  "description": "面向机器学习与 LLM 工作流的流水线框架。",
+  "open_source": true,
+  "repo": "https://github.com/zenml-io/zenml",
+  "logo": "zenml.png"
+}

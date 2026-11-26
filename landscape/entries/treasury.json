@@ -1,0 +1,9 @@
+{
+  "name": "Treasury",
+  "url": "https://treasury.sh/",
+  "category": "finance-agents",
+  "description": "支持对话查询财务状况的 AI 预算与个人理财应用。",
+  "open_source": false,
+  "x": "treasury_sh",
+  "logo": "treasury.png"
+}

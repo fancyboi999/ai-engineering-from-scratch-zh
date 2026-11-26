@@ -1,0 +1,8 @@
+{
+  "name": "Codacy",
+  "url": "https://codacy.com",
+  "category": "review",
+  "description": "自动化代码质量与安全检查工具。",
+  "open_source": false,
+  "logo": "codacy.png"
+}

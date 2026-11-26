@@ -1,0 +1,9 @@
+{
+  "name": "Restate",
+  "url": "https://restate.dev",
+  "category": "orchestration",
+  "description": "面向服务与 agent 的持久化执行引擎。",
+  "open_source": true,
+  "repo": "https://github.com/restatedev/restate",
+  "logo": "restate.png"
+}

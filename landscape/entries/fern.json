@@ -1,0 +1,9 @@
+{
+  "name": "Fern",
+  "url": "https://buildwithfern.com",
+  "category": "connectors",
+  "description": "根据 API 定义自动生成 SDK 与文档的工具。",
+  "open_source": true,
+  "repo": "https://github.com/fern-api/fern",
+  "logo": "fern.png"
+}

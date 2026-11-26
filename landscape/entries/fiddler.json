@@ -1,0 +1,8 @@
+{
+  "name": "Fiddler",
+  "url": "https://fiddler.ai",
+  "category": "evaluation",
+  "description": "面向 AI 系统的可观测性与安全护栏平台。",
+  "open_source": false,
+  "logo": "fiddler.png"
+}

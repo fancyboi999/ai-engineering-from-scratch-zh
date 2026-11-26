@@ -1,0 +1,9 @@
+{
+  "name": "Monid",
+  "url": "https://monid.ai/",
+  "category": "connectors",
+  "description": "用于访问工具与 API 的 agent 技能包。",
+  "open_source": false,
+  "x": "monidhq",
+  "logo": "monid.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "PromptLayer",
+  "url": "https://promptlayer.com",
+  "category": "evaluation",
+  "description": "提供 prompt 管理、日志记录与评测能力的平台。",
+  "open_source": false,
+  "logo": "promptlayer.png"
+}
