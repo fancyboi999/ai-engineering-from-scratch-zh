@@ -1,12 +1,7 @@
 {
   "base": "9712e323fde8cb2ec933310ac619e920e8e31017",
   "target": "5db6280251f9f24123c972a358baf4b5e977277a",
-  "pending": [
-    {
-      "batch": "landscape-821-823",
-      "summary": "AI 工程工具全景（/landscape）：56 分类、1036 条中文简介、表单与 CI 校验及 OG 卡片（#821 #822 #823）线上部署验收"
-    }
-  ],
+  "pending": [],
   "decisions": [
     {
       "scope": "README 结构与文案（2026-10-27）",
@@ -366,6 +361,13 @@
         ".github/workflows/landscape.yml",
         ".github/workflows/build.yml",
         ".sync-upstream-base",
+        ".sync-upstream-pending.json"
+      ]
+    },
+    {
+      "scope": "AI 工程工具全景（5db6280）线上验收并关闭批次（2026-11-26）",
+      "decision": "#165 合并为 466eb9c03 并由 Vercel 部署至生产（dpl_7A15LLqnUYCWJsWALDLTRDQYZ54u，绑定 aieng-zh.cn 与 ai-engineering-from-scratch-zh.vercel.app）；合并后 Landscape 工作流（含 save-logos）绿灯通过。通过生产公共别名实测 /landscape（HTTP 200、canonical 指向 aieng-zh.cn/landscape.html）、/og/page/landscape.png?v=60a00c5973a5（HTTP 200、PNG 10,654B）、/logos/landscape/vllm.svg（HTTP 200、Content-Security-Policy: sandbox）、/sitemap.xml、/llms.txt、首页导航「工具全景」以及真实 Chrome 1,057 块渲染、.bin Logo 加载与 vLLM 详情弹窗交互均通过，关闭 landscape-821-823 pending 批次。",
+      "paths": [
         ".sync-upstream-pending.json"
       ]
     }
