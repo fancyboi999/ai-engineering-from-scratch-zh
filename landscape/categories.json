@@ -420,7 +420,7 @@
     "group_id": "agent-products",
     "group": "Agent 产品",
     "name": "旅行 Agent",
-    "summary": "负责规划行程与预订差旅的 agent。",
+    "summary": "负责规划并预订旅行行程的 agent。",
     "phase": "14-agent-engineering"
   },
   {
@@ -428,7 +428,7 @@
     "group_id": "agent-products",
     "group": "Agent 产品",
     "name": "家居、家庭与健康 Agent",
-    "summary": "服务家庭事务、亲子日程与个人健康的 agent。",
+    "summary": "服务家居事务、家庭日程与个人健康的 agent。",
     "phase": "14-agent-engineering"
   },
   {

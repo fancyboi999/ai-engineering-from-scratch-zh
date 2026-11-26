@@ -53,7 +53,7 @@
       return href.replace(/^\/(lesson|certification|highlights|landscape)(?=[?#]|$)/, '$1.html');
     }
     if (/^\/phase\/([a-z0-9-]+)(?=[?#]|$)/.test(href)) {
-      return href.replace(/^\/phase\/([a-z0-9-]+)/, '/hubs/phase/$1.html');
+      return href.replace(/^\/phase\/([a-z0-9-]+)/, 'hubs/phase/$1.html');
     }
     if (/^(?:\/|(?:\.\.?\/)*)cheatsheets(?:\/|$)/.test(href)) {
       return href.replace(/^((?:\/|(?:\.\.?\/)*)cheatsheets)(?=[?#]|$)/, '$1/index.html').replace(/^((?:\/|(?:\.\.?\/)*)cheatsheets\/[a-z0-9-]+)(?=[?#]|$)/, '$1.html');
@@ -484,7 +484,7 @@
     function loadScript(name) {
       return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = HEADER_BASE + name + '?v=20261121b';
+        script.src = HEADER_BASE + name + '?v=20261126a';
         script.onload = resolve;
         script.onerror = function () { script.remove(); reject(new Error('search asset unavailable')); };
         document.head.appendChild(script);

@@ -20,7 +20,7 @@ permissions:
 
 concurrency:
   group: landscape-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 jobs:
   check:
@@ -91,7 +91,10 @@ jobs:
             git fetch origin "${branch}"
             if ! git rebase "origin/${branch}"; then
               git rebase --abort || true
-              exit 0
+              echo "::error::Rebase failed while saving landscape logos"
+              exit 1
             fi
             sleep "$((attempt * 2))"
           done
+          echo "::error::Failed to push saved landscape logos after 3 attempts"
+          exit 1

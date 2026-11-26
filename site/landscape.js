@@ -85,8 +85,8 @@
   }
 
   var logoObserver = null;
-  var packCache = {};
-  var logoUrls = {};
+  var packCache = Object.create(null);
+  var logoUrls = Object.create(null);
 
   function fetchPack(index) {
     if (!packCache[index]) {
@@ -223,7 +223,7 @@
     var every = el('option', '', '全部 ' + data.categories.length + ' 个分类');
     every.value = 'all';
     select.appendChild(every);
-    var groups = {};
+    var groups = Object.create(null);
     data.categories.forEach(function (category) {
       if (!groups[category.group]) {
         groups[category.group] = el('optgroup');
@@ -358,7 +358,7 @@
     var dialog = document.getElementById('landscapeDetail');
     var grid = document.getElementById('landscapeGrid');
     if (!dialog || !grid) return;
-    var bySlug = {};
+    var bySlug = Object.create(null);
     data.entries.forEach(function (entry) { bySlug[entry.slug] = entry; });
     grid.addEventListener('click', function (event) {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -421,11 +421,13 @@
     };
   }
 
-  var FORM_LABELS = { name: '工具名称', url: '官网地址', category: '所属分类', description: '简介', repo: '源码仓库', logo_url: 'Logo 链接', x: 'X 账号' };
+  var FORM_LABELS = Object.assign(Object.create(null), { name: '工具名称', url: '官网地址', category: '所属分类', description: '简介', repo: '源码仓库', logo_url: 'Logo 链接', x: 'X 账号' });
 
   function formProblem(problem) {
     if (/^必须提供 "logo_url"/.test(problem)) return 'Logo 链接为必填项';
-    return problem.replace(/"([a-z_]+)"/g, function (match, field) { return FORM_LABELS[field] || match; });
+    return problem
+      .replace(/"([a-z_]+)"/g, function (match, field) { return FORM_LABELS[field] || match; })
+      .replace(/([\u4e00-\u9fff])\s+([\u4e00-\u9fff])/g, '$1$2');
   }
 
   function updateForm() {
@@ -436,7 +438,8 @@
     var slug = rules.slugify(entry.name);
     var categoryIds = data.categories.map(function (category) { return category.id; });
     var errors = rules.validateEntry(slug || 'your-tool', entry, categoryIds);
-    var taken = data.entries.some(function (existing) { return existing.slug === slug; });
+    if (entry.name && !slug) errors.unshift('工具名称需包含至少一个英文字母或数字，以生成合法的 JSON 文件名');
+    var taken = Boolean(slug) && data.entries.some(function (existing) { return existing.slug === slug; });
     if (taken) errors.unshift('「' + entry.name + '」已收录，请直接在 GitHub 打开对应文件进行修改。');
 
     document.getElementById('addRepoRow').hidden = !values.open_source;

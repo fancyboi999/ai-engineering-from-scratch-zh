@@ -2,7 +2,7 @@
   "name": "Paperclip",
   "url": "https://paperclip.ing",
   "category": "orchestrators",
-  "description": "用于编排协同运营公司的多 agent 团队的平台。",
+  "description": "编排多 agent 团队协同运营公司的平台。",
   "open_source": true,
   "repo": "https://github.com/paperclipai/paperclip",
   "logo": "paperclip.png"

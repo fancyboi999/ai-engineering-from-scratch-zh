@@ -11,7 +11,7 @@
 ### 1. 使用网页表单（约 2 分钟）
 
 1. 打开 [提交工具表单](https://aieng-zh.cn/landscape#add)。
-2. 填写 6 项必填信息（X 账号选填），表单会实时校验格式。
+2. 填写 6 项表单信息（X 账号选填），表单会实时校验格式。
 3. 点击 **在 GitHub 发起 Pull Request**，GitHub 会自动打开预填好的新建文件页面。
 4. 点击 **Commit changes**，然后点击 **Create pull request**（GitHub 会自动创建 fork）。
 
@@ -41,7 +41,7 @@ node site/build-landscape.js --check
 
 ### 3. 通过 Issue 提交
 
-日常不方便提 PR？可以 [填写工具提交 Issue](https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new?template=landscape_tool.yml)，由维护者代为录入。
+平时不常用 GitHub？可以 [填写工具提交 Issue](https://github.com/fancyboi999/ai-engineering-from-scratch-zh/issues/new?template=landscape_tool.yml)，由维护者代为录入。
 
 ## 字段说明
 
@@ -70,7 +70,7 @@ node site/build-landscape.js --check
 
 ## 分类结构
 
-全部分类归属 6 个大组：模型与算力、开发者工具、数据与检索、Agent 基础设施、语音与多媒体、Agent 产品。完整分类与 ID 见 [`categories.json`](categories.json)。通用对话助手、大模型厂商 Agent 和编程助手分属不同分类，因为厂商的聊天应用、任务型 Agent 产品和编程 Agent 面向的是不同场景。
+全部分类归属 6 个大组：模型与算力、开发者工具、数据与检索、Agent 基础设施、语音与多媒体、Agent 产品。完整分类与 ID 见 [`categories.json`](categories.json)。通用对话助手、大模型厂商 Agent 和编程助手分属不同分类，因为厂商的聊天应用、任务型 agent 产品和编程 agent 面向的是不同场景。
 
 同一分类内的工具统一按名称字母顺序公平排列。
 

@@ -22,18 +22,18 @@
   var X_HANDLE = /^[A-Za-z0-9_]{1,15}$/;
   var SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
   var REPO_URL = /^https:\/\/(github\.com|gitlab\.com|codeberg\.org)\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
-  var PROMOTIONAL = /\b(best|leading|world[- ]class|revolutionary|cutting[- ]edge|number one|blazing\w*|game[- ]chang\w*|next[- ]gen\w*|unmatched|ultimate|state[- ]of[- ]the[- ]art)\b|#1|世界领先|行业领先|全球最佳|最强大|颠覆性|革命性|划时代|无与伦比|终极|排名第一/i;
-  var CRYPTO = /\b(crypto\w*|blockchain\w*|stablecoin\w*|web3|nfts?|on-?chain|defi|memecoin\w*|airdrop\w*|tokenomics|dao)\b|加密货币|区块链|稳定币|去中心化金融|代币经济|链上资产/i;
+  var PROMOTIONAL = /\b(best|leading|world[- ]class|revolutionary|cutting[- ]edge|number one|blazing\w*|game[- ]chang\w*|next[- ]gen\w*|unmatched|ultimate|state[- ]of[- ]the[- ]art)\b|#1(?![0-9])|世界领先|行业领先|全球最佳|最强大|颠覆性|革命性|划时代|无与伦比|终极|排名第一/i;
+  var CRYPTO = /\b(crypto(?:currenc\w*|wallet\w*|coin\w*|mining|asset\w*|trading|payment\w*)?|blockchain\w*|stablecoin\w*|web3|nfts?|on-?chain|defi|memecoin\w*|airdrop\w*|tokenomics|dao)\b|加密货币|区块链|稳定币|去中心化金融|代币经济|链上资产/i;
   var TEMPORARY_HOST = /(^|\.)(vercel\.app|netlify\.app|github\.io|pages\.dev|herokuapp\.com|ngrok\.io|ngrok-free\.app|trycloudflare\.com|bit\.ly|t\.co|tinyurl\.com)$/i;
   var IP_HOST = /^(\d{1,3}\.){3}\d{1,3}$|^\[|^localhost$/i;
   var SVG_BLOCKLIST = [
-    [/<script/i, '包含 <script> 元素'],
-    [/<foreignObject/i, '包含 <foreignObject> 元素'],
-    [/<(iframe|embed|object|image|audio|video)\b/i, '嵌入了外部元素'],
+    [/<(?:[a-z0-9_-]+:)?script\b/i, '包含 <script> 元素'],
+    [/<(?:[a-z0-9_-]+:)?foreignObject\b/i, '包含 <foreignObject> 元素'],
+    [/<(?:[a-z0-9_-]+:)?(iframe|embed|object|image|audio|video)\b/i, '嵌入了外部元素'],
     [/\son[a-z]+\s*=/i, '包含事件处理属性'],
     [/javascript:/i, '包含 javascript: 链接'],
     [/<!ENTITY|<!DOCTYPE[^>]*\[/i, '声明了 XML 实体'],
-    [/(?:xlink:)?href\s*=\s*["'](?!#)/i, '引用了外部资源'],
+    [/(?:[a-z0-9_-]+:)?href\s*=\s*["'](?!#)/i, '引用了外部资源'],
     [/@import|url\(\s*["']?(?!#)/i, '加载了外部样式资源']
   ];
 
@@ -117,10 +117,16 @@
     return errors;
   }
 
+  function utf8Length(text) {
+    if (typeof Buffer === 'function' && typeof Buffer.byteLength === 'function') return Buffer.byteLength(text, 'utf8');
+    if (typeof TextEncoder === 'function') return new TextEncoder().encode(text).length;
+    return unescape(encodeURIComponent(text)).length;
+  }
+
   function svgErrors(text) {
     var errors = [];
     if (typeof text !== 'string' || !/^\s*(<\?xml[^>]*\?>\s*)?(<!--[\s\S]*?-->\s*)*<svg[\s>]/i.test(text)) return ['Logo 不是有效的 SVG 文件'];
-    if (text.length > MAX_LOGO_BYTES) errors.push(TOO_LARGE);
+    if (utf8Length(text) > MAX_LOGO_BYTES) errors.push(TOO_LARGE);
     var body = text.replace(/\sxmlns(:[a-z]+)?\s*=\s*["'][^"']*["']/gi, '');
     SVG_BLOCKLIST.forEach(function (rule) {
       if (rule[0].test(body)) errors.push('Logo ' + rule[1]);

@@ -2,7 +2,7 @@
   "name": "Qwen",
   "url": "https://qwen.ai",
   "category": "models",
-  "description": "来自 Alibaba Cloud 的开源权重模型系列。",
+  "description": "来自 Alibaba Cloud 的开放权重模型系列。",
   "open_source": true,
   "repo": "https://github.com/QwenLM/Qwen3",
   "logo": "qwen.png"

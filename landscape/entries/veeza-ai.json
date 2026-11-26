@@ -2,7 +2,7 @@
   "name": "Veeza AI",
   "url": "https://www.veeza.ai/en",
   "category": "travel-agents",
-  "description": "自动填写旅游签证表格、准备申请材料并预约面签的 AI 工具。",
+  "description": "自动填写旅游签证表格、准备申请材料并处理预约的 AI 工具。",
   "open_source": false,
   "x": "veezaai",
   "logo": "veeza-ai.png"

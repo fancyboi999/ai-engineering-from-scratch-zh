@@ -2,7 +2,7 @@
   "name": "Firecrawl",
   "url": "https://www.firecrawl.dev/",
   "category": "search",
-  "description": "面向需要读取网页内容的 AI agent 的知识基础设施。",
+  "description": "供 AI agent 读取网页内容的知识基础设施。",
   "open_source": true,
   "repo": "https://github.com/firecrawl/firecrawl",
   "x": "firecrawl",

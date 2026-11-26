@@ -216,6 +216,7 @@ test('a complete entry passes with Chinese or English sentence ending', () => {
   assert.deepEqual(errorsFor({}), []);
   assert.deepEqual(errorsFor({ description: 'Hosted inference with per-token pricing.' }), []);
   assert.deepEqual(errorsFor({ description: '按 token 计费的托管模型推理服务。' }), []);
+  assert.deepEqual(errorsFor({ description: 'Cryptographic identity verification for tool #10.' }), []);
 });
 
 test('a closed source entry passes without a repository', () => {
@@ -278,6 +279,8 @@ test('unsafe SVG files are rejected', () => {
   const bad = [
     '<html></html>',
     '<svg><script>alert(1)</script></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:s="http://www.w3.org/2000/svg"><s:script>alert(1)</s:script></svg>',
+    '<svg xmlns:h="http://www.w3.org/1999/xhtml"><h:foreignObject></h:foreignObject></svg>',
     '<svg onload="x()"></svg>',
     '<svg><a href="javascript:x()"></a></svg>',
     '<svg><image href="https://x.dev/a.png"/></svg>',
@@ -285,7 +288,8 @@ test('unsafe SVG files are rejected', () => {
     '<svg><foreignObject></foreignObject></svg>',
     '<svg><style>@import url(https://x.dev/a.css);</style></svg>',
     '<!DOCTYPE svg [<!ENTITY x "y">]><svg></svg>',
-    '<svg>' + 'a'.repeat(rules.MAX_LOGO_BYTES) + '</svg>'
+    '<svg>' + 'a'.repeat(rules.MAX_LOGO_BYTES) + '</svg>',
+    '<svg>' + '中'.repeat(Math.ceil(rules.MAX_LOGO_BYTES / 3) + 1) + '</svg>'
   ];
   for (const svg of bad) assert.ok(rules.svgErrors(svg).length > 0, svg.slice(0, 60));
   assert.deepEqual(rules.svgErrors('<svg xmlns="http://www.w3.org/2000/svg"><use href="#a"/></svg>'), []);
@@ -360,6 +364,14 @@ test('the page loads the data, the shared rules and the form for aieng-zh.cn', (
   const script = fs.readFileSync(path.join(__dirname, 'landscape.js'), 'utf8');
   assert.ok(script.includes("'nofollow noopener'"));
   assert.ok(!/innerHTML/.test(script));
+  assert.ok(script.includes('Object.create(null)'));
+  const vercel = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
+  for (const [fn, cfg] of Object.entries(vercel.functions || {})) {
+    for (const key of ['includeFiles', 'excludeFiles']) {
+      if (cfg[key]) assert.ok(cfg[key].length <= 256, `${fn}.${key} exceeds 256 chars (${cfg[key].length})`);
+    }
+  }
+  assert.ok(vercel.headers.some((h) => h.source === '/logos/landscape/(.*)\\.svg' && h.headers.some((x) => x.key === 'Content-Security-Policy')));
 });
 
 test('the issue form lists the same categories as categories.json', () => {

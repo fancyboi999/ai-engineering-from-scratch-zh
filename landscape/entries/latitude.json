@@ -2,7 +2,7 @@
   "name": "Latitude",
   "url": "https://latitude.so",
   "category": "evaluation",
-  "description": "prompt 工程与评测平台。",
+  "description": "Prompt 工程与评测平台。",
   "open_source": true,
   "repo": "https://github.com/latitude-dev/latitude-llm",
   "logo": "latitude.png"
