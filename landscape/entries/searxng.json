@@ -1,0 +1,9 @@
+{
+  "name": "SearXNG",
+  "url": "https://docs.searxng.org",
+  "category": "search",
+  "description": "可自托管的元搜索引擎。",
+  "open_source": true,
+  "repo": "https://github.com/searxng/searxng",
+  "logo": "searxng.png"
+}

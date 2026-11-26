@@ -1,0 +1,8 @@
+{
+  "name": "Crusoe",
+  "url": "https://crusoe.ai",
+  "category": "gpu-clouds",
+  "description": "提供 GPU 集群与托管推理服务的 AI 云平台。",
+  "open_source": false,
+  "logo": "crusoe.png"
+}

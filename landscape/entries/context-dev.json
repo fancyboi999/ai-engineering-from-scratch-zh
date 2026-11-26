@@ -1,0 +1,9 @@
+{
+  "name": "Context.dev",
+  "url": "https://www.context.dev/",
+  "category": "search",
+  "description": "面向 AI agent 的网页抓取、搜索与爬取 API。",
+  "open_source": false,
+  "x": "getcontextdev",
+  "logo": "context-dev.png"
+}

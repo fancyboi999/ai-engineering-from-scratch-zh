@@ -1,0 +1,9 @@
+{
+  "name": "Agenta",
+  "url": "https://agenta.ai",
+  "category": "evaluation",
+  "description": "Prompt 管理与评测平台。",
+  "open_source": true,
+  "repo": "https://github.com/Agenta-AI/agenta",
+  "logo": "agenta.png"
+}

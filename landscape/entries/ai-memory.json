@@ -1,0 +1,9 @@
+{
+  "name": "ai-memory",
+  "url": "https://github.com/akitaonrails/ai-memory",
+  "category": "memory",
+  "description": "面向编程 agent CLI 的长期记忆工具，支持跨厂商 agent 交接。",
+  "open_source": true,
+  "repo": "https://github.com/akitaonrails/ai-memory",
+  "logo": "ai-memory.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Pneum",
+  "url": "https://pneum.ai/",
+  "category": "voice-agents",
+  "description": "支持通过语音或文字接收请求的助手。",
+  "open_source": false,
+  "x": "Pneum_ai",
+  "logo": "pneum.png"
+}

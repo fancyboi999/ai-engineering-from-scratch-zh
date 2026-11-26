@@ -1,0 +1,9 @@
+{
+  "name": "Model Context Protocol",
+  "url": "https://modelcontextprotocol.io",
+  "category": "protocols",
+  "description": "通过标准接口将模型连接到工具与数据的开放协议。",
+  "open_source": true,
+  "repo": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+  "logo": "model-context-protocol.png"
+}

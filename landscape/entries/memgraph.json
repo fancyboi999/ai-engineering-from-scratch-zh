@@ -1,0 +1,9 @@
+{
+  "name": "Memgraph",
+  "url": "https://memgraph.com",
+  "category": "databases",
+  "description": "内存图数据库。",
+  "open_source": true,
+  "repo": "https://github.com/memgraph/memgraph",
+  "logo": "memgraph.png"
+}

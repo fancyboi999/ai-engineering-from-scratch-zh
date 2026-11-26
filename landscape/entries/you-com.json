@@ -1,0 +1,8 @@
+{
+  "name": "You.com",
+  "url": "https://you.com",
+  "category": "search",
+  "description": "面向 agent 的搜索与研究 API。",
+  "open_source": false,
+  "logo": "you-com.png"
+}

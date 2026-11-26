@@ -1,0 +1,9 @@
+{
+  "name": "Bifrost",
+  "url": "https://getmaxim.ai/bifrost",
+  "category": "gateways",
+  "description": "使用 Go 编写的多模型服务商网关。",
+  "open_source": true,
+  "repo": "https://github.com/maximhq/bifrost",
+  "logo": "bifrost.png"
+}

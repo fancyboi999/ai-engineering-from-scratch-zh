@@ -1,0 +1,9 @@
+{
+  "name": "BAML",
+  "url": "https://boundaryml.com",
+  "category": "agents",
+  "description": "用于编写带类型约束的 prompt 并生成结构化输出的专用语言。",
+  "open_source": true,
+  "repo": "https://github.com/BoundaryML/baml",
+  "logo": "baml.png"
+}

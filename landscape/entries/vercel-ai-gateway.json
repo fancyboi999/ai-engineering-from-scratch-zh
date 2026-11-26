@@ -1,0 +1,8 @@
+{
+  "name": "Vercel AI Gateway",
+  "url": "https://vercel.com/ai-gateway",
+  "category": "gateways",
+  "description": "统一接入多家模型服务商并支持费用管控的单一端点。",
+  "open_source": false,
+  "logo": "vercel-ai-gateway.png"
+}

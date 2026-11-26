@@ -1,0 +1,9 @@
+{
+  "name": "PostHog",
+  "url": "https://posthog.com",
+  "category": "evaluation",
+  "description": "具备 LLM 可观测性能力的产品分析平台。",
+  "open_source": true,
+  "repo": "https://github.com/PostHog/posthog",
+  "logo": "posthog.png"
+}

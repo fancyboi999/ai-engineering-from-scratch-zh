@@ -1,0 +1,9 @@
+{
+  "name": "Notte",
+  "url": "https://notte.cc/",
+  "category": "browser-infra",
+  "description": "面向网页操作型 AI agent 的浏览器平台与框架。",
+  "open_source": false,
+  "x": "nottecore",
+  "logo": "notte.png"
+}

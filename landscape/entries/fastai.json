@@ -1,0 +1,9 @@
+{
+  "name": "fastai",
+  "url": "https://fast.ai",
+  "category": "training",
+  "description": "提供高层训练 API 的深度学习库。",
+  "open_source": true,
+  "repo": "https://github.com/fastai/fastai",
+  "logo": "fastai.png"
+}

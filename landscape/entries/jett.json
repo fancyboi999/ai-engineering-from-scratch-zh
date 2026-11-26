@@ -1,0 +1,9 @@
+{
+  "name": "Jett",
+  "url": "https://www.usejett.com/",
+  "category": "travel-agents",
+  "description": "个人 AI 旅行 agent，可搜索、评分并预订机票与酒店。",
+  "open_source": false,
+  "x": "useJett",
+  "logo": "jett.png"
+}

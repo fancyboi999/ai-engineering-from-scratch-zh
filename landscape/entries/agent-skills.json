@@ -1,0 +1,9 @@
+{
+  "name": "Agent Skills",
+  "url": "https://agentskills.io",
+  "category": "protocols",
+  "description": "用于为 agent 封装技能的开放格式。",
+  "open_source": true,
+  "repo": "https://github.com/agentskills/agentskills",
+  "logo": "agent-skills.png"
+}

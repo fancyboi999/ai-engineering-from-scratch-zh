@@ -1,0 +1,8 @@
+{
+  "name": "Snorkel AI",
+  "url": "https://snorkel.ai",
+  "category": "data",
+  "description": "程序化数据标注与评测平台。",
+  "open_source": false,
+  "logo": "snorkel-ai.png"
+}

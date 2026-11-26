@@ -1,0 +1,9 @@
+{
+  "name": "LibreChat",
+  "url": "https://librechat.ai",
+  "category": "builders",
+  "description": "支持多家模型服务商的自托管对话应用。",
+  "open_source": true,
+  "repo": "https://github.com/danny-avila/LibreChat",
+  "logo": "librechat.png"
+}

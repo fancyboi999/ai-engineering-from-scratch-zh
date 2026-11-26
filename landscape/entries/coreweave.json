@@ -1,0 +1,8 @@
+{
+  "name": "CoreWeave",
+  "url": "https://coreweave.com",
+  "category": "gpu-clouds",
+  "description": "面向大规模 GPU 工作负载的云平台。",
+  "open_source": false,
+  "logo": "coreweave.png"
+}

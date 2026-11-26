@@ -1,0 +1,8 @@
+{
+  "name": "IBM watsonx",
+  "url": "https://ibm.com/watsonx",
+  "category": "model-clouds",
+  "description": "面向企业的模型、数据与治理平台。",
+  "open_source": false,
+  "logo": "ibm-watsonx.png"
+}

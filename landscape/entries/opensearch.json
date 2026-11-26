@@ -1,0 +1,9 @@
+{
+  "name": "OpenSearch",
+  "url": "https://opensearch.org",
+  "category": "databases",
+  "description": "支持向量检索的搜索与数据分析套件。",
+  "open_source": true,
+  "repo": "https://github.com/opensearch-project/OpenSearch",
+  "logo": "opensearch.png"
+}

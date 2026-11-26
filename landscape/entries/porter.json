@@ -1,0 +1,8 @@
+{
+  "name": "Porter",
+  "url": "https://porter.run",
+  "category": "hosting",
+  "description": "将应用部署到自有云账号的托管平台。",
+  "open_source": false,
+  "logo": "porter.png"
+}

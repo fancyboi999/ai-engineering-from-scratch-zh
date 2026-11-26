@@ -1,0 +1,9 @@
+{
+  "name": "Emdash",
+  "url": "https://emdash.com",
+  "category": "orchestrators",
+  "description": "可并行运行多个编程 agent 的桌面应用。",
+  "open_source": true,
+  "repo": "https://github.com/generalaction/emdash",
+  "logo": "emdash.png"
+}

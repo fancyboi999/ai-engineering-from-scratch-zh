@@ -1,0 +1,9 @@
+{
+  "name": "Agent Development Kit",
+  "url": "https://google.github.io/adk-docs",
+  "category": "agents",
+  "description": "Google 推出的 agent 构建与部署工具包。",
+  "open_source": true,
+  "repo": "https://github.com/google/adk-python",
+  "logo": "agent-development-kit.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Scorecard",
+  "url": "https://scorecard.io",
+  "category": "evaluation",
+  "description": "面向 agent 的评测平台。",
+  "open_source": false,
+  "logo": "scorecard.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "PyTorch Lightning",
+  "url": "https://lightning.ai",
+  "category": "training",
+  "description": "构建在 PyTorch 之上的训练循环框架。",
+  "open_source": true,
+  "repo": "https://github.com/Lightning-AI/pytorch-lightning",
+  "logo": "pytorch-lightning.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Photoroom",
+  "url": "https://photoroom.com",
+  "category": "media",
+  "description": "图像编辑与背景生成 API。",
+  "open_source": false,
+  "logo": "photoroom.png"
+}

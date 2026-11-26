@@ -1,0 +1,9 @@
+{
+  "name": "PEFT",
+  "url": "https://huggingface.co/docs/peft",
+  "category": "finetuning",
+  "description": "提供 LoRA 等参数高效微调方法的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/peft",
+  "logo": "peft.png"
+}

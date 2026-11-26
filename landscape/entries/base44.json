@@ -1,0 +1,8 @@
+{
+  "name": "Base44",
+  "url": "https://base44.com",
+  "category": "builders",
+  "description": "通过 prompt 生成全栈应用的构建平台。",
+  "open_source": false,
+  "logo": "base44.png"
+}

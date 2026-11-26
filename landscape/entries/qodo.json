@@ -1,0 +1,9 @@
+{
+  "name": "Qodo",
+  "url": "https://qodo.ai",
+  "category": "review",
+  "description": "用于代码评审、测试与质量保障的 agent 工具。",
+  "open_source": true,
+  "repo": "https://github.com/qodo-ai/pr-agent",
+  "logo": "qodo.png"
+}

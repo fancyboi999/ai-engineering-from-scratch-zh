@@ -1,0 +1,9 @@
+{
+  "name": "Kicker",
+  "url": "https://kickerai.xyz/",
+  "category": "home-health-agents",
+  "description": "连接可穿戴设备与日程的 AI 健康伙伴，帮助保持健康计划节奏。",
+  "open_source": false,
+  "x": "kickerai",
+  "logo": "kicker.png"
+}

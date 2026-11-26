@@ -1,0 +1,8 @@
+{
+  "name": "Civitai",
+  "url": "https://civitai.com",
+  "category": "media",
+  "description": "图像生成模型社区平台。",
+  "open_source": false,
+  "logo": "civitai.png"
+}

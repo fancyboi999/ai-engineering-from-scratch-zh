@@ -1,0 +1,8 @@
+{
+  "name": "Patronus AI",
+  "url": "https://patronus.ai",
+  "category": "evaluation",
+  "description": "面向 agent 的评测与安全护栏平台。",
+  "open_source": false,
+  "logo": "patronus-ai.png"
+}

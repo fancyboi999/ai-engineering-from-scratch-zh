@@ -1,0 +1,9 @@
+{
+  "name": "MLX LM",
+  "url": "https://github.com/ml-explore/mlx-lm",
+  "category": "finetuning",
+  "description": "用于在 Apple Silicon 上运行和微调语言模型的工具包。",
+  "open_source": true,
+  "repo": "https://github.com/ml-explore/mlx-lm",
+  "logo": "mlx-lm.png"
+}

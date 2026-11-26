@@ -1,0 +1,9 @@
+{
+  "name": "Microsoft Copilot",
+  "url": "https://copilot.com/",
+  "category": "chat-assistants",
+  "description": "覆盖 Windows、Microsoft 365 与网页端的 AI 助手。",
+  "open_source": false,
+  "x": "Microsoft",
+  "logo": "microsoft-copilot.png"
+}

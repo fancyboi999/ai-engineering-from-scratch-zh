@@ -1,0 +1,9 @@
+{
+  "name": "PaddlePaddle",
+  "url": "https://paddlepaddle.org.cn",
+  "category": "training",
+  "description": "Baidu 推出的深度学习框架。",
+  "open_source": true,
+  "repo": "https://github.com/PaddlePaddle/Paddle",
+  "logo": "paddlepaddle.png"
+}

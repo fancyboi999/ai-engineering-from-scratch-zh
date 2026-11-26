@@ -1,0 +1,8 @@
+{
+  "name": "Vultr",
+  "url": "https://vultr.com",
+  "category": "gpu-clouds",
+  "description": "提供 GPU 实例的云服务商。",
+  "open_source": false,
+  "logo": "vultr.png"
+}

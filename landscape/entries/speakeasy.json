@@ -1,0 +1,8 @@
+{
+  "name": "Speakeasy",
+  "url": "https://speakeasy.com",
+  "category": "connectors",
+  "description": "根据 OpenAPI 生成 SDK、文档与 MCP 服务器的工具。",
+  "open_source": false,
+  "logo": "speakeasy.png"
+}

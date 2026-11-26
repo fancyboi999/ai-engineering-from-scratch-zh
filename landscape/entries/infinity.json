@@ -1,0 +1,9 @@
+{
+  "name": "Infinity",
+  "url": "https://github.com/michaelfeil/infinity",
+  "category": "embeddings",
+  "description": "用于部署嵌入与重排模型的服务端引擎。",
+  "open_source": true,
+  "repo": "https://github.com/michaelfeil/infinity",
+  "logo": "infinity.png"
+}

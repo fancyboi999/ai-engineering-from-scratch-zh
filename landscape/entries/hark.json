@@ -1,0 +1,9 @@
+{
+  "name": "Hark",
+  "url": "https://hark.com/",
+  "category": "personal-assistants",
+  "description": "用于承接委派任务的个人 AI 助手。",
+  "open_source": false,
+  "x": "hark_labs",
+  "logo": "hark.png"
+}

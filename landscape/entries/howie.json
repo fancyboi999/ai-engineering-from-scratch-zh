@@ -1,0 +1,9 @@
+{
+  "name": "Howie",
+  "url": "https://howie.com/",
+  "category": "email-calendar-agents",
+  "description": "通过邮件和短信安排会议的日程助手。",
+  "open_source": false,
+  "x": "howie_ai",
+  "logo": "howie.png"
+}

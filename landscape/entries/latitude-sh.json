@@ -1,0 +1,8 @@
+{
+  "name": "Latitude.sh",
+  "url": "https://latitude.sh",
+  "category": "gpu-clouds",
+  "description": "提供 GPU 服务器的裸金属云平台。",
+  "open_source": false,
+  "logo": "latitude-sh.png"
+}

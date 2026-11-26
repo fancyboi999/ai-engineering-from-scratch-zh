@@ -1,0 +1,9 @@
+{
+  "name": "Today",
+  "url": "https://today.ai/",
+  "category": "personal-assistants",
+  "description": "结合个人上下文主动预判任务需求的助手。",
+  "open_source": false,
+  "x": "TodayAIofficial",
+  "logo": "today.png"
+}

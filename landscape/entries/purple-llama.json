@@ -1,0 +1,9 @@
+{
+  "name": "Purple Llama",
+  "url": "https://github.com/meta-llama/PurpleLlama",
+  "category": "security",
+  "description": "用于评估和提升模型安全性的工具集。",
+  "open_source": true,
+  "repo": "https://github.com/meta-llama/PurpleLlama",
+  "logo": "purple-llama.png"
+}

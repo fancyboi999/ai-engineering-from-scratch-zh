@@ -1,0 +1,9 @@
+{
+  "name": "treg",
+  "url": "https://treg.to/",
+  "category": "connectors",
+  "description": "按次计费的 agent 工具与数据路由平台，定位类似 OpenRouter。",
+  "open_source": false,
+  "x": "treg_ai",
+  "logo": "treg.png"
+}

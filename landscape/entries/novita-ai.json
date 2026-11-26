@@ -1,0 +1,8 @@
+{
+  "name": "Novita AI",
+  "url": "https://novita.ai",
+  "category": "inference-providers",
+  "description": "面向开源模型的模型 API 与 GPU 实例平台。",
+  "open_source": false,
+  "logo": "novita-ai.png"
+}

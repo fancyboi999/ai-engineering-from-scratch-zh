@@ -1,0 +1,9 @@
+{
+  "name": "Pulumi",
+  "url": "https://pulumi.com",
+  "category": "hosting",
+  "description": "支持使用通用编程语言编写的基础设施即代码工具。",
+  "open_source": true,
+  "repo": "https://github.com/pulumi/pulumi",
+  "logo": "pulumi.png"
+}

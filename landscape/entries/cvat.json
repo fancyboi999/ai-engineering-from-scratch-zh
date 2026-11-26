@@ -1,0 +1,9 @@
+{
+  "name": "CVAT",
+  "url": "https://cvat.ai",
+  "category": "data",
+  "description": "图像与视频数据标注工具。",
+  "open_source": true,
+  "repo": "https://github.com/cvat-ai/cvat",
+  "logo": "cvat.png"
+}

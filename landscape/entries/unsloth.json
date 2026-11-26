@@ -1,0 +1,9 @@
+{
+  "name": "Unsloth",
+  "url": "https://unsloth.ai",
+  "category": "finetuning",
+  "description": "低显存占用的模型微调库。",
+  "open_source": true,
+  "repo": "https://github.com/unslothai/unsloth",
+  "logo": "unsloth.png"
+}

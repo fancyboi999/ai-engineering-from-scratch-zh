@@ -1,0 +1,8 @@
+{
+  "name": "Inworld",
+  "url": "https://inworld.ai",
+  "category": "voice-apis",
+  "description": "面向语音应用的文本转语音与运行时平台。",
+  "open_source": false,
+  "logo": "inworld.png"
+}

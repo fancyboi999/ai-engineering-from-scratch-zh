@@ -1,0 +1,9 @@
+{
+  "name": "Catalyst",
+  "url": "https://catalyst.app/",
+  "category": "finance-agents",
+  "description": "用于研究投资思路、构建策略并执行交易的金融 agent。",
+  "open_source": false,
+  "x": "catalystapp",
+  "logo": "catalyst.png"
+}

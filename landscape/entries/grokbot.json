@@ -1,0 +1,9 @@
+{
+  "name": "GrokBot",
+  "url": "https://docs.x.ai/grok-bot/overview",
+  "category": "lab-assistants",
+  "description": "在云端配备真实电脑的主动式 AI 协作者。",
+  "open_source": false,
+  "x": "bot",
+  "logo": "grokbot.png"
+}

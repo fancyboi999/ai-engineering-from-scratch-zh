@@ -1,0 +1,8 @@
+{
+  "name": "Plivo",
+  "url": "https://plivo.com",
+  "category": "voice-platforms",
+  "description": "提供语音、消息 API 与语音 agent 的通信平台。",
+  "open_source": false,
+  "logo": "plivo.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Sauna",
+  "url": "https://www.sauna.ai/",
+  "category": "work-assistants",
+  "description": "用于管理工作的 AI 工作空间。",
+  "open_source": false,
+  "x": "wordware",
+  "logo": "sauna.png"
+}

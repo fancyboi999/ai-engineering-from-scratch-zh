@@ -1,0 +1,8 @@
+{
+  "name": "Voltage Park",
+  "url": "https://voltagepark.com",
+  "category": "gpu-clouds",
+  "description": "提供按需与预留集群的 GPU 算力云。",
+  "open_source": false,
+  "logo": "voltage-park.png"
+}

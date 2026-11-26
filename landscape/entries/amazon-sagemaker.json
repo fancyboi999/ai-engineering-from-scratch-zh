@@ -1,0 +1,8 @@
+{
+  "name": "Amazon SageMaker",
+  "url": "https://aws.amazon.com/sagemaker",
+  "category": "tracking",
+  "description": "用于构建、训练与部署模型的托管服务。",
+  "open_source": false,
+  "logo": "amazon-sagemaker.png"
+}

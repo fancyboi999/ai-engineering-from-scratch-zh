@@ -1,0 +1,9 @@
+{
+  "name": "Inspect",
+  "url": "https://inspect.aisi.org.uk",
+  "category": "evaluation",
+  "description": "用于大语言模型评测的框架。",
+  "open_source": true,
+  "repo": "https://github.com/UKGovernmentBEIS/inspect_ai",
+  "logo": "inspect.png"
+}

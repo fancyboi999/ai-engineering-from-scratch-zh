@@ -1,0 +1,9 @@
+{
+  "name": "Meilisearch",
+  "url": "https://meilisearch.com",
+  "category": "databases",
+  "description": "支持混合检索的搜索引擎。",
+  "open_source": true,
+  "repo": "https://github.com/meilisearch/meilisearch",
+  "logo": "meilisearch.png"
+}

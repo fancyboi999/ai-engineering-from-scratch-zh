@@ -1,0 +1,8 @@
+{
+  "name": "LandingAI",
+  "url": "https://landing.ai",
+  "category": "docs",
+  "description": "基于 agent 的文档提取与计算机视觉工具。",
+  "open_source": false,
+  "logo": "landingai.png"
+}

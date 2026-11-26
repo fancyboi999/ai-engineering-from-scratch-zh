@@ -1,0 +1,9 @@
+{
+  "name": "Supervision",
+  "url": "https://supervision.roboflow.com",
+  "category": "media",
+  "description": "可复用的计算机视觉工具库。",
+  "open_source": true,
+  "repo": "https://github.com/roboflow/supervision",
+  "logo": "supervision.png"
+}

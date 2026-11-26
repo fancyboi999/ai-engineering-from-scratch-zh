@@ -1,0 +1,8 @@
+{
+  "name": "OWASP GenAI Security Project",
+  "url": "https://genai.owasp.org",
+  "category": "security",
+  "description": "提供 AI 应用安全指南与十大风险清单的安全项目。",
+  "open_source": false,
+  "logo": "owasp-genai-security-project.png"
+}

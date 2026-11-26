@@ -1,0 +1,8 @@
+{
+  "name": "Tecton",
+  "url": "https://tecton.ai",
+  "category": "data-platforms",
+  "description": "面向实时机器学习的特征平台。",
+  "open_source": false,
+  "logo": "tecton.png"
+}

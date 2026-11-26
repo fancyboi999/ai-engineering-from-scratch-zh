@@ -1,0 +1,8 @@
+{
+  "name": "Amazon Bedrock AgentCore",
+  "url": "https://aws.amazon.com/bedrock/agentcore",
+  "category": "agent-platforms",
+  "description": "用于在 AWS 上部署 agent 的运行时与配套服务。",
+  "open_source": false,
+  "logo": "amazon-bedrock-agentcore.png"
+}

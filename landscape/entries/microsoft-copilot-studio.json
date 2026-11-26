@@ -1,0 +1,8 @@
+{
+  "name": "Microsoft Copilot Studio",
+  "url": "https://microsoft.com/microsoft-copilot/microsoft-copilot-studio",
+  "category": "agent-platforms",
+  "description": "基于 Microsoft 365 的低代码 agent 构建工具。",
+  "open_source": false,
+  "logo": "microsoft-copilot-studio.png"
+}

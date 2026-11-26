@@ -1,0 +1,9 @@
+{
+  "name": "Playwright",
+  "url": "https://playwright.dev",
+  "category": "review",
+  "description": "浏览器自动化与端到端测试工具。",
+  "open_source": true,
+  "repo": "https://github.com/microsoft/playwright",
+  "logo": "playwright.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Conviction",
+  "url": "https://www.convictiontrade.ai/",
+  "category": "finance-agents",
+  "description": "描述交易思路后，由 AI agent 自动完成回测、盯盘与交易。",
+  "open_source": false,
+  "x": "tryconviction",
+  "logo": "conviction.png"
+}

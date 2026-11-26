@@ -1,0 +1,8 @@
+{
+  "name": "Prodigy",
+  "url": "https://prodi.gy",
+  "category": "data",
+  "description": "支持脚本化的 NLP 与视觉数据标注工具。",
+  "open_source": false,
+  "logo": "prodigy.png"
+}

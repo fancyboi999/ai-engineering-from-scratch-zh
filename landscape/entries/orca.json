@@ -1,0 +1,9 @@
+{
+  "name": "Orca",
+  "url": "https://orca.dev",
+  "category": "orchestrators",
+  "description": "基于用户自有订阅并行运行多组编程 agent 的工具。",
+  "open_source": true,
+  "repo": "https://github.com/stablyai/orca",
+  "logo": "orca.png"
+}

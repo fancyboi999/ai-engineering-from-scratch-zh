@@ -1,0 +1,8 @@
+{
+  "name": "Warp",
+  "url": "https://warp.dev",
+  "category": "coding",
+  "description": "内置编程 agent 的终端工具。",
+  "open_source": false,
+  "logo": "warp.png"
+}

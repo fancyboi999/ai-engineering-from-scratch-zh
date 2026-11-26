@@ -1,0 +1,8 @@
+{
+  "name": "Phonic",
+  "url": "https://phonic.co",
+  "category": "voice-platforms",
+  "description": "面向语音 agent 的语音到语音模型。",
+  "open_source": false,
+  "logo": "phonic.png"
+}

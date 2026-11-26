@@ -1,0 +1,8 @@
+{
+  "name": "T3 Chat",
+  "url": "https://t3.chat",
+  "category": "chat-assistants",
+  "description": "支持接入多种模型的高速对话应用。",
+  "open_source": false,
+  "logo": "t3-chat.png"
+}

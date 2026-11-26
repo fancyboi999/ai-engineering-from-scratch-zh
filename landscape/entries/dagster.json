@@ -1,0 +1,9 @@
+{
+  "name": "Dagster",
+  "url": "https://dagster.io",
+  "category": "orchestration",
+  "description": "以数据资产为核心的工作流编排器。",
+  "open_source": true,
+  "repo": "https://github.com/dagster-io/dagster",
+  "logo": "dagster.png"
+}

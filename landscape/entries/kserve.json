@@ -1,0 +1,9 @@
+{
+  "name": "KServe",
+  "url": "https://kserve.github.io/website",
+  "category": "inference",
+  "description": "运行在 Kubernetes 上的模型推理服务平台。",
+  "open_source": true,
+  "repo": "https://github.com/kserve/kserve",
+  "logo": "kserve.png"
+}

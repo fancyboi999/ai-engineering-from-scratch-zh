@@ -1,0 +1,8 @@
+{
+  "name": "Phonebox",
+  "url": "https://phonebox.dev/",
+  "category": "computers",
+  "description": "面向 AI agent 的云手机服务。",
+  "open_source": false,
+  "logo": "phonebox.png"
+}

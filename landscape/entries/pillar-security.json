@@ -1,0 +1,8 @@
+{
+  "name": "Pillar Security",
+  "url": "https://pillar.security",
+  "category": "security",
+  "description": "面向 AI 应用与 agent 的安全防护平台。",
+  "open_source": false,
+  "logo": "pillar-security.png"
+}

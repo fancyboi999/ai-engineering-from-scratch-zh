@@ -1,0 +1,8 @@
+{
+  "name": "Kong AI Gateway",
+  "url": "https://konghq.com",
+  "category": "gateways",
+  "description": "内置模型流量插件的 API 网关。",
+  "open_source": false,
+  "logo": "kong-ai-gateway.png"
+}

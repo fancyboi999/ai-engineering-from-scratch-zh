@@ -1,0 +1,9 @@
+{
+  "name": "Giskard",
+  "url": "https://giskard.ai",
+  "category": "evaluation",
+  "description": "面向模型质量与安全性的测试平台。",
+  "open_source": true,
+  "repo": "https://github.com/Giskard-AI/giskard",
+  "logo": "giskard.png"
+}

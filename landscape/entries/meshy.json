@@ -1,0 +1,8 @@
+{
+  "name": "Meshy",
+  "url": "https://meshy.ai",
+  "category": "media",
+  "description": "根据文本与图像生成 3D 模型的工具。",
+  "open_source": false,
+  "logo": "meshy.png"
+}

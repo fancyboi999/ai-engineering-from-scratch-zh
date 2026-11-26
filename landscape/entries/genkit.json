@@ -1,0 +1,9 @@
+{
+  "name": "Genkit",
+  "url": "https://genkit.dev",
+  "category": "agents",
+  "description": "用于在网页与移动应用中构建 AI 功能的框架。",
+  "open_source": true,
+  "repo": "https://github.com/firebase/genkit",
+  "logo": "genkit.png"
+}

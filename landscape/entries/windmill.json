@@ -1,0 +1,9 @@
+{
+  "name": "Windmill",
+  "url": "https://windmill.dev",
+  "category": "orchestration",
+  "description": "将脚本转化为工作流与内部工具的平台。",
+  "open_source": true,
+  "repo": "https://github.com/windmill-labs/windmill",
+  "logo": "windmill.png"
+}

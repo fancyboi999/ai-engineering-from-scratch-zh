@@ -1,0 +1,9 @@
+{
+  "name": "AnythingLLM",
+  "url": "https://anythingllm.com",
+  "category": "builders",
+  "description": "支持文档对话的桌面端与服务端应用。",
+  "open_source": true,
+  "repo": "https://github.com/Mintplex-Labs/anything-llm",
+  "logo": "anythingllm.png"
+}

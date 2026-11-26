@@ -1,0 +1,9 @@
+{
+  "name": "InvokeAI",
+  "url": "https://invoke.ai",
+  "category": "media",
+  "description": "面向 Stable Diffusion 模型的图像创作引擎。",
+  "open_source": true,
+  "repo": "https://github.com/invoke-ai/InvokeAI",
+  "logo": "invokeai.png"
+}

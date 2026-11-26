@@ -1,0 +1,9 @@
+{
+  "name": "Dana",
+  "url": "https://heydana.ai/",
+  "category": "personal-assistants",
+  "description": "运行在 WhatsApp 与 iMessage 中的个人 AI 助手，支持购物与转账。",
+  "open_source": false,
+  "x": "heydana_ai",
+  "logo": "dana.png"
+}

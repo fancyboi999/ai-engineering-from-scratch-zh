@@ -1,0 +1,8 @@
+{
+  "name": "Fivetran",
+  "url": "https://fivetran.com",
+  "category": "connectors",
+  "description": "托管式数据流水线平台。",
+  "open_source": false,
+  "logo": "fivetran.png"
+}

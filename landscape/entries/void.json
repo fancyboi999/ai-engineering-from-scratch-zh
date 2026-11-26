@@ -1,0 +1,9 @@
+{
+  "name": "Void",
+  "url": "https://voideditor.com",
+  "category": "coding",
+  "description": "内置模型对话与 agent 能力的代码编辑器。",
+  "open_source": true,
+  "repo": "https://github.com/voideditor/void",
+  "logo": "void.png"
+}

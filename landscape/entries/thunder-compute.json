@@ -1,0 +1,8 @@
+{
+  "name": "Thunder Compute",
+  "url": "https://thundercompute.com",
+  "category": "gpu-clouds",
+  "description": "面向开发场景的按需 GPU 实例服务。",
+  "open_source": false,
+  "logo": "thunder-compute.png"
+}

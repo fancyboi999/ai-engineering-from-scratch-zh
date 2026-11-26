@@ -1,0 +1,9 @@
+{
+  "name": "Flip",
+  "url": "https://fliptexts.com/",
+  "category": "finance-agents",
+  "description": "运行在 iMessage 中的个人理财助手。",
+  "open_source": false,
+  "x": "fliptexts",
+  "logo": "flip.png"
+}

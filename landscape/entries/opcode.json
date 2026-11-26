@@ -1,0 +1,9 @@
+{
+  "name": "opcode",
+  "url": "https://opcode.sh",
+  "category": "orchestrators",
+  "description": "用于管理 Claude Code 会话与自定义 agent 的桌面应用。",
+  "open_source": true,
+  "repo": "https://github.com/winfunc/opcode",
+  "logo": "opcode.png"
+}

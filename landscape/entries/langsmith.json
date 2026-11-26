@@ -1,0 +1,8 @@
+{
+  "name": "LangSmith",
+  "url": "https://smith.langchain.com",
+  "category": "evaluation",
+  "description": "面向 agent 的链路追踪、评测与部署平台。",
+  "open_source": false,
+  "logo": "langsmith.png"
+}

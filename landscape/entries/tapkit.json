@@ -1,0 +1,9 @@
+{
+  "name": "Tapkit",
+  "url": "https://tapkit.ai/",
+  "category": "computers",
+  "description": "供 agent 点击并操控手机的基础设施。",
+  "open_source": false,
+  "x": "tapkit",
+  "logo": "tapkit.png"
+}

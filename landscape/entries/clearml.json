@@ -1,0 +1,9 @@
+{
+  "name": "ClearML",
+  "url": "https://clear.ml",
+  "category": "tracking",
+  "description": "包含实验管理、任务编排与模型服务功能的套件。",
+  "open_source": true,
+  "repo": "https://github.com/clearml/clearml",
+  "logo": "clearml.png"
+}

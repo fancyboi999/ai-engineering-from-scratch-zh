@@ -1,0 +1,9 @@
+{
+  "name": "Orgo",
+  "url": "https://www.orgo.ai/",
+  "category": "computers",
+  "description": "面向 AI agent 的云端电脑。",
+  "open_source": false,
+  "x": "orgo",
+  "logo": "orgo.png"
+}

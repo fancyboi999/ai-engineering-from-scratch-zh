@@ -1,0 +1,8 @@
+{
+  "name": "Vercel Sandbox",
+  "url": "https://vercel.com/sandbox",
+  "category": "sandboxes",
+  "description": "用于运行不可信代码的隔离计算环境。",
+  "open_source": false,
+  "logo": "vercel-sandbox.png"
+}

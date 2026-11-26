@@ -1,0 +1,9 @@
+{
+  "name": "MemOS",
+  "url": "https://memos.openmem.net",
+  "category": "memory",
+  "description": "面向语言模型的记忆操作系统。",
+  "open_source": true,
+  "repo": "https://github.com/MemTensor/MemOS",
+  "logo": "memos.png"
+}

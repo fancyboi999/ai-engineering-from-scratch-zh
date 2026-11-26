@@ -1,0 +1,8 @@
+{
+  "name": "Fly.io",
+  "url": "https://fly.io",
+  "category": "sandboxes",
+  "description": "在靠近用户的节点运行应用与机器实例的平台。",
+  "open_source": false,
+  "logo": "fly-io.png"
+}

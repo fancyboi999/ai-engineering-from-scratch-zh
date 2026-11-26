@@ -1,0 +1,10 @@
+{
+  "name": "Daytona",
+  "url": "https://www.daytona.io/",
+  "category": "sandboxes",
+  "description": "用于安全运行 AI 生成代码的基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/daytonaio/daytona",
+  "x": "daytonaio",
+  "logo": "daytona.png"
+}

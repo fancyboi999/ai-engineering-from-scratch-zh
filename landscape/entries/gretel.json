@@ -1,0 +1,8 @@
+{
+  "name": "Gretel",
+  "url": "https://gretel.ai",
+  "category": "data",
+  "description": "带隐私控制的合成数据生成平台。",
+  "open_source": false,
+  "logo": "gretel.png"
+}

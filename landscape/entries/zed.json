@@ -1,0 +1,9 @@
+{
+  "name": "Zed",
+  "url": "https://zed.dev",
+  "category": "coding",
+  "description": "使用 Rust 编写并内置模型与 agent 支持的代码编辑器。",
+  "open_source": true,
+  "repo": "https://github.com/zed-industries/zed",
+  "logo": "zed.png"
+}

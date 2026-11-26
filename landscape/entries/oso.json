@@ -1,0 +1,8 @@
+{
+  "name": "Oso",
+  "url": "https://osohq.com",
+  "category": "identity",
+  "description": "面向应用与 agent 的权限授权服务。",
+  "open_source": false,
+  "logo": "oso.png"
+}

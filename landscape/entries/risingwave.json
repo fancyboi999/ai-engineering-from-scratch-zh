@@ -1,0 +1,9 @@
+{
+  "name": "RisingWave",
+  "url": "https://risingwave.com",
+  "category": "data-platforms",
+  "description": "支持 SQL 的流式数据库。",
+  "open_source": true,
+  "repo": "https://github.com/risingwavelabs/risingwave",
+  "logo": "risingwave.png"
+}

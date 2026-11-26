@@ -1,0 +1,8 @@
+{
+  "name": "Northflank",
+  "url": "https://northflank.com",
+  "category": "sandboxes",
+  "description": "用于运行工作负载、沙箱与 GPU 算力的云平台。",
+  "open_source": false,
+  "logo": "northflank.png"
+}

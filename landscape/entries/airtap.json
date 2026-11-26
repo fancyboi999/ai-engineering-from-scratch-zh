@@ -1,0 +1,9 @@
+{
+  "name": "Airtap",
+  "url": "https://airtap.ai/",
+  "category": "personal-assistants",
+  "description": "邀请制个人 AI 助手，通过聊天操控真实手机应用。",
+  "open_source": false,
+  "x": "airtap_ai",
+  "logo": "airtap.png"
+}

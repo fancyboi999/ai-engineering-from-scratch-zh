@@ -1,0 +1,9 @@
+{
+  "name": "Open WebUI",
+  "url": "https://openwebui.com",
+  "category": "builders",
+  "description": "支持本地与远程模型的可自托管对话界面。",
+  "open_source": true,
+  "repo": "https://github.com/open-webui/open-webui",
+  "logo": "open-webui.png"
+}

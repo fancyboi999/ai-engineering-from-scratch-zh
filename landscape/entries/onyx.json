@@ -1,0 +1,9 @@
+{
+  "name": "Onyx",
+  "url": "https://onyx.app",
+  "category": "builders",
+  "description": "面向企业知识库的对话与搜索工具。",
+  "open_source": true,
+  "repo": "https://github.com/onyx-dot-app/onyx",
+  "logo": "onyx.png"
+}

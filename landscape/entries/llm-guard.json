@@ -1,0 +1,9 @@
+{
+  "name": "LLM Guard",
+  "url": "https://github.com/protectai/llm-guard",
+  "category": "security",
+  "description": "用于检测 prompt 与输出安全性的扫描工具。",
+  "open_source": true,
+  "repo": "https://github.com/protectai/llm-guard",
+  "logo": "llm-guard.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Firebase Studio",
+  "url": "https://firebase.studio",
+  "category": "builders",
+  "description": "借助 agent 构建应用的浏览器端工作区。",
+  "open_source": false,
+  "logo": "firebase-studio.png"
+}

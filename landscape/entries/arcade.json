@@ -1,0 +1,9 @@
+{
+  "name": "Arcade",
+  "url": "https://www.arcade.dev/",
+  "category": "connectors",
+  "description": "面向企业 AI agent 的操作运行时，对每项操作进行权限与行为治理。",
+  "open_source": false,
+  "x": "tryarcade",
+  "logo": "arcade.png"
+}

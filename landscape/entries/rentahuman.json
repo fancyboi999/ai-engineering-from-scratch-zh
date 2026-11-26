@@ -1,0 +1,9 @@
+{
+  "name": "RentAHuman",
+  "url": "https://rentahuman.ai/",
+  "category": "connectors",
+  "description": "供 AI agent 雇佣真人执行现实世界任务的服务市场。",
+  "open_source": false,
+  "x": "rentahumanx",
+  "logo": "rentahuman.png"
+}

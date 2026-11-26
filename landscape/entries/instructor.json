@@ -1,0 +1,9 @@
+{
+  "name": "Instructor",
+  "url": "https://python.useinstructor.com",
+  "category": "agents",
+  "description": "用于从语言模型获取结构化输出的库。",
+  "open_source": true,
+  "repo": "https://github.com/567-labs/instructor",
+  "logo": "instructor.png"
+}

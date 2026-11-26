@@ -1,0 +1,9 @@
+{
+  "name": "faster-whisper",
+  "url": "https://github.com/SYSTRAN/faster-whisper",
+  "category": "voice-apis",
+  "description": "基于 CTranslate2 的高速 Whisper 语音转写实现。",
+  "open_source": true,
+  "repo": "https://github.com/SYSTRAN/faster-whisper",
+  "logo": "faster-whisper.png"
+}

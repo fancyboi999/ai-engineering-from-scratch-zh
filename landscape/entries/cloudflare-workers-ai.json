@@ -1,0 +1,8 @@
+{
+  "name": "Cloudflare Workers AI",
+  "url": "https://developers.cloudflare.com/workers-ai",
+  "category": "model-clouds",
+  "description": "运行在 Cloudflare 网络上的无服务器模型推理服务。",
+  "open_source": false,
+  "logo": "cloudflare-workers-ai.png"
+}

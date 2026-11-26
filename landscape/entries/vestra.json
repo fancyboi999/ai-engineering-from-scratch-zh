@@ -1,0 +1,9 @@
+{
+  "name": "Vestra",
+  "url": "https://vestra.ai/",
+  "category": "work-assistants",
+  "description": "可自主搭建业务运营流程的 agent 工作空间。",
+  "open_source": false,
+  "x": "vestra_ai",
+  "logo": "vestra.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Apache Spark",
+  "url": "https://spark.apache.org",
+  "category": "data-platforms",
+  "description": "大规模数据处理引擎。",
+  "open_source": true,
+  "repo": "https://github.com/apache/spark",
+  "logo": "apache-spark.png"
+}

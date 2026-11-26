@@ -1,0 +1,9 @@
+{
+  "name": "Spider",
+  "url": "https://spider.cloud",
+  "category": "search",
+  "description": "使用 Rust 编写的网页爬虫与数据抓取工具。",
+  "open_source": true,
+  "repo": "https://github.com/spider-rs/spider",
+  "logo": "spider.png"
+}

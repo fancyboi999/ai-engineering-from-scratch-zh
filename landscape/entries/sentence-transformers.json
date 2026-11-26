@@ -1,0 +1,9 @@
+{
+  "name": "Sentence Transformers",
+  "url": "https://sbert.net",
+  "category": "embeddings",
+  "description": "用于生成句子与文本向量的嵌入模型库。",
+  "open_source": true,
+  "repo": "https://github.com/UKPLab/sentence-transformers",
+  "logo": "sentence-transformers.png"
+}

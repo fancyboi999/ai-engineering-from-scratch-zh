@@ -1,0 +1,9 @@
+{
+  "name": "Spec Kit",
+  "url": "https://github.com/github/spec-kit",
+  "category": "agent-workflows",
+  "description": "面向编程 agent 的规范驱动开发工具包。",
+  "open_source": true,
+  "repo": "https://github.com/github/spec-kit",
+  "logo": "spec-kit.png"
+}

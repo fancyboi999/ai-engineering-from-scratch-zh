@@ -1,0 +1,9 @@
+{
+  "name": "Manus",
+  "url": "https://manus.im/",
+  "category": "work-assistants",
+  "description": "可生成演示文稿、网站、游戏及其他交付物的通用 agent。",
+  "open_source": false,
+  "x": "ManusAI",
+  "logo": "manus.png"
+}

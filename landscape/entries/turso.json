@@ -1,0 +1,9 @@
+{
+  "name": "Turso",
+  "url": "https://turso.tech",
+  "category": "databases",
+  "description": "面向 agent 与边缘应用的 SQLite 兼容数据库。",
+  "open_source": true,
+  "repo": "https://github.com/tursodatabase/turso",
+  "logo": "turso.png"
+}

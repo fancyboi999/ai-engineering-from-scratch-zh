@@ -1,0 +1,9 @@
+{
+  "name": "Steel",
+  "url": "https://steel.dev",
+  "category": "browser-infra",
+  "description": "面向 agent 的浏览器 API。",
+  "open_source": true,
+  "repo": "https://github.com/steel-dev/steel-browser",
+  "logo": "steel.png"
+}

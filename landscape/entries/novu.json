@@ -1,0 +1,9 @@
+{
+  "name": "Novu",
+  "url": "https://novu.co",
+  "category": "messaging",
+  "description": "消息通知基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/novuhq/novu",
+  "logo": "novu.png"
+}

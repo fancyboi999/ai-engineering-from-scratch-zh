@@ -1,0 +1,8 @@
+{
+  "name": "Pulse",
+  "url": "https://runpulse.com",
+  "category": "docs",
+  "description": "面向复杂文件的文档提取 API。",
+  "open_source": false,
+  "logo": "pulse.png"
+}

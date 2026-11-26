@@ -1,0 +1,9 @@
+{
+  "name": "Inngest",
+  "url": "https://inngest.com",
+  "category": "orchestration",
+  "description": "基于事件触发的持久化函数与工作流平台。",
+  "open_source": true,
+  "repo": "https://github.com/inngest/inngest",
+  "logo": "inngest.png"
+}

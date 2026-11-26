@@ -1,0 +1,9 @@
+{
+  "name": "SGLang",
+  "url": "https://sglang.ai",
+  "category": "inference",
+  "description": "面向语言与视觉模型的推理服务框架。",
+  "open_source": true,
+  "repo": "https://github.com/sgl-project/sglang",
+  "logo": "sglang.png"
+}

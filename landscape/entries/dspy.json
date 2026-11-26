@@ -1,0 +1,9 @@
+{
+  "name": "DSPy",
+  "url": "https://dspy.ai",
+  "category": "agents",
+  "description": "用于编程式调用语言模型并优化其 prompt 的框架。",
+  "open_source": true,
+  "repo": "https://github.com/stanfordnlp/dspy",
+  "logo": "dspy.png"
+}

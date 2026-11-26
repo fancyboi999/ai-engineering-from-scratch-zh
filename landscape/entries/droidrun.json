@@ -1,0 +1,10 @@
+{
+  "name": "droidrun",
+  "url": "https://droidrun.ai/",
+  "category": "computers",
+  "description": "面向 AI agent 的手机操控层。",
+  "open_source": true,
+  "repo": "https://github.com/droidrun/droidrun",
+  "x": "droid_run",
+  "logo": "droidrun.png"
+}

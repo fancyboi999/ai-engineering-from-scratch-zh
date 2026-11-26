@@ -1,0 +1,9 @@
+{
+  "name": "BullMQ",
+  "url": "https://bullmq.io",
+  "category": "orchestration",
+  "description": "基于 Redis 的消息队列与任务调度系统。",
+  "open_source": true,
+  "repo": "https://github.com/taskforcesh/bullmq",
+  "logo": "bullmq.png"
+}

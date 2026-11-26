@@ -1,0 +1,9 @@
+{
+  "name": "LocalAI",
+  "url": "https://localai.io",
+  "category": "inference",
+  "description": "提供 OpenAI 兼容 API 的自托管模型服务。",
+  "open_source": true,
+  "repo": "https://github.com/mudler/LocalAI",
+  "logo": "localai.png"
+}

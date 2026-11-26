@@ -1,0 +1,9 @@
+{
+  "name": "PocketFlow",
+  "url": "https://the-pocket.github.io/PocketFlow",
+  "category": "agents",
+  "description": "面向 agent 的极简图编排框架。",
+  "open_source": true,
+  "repo": "https://github.com/The-Pocket/PocketFlow",
+  "logo": "pocketflow.png"
+}

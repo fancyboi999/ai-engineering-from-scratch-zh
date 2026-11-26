@@ -1,0 +1,9 @@
+{
+  "name": "SurrealDB",
+  "url": "https://surrealdb.com",
+  "category": "databases",
+  "description": "支持文档、图与向量的多模型数据库。",
+  "open_source": true,
+  "repo": "https://github.com/surrealdb/surrealdb",
+  "logo": "surrealdb.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Botpress",
+  "url": "https://botpress.com",
+  "category": "agent-platforms",
+  "description": "用于构建对话式 agent 的平台。",
+  "open_source": false,
+  "logo": "botpress.png"
+}

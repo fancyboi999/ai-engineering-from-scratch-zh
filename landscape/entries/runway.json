@@ -1,0 +1,8 @@
+{
+  "name": "Runway",
+  "url": "https://runwayml.com",
+  "category": "media",
+  "description": "视频生成模型与工具平台。",
+  "open_source": false,
+  "logo": "runway.png"
+}

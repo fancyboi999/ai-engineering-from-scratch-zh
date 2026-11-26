@@ -1,0 +1,9 @@
+{
+  "name": "TruLens",
+  "url": "https://trulens.org",
+  "category": "evaluation",
+  "description": "面向 agent 的评测与链路追踪工具。",
+  "open_source": true,
+  "repo": "https://github.com/truera/trulens",
+  "logo": "trulens.png"
+}

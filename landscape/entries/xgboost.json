@@ -1,0 +1,9 @@
+{
+  "name": "XGBoost",
+  "url": "https://xgboost.ai",
+  "category": "training",
+  "description": "面向表格数据的梯度提升树库。",
+  "open_source": true,
+  "repo": "https://github.com/dmlc/xgboost",
+  "logo": "xgboost.png"
+}

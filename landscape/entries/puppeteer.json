@@ -1,0 +1,9 @@
+{
+  "name": "Puppeteer",
+  "url": "https://pptr.dev",
+  "category": "browser-infra",
+  "description": "用于控制 Chrome 浏览器的 Node 库。",
+  "open_source": true,
+  "repo": "https://github.com/puppeteer/puppeteer",
+  "logo": "puppeteer.png"
+}

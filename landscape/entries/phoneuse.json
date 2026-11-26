@@ -1,0 +1,8 @@
+{
+  "name": "PhoneUse",
+  "url": "https://www.phoneuse.com/",
+  "category": "computers",
+  "description": "供 AI agent 使用的手机。",
+  "open_source": false,
+  "logo": "phoneuse.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "SingleStore",
+  "url": "https://singlestore.com",
+  "category": "databases",
+  "description": "支持向量检索的分布式 SQL 数据库。",
+  "open_source": false,
+  "logo": "singlestore.png"
+}

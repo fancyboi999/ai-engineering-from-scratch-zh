@@ -1,0 +1,9 @@
+{
+  "name": "Pipecat",
+  "url": "https://pipecat.ai",
+  "category": "voice-platforms",
+  "description": "用于构建语音与多模态 agent 的框架。",
+  "open_source": true,
+  "repo": "https://github.com/pipecat-ai/pipecat",
+  "logo": "pipecat.png"
+}

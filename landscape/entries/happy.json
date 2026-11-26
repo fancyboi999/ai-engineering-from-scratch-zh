@@ -1,0 +1,9 @@
+{
+  "name": "Happy",
+  "url": "https://happy.engineering",
+  "category": "orchestrators",
+  "description": "用于控制编程 agent 的移动端与网页客户端。",
+  "open_source": true,
+  "repo": "https://github.com/slopus/happy",
+  "logo": "happy.png"
+}

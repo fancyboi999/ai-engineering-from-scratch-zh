@@ -1,0 +1,8 @@
+{
+  "name": "Rime",
+  "url": "https://rime.ai",
+  "category": "voice-apis",
+  "description": "面向对话式应用的文本转语音服务。",
+  "open_source": false,
+  "logo": "rime.png"
+}

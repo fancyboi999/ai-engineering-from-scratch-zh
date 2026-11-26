@@ -1,0 +1,8 @@
+{
+  "name": "xAI",
+  "url": "https://x.ai",
+  "category": "models",
+  "description": "通过 API 提供 Grok 系列模型。",
+  "open_source": false,
+  "logo": "xai.png"
+}

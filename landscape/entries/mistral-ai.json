@@ -1,0 +1,8 @@
+{
+  "name": "Mistral AI",
+  "url": "https://mistral.ai",
+  "category": "models",
+  "description": "提供开放权重与托管语言模型及 API 的模型服务。",
+  "open_source": false,
+  "logo": "mistral-ai.png"
+}

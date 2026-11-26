@@ -1,0 +1,9 @@
+{
+  "name": "LangGraph",
+  "url": "https://www.langchain.com/langgraph",
+  "category": "agents",
+  "description": "将有状态 agent 编排为步骤图的开发库。",
+  "open_source": true,
+  "repo": "https://github.com/langchain-ai/langgraph",
+  "logo": "langgraph.svg"
+}

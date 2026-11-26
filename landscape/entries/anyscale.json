@@ -1,0 +1,8 @@
+{
+  "name": "Anyscale",
+  "url": "https://anyscale.com",
+  "category": "inference-providers",
+  "description": "用于模型训练与推理部署的托管 Ray 平台。",
+  "open_source": false,
+  "logo": "anyscale.png"
+}

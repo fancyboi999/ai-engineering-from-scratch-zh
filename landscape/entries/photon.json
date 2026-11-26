@@ -1,0 +1,9 @@
+{
+  "name": "Photon",
+  "url": "https://photon.codes/",
+  "category": "messaging",
+  "description": "将 agent 接入 iMessage、WhatsApp、Telegram、Slack 等通讯渠道。",
+  "open_source": false,
+  "x": "photonhq",
+  "logo": "photon.png"
+}

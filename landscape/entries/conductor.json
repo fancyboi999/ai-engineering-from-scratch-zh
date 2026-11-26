@@ -1,0 +1,8 @@
+{
+  "name": "Conductor",
+  "url": "https://conductor.build",
+  "category": "orchestrators",
+  "description": "在 Mac 上并行运行多个编程 agent 的工具。",
+  "open_source": false,
+  "logo": "conductor.png"
+}

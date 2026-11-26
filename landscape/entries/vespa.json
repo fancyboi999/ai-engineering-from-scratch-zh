@@ -1,0 +1,9 @@
+{
+  "name": "Vespa",
+  "url": "https://vespa.ai",
+  "category": "databases",
+  "description": "面向大规模数据的搜索与向量检索引擎。",
+  "open_source": true,
+  "repo": "https://github.com/vespa-engine/vespa",
+  "logo": "vespa.png"
+}

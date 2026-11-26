@@ -1,0 +1,8 @@
+{
+  "name": "ScrapingBee",
+  "url": "https://scrapingbee.com",
+  "category": "search",
+  "description": "自动处理浏览器与代理的网页抓取 API。",
+  "open_source": false,
+  "logo": "scrapingbee.png"
+}

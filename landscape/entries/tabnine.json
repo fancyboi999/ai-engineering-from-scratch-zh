@@ -1,0 +1,8 @@
+{
+  "name": "Tabnine",
+  "url": "https://tabnine.com",
+  "category": "coding",
+  "description": "支持私有化部署的代码助手。",
+  "open_source": false,
+  "logo": "tabnine.png"
+}

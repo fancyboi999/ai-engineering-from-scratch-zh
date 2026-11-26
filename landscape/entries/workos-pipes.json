@@ -1,0 +1,9 @@
+{
+  "name": "WorkOS Pipes",
+  "url": "https://workos.com/docs/pipes",
+  "category": "connectors",
+  "description": "连接用户的第三方账号，使应用与 AI agent 能够在其中代为操作。",
+  "open_source": false,
+  "x": "workos",
+  "logo": "workos-pipes.png"
+}

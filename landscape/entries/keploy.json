@@ -1,0 +1,9 @@
+{
+  "name": "Keploy",
+  "url": "https://keploy.io",
+  "category": "review",
+  "description": "根据真实流量自动生成测试用例与 mock 数据的工具。",
+  "open_source": true,
+  "repo": "https://github.com/keploy/keploy",
+  "logo": "keploy.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "MLCommons",
+  "url": "https://mlcommons.org",
+  "category": "evaluation",
+  "description": "面向 AI 性能与安全性的行业基准评测体系。",
+  "open_source": false,
+  "logo": "mlcommons.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Sourcegraph",
+  "url": "https://sourcegraph.com",
+  "category": "coding",
+  "description": "支持跨代码仓库的代码检索与编程 agent 平台。",
+  "open_source": false,
+  "logo": "sourcegraph.png"
+}

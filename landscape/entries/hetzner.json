@@ -1,0 +1,8 @@
+{
+  "name": "Hetzner",
+  "url": "https://hetzner.com",
+  "category": "hosting",
+  "description": "欧洲云服务器与独立服务器服务商。",
+  "open_source": false,
+  "logo": "hetzner.png"
+}

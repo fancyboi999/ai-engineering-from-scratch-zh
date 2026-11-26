@@ -1,0 +1,9 @@
+{
+  "name": "Delta Lake",
+  "url": "https://delta.io",
+  "category": "data-platforms",
+  "description": "面向湖仓一体数据表的存储框架。",
+  "open_source": true,
+  "repo": "https://github.com/delta-io/delta",
+  "logo": "delta-lake.png"
+}

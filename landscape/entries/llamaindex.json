@@ -1,0 +1,9 @@
+{
+  "name": "LlamaIndex",
+  "url": "https://llamaindex.ai",
+  "category": "agents",
+  "description": "基于自有数据构建 agent 与检索系统的框架。",
+  "open_source": true,
+  "repo": "https://github.com/run-llama/llama_index",
+  "logo": "llamaindex.png"
+}

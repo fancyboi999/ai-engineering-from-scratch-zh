@@ -1,0 +1,8 @@
+{
+  "name": "Stitch",
+  "url": "https://stitch.withgoogle.com",
+  "category": "builders",
+  "description": "根据 prompt 生成界面设计与代码。",
+  "open_source": false,
+  "logo": "stitch.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Promptfoo",
+  "url": "https://promptfoo.dev",
+  "category": "evaluation",
+  "description": "用于测试和红队评估 prompt、agent 与 RAG 的工具。",
+  "open_source": true,
+  "repo": "https://github.com/promptfoo/promptfoo",
+  "logo": "promptfoo.png"
+}

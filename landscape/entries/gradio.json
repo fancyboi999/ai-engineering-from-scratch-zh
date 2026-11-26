@@ -1,0 +1,9 @@
+{
+  "name": "Gradio",
+  "url": "https://www.gradio.app",
+  "category": "builders",
+  "description": "用于构建机器学习模型网页演示的 Python 库。",
+  "open_source": true,
+  "repo": "https://github.com/gradio-app/gradio",
+  "logo": "gradio.png"
+}

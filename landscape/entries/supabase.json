@@ -1,0 +1,9 @@
+{
+  "name": "Supabase",
+  "url": "https://supabase.com",
+  "category": "databases",
+  "description": "集成身份认证、存储与向量检索的 Postgres 平台。",
+  "open_source": true,
+  "repo": "https://github.com/supabase/supabase",
+  "logo": "supabase.png"
+}

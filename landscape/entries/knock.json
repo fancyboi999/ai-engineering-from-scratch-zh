@@ -1,0 +1,8 @@
+{
+  "name": "Knock",
+  "url": "https://knock.app",
+  "category": "messaging",
+  "description": "跨渠道消息通知基础设施。",
+  "open_source": false,
+  "logo": "knock.png"
+}

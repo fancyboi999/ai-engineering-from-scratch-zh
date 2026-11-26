@@ -1,0 +1,8 @@
+{
+  "name": "Sones",
+  "url": "https://sones.ai/",
+  "category": "personal-assistants",
+  "description": "面向现实世界任务的主动式个人 agent（原名 Lucas）。",
+  "open_source": false,
+  "logo": "sones.png"
+}

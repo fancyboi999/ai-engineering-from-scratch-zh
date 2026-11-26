@@ -1,0 +1,8 @@
+{
+  "name": "Contextual AI",
+  "url": "https://contextual.ai",
+  "category": "embeddings",
+  "description": "提供有据可依的语言模型、重排模型与 RAG 平台。",
+  "open_source": false,
+  "logo": "contextual-ai.png"
+}

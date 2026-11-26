@@ -1,0 +1,9 @@
+{
+  "name": "Griptape",
+  "url": "https://griptape.ai",
+  "category": "agents",
+  "description": "用于构建 agent 与工作流的 Python 框架。",
+  "open_source": true,
+  "repo": "https://github.com/griptape-ai/griptape",
+  "logo": "griptape.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Rev AI",
+  "url": "https://rev.ai",
+  "category": "voice-apis",
+  "description": "语音转文本 API。",
+  "open_source": false,
+  "logo": "rev-ai.png"
+}

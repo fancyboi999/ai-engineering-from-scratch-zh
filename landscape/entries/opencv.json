@@ -1,0 +1,9 @@
+{
+  "name": "OpenCV",
+  "url": "https://opencv.org",
+  "category": "media",
+  "description": "计算机视觉库。",
+  "open_source": true,
+  "repo": "https://github.com/opencv/opencv",
+  "logo": "opencv.png"
+}

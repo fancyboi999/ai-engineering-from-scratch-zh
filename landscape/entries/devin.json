@@ -1,0 +1,14 @@
+{
+  "name": "Devin",
+  "url": "https://devin.ai/",
+  "category": "coding",
+  "also": [
+    "harnesses",
+    "orchestrators",
+    "work-assistants"
+  ],
+  "description": "Cognition 推出的 AI 软件工程师。",
+  "open_source": false,
+  "x": "cognition",
+  "logo": "devin.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "WorkOS",
+  "url": "https://workos.com",
+  "category": "identity",
+  "description": "企业级身份认证、单点登录（SSO）与目录同步服务。",
+  "open_source": false,
+  "logo": "workos.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "ChatGPT",
+  "url": "https://chatgpt.com",
+  "category": "chat-assistants",
+  "description": "OpenAI 推出的对话助手，支持问答、写作与搜索。",
+  "open_source": false,
+  "logo": "chatgpt.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "AgentEmail",
+  "url": "https://www.agentemail.co/",
+  "category": "messaging",
+  "description": "面向 AI agent 的邮件基础设施。",
+  "open_source": false,
+  "logo": "agentemail.png"
+}

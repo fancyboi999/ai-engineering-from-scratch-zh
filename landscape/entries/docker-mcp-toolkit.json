@@ -1,0 +1,8 @@
+{
+  "name": "Docker MCP Toolkit",
+  "url": "https://docker.com/products/mcp-catalog-and-toolkit",
+  "category": "protocols",
+  "description": "容器化 MCP 服务器的目录与网关。",
+  "open_source": false,
+  "logo": "docker-mcp-toolkit.png"
+}

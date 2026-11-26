@@ -1,0 +1,8 @@
+{
+  "name": "Anthropic",
+  "url": "https://www.anthropic.com",
+  "category": "models",
+  "description": "Claude 系列模型研发方，通过 API 及各大云平台提供服务。",
+  "open_source": false,
+  "logo": "anthropic.svg"
+}

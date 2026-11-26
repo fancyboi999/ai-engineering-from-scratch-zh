@@ -1,0 +1,9 @@
+{
+  "name": "Materialize",
+  "url": "https://materialize.com",
+  "category": "data-platforms",
+  "description": "支持增量 SQL 视图的实时数据层。",
+  "open_source": true,
+  "repo": "https://github.com/MaterializeInc/materialize",
+  "logo": "materialize.png"
+}

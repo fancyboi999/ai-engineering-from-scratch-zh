@@ -1,0 +1,9 @@
+{
+  "name": "Coder",
+  "url": "https://coder.com",
+  "category": "sandboxes",
+  "description": "可自托管的云端开发环境。",
+  "open_source": true,
+  "repo": "https://github.com/coder/coder",
+  "logo": "coder.png"
+}

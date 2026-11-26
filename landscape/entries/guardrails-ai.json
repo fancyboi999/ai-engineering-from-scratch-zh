@@ -1,0 +1,9 @@
+{
+  "name": "Guardrails AI",
+  "url": "https://guardrailsai.com",
+  "category": "security",
+  "description": "用于校验模型输入与输出的验证器。",
+  "open_source": true,
+  "repo": "https://github.com/guardrails-ai/guardrails",
+  "logo": "guardrails-ai.png"
+}

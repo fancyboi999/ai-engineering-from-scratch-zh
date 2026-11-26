@@ -1,0 +1,9 @@
+{
+  "name": "Verba",
+  "url": "https://github.com/weaviate/Verba",
+  "category": "rag",
+  "description": "基于 Weaviate 构建的 RAG 对话应用。",
+  "open_source": true,
+  "repo": "https://github.com/weaviate/Verba",
+  "logo": "verba.png"
+}

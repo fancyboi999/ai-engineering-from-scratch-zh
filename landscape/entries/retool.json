@@ -1,0 +1,8 @@
+{
+  "name": "Retool",
+  "url": "https://retool.com",
+  "category": "agent-platforms",
+  "description": "用于构建内部工具与 agent 的开发平台。",
+  "open_source": false,
+  "logo": "retool.png"
+}

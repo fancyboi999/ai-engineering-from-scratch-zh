@@ -1,0 +1,9 @@
+{
+  "name": "Semgrep",
+  "url": "https://semgrep.dev",
+  "category": "security",
+  "description": "用于发现代码缺陷与安全漏洞的静态分析工具。",
+  "open_source": true,
+  "repo": "https://github.com/semgrep/semgrep",
+  "logo": "semgrep.png"
+}

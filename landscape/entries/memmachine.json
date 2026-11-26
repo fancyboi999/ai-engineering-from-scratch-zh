@@ -1,0 +1,9 @@
+{
+  "name": "MemMachine",
+  "url": "https://memmachine.ai",
+  "category": "memory",
+  "description": "面向 agent 的记忆层。",
+  "open_source": true,
+  "repo": "https://github.com/MemMachine/MemMachine",
+  "logo": "memmachine.png"
+}

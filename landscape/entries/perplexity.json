@@ -1,0 +1,8 @@
+{
+  "name": "Perplexity",
+  "url": "https://perplexity.ai",
+  "category": "chat-assistants",
+  "description": "附带网页来源引用的问答搜索引擎。",
+  "open_source": false,
+  "logo": "perplexity.png"
+}

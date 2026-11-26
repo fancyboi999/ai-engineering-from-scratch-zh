@@ -1,0 +1,9 @@
+{
+  "name": "Redis",
+  "url": "https://redis.io",
+  "category": "databases",
+  "description": "支持向量检索的内存数据存储系统。",
+  "open_source": true,
+  "repo": "https://github.com/redis/redis",
+  "logo": "redis.png"
+}

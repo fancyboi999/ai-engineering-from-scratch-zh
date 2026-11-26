@@ -1,0 +1,9 @@
+{
+  "name": "Bo",
+  "url": "https://www.getbo.com/",
+  "category": "home-health-agents",
+  "description": "通过短信交互的健康管理助手。",
+  "open_source": false,
+  "x": "boappofficial",
+  "logo": "bo.png"
+}

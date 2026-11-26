@@ -1,0 +1,9 @@
+{
+  "name": "Memori",
+  "url": "https://memorilabs.ai",
+  "category": "memory",
+  "description": "面向 agent 的 SQL 原生记忆引擎。",
+  "open_source": true,
+  "repo": "https://github.com/MemoriLabs/Memori",
+  "logo": "memori.png"
+}

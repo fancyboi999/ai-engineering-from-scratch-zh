@@ -1,0 +1,9 @@
+{
+  "name": "gVisor",
+  "url": "https://gvisor.dev",
+  "category": "sandboxes",
+  "description": "为容器提供沙箱隔离的应用内核。",
+  "open_source": true,
+  "repo": "https://github.com/google/gvisor",
+  "logo": "gvisor.png"
+}

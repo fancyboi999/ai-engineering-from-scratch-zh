@@ -1,0 +1,9 @@
+{
+  "name": "TensorZero",
+  "url": "https://tensorzero.com",
+  "category": "gateways",
+  "description": "面向模型应用的网关、可观测性与优化平台。",
+  "open_source": true,
+  "repo": "https://github.com/tensorzero/tensorzero",
+  "logo": "tensorzero.png"
+}

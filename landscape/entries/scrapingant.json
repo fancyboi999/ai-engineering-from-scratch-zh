@@ -1,0 +1,8 @@
+{
+  "name": "ScrapingAnt",
+  "url": "https://scrapingant.com",
+  "category": "search",
+  "description": "内置无头浏览器的网页抓取 API。",
+  "open_source": false,
+  "logo": "scrapingant.png"
+}

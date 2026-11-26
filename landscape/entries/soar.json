@@ -1,0 +1,9 @@
+{
+  "name": "Soar",
+  "url": "https://joinsoar.co/",
+  "category": "travel-agents",
+  "description": "可将收件箱邮件整理为行程计划的个人旅行助手。",
+  "open_source": false,
+  "x": "soarapp",
+  "logo": "soar.png"
+}

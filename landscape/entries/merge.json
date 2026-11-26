@@ -1,0 +1,8 @@
+{
+  "name": "Merge",
+  "url": "https://merge.dev",
+  "category": "connectors",
+  "description": "面向商业软件的统一 API 与 agent 工具接入层。",
+  "open_source": false,
+  "logo": "merge.png"
+}

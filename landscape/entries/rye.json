@@ -1,0 +1,9 @@
+{
+  "name": "Rye",
+  "url": "https://rye.com/",
+  "category": "commerce",
+  "description": "面向购物 agent 的结账基础设施。",
+  "open_source": false,
+  "x": "rye",
+  "logo": "rye.png"
+}

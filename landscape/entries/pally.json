@@ -1,0 +1,9 @@
+{
+  "name": "Pally",
+  "url": "https://pally.com/",
+  "category": "personal-assistants",
+  "description": "通过短信使用的个人助手。",
+  "open_source": false,
+  "x": "pally",
+  "logo": "pally.png"
+}

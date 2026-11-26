@@ -1,0 +1,8 @@
+{
+  "name": "Tonic.ai",
+  "url": "https://tonic.ai",
+  "category": "data",
+  "description": "面向开发测试的合成数据与脱敏数据生成平台。",
+  "open_source": false,
+  "logo": "tonic-ai.png"
+}

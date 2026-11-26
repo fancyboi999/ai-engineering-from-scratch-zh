@@ -1,0 +1,8 @@
+{
+  "name": "Cloudflare Vectorize",
+  "url": "https://developers.cloudflare.com/vectorize",
+  "category": "databases",
+  "description": "运行于 Cloudflare 网络的向量数据库。",
+  "open_source": false,
+  "logo": "cloudflare-vectorize.png"
+}

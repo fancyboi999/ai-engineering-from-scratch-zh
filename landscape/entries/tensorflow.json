@@ -1,0 +1,9 @@
+{
+  "name": "TensorFlow",
+  "url": "https://tensorflow.org",
+  "category": "training",
+  "description": "用于构建和训练机器学习模型的框架。",
+  "open_source": true,
+  "repo": "https://github.com/tensorflow/tensorflow",
+  "logo": "tensorflow.png"
+}

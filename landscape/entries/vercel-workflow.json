@@ -1,0 +1,9 @@
+{
+  "name": "Vercel Workflow",
+  "url": "https://useworkflow.dev",
+  "category": "orchestration",
+  "description": "面向 TypeScript 应用的持久化函数框架。",
+  "open_source": true,
+  "repo": "https://github.com/vercel/workflow",
+  "logo": "vercel-workflow.png"
+}

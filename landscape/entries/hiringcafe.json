@@ -1,0 +1,9 @@
+{
+  "name": "HiringCafe",
+  "url": "https://hiring.cafe/",
+  "category": "work-assistants",
+  "description": "内置 Talent Agent 的求职搜索引擎，每天为你匹配合适岗位。",
+  "open_source": false,
+  "x": "hiring_cafe",
+  "logo": "hiringcafe.png"
+}

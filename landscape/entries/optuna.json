@@ -1,0 +1,9 @@
+{
+  "name": "Optuna",
+  "url": "https://optuna.org",
+  "category": "tracking",
+  "description": "超参数优化框架。",
+  "open_source": true,
+  "repo": "https://github.com/optuna/optuna",
+  "logo": "optuna.png"
+}

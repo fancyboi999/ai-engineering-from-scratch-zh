@@ -1,0 +1,9 @@
+{
+  "name": "ParadeDB",
+  "url": "https://paradedb.com",
+  "category": "databases",
+  "description": "内置于 Postgres 的搜索与分析引擎。",
+  "open_source": true,
+  "repo": "https://github.com/paradedb/paradedb",
+  "logo": "paradedb.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Hyperbrowser",
+  "url": "https://hyperbrowser.ai",
+  "category": "browser-infra",
+  "description": "面向 agent 的云端浏览器服务。",
+  "open_source": false,
+  "logo": "hyperbrowser.png"
+}

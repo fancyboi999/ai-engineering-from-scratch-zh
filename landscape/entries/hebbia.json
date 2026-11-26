@@ -1,0 +1,8 @@
+{
+  "name": "Hebbia",
+  "url": "https://hebbia.com",
+  "category": "rag",
+  "description": "面向金融与法律领域的文档分析 agent。",
+  "open_source": false,
+  "logo": "hebbia.png"
+}

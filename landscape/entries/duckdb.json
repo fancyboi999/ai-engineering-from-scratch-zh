@@ -1,0 +1,9 @@
+{
+  "name": "DuckDB",
+  "url": "https://duckdb.org",
+  "category": "databases",
+  "description": "进程内分析型 SQL 数据库。",
+  "open_source": true,
+  "repo": "https://github.com/duckdb/duckdb",
+  "logo": "duckdb.png"
+}

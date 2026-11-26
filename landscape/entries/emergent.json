@@ -1,0 +1,8 @@
+{
+  "name": "Emergent",
+  "url": "https://emergent.sh",
+  "category": "builders",
+  "description": "通过 agent 构建并部署应用的平台。",
+  "open_source": false,
+  "logo": "emergent.png"
+}

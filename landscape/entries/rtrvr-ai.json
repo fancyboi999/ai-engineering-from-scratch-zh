@@ -1,0 +1,8 @@
+{
+  "name": "rtrvr.ai",
+  "url": "https://rtrvr.ai",
+  "category": "browser-infra",
+  "description": "运行在浏览器扩展中的网页 agent。",
+  "open_source": false,
+  "logo": "rtrvr-ai.png"
+}

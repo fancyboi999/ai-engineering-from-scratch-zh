@@ -1,0 +1,8 @@
+{
+  "name": "Azure AI Document Intelligence",
+  "url": "https://azure.microsoft.com/products/ai-services/ai-document-intelligence",
+  "category": "docs",
+  "description": "Azure 上的文档信息提取服务。",
+  "open_source": false,
+  "logo": "azure-ai-document-intelligence.png"
+}

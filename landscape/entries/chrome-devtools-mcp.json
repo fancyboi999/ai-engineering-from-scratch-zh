@@ -1,0 +1,9 @@
+{
+  "name": "Chrome DevTools MCP",
+  "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+  "category": "browser-infra",
+  "description": "支持 agent 控制与调试 Chrome 的 MCP 服务器。",
+  "open_source": true,
+  "repo": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+  "logo": "chrome-devtools-mcp.png"
+}

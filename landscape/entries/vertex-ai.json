@@ -1,0 +1,8 @@
+{
+  "name": "Vertex AI",
+  "url": "https://cloud.google.com/vertex-ai",
+  "category": "model-clouds",
+  "description": "Google Cloud 提供的模型托管、微调与 agent 开发平台。",
+  "open_source": false,
+  "logo": "vertex-ai.png"
+}

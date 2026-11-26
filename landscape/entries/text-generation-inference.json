@@ -1,0 +1,9 @@
+{
+  "name": "Text Generation Inference",
+  "url": "https://huggingface.co/docs/text-generation-inference",
+  "category": "inference",
+  "description": "基于 Rust 和 Python 的文本生成模型推理服务。",
+  "open_source": true,
+  "repo": "https://github.com/huggingface/text-generation-inference",
+  "logo": "text-generation-inference.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Labelbox",
+  "url": "https://labelbox.com",
+  "category": "data",
+  "description": "提供专家标注团队的数据标注平台。",
+  "open_source": false,
+  "logo": "labelbox.png"
+}

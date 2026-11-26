@@ -1,0 +1,9 @@
+{
+  "name": "olmOCR",
+  "url": "https://olmocr.allenai.org",
+  "category": "docs",
+  "description": "将 PDF 转换为干净纯文本的工具包。",
+  "open_source": true,
+  "repo": "https://github.com/allenai/olmocr",
+  "logo": "olmocr.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Agent OS",
+  "url": "https://buildermethods.com/agent-os",
+  "category": "agent-workflows",
+  "description": "面向编程 agent 的标准与规范体系。",
+  "open_source": true,
+  "repo": "https://github.com/buildermethods/agent-os",
+  "logo": "agent-os.png"
+}

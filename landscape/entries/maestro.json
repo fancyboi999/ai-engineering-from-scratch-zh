@@ -1,0 +1,9 @@
+{
+  "name": "Maestro",
+  "url": "https://runmaestro.ai",
+  "category": "orchestrators",
+  "description": "用于编排多个编程 agent 的控制中心。",
+  "open_source": true,
+  "repo": "https://github.com/RunMaestro/Maestro",
+  "logo": "maestro.png"
+}

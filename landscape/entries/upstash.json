@@ -1,0 +1,8 @@
+{
+  "name": "Upstash",
+  "url": "https://upstash.com",
+  "category": "databases",
+  "description": "无服务器 Redis、向量数据库与消息队列服务。",
+  "open_source": false,
+  "logo": "upstash.png"
+}

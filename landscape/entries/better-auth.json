@@ -1,0 +1,9 @@
+{
+  "name": "Better Auth",
+  "url": "https://better-auth.com",
+  "category": "identity",
+  "description": "面向 TypeScript 的身份认证框架。",
+  "open_source": true,
+  "repo": "https://github.com/better-auth/better-auth",
+  "logo": "better-auth.png"
+}

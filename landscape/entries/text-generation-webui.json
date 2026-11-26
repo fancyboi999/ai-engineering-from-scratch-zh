@@ -1,0 +1,9 @@
+{
+  "name": "text-generation-webui",
+  "url": "https://github.com/oobabooga/text-generation-webui",
+  "category": "inference",
+  "description": "用于运行本地语言模型的网页界面。",
+  "open_source": true,
+  "repo": "https://github.com/oobabooga/text-generation-webui",
+  "logo": "text-generation-webui.png"
+}

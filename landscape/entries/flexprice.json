@@ -1,0 +1,9 @@
+{
+  "name": "Flexprice",
+  "url": "https://flexprice.io",
+  "category": "payments",
+  "description": "面向 AI 企业的用量计量与计费平台。",
+  "open_source": true,
+  "repo": "https://github.com/flexprice/flexprice",
+  "logo": "flexprice.png"
+}

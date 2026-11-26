@@ -1,0 +1,9 @@
+{
+  "name": "Cal.com",
+  "url": "https://cal.com",
+  "category": "messaging",
+  "description": "日程预约与排期基础设施。",
+  "open_source": true,
+  "repo": "https://github.com/calcom/cal.com",
+  "logo": "cal-com.png"
+}

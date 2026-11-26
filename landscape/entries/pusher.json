@@ -1,0 +1,8 @@
+{
+  "name": "Pusher",
+  "url": "https://pusher.com",
+  "category": "messaging",
+  "description": "实时消息通道与推送通知服务。",
+  "open_source": false,
+  "logo": "pusher.png"
+}

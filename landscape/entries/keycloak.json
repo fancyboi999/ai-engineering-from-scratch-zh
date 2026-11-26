@@ -1,0 +1,9 @@
+{
+  "name": "Keycloak",
+  "url": "https://keycloak.org",
+  "category": "identity",
+  "description": "身份认证与访问管理服务。",
+  "open_source": true,
+  "repo": "https://github.com/keycloak/keycloak",
+  "logo": "keycloak.png"
+}

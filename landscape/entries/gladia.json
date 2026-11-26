@@ -1,0 +1,8 @@
+{
+  "name": "Gladia",
+  "url": "https://gladia.io",
+  "category": "voice-apis",
+  "description": "支持实时与批量音频的语音转文字 API。",
+  "open_source": false,
+  "logo": "gladia.png"
+}

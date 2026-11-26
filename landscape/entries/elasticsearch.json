@@ -1,0 +1,9 @@
+{
+  "name": "Elasticsearch",
+  "url": "https://elastic.co",
+  "category": "databases",
+  "description": "支持向量检索的搜索与分析引擎。",
+  "open_source": true,
+  "repo": "https://github.com/elastic/elasticsearch",
+  "logo": "elasticsearch.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Mastercard Agent Pay",
+  "url": "https://mastercard.com/us/en/business/artificial-intelligence/mastercard-agent-pay.html",
+  "category": "payments",
+  "description": "面向 agent 消费场景的银行卡令牌化支付服务。",
+  "open_source": false,
+  "logo": "mastercard-agent-pay.png"
+}

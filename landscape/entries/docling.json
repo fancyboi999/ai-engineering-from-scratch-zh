@@ -1,0 +1,9 @@
+{
+  "name": "Docling",
+  "url": "https://docling.ai",
+  "category": "docs",
+  "description": "将文档转换为结构化格式的工具。",
+  "open_source": true,
+  "repo": "https://github.com/docling-project/docling",
+  "logo": "docling.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Kiln",
+  "url": "https://kiln.tech",
+  "category": "finetuning",
+  "description": "用于数据集管理、评测与模型微调的桌面工具。",
+  "open_source": true,
+  "repo": "https://github.com/Kiln-AI/Kiln",
+  "logo": "kiln.png"
+}

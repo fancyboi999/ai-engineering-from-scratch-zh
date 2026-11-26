@@ -1,0 +1,11 @@
+{
+  "name": "Kiro",
+  "url": "https://kiro.dev",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "AWS 推出的规格驱动型 agent IDE。",
+  "open_source": false,
+  "logo": "kiro.png"
+}

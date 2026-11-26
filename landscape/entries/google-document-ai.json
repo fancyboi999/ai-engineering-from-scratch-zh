@@ -1,0 +1,8 @@
+{
+  "name": "Google Document AI",
+  "url": "https://cloud.google.com/document-ai",
+  "category": "docs",
+  "description": "运行在 Google Cloud 上的文档处理服务。",
+  "open_source": false,
+  "logo": "google-document-ai.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Browserbase",
+  "url": "https://www.browserbase.com/",
+  "category": "browser-infra",
+  "description": "为需要操作网页的 agent 提供云端无头浏览器基础设施。",
+  "open_source": false,
+  "x": "browserbase",
+  "logo": "browserbase.png"
+}

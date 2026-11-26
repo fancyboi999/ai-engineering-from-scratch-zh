@@ -1,0 +1,9 @@
+{
+  "name": "Quest",
+  "url": "https://new.quest/",
+  "category": "personal-assistants",
+  "description": "聚焦人生目标规划与记忆管理的个人 AI 顾问。",
+  "open_source": false,
+  "x": "personal_quest",
+  "logo": "quest.png"
+}

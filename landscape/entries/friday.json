@@ -1,0 +1,8 @@
+{
+  "name": "Friday",
+  "url": "https://askfriday.io/",
+  "category": "work-assistants",
+  "description": "能够自主承接调研、分析与初稿撰写的工作区 agent。",
+  "open_source": false,
+  "logo": "friday.png"
+}

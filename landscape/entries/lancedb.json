@@ -1,0 +1,9 @@
+{
+  "name": "LanceDB",
+  "url": "https://lancedb.com",
+  "category": "databases",
+  "description": "基于 Lance 格式构建的嵌入式向量数据库。",
+  "open_source": true,
+  "repo": "https://github.com/lancedb/lancedb",
+  "logo": "lancedb.png"
+}

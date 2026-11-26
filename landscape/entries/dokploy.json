@@ -1,0 +1,9 @@
+{
+  "name": "Dokploy",
+  "url": "https://dokploy.com",
+  "category": "hosting",
+  "description": "可自托管的应用部署平台。",
+  "open_source": true,
+  "repo": "https://github.com/Dokploy/dokploy",
+  "logo": "dokploy.png"
+}

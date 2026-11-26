@@ -1,0 +1,9 @@
+{
+  "name": "Sim",
+  "url": "https://sim.ai",
+  "category": "agent-platforms",
+  "description": "用于可视化构建 agent 工作流的平台。",
+  "open_source": true,
+  "repo": "https://github.com/simstudioai/sim",
+  "logo": "sim.png"
+}

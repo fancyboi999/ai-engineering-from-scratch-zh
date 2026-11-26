@@ -1,0 +1,8 @@
+{
+  "name": "Azure AI Search",
+  "url": "https://azure.microsoft.com/products/ai-services/ai-search",
+  "category": "databases",
+  "description": "支持向量与混合检索的托管搜索服务。",
+  "open_source": false,
+  "logo": "azure-ai-search.png"
+}

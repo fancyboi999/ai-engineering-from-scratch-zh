@@ -1,0 +1,8 @@
+{
+  "name": "Membrane",
+  "url": "https://getmembrane.com",
+  "category": "connectors",
+  "description": "面向软件产品与 agent 的集成层。",
+  "open_source": false,
+  "logo": "membrane.png"
+}

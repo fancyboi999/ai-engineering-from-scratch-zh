@@ -1,0 +1,8 @@
+{
+  "name": "SambaNova",
+  "url": "https://sambanova.ai",
+  "category": "inference-providers",
+  "description": "运行在自研数据流硬件上的模型推理平台。",
+  "open_source": false,
+  "logo": "sambanova.png"
+}

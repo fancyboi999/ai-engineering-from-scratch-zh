@@ -1,0 +1,8 @@
+{
+  "name": "Lovable",
+  "url": "https://lovable.dev",
+  "category": "builders",
+  "description": "通过对话 prompt 生成网页应用的开发工具。",
+  "open_source": false,
+  "logo": "lovable.png"
+}

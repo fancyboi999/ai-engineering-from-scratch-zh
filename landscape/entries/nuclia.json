@@ -1,0 +1,8 @@
+{
+  "name": "Nuclia",
+  "url": "https://nuclia.com",
+  "category": "rag",
+  "description": "面向非结构化数据的 RAG 服务。",
+  "open_source": false,
+  "logo": "nuclia.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Datadog LLM Observability",
+  "url": "https://datadoghq.com/product/llm-observability",
+  "category": "evaluation",
+  "description": "Datadog 内置的模型应用监控服务。",
+  "open_source": false,
+  "logo": "datadog-llm-observability.png"
+}

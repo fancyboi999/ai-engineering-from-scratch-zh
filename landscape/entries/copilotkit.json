@@ -1,0 +1,9 @@
+{
+  "name": "CopilotKit",
+  "url": "https://copilotkit.ai",
+  "category": "builders",
+  "description": "用于构建应用内 agent 的 React 框架。",
+  "open_source": true,
+  "repo": "https://github.com/CopilotKit/CopilotKit",
+  "logo": "copilotkit.png"
+}

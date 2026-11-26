@@ -1,0 +1,9 @@
+{
+  "name": "MinerU",
+  "url": "https://mineru.net",
+  "category": "docs",
+  "description": "从 PDF 中提取结构化内容的工具。",
+  "open_source": true,
+  "repo": "https://github.com/opendatalab/MinerU",
+  "logo": "mineru.png"
+}

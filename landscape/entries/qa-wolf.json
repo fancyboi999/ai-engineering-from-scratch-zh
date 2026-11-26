@@ -1,0 +1,8 @@
+{
+  "name": "QA Wolf",
+  "url": "https://qawolf.com",
+  "category": "review",
+  "description": "端到端自动化测试覆盖即服务平台。",
+  "open_source": false,
+  "logo": "qa-wolf.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Sidekick Pro",
+  "url": "https://sidekickpro.com/",
+  "category": "work-assistants",
+  "description": "用于完成工作任务的 agent。",
+  "open_source": false,
+  "x": "GetSidekickPro",
+  "logo": "sidekick-pro.png"
+}

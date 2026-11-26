@@ -1,0 +1,9 @@
+{
+  "name": "Presidio",
+  "url": "https://microsoft.github.io/presidio",
+  "category": "security",
+  "description": "用于检测并移除文本中个人数据的工具。",
+  "open_source": true,
+  "repo": "https://github.com/microsoft/presidio",
+  "logo": "presidio.png"
+}

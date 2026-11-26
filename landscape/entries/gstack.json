@@ -1,0 +1,9 @@
+{
+  "name": "gstack",
+  "url": "https://github.com/garrytan/gstack",
+  "category": "agent-workflows",
+  "description": "为编程 agent 提供规划、评审和 QA 工作流的技能包。",
+  "open_source": true,
+  "repo": "https://github.com/garrytan/gstack",
+  "logo": "gstack.png"
+}

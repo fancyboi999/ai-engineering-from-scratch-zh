@@ -1,0 +1,9 @@
+{
+  "name": "Arize Phoenix",
+  "url": "https://phoenix.arize.com",
+  "category": "evaluation",
+  "description": "面向模型应用的链路追踪与评测工具。",
+  "open_source": true,
+  "repo": "https://github.com/Arize-ai/phoenix",
+  "logo": "arize-phoenix.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Cerebras",
+  "url": "https://cerebras.ai",
+  "category": "inference-providers",
+  "description": "基于晶圆级处理器的模型推理服务。",
+  "open_source": false,
+  "logo": "cerebras.png"
+}

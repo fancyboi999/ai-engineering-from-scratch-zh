@@ -1,0 +1,9 @@
+{
+  "name": "vLLM",
+  "url": "https://docs.vllm.ai",
+  "category": "inference",
+  "description": "提供 OpenAI 兼容接口的语言模型推理与服务引擎。",
+  "open_source": true,
+  "repo": "https://github.com/vllm-project/vllm",
+  "logo": "vllm.svg"
+}

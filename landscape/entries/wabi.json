@@ -1,0 +1,9 @@
+{
+  "name": "Wabi",
+  "url": "https://wabi.ai/",
+  "category": "group-chat-agents",
+  "description": "支持多人共同在共享对话线程中使用的 AI 助手。",
+  "open_source": false,
+  "x": "wabi",
+  "logo": "wabi.png"
+}

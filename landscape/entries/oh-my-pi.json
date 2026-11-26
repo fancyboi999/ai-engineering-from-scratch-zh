@@ -1,0 +1,9 @@
+{
+  "name": "oh-my-pi",
+  "url": "https://github.com/can1357/oh-my-pi",
+  "category": "harnesses",
+  "description": "基于 Pi 构建的编程 agent 运行框架，内置扩展工具与子 agent 支持。",
+  "open_source": true,
+  "repo": "https://github.com/can1357/oh-my-pi",
+  "logo": "oh-my-pi.png"
+}

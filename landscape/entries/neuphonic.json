@@ -1,0 +1,8 @@
+{
+  "name": "Neuphonic",
+  "url": "https://neuphonic.com",
+  "category": "voice-apis",
+  "description": "面向 agent 的低延迟语音合成服务。",
+  "open_source": false,
+  "logo": "neuphonic.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Faiss",
+  "url": "https://faiss.ai",
+  "category": "databases",
+  "description": "面向稠密向量相似度检索的算法库。",
+  "open_source": true,
+  "repo": "https://github.com/facebookresearch/faiss",
+  "logo": "faiss.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "fal",
+  "url": "https://fal.ai",
+  "category": "inference-providers",
+  "description": "面向图像、视频与音频模型的托管推理平台。",
+  "open_source": false,
+  "logo": "fal.png"
+}

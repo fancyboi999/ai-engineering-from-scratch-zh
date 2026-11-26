@@ -1,0 +1,9 @@
+{
+  "name": "AnyAlpha",
+  "url": "https://anyalpha.ai/",
+  "category": "finance-agents",
+  "description": "Agent 化交易平台，由 AI agent 全天候执行研究、回测与交易。",
+  "open_source": false,
+  "x": "anyalphaai",
+  "logo": "anyalpha.png"
+}

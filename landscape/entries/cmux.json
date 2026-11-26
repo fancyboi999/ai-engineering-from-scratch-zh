@@ -1,0 +1,9 @@
+{
+  "name": "cmux",
+  "url": "https://cmux.com",
+  "category": "orchestrators",
+  "description": "专为运行多个编程 agent 设计的终端。",
+  "open_source": true,
+  "repo": "https://github.com/manaflow-ai/cmux",
+  "logo": "cmux.png"
+}

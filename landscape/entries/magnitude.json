@@ -1,0 +1,9 @@
+{
+  "name": "Magnitude",
+  "url": "https://magnitude.run",
+  "category": "browser-infra",
+  "description": "以视觉为主导的浏览器 agent。",
+  "open_source": true,
+  "repo": "https://github.com/magnitudedev/browser-agent",
+  "logo": "magnitude.png"
+}

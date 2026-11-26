@@ -1,0 +1,9 @@
+{
+  "name": "Lithic",
+  "url": "https://www.lithic.com/solutions/agentic-commerce",
+  "category": "payments",
+  "description": "面向 agent 商业场景的发卡与支付基础设施。",
+  "open_source": false,
+  "x": "lithic",
+  "logo": "lithic.png"
+}

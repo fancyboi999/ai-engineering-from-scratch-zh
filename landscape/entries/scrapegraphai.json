@@ -1,0 +1,9 @@
+{
+  "name": "ScrapeGraphAI",
+  "url": "https://scrapegraphai.com",
+  "category": "search",
+  "description": "使用语言模型的网页抓取库。",
+  "open_source": true,
+  "repo": "https://github.com/ScrapeGraphAI/Scrapegraph-ai",
+  "logo": "scrapegraphai.png"
+}

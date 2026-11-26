@@ -1,0 +1,9 @@
+{
+  "name": "Basic Memory",
+  "url": "https://basicmemory.com",
+  "category": "memory",
+  "description": "通过 MCP 将本地 Markdown 文件作为长期记忆的工具。",
+  "open_source": true,
+  "repo": "https://github.com/basicmachines-co/basic-memory",
+  "logo": "basic-memory.png"
+}

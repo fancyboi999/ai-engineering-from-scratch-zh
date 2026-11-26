@@ -1,0 +1,9 @@
+{
+  "name": "Tab",
+  "url": "https://tab.bot/",
+  "category": "personal-assistants",
+  "description": "运行在 Messages 中的个人 AI 助手。",
+  "open_source": false,
+  "x": "tabdotbot",
+  "logo": "tab.png"
+}

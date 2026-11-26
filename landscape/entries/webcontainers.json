@@ -1,0 +1,8 @@
+{
+  "name": "WebContainers",
+  "url": "https://webcontainers.io",
+  "category": "sandboxes",
+  "description": "运行在浏览器内的 Node.js 运行时。",
+  "open_source": false,
+  "logo": "webcontainers.png"
+}

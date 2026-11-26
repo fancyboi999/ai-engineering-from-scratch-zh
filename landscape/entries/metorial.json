@@ -1,0 +1,9 @@
+{
+  "name": "Metorial",
+  "url": "https://metorial.com",
+  "category": "protocols",
+  "description": "用于将 agent 连接到 MCP 服务器的平台。",
+  "open_source": true,
+  "repo": "https://github.com/metorial/metorial",
+  "logo": "metorial.png"
+}

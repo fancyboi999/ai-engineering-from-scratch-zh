@@ -1,0 +1,8 @@
+{
+  "name": "DeepInfra",
+  "url": "https://deepinfra.com",
+  "category": "inference-providers",
+  "description": "按 token 计费的开源模型托管推理服务。",
+  "open_source": false,
+  "logo": "deepinfra.png"
+}

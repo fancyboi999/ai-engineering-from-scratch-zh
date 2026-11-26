@@ -1,0 +1,9 @@
+{
+  "name": "Plandex",
+  "url": "https://github.com/plandex-ai/plandex",
+  "category": "coding",
+  "description": "面向大型编程任务的终端 agent。",
+  "open_source": true,
+  "repo": "https://github.com/plandex-ai/plandex",
+  "logo": "plandex.png"
+}

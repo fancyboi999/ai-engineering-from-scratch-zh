@@ -1,0 +1,9 @@
+{
+  "name": "Kokoro",
+  "url": "https://github.com/hexgrad/kokoro",
+  "category": "voice-apis",
+  "description": "轻量级开源权重文本转语音模型。",
+  "open_source": true,
+  "repo": "https://github.com/hexgrad/kokoro",
+  "logo": "kokoro.png"
+}

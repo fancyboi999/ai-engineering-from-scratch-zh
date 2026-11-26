@@ -1,0 +1,9 @@
+{
+  "name": "Synorb",
+  "url": "https://synorb.com/",
+  "category": "context",
+  "description": "为 AI agent 提供附来源引用且有时效限定的外部上下文。",
+  "open_source": false,
+  "x": "Synorb",
+  "logo": "synorb.png"
+}

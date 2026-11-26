@@ -1,0 +1,9 @@
+{
+  "name": "Firecracker",
+  "url": "https://firecracker-microvm.github.io",
+  "category": "sandboxes",
+  "description": "面向安全多租户工作负载的轻量级微虚拟机。",
+  "open_source": true,
+  "repo": "https://github.com/firecracker-microvm/firecracker",
+  "logo": "firecracker.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Graphiti",
+  "url": "https://github.com/getzep/graphiti",
+  "category": "memory",
+  "description": "用于 agent 记忆的时序知识图谱。",
+  "open_source": true,
+  "repo": "https://github.com/getzep/graphiti",
+  "logo": "graphiti.png"
+}

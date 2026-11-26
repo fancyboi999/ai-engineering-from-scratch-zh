@@ -1,0 +1,9 @@
+{
+  "name": "idem",
+  "url": "https://idem.so/",
+  "category": "work-assistants",
+  "description": "能学习个人上下文与偏好的个人助手。",
+  "open_source": false,
+  "x": "tryidem",
+  "logo": "idem.png"
+}

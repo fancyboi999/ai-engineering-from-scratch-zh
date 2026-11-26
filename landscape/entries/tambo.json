@@ -1,0 +1,9 @@
+{
+  "name": "Tambo",
+  "url": "https://tambo.co",
+  "category": "builders",
+  "description": "面向 React 的生成式界面工具包。",
+  "open_source": true,
+  "repo": "https://github.com/tambo-ai/tambo",
+  "logo": "tambo.png"
+}

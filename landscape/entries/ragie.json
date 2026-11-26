@@ -1,0 +1,8 @@
+{
+  "name": "Ragie",
+  "url": "https://ragie.ai",
+  "category": "rag",
+  "description": "面向开发者的全托管 RAG 服务。",
+  "open_source": false,
+  "logo": "ragie.png"
+}

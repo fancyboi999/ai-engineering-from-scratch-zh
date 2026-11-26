@@ -1,0 +1,9 @@
+{
+  "name": "Sardine",
+  "url": "https://www.sardine.ai/",
+  "category": "payments",
+  "description": "用于反欺诈与反洗钱（AML）的 agent 金融犯罪防控平台。",
+  "open_source": false,
+  "x": "sardine",
+  "logo": "sardine.png"
+}

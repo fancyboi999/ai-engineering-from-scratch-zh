@@ -1,0 +1,9 @@
+{
+  "name": "Chunkr",
+  "url": "https://chunkr.ai",
+  "category": "docs",
+  "description": "文档版面分析与分块处理工具。",
+  "open_source": true,
+  "repo": "https://github.com/lumina-ai-inc/chunkr",
+  "logo": "chunkr.png"
+}

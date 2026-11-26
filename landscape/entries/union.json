@@ -1,0 +1,8 @@
+{
+  "name": "Union",
+  "url": "https://union.ai",
+  "category": "orchestration",
+  "description": "面向 AI 工作流编排的托管版 Flyte 平台。",
+  "open_source": false,
+  "logo": "union.png"
+}

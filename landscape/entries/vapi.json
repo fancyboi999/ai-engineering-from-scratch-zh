@@ -1,0 +1,8 @@
+{
+  "name": "Vapi",
+  "url": "https://vapi.ai",
+  "category": "voice-platforms",
+  "description": "用于构建和部署语音 agent 的平台。",
+  "open_source": false,
+  "logo": "vapi.png"
+}

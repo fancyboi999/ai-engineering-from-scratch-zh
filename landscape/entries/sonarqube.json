@@ -1,0 +1,9 @@
+{
+  "name": "SonarQube",
+  "url": "https://sonarsource.com",
+  "category": "review",
+  "description": "用于代码质量与安全性检测的静态分析平台。",
+  "open_source": true,
+  "repo": "https://github.com/SonarSource/sonarqube",
+  "logo": "sonarqube.png"
+}

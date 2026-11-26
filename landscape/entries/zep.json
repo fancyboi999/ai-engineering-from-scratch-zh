@@ -1,0 +1,9 @@
+{
+  "name": "Zep",
+  "url": "https://www.getzep.com/",
+  "category": "memory",
+  "description": "面向 agent 的企业级上下文层。",
+  "open_source": false,
+  "x": "zep_ai",
+  "logo": "zep.png"
+}

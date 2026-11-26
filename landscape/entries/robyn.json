@@ -1,0 +1,9 @@
+{
+  "name": "Robyn",
+  "url": "https://www.meetrobyn.com/",
+  "category": "personal-assistants",
+  "description": "通过短信交互访问的个人 agent 平台。",
+  "open_source": false,
+  "x": "meetrobyn",
+  "logo": "robyn.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "heyclicky",
+  "url": "https://www.heyclicky.com/",
+  "category": "work-assistants",
+  "description": "适用于 Mac 和 Windows 的桌面 AI 助手，可识别屏幕内容并运行 agent。",
+  "open_source": false,
+  "x": "heyclicky",
+  "logo": "heyclicky.png"
+}

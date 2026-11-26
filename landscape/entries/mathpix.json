@@ -1,0 +1,8 @@
+{
+  "name": "Mathpix",
+  "url": "https://mathpix.com",
+  "category": "docs",
+  "description": "面向数学公式、表格与科技文献的 OCR 工具。",
+  "open_source": false,
+  "logo": "mathpix.png"
+}

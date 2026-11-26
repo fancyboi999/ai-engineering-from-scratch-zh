@@ -1,0 +1,9 @@
+{
+  "name": "Lia",
+  "url": "https://www.liarefer.com/",
+  "category": "work-assistants",
+  "description": "AI 求职 agent，可直接将你引荐给科技公司决策者。",
+  "open_source": false,
+  "x": "tryrefer",
+  "logo": "lia.png"
+}

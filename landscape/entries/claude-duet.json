@@ -1,0 +1,9 @@
+{
+  "name": "Claude Duet",
+  "url": "https://claude.com/product/claude-duet",
+  "category": "lab-assistants",
+  "description": "Anthropic 推出的主动式个人 agent，用于处理工作与日常事务。",
+  "open_source": false,
+  "x": "claudeai",
+  "logo": "claude-duet.png"
+}

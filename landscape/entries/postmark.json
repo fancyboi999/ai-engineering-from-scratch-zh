@@ -1,0 +1,8 @@
+{
+  "name": "Postmark",
+  "url": "https://postmarkapp.com",
+  "category": "messaging",
+  "description": "事务性邮件投递服务。",
+  "open_source": false,
+  "logo": "postmark.png"
+}

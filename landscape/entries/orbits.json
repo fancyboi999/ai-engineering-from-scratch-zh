@@ -1,0 +1,9 @@
+{
+  "name": "Orbits",
+  "url": "https://tryorbits.com/",
+  "category": "home-health-agents",
+  "description": "用于处理家庭日常事务的 AI 助手。",
+  "open_source": false,
+  "x": "tryorbits",
+  "logo": "orbits.png"
+}

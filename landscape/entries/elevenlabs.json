@@ -1,0 +1,8 @@
+{
+  "name": "ElevenLabs",
+  "url": "https://elevenlabs.io",
+  "category": "voice-apis",
+  "description": "语音合成、转写与语音 agent 平台。",
+  "open_source": false,
+  "logo": "elevenlabs.png"
+}

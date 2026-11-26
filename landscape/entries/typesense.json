@@ -1,0 +1,9 @@
+{
+  "name": "Typesense",
+  "url": "https://typesense.org",
+  "category": "databases",
+  "description": "支持拼写容错与向量检索的搜索引擎。",
+  "open_source": true,
+  "repo": "https://github.com/typesense/typesense",
+  "logo": "typesense.png"
+}

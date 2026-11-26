@@ -1,0 +1,8 @@
+{
+  "name": "Modal",
+  "url": "https://modal.com",
+  "category": "sandboxes",
+  "description": "通过 Python 调用代码、GPU 与沙箱的无服务器云平台。",
+  "open_source": false,
+  "logo": "modal.png"
+}

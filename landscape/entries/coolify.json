@@ -1,0 +1,9 @@
+{
+  "name": "Coolify",
+  "url": "https://coolify.io",
+  "category": "hosting",
+  "description": "可自托管的应用与数据库部署平台。",
+  "open_source": true,
+  "repo": "https://github.com/coollabsio/coolify",
+  "logo": "coolify.png"
+}

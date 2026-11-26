@@ -1,0 +1,9 @@
+{
+  "name": "ChatGPT Work",
+  "url": "https://chatgpt.com/work/",
+  "category": "lab-assistants",
+  "description": "将团队需求转化为完整交付成果的协作工作区。",
+  "open_source": false,
+  "x": "OpenAI",
+  "logo": "chatgpt-work.png"
+}

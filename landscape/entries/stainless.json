@@ -1,0 +1,8 @@
+{
+  "name": "Stainless",
+  "url": "https://stainless.com",
+  "category": "connectors",
+  "description": "根据 API 规范生成 SDK 和 MCP 服务。",
+  "open_source": false,
+  "logo": "stainless.png"
+}

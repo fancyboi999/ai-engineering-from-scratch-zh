@@ -1,0 +1,9 @@
+{
+  "name": "OpenFGA",
+  "url": "https://openfga.dev",
+  "category": "identity",
+  "description": "细粒度权限授权系统。",
+  "open_source": true,
+  "repo": "https://github.com/openfga/openfga",
+  "logo": "openfga.png"
+}

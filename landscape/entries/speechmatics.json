@@ -1,0 +1,8 @@
+{
+  "name": "Speechmatics",
+  "url": "https://speechmatics.com",
+  "category": "voice-apis",
+  "description": "支持多语种的语音识别服务。",
+  "open_source": false,
+  "logo": "speechmatics.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Skydive",
+  "url": "https://www.skydive.com/",
+  "category": "work-assistants",
+  "description": "可在 Slack、邮件或 iMessage 中直接对话交互的云端 agent。",
+  "open_source": false,
+  "x": "getskydive",
+  "logo": "skydive.png"
+}

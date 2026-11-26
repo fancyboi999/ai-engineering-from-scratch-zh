@@ -1,0 +1,9 @@
+{
+  "name": "Flowise",
+  "url": "https://flowiseai.com",
+  "category": "agent-platforms",
+  "description": "面向 agent 与模型工作流的可视化构建工具。",
+  "open_source": true,
+  "repo": "https://github.com/FlowiseAI/Flowise",
+  "logo": "flowise.png"
+}

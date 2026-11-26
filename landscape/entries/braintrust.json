@@ -1,0 +1,8 @@
+{
+  "name": "Braintrust",
+  "url": "https://braintrust.dev",
+  "category": "evaluation",
+  "description": "支持评测、链路追踪与 prompt 迭代的开发平台。",
+  "open_source": false,
+  "logo": "braintrust.png"
+}

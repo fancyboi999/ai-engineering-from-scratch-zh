@@ -1,0 +1,8 @@
+{
+  "name": "JetBrains AI",
+  "url": "https://jetbrains.com/ai",
+  "category": "coding",
+  "description": "集成在 JetBrains IDE 中的编程助手与 agent。",
+  "open_source": false,
+  "logo": "jetbrains-ai.png"
+}

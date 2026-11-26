@@ -1,0 +1,9 @@
+{
+  "name": "Jan",
+  "url": "https://jan.ai",
+  "category": "inference",
+  "description": "支持离线运行本地模型的桌面应用。",
+  "open_source": true,
+  "repo": "https://github.com/janhq/jan",
+  "logo": "jan.png"
+}

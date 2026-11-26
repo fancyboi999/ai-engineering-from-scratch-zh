@@ -1,0 +1,9 @@
+{
+  "name": "pgvector",
+  "url": "https://github.com/pgvector/pgvector",
+  "category": "databases",
+  "description": "内置于 Postgres 的向量相似度检索扩展。",
+  "open_source": true,
+  "repo": "https://github.com/pgvector/pgvector",
+  "logo": "pgvector.png"
+}

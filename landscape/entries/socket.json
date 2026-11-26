@@ -1,0 +1,8 @@
+{
+  "name": "Socket",
+  "url": "https://socket.dev",
+  "category": "security",
+  "description": "面向软件依赖项的供应链安全检测平台。",
+  "open_source": false,
+  "logo": "socket.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Mindgard",
+  "url": "https://mindgard.ai",
+  "category": "security",
+  "description": "面向 AI 系统的自动化红队测试工具。",
+  "open_source": false,
+  "logo": "mindgard.png"
+}

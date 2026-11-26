@@ -1,0 +1,9 @@
+{
+  "name": "Langflow",
+  "url": "https://langflow.org",
+  "category": "agent-platforms",
+  "description": "用于构建 agent 与检索流程的可视化工具。",
+  "open_source": true,
+  "repo": "https://github.com/langflow-ai/langflow",
+  "logo": "langflow.png"
+}

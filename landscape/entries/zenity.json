@@ -1,0 +1,8 @@
+{
+  "name": "Zenity",
+  "url": "https://zenity.io",
+  "category": "security",
+  "description": "面向企业级 agent 的安全与治理平台。",
+  "open_source": false,
+  "logo": "zenity.png"
+}

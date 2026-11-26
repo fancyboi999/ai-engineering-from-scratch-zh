@@ -1,0 +1,8 @@
+{
+  "name": "Graphite",
+  "url": "https://graphite.dev",
+  "category": "review",
+  "description": "支持 AI 代码评审的堆叠式 pull request 工具。",
+  "open_source": false,
+  "logo": "graphite.png"
+}

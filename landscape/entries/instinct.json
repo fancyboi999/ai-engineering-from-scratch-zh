@@ -1,0 +1,9 @@
+{
+  "name": "Instinct",
+  "url": "https://instinct.com/",
+  "category": "personal-assistants",
+  "description": "支持短信和电话联系的个人助手，能像人一样操作手机和电脑。",
+  "open_source": false,
+  "x": "Instinct",
+  "logo": "instinct.png"
+}

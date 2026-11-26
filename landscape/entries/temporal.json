@@ -1,0 +1,9 @@
+{
+  "name": "Temporal",
+  "url": "https://temporal.io",
+  "category": "orchestration",
+  "description": "面向长时运行工作流的持久化执行平台。",
+  "open_source": true,
+  "repo": "https://github.com/temporalio/temporal",
+  "logo": "temporal.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Chorus",
+  "url": "https://chorus.com/",
+  "category": "work-assistants",
+  "description": "覆盖市场、运营、数据、财务与工程岗位的 AI 员工平台。",
+  "open_source": false,
+  "x": "chorus_agent",
+  "logo": "chorus.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Graphlit",
+  "url": "https://graphlit.com",
+  "category": "rag",
+  "description": "为 agent 接入和处理内容的平台。",
+  "open_source": false,
+  "logo": "graphlit.png"
+}

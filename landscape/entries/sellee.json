@@ -1,0 +1,9 @@
+{
+  "name": "Sellee",
+  "url": "https://www.sellee.ai/",
+  "category": "shopping-agents",
+  "description": "通过商品照片为物品定价、上架并议价促成交易的购物 agent。",
+  "open_source": false,
+  "x": "selleeai",
+  "logo": "sellee.png"
+}

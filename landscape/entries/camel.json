@@ -1,0 +1,9 @@
+{
+  "name": "CAMEL",
+  "url": "https://camel-ai.org",
+  "category": "agents",
+  "description": "面向多 agent 研究与应用的框架。",
+  "open_source": true,
+  "repo": "https://github.com/camel-ai/camel",
+  "logo": "camel.png"
+}

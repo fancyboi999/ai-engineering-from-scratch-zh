@@ -1,0 +1,12 @@
+{
+  "name": "Codex",
+  "url": "https://openai.com/codex",
+  "category": "coding",
+  "also": [
+    "harnesses"
+  ],
+  "description": "OpenAI 推出的编程 agent，支持终端、IDE 与云端。",
+  "open_source": true,
+  "repo": "https://github.com/openai/codex",
+  "logo": "codex.png"
+}

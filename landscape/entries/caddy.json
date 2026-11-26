@@ -1,0 +1,9 @@
+{
+  "name": "Caddy",
+  "url": "https://caddy.app/",
+  "category": "personal-assistants",
+  "description": "集成在 Messages 中的个人 AI 助手。",
+  "open_source": false,
+  "x": "try_caddy",
+  "logo": "caddy.png"
+}

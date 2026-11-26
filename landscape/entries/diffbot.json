@@ -1,0 +1,8 @@
+{
+  "name": "Diffbot",
+  "url": "https://diffbot.com",
+  "category": "search",
+  "description": "面向网页数据的知识图谱与信息提取 API。",
+  "open_source": false,
+  "logo": "diffbot.png"
+}

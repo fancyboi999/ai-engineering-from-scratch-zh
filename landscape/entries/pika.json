@@ -1,0 +1,8 @@
+{
+  "name": "Pika",
+  "url": "https://pika.art",
+  "category": "media",
+  "description": "根据文本与图像生成视频的工具。",
+  "open_source": false,
+  "logo": "pika.png"
+}

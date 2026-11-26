@@ -1,0 +1,9 @@
+{
+  "name": "Memobase",
+  "url": "https://github.com/memodb-io/memobase",
+  "category": "memory",
+  "description": "面向 AI 应用的用户画像记忆系统。",
+  "open_source": true,
+  "repo": "https://github.com/memodb-io/memobase",
+  "logo": "memobase.png"
+}

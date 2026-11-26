@@ -1,0 +1,8 @@
+{
+  "name": "Azure AI Speech",
+  "url": "https://azure.microsoft.com/products/ai-services/ai-speech",
+  "category": "voice-apis",
+  "description": "Azure 上的语音识别与语音合成服务。",
+  "open_source": false,
+  "logo": "azure-ai-speech.png"
+}

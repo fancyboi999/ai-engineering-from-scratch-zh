@@ -1,0 +1,9 @@
+{
+  "name": "Captum",
+  "url": "https://captum.ai",
+  "category": "interpretability",
+  "description": "面向 PyTorch 的模型可解释性工具库。",
+  "open_source": true,
+  "repo": "https://github.com/pytorch/captum",
+  "logo": "captum.png"
+}

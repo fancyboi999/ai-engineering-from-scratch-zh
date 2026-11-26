@@ -1,0 +1,9 @@
+{
+  "name": "Klavis AI",
+  "url": "https://klavis.ai",
+  "category": "protocols",
+  "description": "带托管认证机制的托管型 MCP 服务。",
+  "open_source": true,
+  "repo": "https://github.com/Klavis-AI/klavis",
+  "logo": "klavis-ai.png"
+}

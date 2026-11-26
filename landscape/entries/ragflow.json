@@ -1,0 +1,9 @@
+{
+  "name": "RAGFlow",
+  "url": "https://ragflow.io",
+  "category": "rag",
+  "description": "具备深度文档理解能力的 RAG 引擎。",
+  "open_source": true,
+  "repo": "https://github.com/infiniflow/ragflow",
+  "logo": "ragflow.png"
+}

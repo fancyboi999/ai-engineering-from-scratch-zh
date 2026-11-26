@@ -1,0 +1,9 @@
+{
+  "name": "llms.txt",
+  "url": "https://llmstxt.org",
+  "category": "protocols",
+  "description": "向模型说明如何读取网站内容的标准提案文件。",
+  "open_source": true,
+  "repo": "https://github.com/AnswerDotAI/llms-txt",
+  "logo": "llms-txt.png"
+}

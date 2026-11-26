@@ -1,0 +1,9 @@
+{
+  "name": "Dots",
+  "url": "https://openai.com/index/introducing-dots/",
+  "category": "lab-assistants",
+  "description": "OpenAI 推出的个人 agent，可独立执行委派任务。",
+  "open_source": false,
+  "x": "OpenAI",
+  "logo": "dots.png"
+}

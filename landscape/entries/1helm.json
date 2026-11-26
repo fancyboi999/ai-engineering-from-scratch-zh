@@ -1,0 +1,9 @@
+{
+  "name": "1Helm",
+  "url": "https://1helm.com/",
+  "category": "personal-assistants",
+  "description": "自带浏览器的个人助手，用于预订、购物和填写表单。",
+  "open_source": false,
+  "x": "1helmcloud",
+  "logo": "1helm.png"
+}

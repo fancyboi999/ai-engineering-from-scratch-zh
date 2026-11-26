@@ -1,0 +1,8 @@
+{
+  "name": "Shadeform",
+  "url": "https://shadeform.ai",
+  "category": "gpu-clouds",
+  "description": "通过单一 API 调用多云 GPU 实例的算力平台。",
+  "open_source": false,
+  "logo": "shadeform.png"
+}

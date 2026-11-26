@@ -1,0 +1,9 @@
+{
+  "name": "Jobright",
+  "url": "https://jobright.ai/",
+  "category": "work-assistants",
+  "description": "AI 求职 agent，可匹配岗位、定制简历并自动填写申请。",
+  "open_source": false,
+  "x": "jobrightai",
+  "logo": "jobright.png"
+}

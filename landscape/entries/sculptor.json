@@ -1,0 +1,8 @@
+{
+  "name": "Sculptor",
+  "url": "https://imbue.com/sculptor",
+  "category": "orchestrators",
+  "description": "在隔离容器中并行运行编程 agent 的编排工具。",
+  "open_source": false,
+  "logo": "sculptor.png"
+}

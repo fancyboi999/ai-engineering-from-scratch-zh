@@ -1,0 +1,9 @@
+{
+  "name": "Pathway",
+  "url": "https://pathway.com",
+  "category": "rag",
+  "description": "支持实时 RAG 流水线的流处理框架。",
+  "open_source": true,
+  "repo": "https://github.com/pathwaycom/pathway",
+  "logo": "pathway.png"
+}

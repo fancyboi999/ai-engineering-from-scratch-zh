@@ -1,0 +1,8 @@
+{
+  "name": "Unreal Speech",
+  "url": "https://unrealspeech.com",
+  "category": "voice-apis",
+  "description": "低成本文本转语音 API。",
+  "open_source": false,
+  "logo": "unreal-speech.png"
+}

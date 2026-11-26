@@ -1,0 +1,9 @@
+{
+  "name": "DVC",
+  "url": "https://dvc.org",
+  "category": "tracking",
+  "description": "面向数据与模型的版本控制工具。",
+  "open_source": true,
+  "repo": "https://github.com/iterative/dvc",
+  "logo": "dvc.png"
+}

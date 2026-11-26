@@ -1,0 +1,9 @@
+{
+  "name": "Lava",
+  "url": "https://www.lava.so/",
+  "category": "work-assistants",
+  "description": "跨常用工具协同工作的 agent。",
+  "open_source": false,
+  "x": "trylava",
+  "logo": "lava.png"
+}

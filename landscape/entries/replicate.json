@@ -1,0 +1,8 @@
+{
+  "name": "Replicate",
+  "url": "https://replicate.com",
+  "category": "inference-providers",
+  "description": "通过 API 运行开源模型并按秒计费的推理服务。",
+  "open_source": false,
+  "logo": "replicate.png"
+}

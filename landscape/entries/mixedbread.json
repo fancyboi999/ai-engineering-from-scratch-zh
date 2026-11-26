@@ -1,0 +1,8 @@
+{
+  "name": "Mixedbread",
+  "url": "https://mixedbread.com",
+  "category": "embeddings",
+  "description": "提供向量嵌入、重排模型与搜索 API 的服务。",
+  "open_source": false,
+  "logo": "mixedbread.png"
+}

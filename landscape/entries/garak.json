@@ -1,0 +1,9 @@
+{
+  "name": "garak",
+  "url": "https://garak.ai",
+  "category": "security",
+  "description": "面向语言模型的漏洞扫描工具。",
+  "open_source": true,
+  "repo": "https://github.com/NVIDIA/garak",
+  "logo": "garak.png"
+}

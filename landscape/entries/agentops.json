@@ -1,0 +1,9 @@
+{
+  "name": "AgentOps",
+  "url": "https://agentops.ai",
+  "category": "evaluation",
+  "description": "面向 agent 的会话追踪与成本监控平台。",
+  "open_source": true,
+  "repo": "https://github.com/AgentOps-AI/agentops",
+  "logo": "agentops.png"
+}

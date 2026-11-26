@@ -1,0 +1,8 @@
+{
+  "name": "Koyeb",
+  "url": "https://koyeb.com",
+  "category": "sandboxes",
+  "description": "支持应用、沙箱与 GPU 的无服务器部署平台。",
+  "open_source": false,
+  "logo": "koyeb.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Ideogram",
+  "url": "https://ideogram.ai",
+  "category": "media",
+  "description": "具备准确文字渲染能力的图像生成工具。",
+  "open_source": false,
+  "logo": "ideogram.png"
+}

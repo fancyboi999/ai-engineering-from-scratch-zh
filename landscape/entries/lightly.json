@@ -1,0 +1,9 @@
+{
+  "name": "Lightly",
+  "url": "https://lightly.ai",
+  "category": "data",
+  "description": "面向计算机视觉的数据筛选与自监督学习工具。",
+  "open_source": true,
+  "repo": "https://github.com/lightly-ai/lightly",
+  "logo": "lightly.png"
+}

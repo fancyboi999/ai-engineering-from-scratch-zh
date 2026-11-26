@@ -1,0 +1,8 @@
+{
+  "name": "Cohere",
+  "url": "https://cohere.com",
+  "category": "models",
+  "description": "面向企业应用的语言、嵌入与重排模型。",
+  "open_source": false,
+  "logo": "cohere.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Snowflake Cortex",
+  "url": "https://snowflake.com",
+  "category": "model-clouds",
+  "description": "内置于 Snowflake 数据云中的模型与 agent 服务。",
+  "open_source": false,
+  "logo": "snowflake-cortex.png"
+}

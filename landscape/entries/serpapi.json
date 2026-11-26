@@ -1,0 +1,8 @@
+{
+  "name": "SerpApi",
+  "url": "https://serpapi.com",
+  "category": "search",
+  "description": "获取搜索引擎结果的 API。",
+  "open_source": false,
+  "logo": "serpapi.png"
+}

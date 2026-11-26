@@ -1,0 +1,8 @@
+{
+  "name": "LM Studio",
+  "url": "https://lmstudio.ai",
+  "category": "inference",
+  "description": "用于下载和运行本地模型的桌面应用。",
+  "open_source": false,
+  "logo": "lm-studio.png"
+}

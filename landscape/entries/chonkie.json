@@ -1,0 +1,9 @@
+{
+  "name": "Chonkie",
+  "url": "https://chonkie.ai",
+  "category": "rag",
+  "description": "用于文本分块的工具库。",
+  "open_source": true,
+  "repo": "https://github.com/chonkie-inc/chonkie",
+  "logo": "chonkie.png"
+}

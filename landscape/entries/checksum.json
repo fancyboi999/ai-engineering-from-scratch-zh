@@ -1,0 +1,8 @@
+{
+  "name": "Checksum",
+  "url": "https://checksum.ai",
+  "category": "review",
+  "description": "自动生成并维护端到端测试的工具。",
+  "open_source": false,
+  "logo": "checksum.png"
+}

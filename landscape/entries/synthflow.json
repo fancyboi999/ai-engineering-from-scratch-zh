@@ -1,0 +1,8 @@
+{
+  "name": "Synthflow",
+  "url": "https://synthflow.ai",
+  "category": "voice-platforms",
+  "description": "用于电话通话的无代码语音 agent。",
+  "open_source": false,
+  "logo": "synthflow.png"
+}

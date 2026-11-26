@@ -1,0 +1,8 @@
+{
+  "name": "AWS Step Functions",
+  "url": "https://aws.amazon.com/step-functions",
+  "category": "orchestration",
+  "description": "AWS 上基于状态机的工作流编排服务。",
+  "open_source": false,
+  "logo": "aws-step-functions.png"
+}

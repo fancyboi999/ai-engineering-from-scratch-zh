@@ -1,0 +1,8 @@
+{
+  "name": "Augment Code",
+  "url": "https://augmentcode.com",
+  "category": "coding",
+  "description": "内置面向大型代码库上下文引擎的编程 agent。",
+  "open_source": false,
+  "logo": "augment-code.png"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Tiger Data",
+  "url": "https://tigerdata.com",
+  "category": "databases",
+  "description": "面向时序数据与 AI 工作负载的 Postgres 数据库。",
+  "open_source": true,
+  "repo": "https://github.com/timescale/pgai",
+  "logo": "tiger-data.png"
+}

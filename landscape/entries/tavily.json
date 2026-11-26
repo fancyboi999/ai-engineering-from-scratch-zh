@@ -1,0 +1,9 @@
+{
+  "name": "Tavily",
+  "url": "https://tavily.com/",
+  "category": "search",
+  "description": "专为 AI agent 设计的搜索与网页内容提取 API。",
+  "open_source": false,
+  "x": "tavilyai",
+  "logo": "tavily.png"
+}

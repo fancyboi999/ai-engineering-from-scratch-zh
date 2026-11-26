@@ -1,0 +1,8 @@
+{
+  "name": "Omnara",
+  "url": "https://omnara.com",
+  "category": "orchestrators",
+  "description": "支持网页端与移动端的编程 agent 控制中心。",
+  "open_source": false,
+  "logo": "omnara.png"
+}

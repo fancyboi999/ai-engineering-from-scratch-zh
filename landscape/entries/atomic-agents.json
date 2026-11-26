@@ -1,0 +1,9 @@
+{
+  "name": "Atomic Agents",
+  "url": "https://github.com/BrainBlend-AI/atomic-agents",
+  "category": "agents",
+  "description": "用于构建 agent 的模块化框架。",
+  "open_source": true,
+  "repo": "https://github.com/BrainBlend-AI/atomic-agents",
+  "logo": "atomic-agents.png"
+}

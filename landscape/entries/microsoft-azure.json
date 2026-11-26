@@ -1,0 +1,8 @@
+{
+  "name": "Microsoft Azure",
+  "url": "https://azure.microsoft.com",
+  "category": "hosting",
+  "description": "提供计算、数据与 AI 服务的云平台。",
+  "open_source": false,
+  "logo": "microsoft-azure.png"
+}

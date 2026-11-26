@@ -1,0 +1,8 @@
+{
+  "name": "Runloop",
+  "url": "https://runloop.ai",
+  "category": "sandboxes",
+  "description": "面向编程 agent 的开发沙箱环境。",
+  "open_source": false,
+  "logo": "runloop.png"
+}

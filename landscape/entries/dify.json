@@ -1,0 +1,9 @@
+{
+  "name": "Dify",
+  "url": "https://dify.ai",
+  "category": "agent-platforms",
+  "description": "用于构建 agent 与工作流应用的平台。",
+  "open_source": true,
+  "repo": "https://github.com/langgenius/dify",
+  "logo": "dify.png"
+}

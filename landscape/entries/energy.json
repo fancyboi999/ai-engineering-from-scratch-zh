@@ -1,0 +1,9 @@
+{
+  "name": "Energy",
+  "url": "https://getenergy.com/",
+  "category": "work-assistants",
+  "description": "由 AI 跨应用执行任务的桌面工作区。",
+  "open_source": false,
+  "x": "GetEnergy_",
+  "logo": "energy.png"
+}

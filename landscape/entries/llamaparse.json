@@ -1,0 +1,8 @@
+{
+  "name": "LlamaParse",
+  "url": "https://llamaindex.ai/llamaparse",
+  "category": "docs",
+  "description": "面向复杂文件的文档解析服务。",
+  "open_source": false,
+  "logo": "llamaparse.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "LMNT",
+  "url": "https://lmnt.com",
+  "category": "voice-apis",
+  "description": "低延迟文本转语音 API。",
+  "open_source": false,
+  "logo": "lmnt.png"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Featherless",
+  "url": "https://featherless.ai",
+  "category": "inference-providers",
+  "description": "支持大量开源模型目录的无服务器推理平台。",
+  "open_source": false,
+  "logo": "featherless.png"
+}

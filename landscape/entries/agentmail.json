@@ -1,0 +1,9 @@
+{
+  "name": "AgentMail",
+  "url": "https://www.agentmail.to/",
+  "category": "messaging",
+  "description": "面向 AI agent 的电子邮箱 API。",
+  "open_source": false,
+  "x": "agentmail",
+  "logo": "agentmail.png"
+}

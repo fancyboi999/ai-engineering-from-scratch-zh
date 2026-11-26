@@ -1,0 +1,9 @@
+{
+  "name": "Meta Llama",
+  "url": "https://llama.com",
+  "category": "models",
+  "description": "Meta 发布的开放权重 Llama 系列模型。",
+  "open_source": true,
+  "repo": "https://github.com/meta-llama/llama-models",
+  "logo": "meta-llama.png"
+}

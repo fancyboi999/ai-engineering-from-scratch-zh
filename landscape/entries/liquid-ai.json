@@ -1,0 +1,8 @@
+{
+  "name": "Liquid AI",
+  "url": "https://liquid.ai",
+  "category": "models",
+  "description": "面向端侧运行设计的小型基础模型。",
+  "open_source": false,
+  "logo": "liquid-ai.png"
+}

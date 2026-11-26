@@ -1,0 +1,9 @@
+{
+  "name": "Tasklet",
+  "url": "https://tasklet.ai/",
+  "category": "work-assistants",
+  "description": "用于执行业务工作流的 agent。",
+  "open_source": false,
+  "x": "taskletai",
+  "logo": "tasklet.png"
+}

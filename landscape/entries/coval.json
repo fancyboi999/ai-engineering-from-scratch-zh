@@ -1,0 +1,8 @@
+{
+  "name": "Coval",
+  "url": "https://coval.dev",
+  "category": "voice-platforms",
+  "description": "面向语音与对话 agent 的仿真和评测平台。",
+  "open_source": false,
+  "logo": "coval.png"
+}

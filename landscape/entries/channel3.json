@@ -1,0 +1,9 @@
+{
+  "name": "Channel3",
+  "url": "https://www.trychannel3.com/",
+  "category": "commerce",
+  "description": "商品知识图谱，支持 agent 进行商品搜索、推荐与购买。",
+  "open_source": false,
+  "x": "channel3_ai",
+  "logo": "channel3.png"
+}

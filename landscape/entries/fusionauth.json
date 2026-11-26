@@ -1,0 +1,8 @@
+{
+  "name": "FusionAuth",
+  "url": "https://fusionauth.io",
+  "category": "identity",
+  "description": "面向开发者的用户身份认证平台。",
+  "open_source": false,
+  "logo": "fusionauth.png"
+}
