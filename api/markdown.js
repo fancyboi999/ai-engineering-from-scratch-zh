@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SITE_ROOT = path.join(__dirname, '..', 'site');
-const { PAGES: HTML_BY_PATH } = require('../lib/agent-content');
+const { PAGES: HTML_BY_PATH } = require('../lib/agent-pages');
 
 const { representation } = require('../lib/agent-http');
 

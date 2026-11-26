@@ -10,7 +10,8 @@ const { globSync } = createRequire(require.resolve('@vercel/nft'))('glob');
 
 const ROOT = path.join(__dirname, '..');
 const config = require('../vercel.json');
-const budgets = { certification: 5, lesson: 30, markdown: 25, og: 10 };
+const { PAGES } = require('../lib/agent-pages');
+const budgets = { certification: 5, lesson: 30, markdown: 15, 'v1/markdown': 15, og: 10 };
 
 test('deployment routing compiles with the Vercel platform parser', () => {
   const transformed = getTransformedRoutes(config);
@@ -93,18 +94,26 @@ async function smoke(name, root) {
         }
       }
     }
-  } else if (name === 'markdown') {
+  } else if (name === 'markdown' || name === 'v1/markdown') {
+    for (const targetPath of Object.keys(PAGES)) {
+      for (const [accept, expectedType] of [['text/html', /^text\/html/], ['text/markdown', /^text\/markdown/]]) {
+        const response = await invoke(handler, `/api/${name}?path=${encodeURIComponent(targetPath)}`, { accept });
+        assert.equal(response.statusCode, 200, `${targetPath} (${accept})`);
+        assert.match(response.headers['content-type'], expectedType);
+        assert.ok(response.body.length > 0);
+      }
+    }
     for (const [targetPath, accept, expectedType] of [
-      ['/', 'text/html', /^text\/html/],
-      ['/', 'text/markdown', /^text\/markdown/],
+      ['/phase/setup-and-tooling', 'text/html', /^text\/html/],
       ['/phase/setup-and-tooling', 'text/markdown', /^text\/markdown/],
+      ['/glossary/activation-checkpointing', 'text/markdown', /^text\/markdown/],
     ]) {
-      const response = await invoke(handler, `/api/markdown?path=${encodeURIComponent(targetPath)}`, { accept });
+      const response = await invoke(handler, `/api/${name}?path=${encodeURIComponent(targetPath)}`, { accept });
       assert.equal(response.statusCode, 200, `${targetPath} (${accept})`);
       assert.match(response.headers['content-type'], expectedType);
       assert.ok(response.body.length > 0);
     }
-    const missing = await invoke(handler, '/api/markdown?path=/not-a-page', { accept: 'text/html' });
+    const missing = await invoke(handler, `/api/${name}?path=/not-a-page`, { accept: 'text/html' });
     assert.equal(missing.statusCode, 404);
   } else {
     const lesson = Object.keys(manifest(root, 'lesson-seo').lessons)[0];
@@ -131,13 +140,16 @@ for (const [name, megabytes] of Object.entries(budgets)) {
       ignore: ['.git', '.git/**', '.vercel/**', ...(fnConfig.excludeFiles ? [fnConfig.excludeFiles] : [])],
     });
     const excluded = new Set(fnConfig.excludeFiles ? globSync(fnConfig.excludeFiles, { cwd: ROOT, nodir: true }) : []);
-    const files = new Set([...trace.fileList, ...(fnConfig.includeFiles ? globSync(fnConfig.includeFiles, { cwd: ROOT, nodir: true }) : [])].filter(file => !excluded.has(file)));
+    // 与 Vercel @vercel/node 真实打包口径一致：excludeFiles 只过滤动态追踪结果，includeFiles 显式并入且不受 excludeFiles 裁掉。
+    const traced = [...trace.fileList].filter(file => !excluded.has(file));
+    const included = fnConfig.includeFiles ? globSync(fnConfig.includeFiles, { cwd: ROOT, nodir: true }) : [];
+    const files = new Set([...traced, ...included]);
     const unexpected = [...files].filter(file => sourceOnly.some(pattern => pattern.test(file)));
     assert.equal(unexpected.length, 0, `source files leaked into ${entry}: ${unexpected.slice(0, 10).join(', ')}`);
     const bytes = [...files].reduce((total, file) => total + fs.statSync(path.join(ROOT, file)).size, 0);
     assert.ok(bytes < megabytes * 1024 * 1024, `${entry} is ${(bytes / 1024 / 1024).toFixed(2)} MiB, budget ${megabytes} MiB`);
     t.diagnostic(`${files.size} files, ${(bytes / 1024 / 1024).toFixed(2)} MiB`);
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), `aiefs-${name}-bundle-`));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), `aiefs-${name.replace(/\//g, '-')}-bundle-`));
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
     for (const file of files) {
       const destination = path.join(root, file);
